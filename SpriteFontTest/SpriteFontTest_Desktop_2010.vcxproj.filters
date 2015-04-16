@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="SpriteFontTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BuildTestFonts.bat" />
+    <None Include="comic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="italic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="japanese.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="multicolored.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="nonproportional.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="script.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="xboxController.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="consolas.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{55d102b3-992b-4377-ab2c-036a8da93bcc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

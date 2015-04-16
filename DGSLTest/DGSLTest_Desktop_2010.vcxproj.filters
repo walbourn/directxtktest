@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="DGSLTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{65612dc9-1ea1-49d8-aba6-58239be2b671}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cup._obj">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="cup.jpg">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="cup.mtl">
+      <Filter>Assets</Filter>
+    </None>
+  </ItemGroup>
+</Project>
