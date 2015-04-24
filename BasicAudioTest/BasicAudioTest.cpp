@@ -1286,7 +1286,7 @@ int __cdecl main()
         dump_stats( audEngine.get() );
     }
 
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
 
     { // xWMA .WAV
         std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"musicmono_xwma.wav" ) );
@@ -1331,7 +1331,7 @@ int __cdecl main()
         dump_stats( audEngine.get() );
     }
 
-#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8 || _WIN32_WINNT >= _WIN32_WINNT_WIN10
 
     // SoundEffect One-shots
     { // PCM .WAV one-shots
@@ -1641,7 +1641,7 @@ int __cdecl main()
         dump_stats( audEngine.get() );
     }
 
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
 
     { // xWMA .WAV one-shots
         std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01_xwma.wav" ) );
@@ -1689,7 +1689,7 @@ int __cdecl main()
         dump_stats( audEngine.get() );
     }
 
-#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8 || _WIN32_WINNT >= _WIN32_WINNT_WIN10
 
 #endif // TEST_SOUNDEFFECT
 
@@ -2153,7 +2153,7 @@ int __cdecl main()
         }
     }
 
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
 
     { // xWMV WaveBank
         std::unique_ptr<WaveBank> wb( new WaveBank( audEngine.get(), L"xwmadroid.xwb" ) );
@@ -2250,7 +2250,7 @@ int __cdecl main()
         }
     }
 
-#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8 || _WIN32_WINNT >= _WIN32_WINNT_WIN10
 
 #endif // TEST_WAVEBANK
 
