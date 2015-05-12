@@ -29,6 +29,11 @@
 #include <wincodec.h>
 #pragma warning(pop)
 
+#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
+#include <wrl.h>
+#pragma comment(lib,"RuntimeObject.lib")
+#endif
+
 using namespace DirectX;
 
 std::unique_ptr<SpriteBatch> g_spriteBatch;
@@ -71,6 +76,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCmdShow )
 {
     HRESULT hr;
+
+#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
+    Microsoft::WRL::Wrappers::RoInitializeWrapper initialize(RO_INIT_MULTITHREADED);
+    if (FAILED(initialize))
+        return 1;
+#endif
 
     wchar_t *const className = L"TestWindowClass";
 
