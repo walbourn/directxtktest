@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_Desktop_2015", "..\DirectXTK_Desktop_2015.vcxproj", "{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}"
 EndProject
@@ -63,6 +63,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DynamicAudioTest_Desktop_20
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GamePadTest_Desktop_2015", "GamePadTest\GamePadTest_Desktop_2015.vcxproj", "{C526C2CB-1E62-4ABD-AAD1-05B52BEDDA6C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnimTest_Desktop_2015", "AnimTest\AnimTest_Desktop_2015.vcxproj", "{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3D11Test_Desktop_2015", "D3D11Test\D3D11Test_Desktop_2015.vcxproj", "{BAD524A1-A164-4B82-83C7-A38E2601E6A5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
 	EndProjectSection
@@ -261,6 +271,30 @@ Global
 		{C526C2CB-1E62-4ABD-AAD1-05B52BEDDA6C}.Release|Win32.Build.0 = Release|Win32
 		{C526C2CB-1E62-4ABD-AAD1-05B52BEDDA6C}.Release|x64.ActiveCfg = Release|x64
 		{C526C2CB-1E62-4ABD-AAD1-05B52BEDDA6C}.Release|x64.Build.0 = Release|x64
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Debug|Win32.Build.0 = Debug|Win32
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Debug|x64.ActiveCfg = Debug|x64
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Debug|x64.Build.0 = Debug|x64
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Release|Win32.ActiveCfg = Release|Win32
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Release|Win32.Build.0 = Release|Win32
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Release|x64.ActiveCfg = Release|x64
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}.Release|x64.Build.0 = Release|x64
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Debug|Win32.Build.0 = Debug|Win32
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Debug|x64.ActiveCfg = Debug|x64
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Debug|x64.Build.0 = Debug|x64
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Release|Win32.ActiveCfg = Release|Win32
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Release|Win32.Build.0 = Release|Win32
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Release|x64.ActiveCfg = Release|x64
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -278,5 +312,7 @@ Global
 		{C81EFCF2-0DD3-4BF6-BB74-B2CC876CFA4B} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{C0702EBA-C4C6-4530-9AE3-8D74BF7D7644} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{C526C2CB-1E62-4ABD-AAD1-05B52BEDDA6C} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
+		{68B6C0D1-60A6-45B9-AD0B-86FB10407A53} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
+		{BAD524A1-A164-4B82-83C7-A38E2601E6A5} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 	EndGlobalSection
 EndGlobal
