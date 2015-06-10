@@ -259,6 +259,10 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             lastStr = L"RightCtrl was pressed";
         else if (tracker.released.RightControl)
             lastStr = L"RightCtrl was released";
+        else if (tracker.pressed.Space)
+            lastStr = L"Space was pressed";
+        else if (tracker.released.Space)
+            lastStr = L"Space was released";
 
         for (int vk = VK_F1; vk <= VK_F10; ++vk)
         {
@@ -385,6 +389,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         pos.x += width * 10;
 
         comic.DrawString(g_spriteBatch.get(), L"RightAlt", pos, kb.RightAlt ? Colors::Red : Colors::White);
+
+       // Row 6
+        pos.x = 50;
+        pos.y += height * 2;
+
+        comic.DrawString(g_spriteBatch.get(), L"Space", pos, kb.Space ? Colors::Red : Colors::White);
 
         if ( lastStr )
         {
