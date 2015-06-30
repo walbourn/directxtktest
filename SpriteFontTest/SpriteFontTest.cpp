@@ -18,6 +18,9 @@
 #include "DirectXColors.h"
 #include "ScreenGrab.h"
 
+#include <wrl/client.h>
+using Microsoft::WRL::ComPtr;
+
 using namespace DirectX;
 
 std::unique_ptr<SpriteBatch> g_spriteBatch;
@@ -98,12 +101,13 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     RECT client;
     GetClientRect(hwnd, &client);
 
-    ID3D11Device* device;
-    ID3D11DeviceContext* context;
-    IDXGISwapChain* swapChain;
-    ID3D11Texture2D* backBufferTexture;
-    ID3D11RenderTargetView* backBuffer;
-    ID3D11RasterizerState* scissorState;
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
+    ComPtr<IDXGISwapChain> swapChain;
+    ComPtr<ID3D11Texture2D> backBufferTexture;
+    ComPtr<ID3D11RenderTargetView> backBuffer;
+    ComPtr<ID3D11RasterizerState> scissorState;
+
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 
@@ -131,21 +135,68 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
 
-    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture, &renderTargetViewDesc, &backBuffer)))
+    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
-    g_spriteBatch.reset( new SpriteBatch(context) );
+    g_spriteBatch.reset( new SpriteBatch(context.Get()) );
 
-    SpriteFont comicFont(device, L"comic.spritefont");
-    SpriteFont italicFont(device, L"italic.spritefont");
-    SpriteFont scriptFont(device, L"script.spritefont");
-    SpriteFont nonproportionalFont(device, L"nonproportional.spritefont");
-    SpriteFont multicoloredFont(device, L"multicolored.spritefont");
-    SpriteFont japaneseFont(device, L"japanese.spritefont");
-    SpriteFont ctrlFont(device, L"xboxController.spritefont");
-    SpriteFont consolasFont(device, L"consolas.spritefont");
+    SpriteFont comicFont(device.Get(), L"comic.spritefont");
+    SpriteFont italicFont(device.Get(), L"italic.spritefont");
+    SpriteFont scriptFont(device.Get(), L"script.spritefont");
+    SpriteFont nonproportionalFont(device.Get(), L"nonproportional.spritefont");
+    SpriteFont multicoloredFont(device.Get(), L"multicolored.spritefont");
+    SpriteFont japaneseFont(device.Get(), L"japanese.spritefont");
+    SpriteFont ctrlFont(device.Get(), L"xboxController.spritefont");
+    SpriteFont consolasFont(device.Get(), L"consolas.spritefont");
 
+    if ( comicFont.GetDefaultCharacter() != 0 )
+    {
+        MessageBox( hwnd, L"GetDefaultCharacter failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
+    }
+
+    // ContainsCharacter tests
+    if ( comicFont.ContainsCharacter( 27 ) 
+         || !comicFont.ContainsCharacter( '-' ) )
+    {
+        MessageBox( hwnd, L"ContainsCharacter failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
+    }
+
+    // FindGlyph/GetSpriteSheet tests
+    {
+        auto g = comicFont.FindGlyph( '-' );
+        if ( g->Character != '-' || g->XOffset != 6 || g->YOffset != 24 )
+        {
+            MessageBox( hwnd, L"FindGlyph failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
+        }
+
+        ComPtr<ID3D11ShaderResourceView> sheet;
+        comicFont.GetSpriteSheet( sheet.GetAddressOf() );
+        if ( !sheet )
+        {
+            MessageBox( hwnd, L"GetSpriteSheet failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
+        }
+    }
+
+    // DefaultCharacter tests
     comicFont.SetDefaultCharacter('-');
+    if ( comicFont.GetDefaultCharacter() != '-' )
+    {
+        MessageBox( hwnd, L"Get/SetDefaultCharacter failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
+    }
+
+    // Linespacing tests
+    float s=ctrlFont.GetLineSpacing();
+    if ( s != 186.f )
+    {
+        MessageBox( hwnd, L"GetLineSpacing failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
+    }
+    ctrlFont.SetLineSpacing(256.f);
+    s=ctrlFont.GetLineSpacing();
+    if ( s != 256.f )
+    {
+        MessageBox( hwnd, L"Get/SetLineSpacing failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
+    }
+    ctrlFont.SetLineSpacing(186.f);
 
     bool quit = false;
 
@@ -153,7 +204,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     context->RSSetViewports(1, &vp);
 
-    context->OMSetRenderTargets(1, &backBuffer, NULL);
+    context->OMSetRenderTargets(1, backBuffer.GetAddressOf(), NULL);
 
     CD3D11_RASTERIZER_DESC rsDesc(D3D11_FILL_SOLID, D3D11_CULL_BACK, FALSE, 0, 0.f, 0.f, TRUE, TRUE, TRUE, FALSE);
     if (FAILED(device->CreateRasterizerState(&rsDesc, &scissorState)))
@@ -185,7 +236,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         float time = 60 * (float)(counter.QuadPart - start.QuadPart) / (float)freq.QuadPart;
 
-        context->ClearRenderTargetView(backBuffer, Colors::CornflowerBlue);
+        context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
 
         g_spriteBatch->Begin();
 
@@ -275,7 +326,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         g_spriteBatch->End();
 
-        g_spriteBatch->Begin(SpriteSortMode_Deferred, nullptr, nullptr, nullptr, scissorState, [&]()
+        g_spriteBatch->Begin(SpriteSortMode_Deferred, nullptr, nullptr, nullptr, scissorState.Get(), [&]()
         {
             CD3D11_RECT r(640, 20, 740, 38);
             context->RSSetScissorRects(1, &r);
@@ -290,25 +341,17 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         if ( frame == 10 )
         {
-            ID3D11Texture2D* backBufferTex = nullptr;
+            ComPtr<ID3D11Texture2D> backBufferTex;
             hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTex);
             if ( SUCCEEDED(hr) )
             {
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
-                hr = SaveDDSTextureToFile( context, backBufferTex, L"SCREENSHOT.DDS" );
-                backBufferTex->Release();
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
+                hr = SaveDDSTextureToFile( context.Get(), backBufferTex.Get(), L"SCREENSHOT.DDS" );
             }
         }
     }
 
     g_spriteBatch.reset();
-
-    scissorState->Release();
-    backBuffer->Release();
-    backBufferTexture->Release();
-    swapChain->Release();
-    context->Release();
-    device->Release();
 
     return 0;
 }
