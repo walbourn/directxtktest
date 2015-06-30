@@ -137,6 +137,27 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     g_keyboard.reset(new Keyboard);
 
+    // Singleton test
+    {
+        bool thrown = false;
+
+        try
+        {
+            std::unique_ptr<Keyboard> kb2(new Keyboard);
+        }
+        catch (...)
+        {
+            thrown = true;
+        }
+
+        if (!thrown)
+        {
+            MessageBox(hwnd, L"Keyboard not acting like a singleton", 0, 0);
+        }
+
+        auto state = Keyboard::Get().GetState();
+    }
+
     bool quit = false;
 
     D3D11_VIEWPORT vp = { 0, 0, (float)client.right, (float)client.bottom, 0, 1 };

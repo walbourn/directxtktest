@@ -143,6 +143,27 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     g_mouse.reset( new Mouse );
 
+    // Singleton test
+    {
+        bool thrown = false;
+
+        try
+        {
+            std::unique_ptr<Mouse> mouse2(new Mouse);
+        }
+        catch (...)
+        {
+            thrown = true;
+        }
+
+        if (!thrown)
+        {
+            MessageBox(hwnd, L"Mouse not acting like a singleton", 0, 0);
+        }
+
+        auto state = Mouse::Get().GetState();
+    }
+
     bool quit = false;
 
     D3D11_VIEWPORT vp = { 0, 0, (float)client.right, (float)client.bottom, 0, 1 };
