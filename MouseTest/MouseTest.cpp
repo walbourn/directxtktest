@@ -13,7 +13,10 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
 
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+
 #include <windows.h>
 #include "Mouse.h"
 #include "CommonStates.h"
@@ -183,7 +186,6 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     Mouse::ButtonStateTracker tracker;
 
     const wchar_t * lastStr = nullptr;
-    wchar_t lastStrBuff[128] = { 0 };
     while (!quit)
     {
         MSG msg;
