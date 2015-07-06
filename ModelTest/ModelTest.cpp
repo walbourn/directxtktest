@@ -190,6 +190,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     auto tiny = Model::CreateFromSDKMESH( device, L"tiny.sdkmesh", fx, !ccw );
     auto soldier = Model::CreateFromSDKMESH( device, L"soldier.sdkmesh", fx, !ccw );
     auto dwarf = Model::CreateFromSDKMESH( device, L"dwarf.sdkmesh", fx, !ccw );
+    auto lmap = Model::CreateFromSDKMESH( device, L"SimpleLightMap.sdkmesh", fx, !ccw );
 
     bool quit = false;
 
@@ -381,6 +382,10 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         local = XMMatrixTranslation(-2.5f, row2, 0.f );
         local = XMMatrixMultiply( world, local );
         dwarf->Draw( context, states, local, view, projection );
+
+        local = XMMatrixMultiply( XMMatrixScaling( 0.01f, 0.01f, 0.01f ), XMMatrixTranslation( -5.0f, row2, 0.f ) );
+        local = XMMatrixMultiply( XMMatrixRotationRollPitchYaw(0, XM_PI, roll), local );
+        lmap->Draw( context, states, local, view, projection );
 
         soldier->UpdateEffects([&](IEffect* effect)
         {
