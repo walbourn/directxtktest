@@ -150,8 +150,6 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     // Singleton test
     {
-
-#if _MSC_VER < 1900
         bool thrown = false;
 
         try
@@ -167,7 +165,6 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         {
             MessageBox(hwnd, L"GamePad not acting like a singleton", 0, 0);
         }
-#endif
 
         auto state = GamePad::Get().GetState(0);
     }
