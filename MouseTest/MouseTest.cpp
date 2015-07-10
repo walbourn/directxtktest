@@ -165,6 +165,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         }
 
         auto state = Mouse::Get().GetState();
+        state;
     }
 
     bool quit = false;
@@ -231,7 +232,6 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         XMVECTOR xsize = comic.MeasureString( L"X" );
 
-        float width = XMVectorGetX(xsize);
         float height = XMVectorGetY(xsize);
 
         g_spriteBatch->Begin();

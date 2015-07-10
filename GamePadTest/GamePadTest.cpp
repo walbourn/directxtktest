@@ -167,6 +167,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         }
 
         auto state = GamePad::Get().GetState(0);
+        state;
     }
 
     ID3D11ShaderResourceView* defaultTex = nullptr;

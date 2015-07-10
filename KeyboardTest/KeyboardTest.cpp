@@ -159,6 +159,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         }
 
         auto state = Keyboard::Get().GetState();
+        state;
     }
 
     bool quit = false;
