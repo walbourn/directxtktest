@@ -28,6 +28,7 @@
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
+using Microsoft::WRL::ComPtr;
 
 // Build for LH vs. RH coords
 #define LH_COORDS
@@ -67,25 +68,18 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = hInstance;
     wndClass.lpszClassName = className;
-    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
     RegisterClassEx(&wndClass);
 
-    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, NULL, NULL, hInstance, NULL);
+    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+                               CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
     RECT client;
     GetClientRect(hwnd, &client);
-
-    ID3D11Device* device;
-    ID3D11DeviceContext* context;
-    IDXGISwapChain* swapChain;
-    ID3D11Texture2D* backBufferTexture;
-    ID3D11RenderTargetView* backBuffer;
-    ID3D11Texture2D* depthStencilTexture;
-    ID3D11DepthStencilView* depthStencil;
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 
@@ -105,15 +99,21 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, d3dFlags, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, NULL, &context)))
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
+    ComPtr<IDXGISwapChain> swapChain;
+    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
+                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
         return 1;
 
+    ComPtr<ID3D11Texture2D> backBufferTexture;
     if (FAILED(hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture)))
         return 1;
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
 
-    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture, &renderTargetViewDesc, &backBuffer)))
+    ComPtr<ID3D11RenderTargetView> backBuffer;
+    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
     D3D11_TEXTURE2D_DESC depthStencilDesc = { 0 };
@@ -127,7 +127,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     depthStencilDesc.MipLevels = 1;
     depthStencilDesc.ArraySize = 1;
 
-    if (FAILED(device->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilTexture)))
+    ComPtr<ID3D11Texture2D> depthStencilTexture;
+    if (FAILED(device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilTexture)))
         return 1;
 
     D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
@@ -136,20 +137,21 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
-    if (FAILED(device->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDesc, &depthStencil)))
+    ComPtr<ID3D11DepthStencilView> depthStencil;
+    if (FAILED(device->CreateDepthStencilView(depthStencilTexture.Get(), &depthStencilViewDesc, &depthStencil)))
         return 1;
 
-    CommonStates states(device);
+    CommonStates states(device.Get());
 
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> defaultTex;
-    if (FAILED(CreateDDSTextureFromFile(device, L"default.dds", nullptr, defaultTex.GetAddressOf())))
-        MessageBox(hwnd, L"Error loading default.dds", 0, 0);
+    ComPtr<ID3D11ShaderResourceView> defaultTex;
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"default.dds", nullptr, defaultTex.GetAddressOf())))
+        MessageBox(hwnd, L"Error loading default.dds", L"ModelTest", MB_ICONERROR);
 
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cubeMap;
-    if (FAILED(CreateDDSTextureFromFile(device, L"cubemap.dds", nullptr, cubeMap.GetAddressOf())))
-        MessageBox(hwnd, L"Error loading cubemap.dds", 0, 0);
+    ComPtr<ID3D11ShaderResourceView> cubeMap;
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"cubemap.dds", nullptr, cubeMap.GetAddressOf())))
+        MessageBox(hwnd, L"Error loading cubemap.dds", L"ModelTest", MB_ICONERROR);
 
-    EffectFactory fx(device);
+    EffectFactory fx(device.Get());
 
 #ifdef LH_COORDS
     bool ccw = false;
@@ -167,30 +169,30 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     }
 
     // Wavefront OBJ
-    auto cup = CreateModelFromOBJ( device, context, L"cup._obj", fx, !ccw );
+    auto cup = CreateModelFromOBJ( device.Get(), context.Get(), L"cup._obj", fx, !ccw );
 
     // VBO
-    auto vbo = Model::CreateFromVBO(device, L"player_ship_a.vbo", nullptr, !ccw);
+    auto vbo = Model::CreateFromVBO(device.Get(), L"player_ship_a.vbo", nullptr, !ccw);
 
-    auto effect = std::make_shared<EnvironmentMapEffect>(device);
+    auto effect = std::make_shared<EnvironmentMapEffect>(device.Get());
     effect->EnableDefaultLighting();
     effect->SetTexture(defaultTex.Get());
     effect->SetEnvironmentMap(cubeMap.Get());
 
-    auto vbo2 = Model::CreateFromVBO(device, L"player_ship_a.vbo", effect, !ccw);
+    auto vbo2 = Model::CreateFromVBO(device.Get(), L"player_ship_a.vbo", effect, !ccw);
 
     // VS 2012 CMO
-    auto teapot = Model::CreateFromCMO( device, L"teapot.cmo", fx, ccw );
+    auto teapot = Model::CreateFromCMO( device.Get(), L"teapot.cmo", fx, ccw );
 
-    auto gamelevel = Model::CreateFromCMO( device, L"gamelevel.cmo", fx, ccw );
+    auto gamelevel = Model::CreateFromCMO( device.Get(), L"gamelevel.cmo", fx, ccw );
 
-    auto ship = Model::CreateFromCMO( device, L"25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo", fx, ccw );
+    auto ship = Model::CreateFromCMO( device.Get(), L"25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo", fx, ccw );
 
     // DirectX SDK Mesh
-    auto tiny = Model::CreateFromSDKMESH( device, L"tiny.sdkmesh", fx, !ccw );
-    auto soldier = Model::CreateFromSDKMESH( device, L"soldier.sdkmesh", fx, !ccw );
-    auto dwarf = Model::CreateFromSDKMESH( device, L"dwarf.sdkmesh", fx, !ccw );
-    auto lmap = Model::CreateFromSDKMESH( device, L"SimpleLightMap.sdkmesh", fx, !ccw );
+    auto tiny = Model::CreateFromSDKMESH( device.Get(), L"tiny.sdkmesh", fx, !ccw );
+    auto soldier = Model::CreateFromSDKMESH( device.Get(), L"soldier.sdkmesh", fx, !ccw );
+    auto dwarf = Model::CreateFromSDKMESH( device.Get(), L"dwarf.sdkmesh", fx, !ccw );
+    auto lmap = Model::CreateFromSDKMESH( device.Get(), L"SimpleLightMap.sdkmesh", fx, !ccw );
 
     bool quit = false;
 
@@ -198,7 +200,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     context->RSSetViewports(1, &vp);
 
-    context->OMSetRenderTargets(1, &backBuffer, depthStencil);
+    context->OMSetRenderTargets(1, backBuffer.GetAddressOf(), depthStencil.Get());
 
     LARGE_INTEGER freq;
     QueryPerformanceFrequency(&freq);
@@ -215,7 +217,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     {
         MSG msg;
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
                 quit = true;
@@ -229,8 +231,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         
         float time = (float)(counter.QuadPart - start.QuadPart) / (float)freq.QuadPart;
 
-        context->ClearRenderTargetView(backBuffer, Colors::CornflowerBlue);
-        context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+        context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
+        context->ClearDepthStencilView(depthStencil.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
         // Compute camera matrices.
         float alphaFade = (sin(time * 2) + 1) / 2;
@@ -264,17 +266,17 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         // Draw Wavefront OBJ models
         XMMATRIX local = XMMatrixTranslation( 1.5f, row0, 0.f );
         local = XMMatrixMultiply( world, local );
-        cup->Draw( context, states, local, view, projection );
+        cup->Draw( context.Get(), states, local, view, projection );
 
             // Wireframe
         local = XMMatrixTranslation( 3.f, row0, 0.f );
         local = XMMatrixMultiply( world, local );
-        cup->Draw( context, states, local, view, projection, true );
+        cup->Draw( context.Get(), states, local, view, projection, true );
 
             // Custom settings
         local = XMMatrixTranslation( 0.f, row0, 0.f );
         local = XMMatrixMultiply( world, local );
-        cup->Draw( context, states, local, view, projection, false, [&]()
+        cup->Draw( context.Get(), states, local, view, projection, false, [&]()
         {
             ID3D11ShaderResourceView* srv = nullptr;
             context->PSSetShaderResources( 0, 1, &srv );
@@ -291,7 +293,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             }
         });
         local = XMMatrixTranslation( -1.5f, row0, 0.f );
-        cup->Draw( context, states, local, view, projection );
+        cup->Draw( context.Get(), states, local, view, projection );
 
             // Fog settings
         cup->UpdateEffects([&](IEffect* effect)
@@ -317,7 +319,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             }
         });
         local = XMMatrixTranslation( -3.f, row0, cos(time) * 2.f );
-        cup->Draw( context, states, local, view, projection );
+        cup->Draw( context.Get(), states, local, view, projection );
 
         cup->UpdateEffects([&](IEffect* effect)
         {
@@ -329,11 +331,11 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         // Draw VBO models
         local = XMMatrixMultiply(XMMatrixScaling(0.25f, 0.25f, 0.25f), XMMatrixTranslation(4.5f, row0, 0.f));
         local = XMMatrixMultiply(world, local);
-        vbo->Draw(context, states, local, view, projection);
+        vbo->Draw(context.Get(), states, local, view, projection);
 
         local = XMMatrixMultiply(XMMatrixScaling(0.25f, 0.25f, 0.25f), XMMatrixTranslation(4.5f, row2, 0.f));
         local = XMMatrixMultiply(world, local);
-        vbo2->Draw(context, states, local, view, projection);
+        vbo2->Draw(context.Get(), states, local, view, projection);
 
         // Skinning settings
         float s = 1 + sin(time * 1.7f) * 0.5f;
@@ -354,7 +356,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         });
         local = XMMatrixMultiply( XMMatrixScaling( 0.01f, 0.01f, 0.01f ), XMMatrixTranslation( -2.f, row1, 0.f ) );
         local = XMMatrixMultiply( world, local );
-        teapot->Draw( context, states, local, view, projection );
+        teapot->Draw( context.Get(), states, local, view, projection );
 
         teapot->UpdateEffects([&](IEffect* effect)
         {
@@ -364,28 +366,28 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         });
         local = XMMatrixMultiply( XMMatrixScaling( 0.01f, 0.01f, 0.01f ), XMMatrixTranslation( -3.5f, row1, 0.f ) );
         local = XMMatrixMultiply( world, local );
-        teapot->Draw( context, states, local, view, projection );
+        teapot->Draw( context.Get(), states, local, view, projection );
 
         local = XMMatrixMultiply( XMMatrixScaling( 0.1f, 0.1f, 0.1f ), XMMatrixTranslation( 0.f, row1, 0.f ) );
         local = XMMatrixMultiply( world, local );
-        gamelevel->Draw( context, states, local, view, projection );
+        gamelevel->Draw( context.Get(), states, local, view, projection );
 
         local = XMMatrixMultiply( XMMatrixScaling( .2f, .2f, .2f ), XMMatrixTranslation( 0.f, row2, 0.f ) );
         local = XMMatrixMultiply( world, local );
-        ship->Draw( context, states, local, view, projection );
+        ship->Draw( context.Get(), states, local, view, projection );
 
         // Draw SDKMESH models
         local = XMMatrixMultiply( XMMatrixScaling( 0.005f, 0.005f, 0.005f ), XMMatrixTranslation( 2.5f, row2, 0.f ) );
         local = XMMatrixMultiply( world, local );
-        tiny->Draw( context, states, local, view, projection );
+        tiny->Draw( context.Get(), states, local, view, projection );
 
         local = XMMatrixTranslation(-2.5f, row2, 0.f );
         local = XMMatrixMultiply( world, local );
-        dwarf->Draw( context, states, local, view, projection );
+        dwarf->Draw( context.Get(), states, local, view, projection );
 
         local = XMMatrixMultiply( XMMatrixScaling( 0.01f, 0.01f, 0.01f ), XMMatrixTranslation( -5.0f, row2, 0.f ) );
         local = XMMatrixMultiply( XMMatrixRotationRollPitchYaw(0, XM_PI, roll), local );
-        lmap->Draw( context, states, local, view, projection );
+        lmap->Draw( context.Get(), states, local, view, projection );
 
         soldier->UpdateEffects([&](IEffect* effect)
         {
@@ -395,7 +397,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         });
         local = XMMatrixMultiply( XMMatrixScaling( 2.f, 2.f, 2.f ), XMMatrixTranslation( 3.5f, row1, 0.f ) );
         local = XMMatrixMultiply( world, local );
-        soldier->Draw( context, states, local, view, projection );
+        soldier->Draw( context.Get(), states, local, view, projection );
 
         soldier->UpdateEffects([&](IEffect* effect)
         {
@@ -404,20 +406,19 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                 skinnedEffect->SetBoneTransforms(bones.get(), SkinnedEffect::MaxBones);
         });
         local = XMMatrixMultiply( XMMatrixScaling( 2.f, 2.f, 2.f ), XMMatrixTranslation( 2.5f, row1, 0.f ) );
-        soldier->Draw( context, states, local, view, projection );
+        soldier->Draw( context.Get(), states, local, view, projection );
 
         swapChain->Present(1, 0);
         ++frame;
 
         if ( frame == 10 )
         {
-            ID3D11Texture2D* backBufferTex = nullptr;
+            ComPtr<ID3D11Texture2D> backBufferTex;
             hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTex);
             if ( SUCCEEDED(hr) )
             {
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
-                hr = SaveDDSTextureToFile( context, backBufferTex, L"SCREENSHOT.DDS" );
-                backBufferTex->Release();
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
+                hr = SaveDDSTextureToFile( context.Get(), backBufferTex.Get(), L"SCREENSHOT.DDS" );
             }
         }
 
@@ -425,13 +426,6 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     }
 
     cup.reset(nullptr);
-    depthStencilTexture->Release();
-    depthStencil->Release();
-    backBuffer->Release();
-    backBufferTexture->Release();
-    swapChain->Release();
-    context->Release();
-    device->Release();
 
     return 0;
 }

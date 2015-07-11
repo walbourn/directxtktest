@@ -20,6 +20,8 @@
 #include "DirectXPackedVector.h"
 #include "ScreenGrab.h"
 
+#include <wrl/client.h>
+
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #include <wincodec.h>
@@ -27,6 +29,7 @@
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
+using Microsoft::WRL::ComPtr;
 
 // Build for LH vs. RH coords
 #define LH_COORDS
@@ -63,25 +66,18 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = hInstance;
     wndClass.lpszClassName = className;
-    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
     RegisterClassEx(&wndClass);
 
-    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 720, NULL, NULL, hInstance, NULL);
+    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+                               CW_USEDEFAULT, CW_USEDEFAULT, 1024, 720, nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
     RECT client;
     GetClientRect(hwnd, &client);
-
-    ID3D11Device* device;
-    ID3D11DeviceContext* context;
-    IDXGISwapChain* swapChain;
-    ID3D11Texture2D* backBufferTexture;
-    ID3D11RenderTargetView* backBuffer;
-    ID3D11Texture2D* depthStencilTexture;
-    ID3D11DepthStencilView* depthStencil;
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 
@@ -101,15 +97,21 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, d3dFlags, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, NULL, &context)))
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
+    ComPtr<IDXGISwapChain> swapChain;
+    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
+                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
         return 1;
 
+    ComPtr<ID3D11Texture2D> backBufferTexture;
     if (FAILED(hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture)))
         return 1;
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
 
-    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture, &renderTargetViewDesc, &backBuffer)))
+    ComPtr<ID3D11RenderTargetView> backBuffer;
+    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
     D3D11_TEXTURE2D_DESC depthStencilDesc = { 0 };
@@ -123,7 +125,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     depthStencilDesc.MipLevels = 1;
     depthStencilDesc.ArraySize = 1;
 
-    if (FAILED(device->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilTexture)))
+    ComPtr<ID3D11Texture2D> depthStencilTexture;
+    if (FAILED(device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilTexture)))
         return 1;
 
     D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
@@ -132,11 +135,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
-    if (FAILED(device->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDesc, &depthStencil)))
+    ComPtr<ID3D11DepthStencilView> depthStencil;
+    if (FAILED(device->CreateDepthStencilView(depthStencilTexture.Get(), &depthStencilViewDesc, &depthStencil)))
         return 1;
 
-    CommonStates states(device);
-    EffectFactory fx(device);
+    CommonStates states(device.Get());
+    EffectFactory fx(device.Get());
 
 #ifdef LH_COORDS
     bool ccw = false;
@@ -154,12 +158,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     }
 
     // VS 2012 CMO
-    auto teapot = Model::CreateFromCMO( device, L"teapot.cmo", fx, ccw, false );
+    auto teapot = Model::CreateFromCMO( device.Get(), L"teapot.cmo", fx, ccw, false );
 
     // DirectX SDK Mesh
-    auto tank = Model::CreateFromSDKMESH( device, L"TankScene.sdkmesh", fx, !ccw );
+    auto tank = Model::CreateFromSDKMESH( device.Get(), L"TankScene.sdkmesh", fx, !ccw );
 
-    auto soldier = Model::CreateFromSDKMESH( device, L"soldier.sdkmesh", fx, !ccw, false );
+    auto soldier = Model::CreateFromSDKMESH( device.Get(), L"soldier.sdkmesh", fx, !ccw, false );
 
     bool quit = false;
 
@@ -167,7 +171,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     context->RSSetViewports(1, &vp);
 
-    context->OMSetRenderTargets(1, &backBuffer, depthStencil);
+    context->OMSetRenderTargets(1, backBuffer.GetAddressOf(), depthStencil.Get());
 
     LARGE_INTEGER freq;
     QueryPerformanceFrequency(&freq);
@@ -184,7 +188,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     {
         MSG msg;
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
                 quit = true;
@@ -198,8 +202,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         
         float time = (float)(counter.QuadPart - start.QuadPart) / (float)freq.QuadPart;
 
-        context->ClearRenderTargetView(backBuffer, Colors::CornflowerBlue);
-        context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+        context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
+        context->ClearDepthStencilView(depthStencil.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
         // Compute camera matrices.
         float alphaFade = (sin(time * 2) + 1) / 2;
@@ -242,7 +246,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         // Draw CMO models
         XMMATRIX local = XMMatrixMultiply( XMMatrixScaling( 0.3f, 0.3f, 0.3f ), XMMatrixTranslation( 0.f, row2, 0.f ) );
         local = XMMatrixMultiply( world, local );
-        tank->Draw( context, states, local, view, projection );
+        tank->Draw( context.Get(), states, local, view, projection );
 
         teapot->UpdateEffects([&](IEffect* effect)
         {
@@ -251,7 +255,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                 skinnedEffect->ResetBoneTransforms();
         });
         local = XMMatrixMultiply( XMMatrixScaling( 0.01f, 0.01f, 0.01f ), XMMatrixTranslation( -2.f, row0, 0.f ) );
-        teapot->Draw( context, states, local, view, projection );
+        teapot->Draw( context.Get(), states, local, view, projection );
 
         teapot->UpdateEffects([&](IEffect* effect)
         {
@@ -260,7 +264,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                 skinnedEffect->SetBoneTransforms(bones.get(), SkinnedEffect::MaxBones);
         });
         local = XMMatrixMultiply( XMMatrixScaling( 0.01f, 0.01f, 0.01f ), XMMatrixTranslation( -2.f, row1, 0.f ) );
-        teapot->Draw( context, states, local, view, projection );
+        teapot->Draw( context.Get(), states, local, view, projection );
 
         // Draw SDKMESH models
         soldier->UpdateEffects([&](IEffect* effect)
@@ -271,7 +275,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         });
         local = XMMatrixMultiply( XMMatrixScaling( 2.f, 2.f, 2.f ), XMMatrixTranslation( 2.f, row0, 0.f ) );
         local = XMMatrixMultiply( world, local );
-        soldier->Draw( context, states, local, view, projection );
+        soldier->Draw( context.Get(), states, local, view, projection );
 
         soldier->UpdateEffects([&](IEffect* effect)
         {
@@ -281,33 +285,24 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         });
         local = XMMatrixMultiply( XMMatrixScaling( 2.f, 2.f, 2.f ), XMMatrixTranslation( 2.f, row1, 0.f ) );
         local = XMMatrixMultiply( world, local );
-        soldier->Draw( context, states, local, view, projection );
+        soldier->Draw( context.Get(), states, local, view, projection );
 
         swapChain->Present(1, 0);
         ++frame;
 
         if ( frame == 10 )
         {
-            ID3D11Texture2D* backBufferTex = nullptr;
+            ComPtr<ID3D11Texture2D> backBufferTex;
             hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTex);
             if ( SUCCEEDED(hr) )
             {
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
-                hr = SaveDDSTextureToFile( context, backBufferTex, L"SCREENSHOT.DDS" );
-                backBufferTex->Release();
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
+                hr = SaveDDSTextureToFile( context.Get(), backBufferTex.Get(), L"SCREENSHOT.DDS" );
             }
         }
 
         time++;
     }
-
-    depthStencilTexture->Release();
-    depthStencil->Release();
-    backBuffer->Release();
-    backBufferTexture->Release();
-    swapChain->Release();
-    context->Release();
-    device->Release();
 
     return 0;
 }

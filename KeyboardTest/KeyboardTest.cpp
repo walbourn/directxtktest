@@ -85,23 +85,18 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = hInstance;
     wndClass.lpszClassName = className;
-    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
     RegisterClassEx(&wndClass);
 
-    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, hInstance, NULL);
+    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+                               CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
     RECT client;
     GetClientRect(hwnd, &client);
-
-    ComPtr<ID3D11Device> device;
-    ComPtr<ID3D11DeviceContext> context;
-    ComPtr<IDXGISwapChain> swapChain;
-    ComPtr<ID3D11Texture2D> backBufferTexture;
-    ComPtr<ID3D11RenderTargetView> backBuffer;
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 
@@ -121,14 +116,20 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, d3dFlags, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, NULL, &context)))
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
+    ComPtr<IDXGISwapChain> swapChain;
+    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
+                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
         return 1;
 
+    ComPtr<ID3D11Texture2D> backBufferTexture;
     if (FAILED(hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture)))
         return 1;
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
 
+    ComPtr<ID3D11RenderTargetView> backBuffer;
     if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
@@ -155,7 +156,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         if (!thrown)
         {
-            MessageBox(hwnd, L"Keyboard not acting like a singleton", 0, 0);
+            MessageBox(hwnd, L"Keyboard not acting like a singleton", L"KeyboardTest", MB_ICONERROR);
         }
 
         auto state = Keyboard::Get().GetState();
@@ -186,7 +187,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     {
         MSG msg;
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
                 quit = true;

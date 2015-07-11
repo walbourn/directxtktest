@@ -19,12 +19,15 @@
 #include "DDSTextureLoader.h"
 #include "ScreenGrab.h"
 
+#include <wrl\client.h>
+
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #include <wincodec.h>
 #pragma warning(pop)
 
 using namespace DirectX;
+using Microsoft::WRL::ComPtr;
 
 std::unique_ptr<SpriteBatch> g_spriteBatch;
 
@@ -102,23 +105,18 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = hInstance;
     wndClass.lpszClassName = className;
-    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
     RegisterClassEx(&wndClass);
 
-    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, hInstance, NULL);
+    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
+                               1024, 768, nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
     RECT client;
     GetClientRect(hwnd, &client);
-
-    ID3D11Device* device;
-    ID3D11DeviceContext* context;
-    IDXGISwapChain* swapChain;
-    ID3D11Texture2D* backBufferTexture;
-    ID3D11RenderTargetView* backBuffer;
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 
@@ -138,50 +136,55 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, d3dFlags, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, NULL, &context)))
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
+    ComPtr<IDXGISwapChain> swapChain;
+    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
+                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
         return 1;
 
+    ComPtr<ID3D11Texture2D> backBufferTexture;
     if (FAILED(hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture)))
         return 1;
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
 
-    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture, &renderTargetViewDesc, &backBuffer)))
+    ComPtr<ID3D11RenderTargetView> backBuffer;
+    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
-    ID3D11Resource* catTexture;
-    ID3D11ShaderResourceView* cat;
-    ID3D11ShaderResourceView* letterA;
-    ID3D11ShaderResourceView* letterB;
-    ID3D11ShaderResourceView* letterC;
-
-    if (FAILED(CreateDDSTextureFromFile(device, L"cat.dds", &catTexture, &cat)))
+    ComPtr<ID3D11ShaderResourceView> cat;
+    ComPtr<ID3D11Resource> catTexture;
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"cat.dds", &catTexture, &cat)))
     {
-        MessageBox(hwnd, L"Error loading cat.dds", 0, 0);
+        MessageBox(hwnd, L"Error loading cat.dds", L"SpriteBatchTest", MB_ICONERROR);
         return 1;
     }
 
-    if (FAILED(CreateDDSTextureFromFile(device, L"a.dds", nullptr, &letterA)))
+    ComPtr<ID3D11ShaderResourceView> letterA;
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"a.dds", nullptr, &letterA)))
     {
-        MessageBox(hwnd, L"Error loading a.dds", 0, 0);
+        MessageBox(hwnd, L"Error loading a.dds", L"SpriteBatchTest", MB_ICONERROR);
         return 1;
     }
 
-    if (FAILED(CreateDDSTextureFromFile(device, L"b.dds", nullptr, &letterB)))
+    ComPtr<ID3D11ShaderResourceView> letterB;
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"b.dds", nullptr, &letterB)))
     {
-        MessageBox(hwnd, L"Error loading b.dds", 0, 0);
+        MessageBox(hwnd, L"Error loading b.dds", L"SpriteBatchTest", MB_ICONERROR);
         return 1;
     }
 
-    if (FAILED(CreateDDSTextureFromFile(device, L"c.dds", nullptr, &letterC)))
+    ComPtr<ID3D11ShaderResourceView> letterC;
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"c.dds", nullptr, &letterC)))
     {
-        MessageBox(hwnd, L"Error loading c.dds", 0, 0);
+        MessageBox(hwnd, L"Error loading c.dds", L"SpriteBatchTest", MB_ICONERROR);
         return 1;
     }
 
-    CommonStates states(device);
+    CommonStates states(device.Get());
 
-    g_spriteBatch.reset( new SpriteBatch(context) );
+    g_spriteBatch.reset( new SpriteBatch(context.Get()) );
 
     bool quit = false;
 
@@ -191,7 +194,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     g_spriteBatch->SetViewport( vp );
 
-    context->OMSetRenderTargets(1, &backBuffer, NULL);
+    context->OMSetRenderTargets(1, backBuffer.GetAddressOf(), nullptr);
 
     LARGE_INTEGER freq;
     QueryPerformanceFrequency(&freq);
@@ -205,7 +208,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     {
         MSG msg;
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
                 quit = true;
@@ -219,75 +222,75 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         
         float time = 60 * (float)(counter.QuadPart - start.QuadPart) / (float)freq.QuadPart;
 
-        context->ClearRenderTargetView(backBuffer, Colors::CornflowerBlue);
+        context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
 
         g_spriteBatch->Begin(SpriteSortMode_Deferred, states.NonPremultiplied());
 
         // Moving
-        g_spriteBatch->Draw(cat, XMFLOAT2(900,384.f + sinf(time/60.f)*384.f), nullptr, Colors::White, 0.f, XMFLOAT2(128, 128), 1, SpriteEffects_None, 0);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(900,384.f + sinf(time/60.f)*384.f), nullptr, Colors::White, 0.f, XMFLOAT2(128, 128), 1, SpriteEffects_None, 0);
 
         // Spinning.
-        g_spriteBatch->Draw(cat, XMFLOAT2(200, 150), nullptr, Colors::White, time / 100, XMFLOAT2(128, 128), 1, SpriteEffects_None, 0);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(200, 150), nullptr, Colors::White, time / 100, XMFLOAT2(128, 128), 1, SpriteEffects_None, 0);
 
         // Zero size source region.
         RECT src = { 128, 128, 128, 140 };
         RECT dest = { 400, 150, 450, 200 };
 
-        g_spriteBatch->Draw(cat, dest, &src, Colors::White, time / 100, XMFLOAT2(0, 6), SpriteEffects_None, 0);
+        g_spriteBatch->Draw(cat.Get(), dest, &src, Colors::White, time / 100, XMFLOAT2(0, 6), SpriteEffects_None, 0);
 
         // Differently scaled.
-        g_spriteBatch->Draw(cat, XMFLOAT2(0, 0), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.5);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(0, 0), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.5);
 
         RECT dest1 = { 0, 0, 256, 64 };
         RECT dest2 = { 0, 0, 64, 256 };
 
-        g_spriteBatch->Draw(cat, dest1);
-        g_spriteBatch->Draw(cat, dest2);
+        g_spriteBatch->Draw(cat.Get(), dest1);
+        g_spriteBatch->Draw(cat.Get(), dest2);
 
         // Mirroring.
-        g_spriteBatch->Draw(cat, XMFLOAT2(300, 10), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.3f, SpriteEffects_None);
-        g_spriteBatch->Draw(cat, XMFLOAT2(350, 10), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.3f, SpriteEffects_FlipHorizontally);
-        g_spriteBatch->Draw(cat, XMFLOAT2(400, 10), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.3f, SpriteEffects_FlipVertically);
-        g_spriteBatch->Draw(cat, XMFLOAT2(450, 10), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.3f, SpriteEffects_FlipBoth);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(300, 10), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.3f, SpriteEffects_None);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(350, 10), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.3f, SpriteEffects_FlipHorizontally);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(400, 10), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.3f, SpriteEffects_FlipVertically);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(450, 10), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.3f, SpriteEffects_FlipBoth);
 
         // Sorting.
-        g_spriteBatch->Draw(letterA, XMFLOAT2(10, 280), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.1f);
-        g_spriteBatch->Draw(letterC, XMFLOAT2(15, 290), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.9f);
-        g_spriteBatch->Draw(letterB, XMFLOAT2(15, 285), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(letterA.Get(), XMFLOAT2(10, 280), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.1f);
+        g_spriteBatch->Draw(letterC.Get(), XMFLOAT2(15, 290), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.9f);
+        g_spriteBatch->Draw(letterB.Get(), XMFLOAT2(15, 285), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.5f);
 
-        g_spriteBatch->Draw(letterA, XMFLOAT2(50, 280), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.9f);
-        g_spriteBatch->Draw(letterC, XMFLOAT2(55, 290), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.1f);
-        g_spriteBatch->Draw(letterB, XMFLOAT2(55, 285), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(letterA.Get(), XMFLOAT2(50, 280), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.9f);
+        g_spriteBatch->Draw(letterC.Get(), XMFLOAT2(55, 290), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.1f);
+        g_spriteBatch->Draw(letterB.Get(), XMFLOAT2(55, 285), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 1, SpriteEffects_None, 0.5f);
 
         RECT source = { 16, 32, 256, 192 };
 
         // Draw overloads specifying position, origin and scale as XMFLOAT2.
-        g_spriteBatch->Draw(cat, XMFLOAT2(-40, 320), Colors::Red);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(-40, 320), Colors::Red);
         
-        g_spriteBatch->Draw(cat, XMFLOAT2(200, 320), nullptr, Colors::Lime, time / 500, XMFLOAT2(32, 128), 0.5f, SpriteEffects_None, 0.5f);
-        g_spriteBatch->Draw(cat, XMFLOAT2(300, 320), &source, Colors::Lime, time / 500, XMFLOAT2(120, 80), 0.5f, SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(200, 320), nullptr, Colors::Lime, time / 500, XMFLOAT2(32, 128), 0.5f, SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(300, 320), &source, Colors::Lime, time / 500, XMFLOAT2(120, 80), 0.5f, SpriteEffects_None, 0.5f);
         
-        g_spriteBatch->Draw(cat, XMFLOAT2(350, 320), nullptr, Colors::Blue, time / 500, XMFLOAT2(32, 128), XMFLOAT2(0.25f, 0.5f), SpriteEffects_None, 0.5f);
-        g_spriteBatch->Draw(cat, XMFLOAT2(450, 320), &source, Colors::Blue, time / 500, XMFLOAT2(120, 80), XMFLOAT2(0.5f, 0.25f), SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(350, 320), nullptr, Colors::Blue, time / 500, XMFLOAT2(32, 128), XMFLOAT2(0.25f, 0.5f), SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(450, 320), &source, Colors::Blue, time / 500, XMFLOAT2(120, 80), XMFLOAT2(0.5f, 0.25f), SpriteEffects_None, 0.5f);
 
         // Draw overloads specifying position, origin and scale via the first two components of an XMVECTOR.
-        g_spriteBatch->Draw(cat, XMVectorSet(0, 450, randf(), randf()), Colors::Pink);
+        g_spriteBatch->Draw(cat.Get(), XMVectorSet(0, 450, randf(), randf()), Colors::Pink);
         
-        g_spriteBatch->Draw(cat, XMVectorSet(200, 450, randf(), randf()), nullptr, Colors::Lime, time / 500, XMVectorSet(32, 128, randf(), randf()), 0.5f, SpriteEffects_None, 0.5f);
-        g_spriteBatch->Draw(cat, XMVectorSet(300, 450, randf(), randf()), &source, Colors::Lime, time / 500, XMVectorSet(120, 80, randf(), randf()), 0.5f, SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), XMVectorSet(200, 450, randf(), randf()), nullptr, Colors::Lime, time / 500, XMVectorSet(32, 128, randf(), randf()), 0.5f, SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), XMVectorSet(300, 450, randf(), randf()), &source, Colors::Lime, time / 500, XMVectorSet(120, 80, randf(), randf()), 0.5f, SpriteEffects_None, 0.5f);
         
-        g_spriteBatch->Draw(cat, XMVectorSet(350, 450, randf(), randf()), nullptr, Colors::Blue, time / 500, XMVectorSet(32, 128, randf(), randf()), XMVectorSet(0.25f, 0.5f, randf(), randf()), SpriteEffects_None, 0.5f);
-        g_spriteBatch->Draw(cat, XMVectorSet(450, 450, randf(), randf()), &source, Colors::Blue, time / 500, XMVectorSet(120, 80, randf(), randf()), XMVectorSet(0.5f, 0.25f, randf(), randf()), SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), XMVectorSet(350, 450, randf(), randf()), nullptr, Colors::Blue, time / 500, XMVectorSet(32, 128, randf(), randf()), XMVectorSet(0.25f, 0.5f, randf(), randf()), SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), XMVectorSet(450, 450, randf(), randf()), &source, Colors::Blue, time / 500, XMVectorSet(120, 80, randf(), randf()), XMVectorSet(0.5f, 0.25f, randf(), randf()), SpriteEffects_None, 0.5f);
 
         // Draw overloads specifying position as a RECT.
         RECT rc1 = { 500, 320, 600, 420 };
         RECT rc2 = { 550, 450, 650, 550 };
         RECT rc3 = { 550, 550, 650, 650 };
 
-        g_spriteBatch->Draw(cat, rc1, Colors::Gray);
+        g_spriteBatch->Draw(cat.Get(), rc1, Colors::Gray);
         
-        g_spriteBatch->Draw(cat, rc2, nullptr, Colors::LightSeaGreen, time / 300, XMFLOAT2(128, 128), SpriteEffects_None, 0.5f);
-        g_spriteBatch->Draw(cat, rc3, &source, Colors::LightSeaGreen, time / 300, XMFLOAT2(128, 128), SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), rc2, nullptr, Colors::LightSeaGreen, time / 300, XMFLOAT2(128, 128), SpriteEffects_None, 0.5f);
+        g_spriteBatch->Draw(cat.Get(), rc3, &source, Colors::LightSeaGreen, time / 300, XMFLOAT2(128, 128), SpriteEffects_None, 0.5f);
 
         g_spriteBatch->End();
 
@@ -296,29 +299,17 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         if ( frame == 10 )
         {
-            ID3D11Texture2D* backBufferTex = nullptr;
+            ComPtr<ID3D11Texture2D> backBufferTex;
             hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTex);
             if ( SUCCEEDED(hr) )
             {
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
-                hr = SaveDDSTextureToFile( context, backBufferTex, L"SCREENSHOT.DDS" );
-                backBufferTex->Release();
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
+                hr = SaveDDSTextureToFile( context.Get(), backBufferTex.Get(), L"SCREENSHOT.DDS" );
             }
         }
     }
 
     g_spriteBatch.reset();
-
-    letterA->Release();
-    letterB->Release();
-    letterC->Release();
-    cat->Release();
-    catTexture->Release();
-    backBuffer->Release();
-    backBufferTexture->Release();
-    swapChain->Release();
-    context->Release();
-    device->Release();
 
     return 0;
 }

@@ -23,12 +23,15 @@
 #include "Shaders\Compiled\LoadTest_VS2D.inc"
 #include "Shaders\Compiled\LoadTest_PS2D.inc"
 
+#include <wrl/client.h>
+
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #include <wincodec.h>
 #pragma warning(pop)
 
 using namespace DirectX;
+using Microsoft::WRL::ComPtr;
 
 // Build for LH vs. RH coords
 //#define LH_COORDS
@@ -80,23 +83,18 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = hInstance;
     wndClass.lpszClassName = className;
-    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
     RegisterClassEx(&wndClass);
 
-    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 640, 640, NULL, NULL, hInstance, NULL);
+    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+                               CW_USEDEFAULT, CW_USEDEFAULT, 640, 640, nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
     RECT client;
     GetClientRect(hwnd, &client);
-
-    ID3D11Device* device;
-    ID3D11DeviceContext* context;
-    IDXGISwapChain* swapChain;
-    ID3D11Texture2D* backBufferTexture;
-    ID3D11RenderTargetView* backBuffer;
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 
@@ -116,26 +114,32 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, d3dFlags, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, NULL, &context)))
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
+    ComPtr<IDXGISwapChain> swapChain;
+    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
+                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
         return 1;
 
+    ComPtr<ID3D11Texture2D> backBufferTexture;
     if (FAILED(hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture)))
         return 1;
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
 
-    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture, &renderTargetViewDesc, &backBuffer)))
+    ComPtr<ID3D11RenderTargetView> backBuffer;
+    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
-    ID3D11VertexShader* vertexShader;
+    ComPtr<ID3D11VertexShader> vertexShader;
     if (FAILED(device->CreateVertexShader( LoadTest_VS2D, sizeof(LoadTest_VS2D), nullptr, &vertexShader )))
         return 1;
 
-    ID3D11PixelShader* pixelShader;
+    ComPtr<ID3D11PixelShader> pixelShader;
     if (FAILED(device->CreatePixelShader( LoadTest_PS2D, sizeof(LoadTest_PS2D), nullptr, &pixelShader )))
         return 1;
 
-    ID3D11InputLayout* vertexLayout;
+    ComPtr<ID3D11InputLayout> vertexLayout;
     if (FAILED(device->CreateInputLayout( VertexPositionNormalTexture::InputElements, VertexPositionNormalTexture::InputElementCount,
                                           LoadTest_VS2D, sizeof(LoadTest_VS2D), &vertexLayout ) ) )
         return 1;
@@ -148,7 +152,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     static const float low = 1.f;
 #endif
 
-    static VertexPositionNormalTexture vertices[] =
+    static const VertexPositionNormalTexture vertices[] =
     {
         VertexPositionNormalTexture( XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT3( 0.0f, 1.0f, 0.0f), XMFLOAT2( hi, 0.0f ) ),
         VertexPositionNormalTexture( XMFLOAT3( 1.0f, 1.0f, -1.0f ), XMFLOAT3( 0.0f, 1.0f, 0.0f), XMFLOAT2( low, 0.0f ) ),
@@ -191,7 +195,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     ZeroMemory( &InitData, sizeof(InitData) );
     InitData.pSysMem = vertices;
 
-    ID3D11Buffer* vertexBuffer;
+    ComPtr<ID3D11Buffer> vertexBuffer;
     if (FAILED(device->CreateBuffer( &bd, &InitData, &vertexBuffer )))
         return 1;
 
@@ -225,15 +229,15 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     bd.CPUAccessFlags = 0;
     InitData.pSysMem = indices;
 
-    ID3D11Buffer* indexBuffer;
+    ComPtr<ID3D11Buffer> indexBuffer;
     if (FAILED(device->CreateBuffer( &bd, &InitData, &indexBuffer )))
         return 1;
 
-    context->VSSetShader( vertexShader, nullptr, 0 );
-    context->PSSetShader( pixelShader, nullptr, 0 );
-    context->IASetInputLayout( vertexLayout );
-    context->IASetVertexBuffers( 0, 1, &vertexBuffer, &stride, &offset );
-    context->IASetIndexBuffer( indexBuffer, DXGI_FORMAT_R16_UINT, 0 );
+    context->VSSetShader( vertexShader.Get(), nullptr, 0 );
+    context->PSSetShader( pixelShader.Get(), nullptr, 0 );
+    context->IASetInputLayout( vertexLayout.Get() );
+    context->IASetVertexBuffers( 0, 1, vertexBuffer.GetAddressOf(), &stride, &offset );
+    context->IASetIndexBuffer( indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0 );
     context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
     bd.Usage = D3D11_USAGE_DEFAULT;
@@ -241,19 +245,19 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     bd.CPUAccessFlags = 0;
 
-    ID3D11Buffer* cbNeverChanges;
+    ComPtr<ID3D11Buffer> cbNeverChanges;
     if (FAILED(device->CreateBuffer( &bd, nullptr, &cbNeverChanges )))
         return 1;
     
     bd.ByteWidth = sizeof(CBChangeOnResize);
 
-    ID3D11Buffer* cbChangeOnResize;
+    ComPtr<ID3D11Buffer> cbChangeOnResize;
     if (FAILED(device->CreateBuffer( &bd, nullptr, &cbChangeOnResize )))
         return 1;
     
     bd.ByteWidth = sizeof(CBChangesEveryFrame);
 
-    ID3D11Buffer* cbChangesEveryFrame;
+    ComPtr<ID3D11Buffer> cbChangesEveryFrame;
     hr = device->CreateBuffer( &bd, nullptr, &cbChangesEveryFrame );
     if( FAILED( hr ) )
         return hr;
@@ -275,32 +279,28 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     CBNeverChanges cbNever;
     cbNever.mView = XMMatrixTranspose( view );
-    context->UpdateSubresource( cbNeverChanges, 0, nullptr, &cbNever, 0, 0 );
+    context->UpdateSubresource( cbNeverChanges.Get(), 0, nullptr, &cbNever, 0, 0 );
     
     CBChangeOnResize cbChanges;
     cbChanges.mProjection = XMMatrixTranspose( proj );
-    context->UpdateSubresource( cbChangeOnResize, 0, nullptr, &cbChanges, 0, 0 );
+    context->UpdateSubresource( cbChangeOnResize.Get(), 0, nullptr, &cbChanges, 0, 0 );
 
     // Alpha mode test
     DDS_ALPHA_MODE alphaMode;
     {
-        ID3D11ShaderResourceView* tree;
-        if (FAILED(CreateDDSTextureFromFile(device, L"tree02S_pmalpha.dds", nullptr, &tree, 0, &alphaMode)) || alphaMode != DDS_ALPHA_MODE_PREMULTIPLIED)
+        ComPtr<ID3D11ShaderResourceView> tree;
+        if (FAILED(CreateDDSTextureFromFile(device.Get(), L"tree02S_pmalpha.dds", nullptr, &tree, 0, &alphaMode)) || alphaMode != DDS_ALPHA_MODE_PREMULTIPLIED)
         {
-            MessageBox(hwnd, L"Error loading tree02S_pmalpha.dds", 0, 0);
-        }
-        else
-        {
-            tree->Release();
+            MessageBox(hwnd, L"Error loading tree02S_pmalpha.dds", L"LoadTest", MB_ICONERROR);
         }
     }
 
     // Various dimension loads
     {
-        ID3D11ShaderResourceView* test;
-        if (FAILED(CreateDDSTextureFromFile(device, L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", nullptr, &test, 0 )))
+        ComPtr<ID3D11ShaderResourceView> test;
+        if (FAILED(CreateDDSTextureFromFile(device.Get(), L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", nullptr, &test, 0 )))
         {
-            MessageBox(hwnd, L"Error loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", 0, 0);
+            MessageBox(hwnd, L"Error loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", L"LoadTest", MB_ICONERROR);
         }
         else
         {
@@ -311,18 +311,16 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                  || desc.ViewDimension != D3D_SRV_DIMENSION_TEXTURE1D
                  || desc.Texture1D.MipLevels != 1 )
             {
-                MessageBox(hwnd, L"Error validating io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", 0, 0);
+                MessageBox(hwnd, L"Error validating io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", L"LoadTest", MB_ICONERROR);
             }
-
-            test->Release();
         }
     }
 
     {
-        ID3D11ShaderResourceView* test;
-        if (FAILED(CreateDDSTextureFromFile(device, L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", nullptr, &test, 0 )))
+        ComPtr<ID3D11ShaderResourceView> test;
+        if (FAILED(CreateDDSTextureFromFile(device.Get(), L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", nullptr, &test, 0 )))
         {
-            MessageBox(hwnd, L"Error loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", 0, 0);
+            MessageBox(hwnd, L"Error loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", L"LoadTest", MB_ICONERROR);
         }
         else
         {
@@ -334,18 +332,16 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                  || desc.Texture1DArray.MipLevels != 1
                  || desc.Texture1DArray.ArraySize != 6 )
             {
-                MessageBox(hwnd, L"Error validating io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", 0, 0);
+                MessageBox(hwnd, L"Error validating io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", L"LoadTest", MB_ICONERROR);
             }
-
-            test->Release();
         }
     }
 
     {
-        ID3D11ShaderResourceView* test;
-        if (FAILED(CreateDDSTextureFromFile(device, L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", nullptr, &test, 0 )))
+        ComPtr<ID3D11ShaderResourceView> test;
+        if (FAILED(CreateDDSTextureFromFile(device.Get(), L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", nullptr, &test, 0 )))
         {
-            MessageBox(hwnd, L"Error loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", 0, 0);
+            MessageBox(hwnd, L"Error loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", L"LoadTest", MB_ICONERROR);
         }
         else
         {
@@ -357,18 +353,16 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                  || desc.Texture2DArray.MipLevels != 1
                  || desc.Texture2DArray.ArraySize != 6 )
             {
-                MessageBox(hwnd, L"Error validating io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", 0, 0);
+                MessageBox(hwnd, L"Error validating io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", L"LoadTest", MB_ICONERROR);
             }
-
-            test->Release();
         }
     }
 
     {
-        ID3D11ShaderResourceView* test;
-        if (FAILED(CreateDDSTextureFromFile(device, L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", nullptr, &test, 0 )))
+        ComPtr<ID3D11ShaderResourceView> test;
+        if (FAILED(CreateDDSTextureFromFile(device.Get(), L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", nullptr, &test, 0 )))
         {
-            MessageBox(hwnd, L"Error loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", 0, 0);
+            MessageBox(hwnd, L"Error loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", L"LoadTest", MB_ICONERROR);
         }
         else
         {
@@ -379,19 +373,17 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                  || desc.ViewDimension != D3D_SRV_DIMENSION_TEXTURE3D
                  || desc.Texture3D.MipLevels != 1)
             {
-                MessageBox(hwnd, L"Error validating io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", 0, 0);
+                MessageBox(hwnd, L"Error validating io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", L"LoadTest", MB_ICONERROR);
             }
-
-            test->Release();
         }
     }
 
     // Auto-gen mip various dimension loads
     {
-        ID3D11ShaderResourceView* test;
-        if (FAILED(CreateDDSTextureFromFile(device, context, L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", nullptr, &test, 0 )))
+        ComPtr<ID3D11ShaderResourceView> test;
+        if (FAILED(CreateDDSTextureFromFile(device.Get(), context.Get(), L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", nullptr, &test, 0 )))
         {
-            MessageBox(hwnd, L"Error autogen loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", 0, 0);
+            MessageBox(hwnd, L"Error autogen loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", L"LoadTest", MB_ICONERROR);
         }
         else
         {
@@ -402,18 +394,16 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                  || desc.ViewDimension != D3D_SRV_DIMENSION_TEXTURE1D
                  || desc.Texture1D.MipLevels != 6 )
             {
-                MessageBox(hwnd, L"Error validating autogen io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", 0, 0);
+                MessageBox(hwnd, L"Error validating autogen io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds", L"LoadTest", MB_ICONERROR);
             }
-
-            test->Release();
         }
     }
 
     {
-        ID3D11ShaderResourceView* test;
-        if (FAILED(CreateDDSTextureFromFile(device, context, L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", nullptr, &test, 0 )))
+        ComPtr<ID3D11ShaderResourceView> test;
+        if (FAILED(CreateDDSTextureFromFile(device.Get(), context.Get(), L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", nullptr, &test, 0 )))
         {
-            MessageBox(hwnd, L"Error autogen loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", 0, 0);
+            MessageBox(hwnd, L"Error autogen loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", L"LoadTest", MB_ICONERROR);
         }
         else
         {
@@ -425,18 +415,16 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                  || desc.Texture1DArray.MipLevels != 6
                  || desc.Texture1DArray.ArraySize != 6 )
             {
-                MessageBox(hwnd, L"Error validating autogen io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", 0, 0);
+                MessageBox(hwnd, L"Error validating autogen io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1DArray_MipOff.dds", L"LoadTest", MB_ICONERROR);
             }
-
-            test->Release();
         }
     }
 
     {
-        ID3D11ShaderResourceView* test;
-        if (FAILED(CreateDDSTextureFromFile(device, context, L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", nullptr, &test, 0 )))
+        ComPtr<ID3D11ShaderResourceView> test;
+        if (FAILED(CreateDDSTextureFromFile(device.Get(), context.Get(), L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", nullptr, &test, 0 )))
         {
-            MessageBox(hwnd, L"Error autogen loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", 0, 0);
+            MessageBox(hwnd, L"Error autogen loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", L"LoadTest", MB_ICONERROR);
         }
         else
         {
@@ -448,18 +436,16 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                  || desc.Texture2DArray.MipLevels != 8
                  || desc.Texture2DArray.ArraySize != 6 )
             {
-                MessageBox(hwnd, L"Error validating autogen io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", 0, 0);
+                MessageBox(hwnd, L"Error validating autogen io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE2DArray_MipOff.dds", L"LoadTest", MB_ICONERROR);
             }
-
-            test->Release();
         }
     }
 
     {
-        ID3D11ShaderResourceView* test;
-        if (FAILED(CreateDDSTextureFromFile(device, context, L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", nullptr, &test, 0 )))
+        ComPtr<ID3D11ShaderResourceView> test;
+        if (FAILED(CreateDDSTextureFromFile(device.Get(), context.Get(), L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", nullptr, &test, 0 )))
         {
-            MessageBox(hwnd, L"Error autogen loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", 0, 0);
+            MessageBox(hwnd, L"Error autogen loading io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", L"LoadTest", MB_ICONERROR);
         }
         else
         {
@@ -470,19 +456,17 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                  || desc.ViewDimension != D3D_SRV_DIMENSION_TEXTURE3D
                  || desc.Texture3D.MipLevels != 8)
             {
-                MessageBox(hwnd, L"Error validating autogen io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", 0, 0);
+                MessageBox(hwnd, L"Error validating autogen io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE3D_MipOff.dds", L"LoadTest", MB_ICONERROR);
             }
-
-            test->Release();
         }
     }
 
     // sRGB test
     {
-        ID3D11ShaderResourceView* test;
-        if (FAILED(CreateWICTextureFromFile(device, L"cup_small.jpg", nullptr, &test, 0 )))
+        ComPtr<ID3D11ShaderResourceView> test;
+        if (FAILED(CreateWICTextureFromFile(device.Get(), L"cup_small.jpg", nullptr, &test, 0 )))
         {
-            MessageBox(hwnd, L"Error loading cup_small.jpg", 0, 0);
+            MessageBox(hwnd, L"Error loading cup_small.jpg", L"LoadTest", MB_ICONERROR);
         }
         else
         {
@@ -491,58 +475,56 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             
             if ( desc.Format != DXGI_FORMAT_R8G8B8A8_UNORM_SRGB )
             {
-                MessageBox(hwnd, L"Error validating cup_small.jpg", 0, 0);
+                MessageBox(hwnd, L"Error validating cup_small.jpg", L"LoadTest", MB_ICONERROR);
             }
-
-            test->Release();
         }
     }
 
 
     // View textures
-    ID3D11ShaderResourceView* earth;
-    if (FAILED(CreateDDSTextureFromFile(device, L"earth_A2B10G10R10.dds", nullptr, &earth, 0, &alphaMode)) || alphaMode != DDS_ALPHA_MODE_UNKNOWN)
+    ComPtr<ID3D11ShaderResourceView> earth;
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"earth_A2B10G10R10.dds", nullptr, &earth, 0, &alphaMode)) || alphaMode != DDS_ALPHA_MODE_UNKNOWN)
     {
-        MessageBox(hwnd, L"Error loading earth_A2B10G10R10.dds", 0, 0);
+        MessageBox(hwnd, L"Error loading earth_A2B10G10R10.dds", L"LoadTest", MB_ICONERROR);
         return 1;
     }
 
-    ID3D11ShaderResourceView* earth2;
-    if (FAILED(CreateDDSTextureFromFileEx(device, L"earth_A2B10G10R10.dds", 0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, true, nullptr, &earth2)))
+    ComPtr<ID3D11ShaderResourceView> earth2;
+    if (FAILED(CreateDDSTextureFromFileEx(device.Get(), L"earth_A2B10G10R10.dds", 0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, true, nullptr, &earth2)))
     {
-        MessageBox(hwnd, L"Error loading earth_A2B10G10R10.dds (2)", 0, 0);
+        MessageBox(hwnd, L"Error loading earth_A2B10G10R10.dds (2)", L"LoadTest", MB_ICONERROR);
         return 1;
     }
 
-    ID3D11ShaderResourceView* dxlogo;
-    if (FAILED(CreateDDSTextureFromFile( device, context, L"dx5_logo_autogen.dds", nullptr, &dxlogo )))
+    ComPtr<ID3D11ShaderResourceView> dxlogo;
+    if (FAILED(CreateDDSTextureFromFile( device.Get(), context.Get(), L"dx5_logo_autogen.dds", nullptr, &dxlogo )))
     {
-        MessageBox(hwnd, L"Error loading dxlogo autogen.dds", 0, 0);
+        MessageBox(hwnd, L"Error loading dxlogo autogen.dds", L"LoadTest", MB_ICONERROR);
         return 1;
     }
 
-    ID3D11ShaderResourceView* dxlogo2;
-    if (FAILED(CreateDDSTextureFromFileEx( device, L"dx5_logo.dds", 0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, true, nullptr, &dxlogo2)))
+    ComPtr<ID3D11ShaderResourceView> dxlogo2;
+    if (FAILED(CreateDDSTextureFromFileEx( device.Get(), L"dx5_logo.dds", 0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, true, nullptr, &dxlogo2)))
     {
-        MessageBox(hwnd, L"Error loading dxlogo.dds (2)", 0, 0);
+        MessageBox(hwnd, L"Error loading dxlogo.dds (2)", L"LoadTest", MB_ICONERROR);
         return 1;
     }
 
-    ID3D11ShaderResourceView* win95;
-    if (FAILED(CreateWICTextureFromFile(device, context, L"win95.bmp", nullptr, &win95)))
+    ComPtr<ID3D11ShaderResourceView> win95;
+    if (FAILED(CreateWICTextureFromFile(device.Get(), context.Get(), L"win95.bmp", nullptr, &win95)))
     {
-        MessageBox(hwnd, L"Error loading win95.bmp", 0, 0);
+        MessageBox(hwnd, L"Error loading win95.bmp", L"LoadTest", MB_ICONERROR);
         return 1;
     }
 
-    ID3D11ShaderResourceView* win95_2;
-    if (FAILED(CreateWICTextureFromFileEx(device, context, L"win95.bmp", 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, true, nullptr, &win95_2)))
+    ComPtr<ID3D11ShaderResourceView> win95_2;
+    if (FAILED(CreateWICTextureFromFileEx(device.Get(), context.Get(), L"win95.bmp", 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, true, nullptr, &win95_2)))
     {
-        MessageBox(hwnd, L"Error loading win95.bmp (2)", 0, 0);
+        MessageBox(hwnd, L"Error loading win95.bmp (2)", L"LoadTest", MB_ICONERROR);
         return 1;
     }
 
-    CommonStates states(device);
+    CommonStates states(device.Get());
 
     bool quit = false;
 
@@ -550,7 +532,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     context->RSSetViewports(1, &vp);
 
-    context->OMSetRenderTargets(1, &backBuffer, nullptr);
+    context->OMSetRenderTargets(1, backBuffer.GetAddressOf(), nullptr);
 
 #ifdef LH_COORDS
     context->RSSetState( states.CullCounterClockwise() );
@@ -564,7 +546,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     {
         MSG msg;
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
                 quit = true;
@@ -580,7 +562,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             timeStart = timeCur;
         t = ( timeCur - timeStart ) / 1000.0f;
 
-        context->ClearRenderTargetView(backBuffer, Colors::CornflowerBlue);
+        context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
 
         float dist = 10.f;
 
@@ -591,62 +573,62 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         cb.mWorld = XMMatrixTranspose( world );
         XMStoreFloat4( &cb.vEyePosition, eyePosition );
         XMStoreFloat4( &cb.vMeshColor, Colors::White );
-        context->UpdateSubresource( cbChangesEveryFrame, 0, nullptr, &cb, 0, 0 );
+        context->UpdateSubresource( cbChangesEveryFrame.Get(), 0, nullptr, &cb, 0, 0 );
 
-        context->VSSetConstantBuffers( 0, 1, &cbNeverChanges );
-        context->VSSetConstantBuffers( 1, 1, &cbChangeOnResize );
-        context->VSSetConstantBuffers( 2, 1, &cbChangesEveryFrame );
-        context->PSSetConstantBuffers( 2, 1, &cbChangesEveryFrame );
+        context->VSSetConstantBuffers( 0, 1, cbNeverChanges.GetAddressOf() );
+        context->VSSetConstantBuffers( 1, 1, cbChangeOnResize.GetAddressOf() );
+        context->VSSetConstantBuffers( 2, 1, cbChangesEveryFrame.GetAddressOf() );
+        context->PSSetConstantBuffers( 2, 1, cbChangesEveryFrame.GetAddressOf() );
 
         ID3D11SamplerState* samplerState = states.LinearClamp();
         context->PSSetSamplers( 0, 1, &samplerState );
 
-        context->PSSetShaderResources( 0, 1, &earth );
+        context->PSSetShaderResources( 0, 1, earth.GetAddressOf() );
         context->DrawIndexed( 36, 0, 0 );
 
         // Cube 2
         world = XMMatrixRotationY( -t ) * XMMatrixTranslation( 1.5f, 0, (dist/2.f) + dist * sin(t) );
 
         cb.mWorld = XMMatrixTranspose( world );
-        context->UpdateSubresource( cbChangesEveryFrame, 0, nullptr, &cb, 0, 0 );
+        context->UpdateSubresource( cbChangesEveryFrame.Get(), 0, nullptr, &cb, 0, 0 );
 
-        context->PSSetShaderResources( 0, 1, &win95_2 );
+        context->PSSetShaderResources( 0, 1, win95_2.GetAddressOf() );
         context->DrawIndexed( 36, 0, 0 );
 
         // Cube 3
         world = XMMatrixRotationY( t ) * XMMatrixTranslation( 1.5f, 2.1f, (dist/2.f) + dist * sin(t) );
 
         cb.mWorld = XMMatrixTranspose( world );
-        context->UpdateSubresource( cbChangesEveryFrame, 0, nullptr, &cb, 0, 0 );
+        context->UpdateSubresource( cbChangesEveryFrame.Get(), 0, nullptr, &cb, 0, 0 );
 
-        context->PSSetShaderResources( 0, 1, &win95 );
+        context->PSSetShaderResources( 0, 1, win95.GetAddressOf() );
         context->DrawIndexed( 36, 0, 0 );
 
         // Cube 4
         world = XMMatrixRotationY( -t ) * XMMatrixTranslation( -1.5f, -2.1f, (dist/2.f) + dist * sin(t) );
 
         cb.mWorld = XMMatrixTranspose( world );
-        context->UpdateSubresource( cbChangesEveryFrame, 0, nullptr, &cb, 0, 0 );
+        context->UpdateSubresource( cbChangesEveryFrame.Get(), 0, nullptr, &cb, 0, 0 );
 
-        context->PSSetShaderResources( 0, 1, &earth2 );
+        context->PSSetShaderResources( 0, 1, earth2.GetAddressOf() );
         context->DrawIndexed( 36, 0, 0 );
 
         // Cube 5
         world = XMMatrixRotationY( t ) * XMMatrixTranslation( -1.5f, 0, (dist/2.f) + dist * sin(t) );
 
         cb.mWorld = XMMatrixTranspose( world );
-        context->UpdateSubresource( cbChangesEveryFrame, 0, nullptr, &cb, 0, 0 );
+        context->UpdateSubresource( cbChangesEveryFrame.Get(), 0, nullptr, &cb, 0, 0 );
 
-        context->PSSetShaderResources( 0, 1, &dxlogo2 );
+        context->PSSetShaderResources( 0, 1, dxlogo2.GetAddressOf() );
         context->DrawIndexed( 36, 0, 0 );
 
         // Cube 6
         world = XMMatrixRotationY( -t ) * XMMatrixTranslation( -1.5f, 2.1f, (dist/2.f) + dist * sin(t) );
 
         cb.mWorld = XMMatrixTranspose( world );
-        context->UpdateSubresource( cbChangesEveryFrame, 0, nullptr, &cb, 0, 0 );
+        context->UpdateSubresource( cbChangesEveryFrame.Get(), 0, nullptr, &cb, 0, 0 );
 
-        context->PSSetShaderResources( 0, 1, &dxlogo );
+        context->PSSetShaderResources( 0, 1, dxlogo.GetAddressOf() );
         context->DrawIndexed( 36, 0, 0 );
 
         swapChain->Present(1, 0);
@@ -654,14 +636,14 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         if ( frame == 10 )
         {
-            ID3D11Texture2D* backBufferTex = nullptr;
+            ComPtr<ID3D11Texture2D> backBufferTex;
             hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTex);
             if ( SUCCEEDED(hr) )
             {
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatPng, L"SCREENSHOT.PNG");
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatJpeg, L"SCREENSHOT.JPG" );
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatBmp, L"SCREENSHOT.BMP", &GUID_WICPixelFormat16bppBGR565 );
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatTiff, L"SCREENSHOT.TIF", nullptr,
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatPng, L"SCREENSHOT.PNG");
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatJpeg, L"SCREENSHOT.JPG" );
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatBmp, L"SCREENSHOT.BMP", &GUID_WICPixelFormat16bppBGR565 );
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatTiff, L"SCREENSHOT.TIF", nullptr,
                                             [&](IPropertyBag2* props)
                                             {
                                                 PROPBAG2 options[2] = { 0, 0 };
@@ -678,32 +660,10 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                                                 (void)props->Write( 2, options, varValues ); 
                                             });
 
-                hr = SaveDDSTextureToFile( context, backBufferTex, L"SCREENSHOT.DDS" );
-
-                backBufferTex->Release();
+                hr = SaveDDSTextureToFile( context.Get(), backBufferTex.Get(), L"SCREENSHOT.DDS" );
             }
         }
     }
-
-    dxlogo->Release();
-    dxlogo2->Release();
-    earth->Release();
-    earth2->Release();
-    win95->Release();
-    win95_2->Release();
-    cbNeverChanges->Release();
-    cbChangeOnResize->Release();
-    cbChangesEveryFrame->Release();
-    indexBuffer->Release();
-    vertexBuffer->Release();
-    vertexLayout->Release();
-    vertexShader->Release();
-    pixelShader->Release();
-    backBuffer->Release();
-    backBufferTexture->Release();
-    swapChain->Release();
-    context->Release();
-    device->Release();
 
     return 0;
 }

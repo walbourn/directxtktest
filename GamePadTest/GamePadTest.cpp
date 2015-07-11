@@ -24,6 +24,8 @@
 
 #include <stdio.h>
 
+#include <wrl/client.h>
+
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #include <wincodec.h>
@@ -35,6 +37,7 @@
 #endif
 
 using namespace DirectX;
+using Microsoft::WRL::ComPtr;
 
 std::unique_ptr<SpriteBatch> g_spriteBatch;
 std::unique_ptr<GamePad> g_gamePad;
@@ -91,23 +94,18 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = hInstance;
     wndClass.lpszClassName = className;
-    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
     RegisterClassEx(&wndClass);
 
-    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, hInstance, NULL);
+    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+                               CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
     RECT client;
     GetClientRect(hwnd, &client);
-
-    ID3D11Device* device;
-    ID3D11DeviceContext* context;
-    IDXGISwapChain* swapChain;
-    ID3D11Texture2D* backBufferTexture;
-    ID3D11RenderTargetView* backBuffer;
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 
@@ -127,24 +125,30 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, d3dFlags, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, NULL, &context)))
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
+    ComPtr<IDXGISwapChain> swapChain;
+    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
+                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
         return 1;
 
+    ComPtr<ID3D11Texture2D> backBufferTexture;
     if (FAILED(hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture)))
         return 1;
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
 
-    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture, &renderTargetViewDesc, &backBuffer)))
+    ComPtr<ID3D11RenderTargetView> backBuffer;
+    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
-    CommonStates states(device);
+    CommonStates states(device.Get());
 
-    g_spriteBatch.reset(new SpriteBatch(context));
+    g_spriteBatch.reset(new SpriteBatch(context.Get()));
 
-    SpriteFont ctrlFont(device, L"xboxController.spritefont");
+    SpriteFont ctrlFont(device.Get(), L"xboxController.spritefont");
 
-    SpriteFont comic(device, L"comic.spritefont");
+    SpriteFont comic(device.Get(), L"comic.spritefont");
 
     g_gamePad.reset( new GamePad );
 
@@ -163,14 +167,14 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         if ( !thrown )
         {
-            MessageBox(hwnd, L"GamePad not acting like a singleton", 0, 0);
+            MessageBox(hwnd, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
         }
 
         auto state = GamePad::Get().GetState(0);
         state;
     }
 
-    ID3D11ShaderResourceView* defaultTex = nullptr;
+    ComPtr<ID3D11ShaderResourceView> defaultTex;
     {
         static const uint32_t s_pixel = 0xffffffff;
 
@@ -184,7 +188,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         desc.Usage = D3D11_USAGE_IMMUTABLE;
         desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
-        ID3D11Texture2D* tex = nullptr;
+        ComPtr<ID3D11Texture2D> tex;
         hr = device->CreateTexture2D(&desc, &initData, &tex);
 
         if (FAILED(hr))
@@ -198,13 +202,11 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         SRVDesc.Texture2D.MipLevels = 1;
 
-        hr = device->CreateShaderResourceView(tex, &SRVDesc, &defaultTex);
+        hr = device->CreateShaderResourceView(tex.Get(), &SRVDesc, &defaultTex);
         if (FAILED(hr))
         {
             return 1;
         }
-
-        tex->Release();
     }
 
     bool quit = false;
@@ -213,7 +215,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     context->RSSetViewports(1, &vp);
 
-    context->OMSetRenderTargets(1, &backBuffer, nullptr);
+    context->OMSetRenderTargets(1, backBuffer.GetAddressOf(), nullptr);
 
 #ifdef LH_COORDS
     context->RSSetState( states.CullCounterClockwise() );
@@ -234,7 +236,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     {
         MSG msg;
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
                 quit = true;
@@ -243,7 +245,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             DispatchMessage(&msg);
         }
 
-        context->ClearRenderTargetView(backBuffer, Colors::CornflowerBlue);
+        context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
 
         g_spriteBatch->Begin();
 
@@ -422,28 +424,28 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             rc.bottom = 525;
             rc.right = rc.left + int( ( (state.thumbSticks.leftX + 1.f) / 2.f) * 275);
 
-            g_spriteBatch->Draw(defaultTex, rc, &src);
+            g_spriteBatch->Draw(defaultTex.Get(), rc, &src);
 
             rc.top = 550;
             rc.bottom = 575;
 
             rc.right = rc.left + int( ((state.thumbSticks.leftY + 1.f) / 2.f) * 275);
 
-            g_spriteBatch->Draw(defaultTex, rc, &src);
+            g_spriteBatch->Draw(defaultTex.Get(), rc, &src);
 
             rc.top = 500;
             rc.left = 325;
             rc.bottom = 525;
             rc.right = rc.left + int(((state.thumbSticks.rightX + 1.f) / 2.f) * 275);
 
-            g_spriteBatch->Draw(defaultTex, rc, &src);
+            g_spriteBatch->Draw(defaultTex.Get(), rc, &src);
 
             rc.top = 550;
             rc.bottom = 575;
 
             rc.right = rc.left + int(((state.thumbSticks.rightY + 1.f) / 2.f) * 275);
 
-            g_spriteBatch->Draw(defaultTex, rc, &src);
+            g_spriteBatch->Draw(defaultTex.Get(), rc, &src);
 
             g_gamePad->SetVibration(player, state.triggers.left, state.triggers.right);
         }
@@ -460,26 +462,17 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         if ( frame == 10 )
         {
-            ID3D11Texture2D* backBufferTex = nullptr;
+            ComPtr<ID3D11Texture2D> backBufferTex;
             hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTex);
             if ( SUCCEEDED(hr) )
             {
-                hr = SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatBmp, L"SCREENSHOT.BMP");
-                hr = SaveDDSTextureToFile( context, backBufferTex, L"SCREENSHOT.DDS" );
-
-                backBufferTex->Release();
+                hr = SaveWICTextureToFile(context.Get(), backBufferTex.Get(), GUID_ContainerFormatBmp, L"SCREENSHOT.BMP");
+                hr = SaveDDSTextureToFile(context.Get(), backBufferTex.Get(), L"SCREENSHOT.DDS" );
             }
         }
     }
 
     g_spriteBatch.reset();
-
-    defaultTex->Release();
-    backBuffer->Release();
-    backBufferTexture->Release();
-    swapChain->Release();
-    context->Release();
-    device->Release();
 
     return 0;
 }

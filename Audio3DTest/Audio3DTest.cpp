@@ -29,12 +29,15 @@
 
 #include "Audio.h"
 
+#include <wrl/client.h>
+
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #include <wincodec.h>
 #pragma warning(pop)
 
 using namespace DirectX;
+using Microsoft::WRL::ComPtr;
 
 // Build for LH vs. RH coords
 //#define LH_COORDS
@@ -172,7 +175,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     if (FAILED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)))
     {
-        MessageBoxA(NULL, "COM init failed", 0, 0);
+        MessageBox(nullptr, L"COM init failed", L"Audio3DTest", MB_ICONERROR);
         return 1;
     }
 
@@ -184,11 +187,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = hInstance;
     wndClass.lpszClassName = className;
-    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
     RegisterClassEx(&wndClass);
 
-    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1600, 720, NULL, NULL, hInstance, NULL);
+    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+                               CW_USEDEFAULT, CW_USEDEFAULT, 1600, 720, nullptr, nullptr, hInstance, nullptr);
 
     DEV_BROADCAST_DEVICEINTERFACE filter = {0};
     filter.dbcc_size = sizeof( filter );
@@ -228,14 +232,6 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     RECT client;
     GetClientRect(hwnd, &client);
 
-    ID3D11Device* device;
-    ID3D11DeviceContext* context;
-    IDXGISwapChain* swapChain;
-    ID3D11Texture2D* backBufferTexture;
-    ID3D11RenderTargetView* backBuffer;
-    ID3D11Texture2D* depthStencilTexture;
-    ID3D11DepthStencilView* depthStencil;
-
     DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 
     swapChainDesc.BufferCount = 1;
@@ -254,15 +250,21 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
     
-    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, d3dFlags, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, NULL, &context)))
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
+    ComPtr<IDXGISwapChain> swapChain;
+    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
+                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
         return 1;
 
+    ComPtr<ID3D11Texture2D> backBufferTexture;
     if (FAILED(hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture)))
         return 1;
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
 
-    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture, &renderTargetViewDesc, &backBuffer)))
+    ComPtr<ID3D11RenderTargetView> backBuffer;
+    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
     D3D11_TEXTURE2D_DESC depthStencilDesc = { 0 };
@@ -276,7 +278,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     depthStencilDesc.MipLevels = 1;
     depthStencilDesc.ArraySize = 1;
 
-    if (FAILED(device->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilTexture)))
+    ComPtr<ID3D11Texture2D> depthStencilTexture;
+    if (FAILED(device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilTexture)))
         return 1;
 
     D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
@@ -285,10 +288,11 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
-    if (FAILED(device->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDesc, &depthStencil)))
+    ComPtr<ID3D11DepthStencilView> depthStencil;
+    if (FAILED(device->CreateDepthStencilView(depthStencilTexture.Get(), &depthStencilViewDesc, &depthStencil)))
         return 1;
 
-    CommonStates states(device);
+    CommonStates states(device.Get());
 
 #ifdef LH_COORDS
     bool rhcoords = false;
@@ -296,7 +300,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     bool rhcoords = true;
 #endif
 
-    auto sphere = GeometricPrimitive::CreateSphere(context, 1.f, 16, rhcoords );
+    auto sphere = GeometricPrimitive::CreateSphere(context.Get(), 1.f, 16, rhcoords );
 
     bool quit = false;
 
@@ -304,7 +308,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     context->RSSetViewports(1, &vp);
 
-    context->OMSetRenderTargets(1, &backBuffer, depthStencil);
+    context->OMSetRenderTargets(1, backBuffer.GetAddressOf(), depthStencil.Get());
 
     LARGE_INTEGER freq;
     QueryPerformanceFrequency(&freq);
@@ -335,9 +339,9 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     float lastTime = 0.f;
 
-    SpriteBatch spriteBatch(context);
+    SpriteBatch spriteBatch(context.Get());
 
-    SpriteFont spriteFont(device, L"comic.spritefont");
+    SpriteFont spriteFont(device.Get(), L"comic.spritefont");
 
     audEngine->SetReverb( Reverb_Default );
 
@@ -363,7 +367,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         MSG msg;
         bool newaudio = false;
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
                 quit = true;
@@ -380,8 +384,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         
         float time = (float)(counter.QuadPart - start.QuadPart) / (float)freq.QuadPart;
 
-        context->ClearRenderTargetView(backBuffer, Colors::CornflowerBlue);
-        context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+        context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
+        context->ClearDepthStencilView(depthStencil.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
         XMVECTORF32 cameraPosition = { 0, 14, 0 };
 
@@ -460,13 +464,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         if ( frame == 10 )
         {
-            ID3D11Texture2D* backBufferTex = nullptr;
+            ComPtr<ID3D11Texture2D> backBufferTex;
             hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTex);
             if ( SUCCEEDED(hr) )
             {
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
-                hr = SaveDDSTextureToFile( context, backBufferTex, L"SCREENSHOT.DDS" );
-                backBufferTex->Release();
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
+                hr = SaveDDSTextureToFile( context.Get(), backBufferTex.Get(), L"SCREENSHOT.DDS" );
             }
         }
 
@@ -477,14 +480,6 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     SetWindowLongPtr( hwnd, GWLP_USERDATA, NULL );
     audEngine.reset();
-
-    depthStencilTexture->Release();
-    depthStencil->Release();
-    backBuffer->Release();
-    backBufferTexture->Release();
-    swapChain->Release();
-    context->Release();
-    device->Release();
 
     UnregisterDeviceNotification( hNewAudio );
 

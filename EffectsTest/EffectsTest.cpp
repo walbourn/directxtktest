@@ -24,6 +24,8 @@
 #include <vector>
 #include <functional>
 
+#include <wrl/client.h>
+
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #include <wincodec.h>
@@ -31,6 +33,7 @@
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
+using Microsoft::WRL::ComPtr;
 
 // Build for LH vs. RH coords
 //#define LH_COORDS
@@ -201,12 +204,6 @@ public:
     }
 
 
-    ~EffectWithDecl()
-    {
-        inputLayout->Release();
-    }
-
-
     void Apply(ID3D11DeviceContext* context, CXMMATRIX world, CXMMATRIX view, CXMMATRIX projection)
     {
         SetWorld(world);
@@ -215,12 +212,12 @@ public:
 
         T::Apply(context);
 
-        context->IASetInputLayout(inputLayout);
+        context->IASetInputLayout(inputLayout.Get());
     }
 
 
 private:
-    ID3D11InputLayout* inputLayout;
+    ComPtr<ID3D11InputLayout> inputLayout;
 };
 
 
@@ -254,25 +251,18 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     wndClass.lpfnWndProc = WndProc;
     wndClass.hInstance = hInstance;
     wndClass.lpszClassName = className;
-    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
     RegisterClassEx(&wndClass);
 
-    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 720, NULL, NULL, hInstance, NULL);
+    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+                               CW_USEDEFAULT, CW_USEDEFAULT, 1024, 720, nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
     RECT client;
     GetClientRect(hwnd, &client);
-
-    ID3D11Device* device;
-    ID3D11DeviceContext* context;
-    IDXGISwapChain* swapChain;
-    ID3D11Texture2D* backBufferTexture;
-    ID3D11RenderTargetView* backBuffer;
-    ID3D11Texture2D* depthStencilTexture;
-    ID3D11DepthStencilView* depthStencil;
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 
@@ -292,15 +282,21 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, d3dFlags, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, NULL, &context)))
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
+    ComPtr<IDXGISwapChain> swapChain;
+    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
+                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
         return 1;
 
+    ComPtr<ID3D11Texture2D> backBufferTexture;
     if (FAILED(hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture)))
         return 1;
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
 
-    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture, &renderTargetViewDesc, &backBuffer)))
+    ComPtr<ID3D11RenderTargetView> backBuffer;
+    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
     D3D11_TEXTURE2D_DESC depthStencilDesc = { 0 };
@@ -314,7 +310,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     depthStencilDesc.MipLevels = 1;
     depthStencilDesc.ArraySize = 1;
 
-    if (FAILED(device->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilTexture)))
+    ComPtr<ID3D11Texture2D> depthStencilTexture;
+    if (FAILED(device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilTexture)))
         return 1;
 
     D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
@@ -323,83 +320,84 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
-    if (FAILED(device->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDesc, &depthStencil)))
+    ComPtr<ID3D11DepthStencilView> depthStencil;
+    if (FAILED(device->CreateDepthStencilView(depthStencilTexture.Get(), &depthStencilViewDesc, &depthStencil)))
         return 1;
 
-    CommonStates states(device);
+    CommonStates states(device.Get());
 
     // Load textures.
-    ID3D11ShaderResourceView* cat;
-    ID3D11ShaderResourceView* opaqueCat;
-    ID3D11ShaderResourceView* cubemap;
-    ID3D11ShaderResourceView* overlay;
+    ComPtr<ID3D11ShaderResourceView> cat;
+    ComPtr<ID3D11ShaderResourceView> opaqueCat;
+    ComPtr<ID3D11ShaderResourceView> cubemap;
+    ComPtr<ID3D11ShaderResourceView> overlay;
 
-    if (FAILED(CreateDDSTextureFromFile(device, L"cat.dds", nullptr, &cat)))
-        MessageBox(hwnd, L"Error loading cat.dds", 0, 0);
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"cat.dds", nullptr, &cat)))
+        MessageBox(hwnd, L"Error loading cat.dds", L"EffectsTest", MB_ICONERROR);
 
-    if (FAILED(CreateDDSTextureFromFile(device, L"opaqueCat.dds", nullptr, &opaqueCat)))
-        MessageBox(hwnd, L"Error loading opaqueCat.dds", 0, 0);
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"opaqueCat.dds", nullptr, &opaqueCat)))
+        MessageBox(hwnd, L"Error loading opaqueCat.dds", L"EffectsTest", MB_ICONERROR);
 
-    if (FAILED(CreateDDSTextureFromFile(device, L"cubemap.dds", nullptr, &cubemap)))
-        MessageBox(hwnd, L"Error loading cubemap.dds", 0, 0);
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"cubemap.dds", nullptr, &cubemap)))
+        MessageBox(hwnd, L"Error loading cubemap.dds", L"EffectsTest", MB_ICONERROR);
 
-    if (FAILED(CreateDDSTextureFromFile(device, L"overlay.dds", nullptr, &overlay)))
-        MessageBox(hwnd, L"Error loading overlay.dds", 0, 0);
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"overlay.dds", nullptr, &overlay)))
+        MessageBox(hwnd, L"Error loading overlay.dds", L"EffectsTest", MB_ICONERROR);
 
     // Create test geometry.
-    ID3D11Buffer* vertexBuffer;
-    ID3D11Buffer* indexBuffer;
+    ComPtr<ID3D11Buffer> vertexBuffer;
+    ComPtr<ID3D11Buffer> indexBuffer;
     
-    int indexCount = CreateTeapot(device, &vertexBuffer, &indexBuffer);
+    int indexCount = CreateTeapot(device.Get(), &vertexBuffer, &indexBuffer);
 
     // Create the shaders.
-    EffectWithDecl<BasicEffect> basicEffectUnlit(device, [](BasicEffect* effect)
+    EffectWithDecl<BasicEffect> basicEffectUnlit(device.Get(), [](BasicEffect* effect)
     {
         effect->SetDiffuseColor(Colors::Blue);
     });
 
-    EffectWithDecl<BasicEffect> basicEffect(device, [](BasicEffect* effect)
+    EffectWithDecl<BasicEffect> basicEffect(device.Get(), [](BasicEffect* effect)
     {
         effect->EnableDefaultLighting();
         effect->SetDiffuseColor(Colors::Red);
     });
 
-    EffectWithDecl<BasicEffect> basicEffectNoSpecular(device, [](BasicEffect* effect)
+    EffectWithDecl<BasicEffect> basicEffectNoSpecular(device.Get(), [](BasicEffect* effect)
     {
         effect->EnableDefaultLighting();
         effect->SetDiffuseColor(Colors::Red);
         effect->DisableSpecular();
     });
 
-    EffectWithDecl<SkinnedEffect> skinnedEffect(device, [&](SkinnedEffect* effect)
+    EffectWithDecl<SkinnedEffect> skinnedEffect(device.Get(), [&](SkinnedEffect* effect)
     {
         effect->EnableDefaultLighting();
-        effect->SetTexture(opaqueCat);
+        effect->SetTexture(opaqueCat.Get());
     });
 
-    EffectWithDecl<SkinnedEffect> skinnedEffectNoSpecular(device, [&](SkinnedEffect* effect)
+    EffectWithDecl<SkinnedEffect> skinnedEffectNoSpecular(device.Get(), [&](SkinnedEffect* effect)
     {
         effect->EnableDefaultLighting();
-        effect->SetTexture(opaqueCat);
+        effect->SetTexture(opaqueCat.Get());
         effect->DisableSpecular();
     });
 
-    EffectWithDecl<EnvironmentMapEffect> envmap(device, [&](EnvironmentMapEffect* effect)
+    EffectWithDecl<EnvironmentMapEffect> envmap(device.Get(), [&](EnvironmentMapEffect* effect)
     {
         effect->EnableDefaultLighting();
-        effect->SetTexture(opaqueCat);
-        effect->SetEnvironmentMap(cubemap);
+        effect->SetTexture(opaqueCat.Get());
+        effect->SetEnvironmentMap(cubemap.Get());
     });
 
-    EffectWithDecl<DualTextureEffect> dualTexture(device, [&](DualTextureEffect* effect)
+    EffectWithDecl<DualTextureEffect> dualTexture(device.Get(), [&](DualTextureEffect* effect)
     {
-        effect->SetTexture(opaqueCat);
-        effect->SetTexture2(overlay);
+        effect->SetTexture(opaqueCat.Get());
+        effect->SetTexture2(overlay.Get());
     });
 
-    EffectWithDecl<AlphaTestEffect> alphaTest(device, [&](AlphaTestEffect* effect)
+    EffectWithDecl<AlphaTestEffect> alphaTest(device.Get(), [&](AlphaTestEffect* effect)
     {
-        effect->SetTexture(cat);
+        effect->SetTexture(cat.Get());
     });
 
     bool quit = false;
@@ -408,7 +406,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     context->RSSetViewports(1, &vp);
 
-    context->OMSetRenderTargets(1, &backBuffer, depthStencil);
+    context->OMSetRenderTargets(1, backBuffer.GetAddressOf(), depthStencil.Get());
 
     LARGE_INTEGER freq;
     QueryPerformanceFrequency(&freq);
@@ -422,7 +420,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     {
         MSG msg;
 
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
                 quit = true;
@@ -436,8 +434,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         
         float time = (float)(counter.QuadPart - start.QuadPart) / (float)freq.QuadPart;
 
-        context->ClearRenderTargetView(backBuffer, Colors::CornflowerBlue);
-        context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+        context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
+        context->ClearDepthStencilView(depthStencil.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
         // Set state objects.
         context->OMSetBlendState(states.AlphaBlend(), Colors::White, 0xFFFFFFFF);
@@ -460,9 +458,9 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         UINT vertexStride = sizeof(TestVertex);
         UINT vertexOffset = 0;
 
-        context->IASetVertexBuffers(0, 1, &vertexBuffer, &vertexStride, &vertexOffset);
+        context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
 
-        context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0);
+        context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -494,12 +492,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 #endif
 
         // Simple unlit teapot.
-        basicEffectUnlit.Apply(context, world * XMMatrixTranslation(-4, 2.5f, 0), view, projection);
+        basicEffectUnlit.Apply(context.Get(), world * XMMatrixTranslation(-4, 2.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         // Unlit with alpha fading.
         basicEffectUnlit.SetAlpha(alphaFade);
-        basicEffectUnlit.Apply(context, world * XMMatrixTranslation(-4, 1.5f, 0), view, projection);
+        basicEffectUnlit.Apply(context.Get(), world * XMMatrixTranslation(-4, 1.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         basicEffectUnlit.SetAlpha(1);
 
@@ -508,27 +506,27 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         basicEffectUnlit.SetFogStart(fogstart);
         basicEffectUnlit.SetFogEnd(fogend);
         basicEffectUnlit.SetFogColor(Colors::Gray);
-        basicEffectUnlit.Apply(context, world * XMMatrixTranslation(-4, 0.5f, 2 - alphaFade * 6), view, projection);
+        basicEffectUnlit.Apply(context.Get(), world * XMMatrixTranslation(-4, 0.5f, 2 - alphaFade * 6), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         basicEffectUnlit.SetFogEnabled(false);
 
         // Simple lit teapot.
-        basicEffect.Apply(context, world * XMMatrixTranslation(-3, 2.5f, 0), view, projection);
+        basicEffect.Apply(context.Get(), world * XMMatrixTranslation(-3, 2.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         // Simple lit teapot, no specular
-        basicEffectNoSpecular.Apply(context, world * XMMatrixTranslation(-2, 0, 0), view, projection);
+        basicEffectNoSpecular.Apply(context.Get(), world * XMMatrixTranslation(-2, 0, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         // Simple lit with alpha fading.
         basicEffect.SetAlpha(alphaFade);
-        basicEffect.Apply(context, world * XMMatrixTranslation(-3, 1.5f, 0), view, projection);
+        basicEffect.Apply(context.Get(), world * XMMatrixTranslation(-3, 1.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         basicEffect.SetAlpha(1);
 
         // Simple lit alpha fading, no specular.
         basicEffectNoSpecular.SetAlpha(alphaFade);
-        basicEffectNoSpecular.Apply(context, world * XMMatrixTranslation(-1, 0, 0), view, projection);
+        basicEffectNoSpecular.Apply(context.Get(), world * XMMatrixTranslation(-1, 0, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         basicEffectNoSpecular.SetAlpha(1);
 
@@ -537,7 +535,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         basicEffect.SetFogStart(fogstart);
         basicEffect.SetFogEnd(fogend);
         basicEffect.SetFogColor(Colors::Gray);
-        basicEffect.Apply(context, world * XMMatrixTranslation(-3, 0.5f, 2 - alphaFade * 6), view, projection);
+        basicEffect.Apply(context.Get(), world * XMMatrixTranslation(-3, 0.5f, 2 - alphaFade * 6), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         basicEffect.SetFogEnabled(false);
 
@@ -547,24 +545,24 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         {
             // Light only from above.
             basicEffect.SetLightDirection(0, XMVectorSet(0, -1, 0, 0));
-            basicEffect.Apply(context, world * XMMatrixTranslation(-2, 2.5f, 0), view, projection);
+            basicEffect.Apply(context.Get(), world * XMMatrixTranslation(-2, 2.5f, 0), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
 
             // Light only from the left.
             basicEffect.SetLightDirection(0, XMVectorSet(1, 0, 0, 0));
-            basicEffect.Apply(context, world * XMMatrixTranslation(-1, 2.5f, 0), view, projection);
+            basicEffect.Apply(context.Get(), world * XMMatrixTranslation(-1, 2.5f, 0), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
 
             // Light only from straight in front.
             basicEffect.SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
-            basicEffect.Apply(context, world * XMMatrixTranslation(0, 2.5f, 0), view, projection);
+            basicEffect.Apply(context.Get(), world * XMMatrixTranslation(0, 2.5f, 0), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
         }
 
         basicEffect.EnableDefaultLighting();
 
         // Non uniform scaling.
-        basicEffect.Apply(context, XMMatrixScaling(1, 2, 0.25f) * world * XMMatrixTranslation(1, 2.5f, 0), view, projection);
+        basicEffect.Apply(context.Get(), XMMatrixScaling(1, 2, 0.25f) * world * XMMatrixTranslation(1, 2.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         basicEffect.SetPerPixelLighting(true);
@@ -576,24 +574,24 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             {
                 // Light only from above + per pixel lighting.
                 basicEffect.SetLightDirection(0, XMVectorSet(0, -1, 0, 0));
-                basicEffect.Apply(context, world * XMMatrixTranslation(-2, 1.5f, 0), view, projection);
+                basicEffect.Apply(context.Get(), world * XMMatrixTranslation(-2, 1.5f, 0), view, projection);
                 context->DrawIndexed(indexCount, 0, 0);
 
                 // Light only from the left + per pixel lighting.
                 basicEffect.SetLightDirection(0, XMVectorSet(1, 0, 0, 0));
-                basicEffect.Apply(context, world * XMMatrixTranslation(-1, 1.5f, 0), view, projection);
+                basicEffect.Apply(context.Get(), world * XMMatrixTranslation(-1, 1.5f, 0), view, projection);
                 context->DrawIndexed(indexCount, 0, 0);
 
                 // Light only from straight in front + per pixel lighting.
                 basicEffect.SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
-                basicEffect.Apply(context, world * XMMatrixTranslation(0, 1.5f, 0), view, projection);
+                basicEffect.Apply(context.Get(), world * XMMatrixTranslation(0, 1.5f, 0), view, projection);
                 context->DrawIndexed(indexCount, 0, 0);
             }
 
             basicEffect.EnableDefaultLighting();
 
             // Non uniform scaling + per pixel lighting.
-            basicEffect.Apply(context, XMMatrixScaling(1, 2, 0.25f) * world * XMMatrixTranslation(1, 1.5f, 0), view, projection);
+            basicEffect.Apply(context.Get(), XMMatrixScaling(1, 2, 0.25f) * world * XMMatrixTranslation(1, 1.5f, 0), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
         }
 
@@ -609,11 +607,11 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         };
 
         skinnedEffect.SetBoneTransforms(bones, 4);
-        skinnedEffect.Apply(context, world, view, projection);
+        skinnedEffect.Apply(context.Get(), world, view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         skinnedEffectNoSpecular.SetBoneTransforms(bones, 4);
-        skinnedEffectNoSpecular.Apply(context, world * XMMatrixTranslation(1, 0, 0), view, projection);
+        skinnedEffectNoSpecular.Apply(context.Get(), world * XMMatrixTranslation(1, 0, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         // Skinned effect, variable scaling transforms.
@@ -631,7 +629,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         }
 
         skinnedEffect.SetBoneTransforms(bones, 4);
-        skinnedEffect.Apply(context, world * XMMatrixTranslation(-1, -2, 0), view, projection);
+        skinnedEffect.Apply(context.Get(), world * XMMatrixTranslation(-1, -2, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         // Skinned effect, different variable scaling transforms.
@@ -649,16 +647,16 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         }
 
         skinnedEffect.SetBoneTransforms(bones, 4);
-        skinnedEffect.Apply(context, world * XMMatrixTranslation(-3, -2, 0), view, projection);
+        skinnedEffect.Apply(context.Get(), world * XMMatrixTranslation(-3, -2, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         // Environment map effect.
-        envmap.Apply(context, world * XMMatrixTranslation(2, 2.5f, 0), view, projection);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, 2.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         // Environment map with alpha fading.
         envmap.SetAlpha(alphaFade);
-        envmap.Apply(context, world * XMMatrixTranslation(2, 1.5f, 0), view, projection);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, 1.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         envmap.SetAlpha(1);
 
@@ -667,37 +665,37 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         envmap.SetFogStart(fogstart);
         envmap.SetFogEnd(fogend);
         envmap.SetFogColor(Colors::Gray);
-        envmap.Apply(context, world * XMMatrixTranslation(2, 0.5f, 2 - alphaFade * 6), view, projection);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, 0.5f, 2 - alphaFade * 6), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         envmap.SetFogEnabled(false);
 
         // Environment map, animating the fresnel factor.
         envmap.SetFresnelFactor(alphaFade * 3);
-        envmap.Apply(context, world * XMMatrixTranslation(2, -0.5f, 0), view, projection);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, -0.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         envmap.SetFresnelFactor(1);
 
         // Environment map, animating the amount.
         envmap.SetEnvironmentMapAmount(alphaFade);
-        envmap.Apply(context, world * XMMatrixTranslation(2, -1.5f, 0), view, projection);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, -1.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         envmap.SetEnvironmentMapAmount(1);
 
         // Environment map, animating the amount, with no fresnel.
         envmap.SetEnvironmentMapAmount(alphaFade);
         envmap.SetFresnelFactor(0);
-        envmap.Apply(context, world * XMMatrixTranslation(2, -2.5f, 0), view, projection);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, -2.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         envmap.SetEnvironmentMapAmount(1);
         envmap.SetFresnelFactor(1);
 
         // Dual texture effect.
-        dualTexture.Apply(context, world * XMMatrixTranslation(3, 2.5f, 0), view, projection);
+        dualTexture.Apply(context.Get(), world * XMMatrixTranslation(3, 2.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
 
         // Dual texture with alpha fading.
         dualTexture.SetAlpha(alphaFade);
-        dualTexture.Apply(context, world * XMMatrixTranslation(3, 1.5f, 0), view, projection);
+        dualTexture.Apply(context.Get(), world * XMMatrixTranslation(3, 1.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         dualTexture.SetAlpha(1);
 
@@ -706,7 +704,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         dualTexture.SetFogStart(fogstart);
         dualTexture.SetFogEnd(fogend);
         dualTexture.SetFogColor(Colors::Gray);
-        dualTexture.Apply(context, world * XMMatrixTranslation(3, 0.5f, 2 - alphaFade * 6), view, projection);
+        dualTexture.Apply(context.Get(), world * XMMatrixTranslation(3, 0.5f, 2 - alphaFade * 6), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         dualTexture.SetFogEnabled(false);
 
@@ -716,13 +714,13 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             // Alpha test, > 0.
             alphaTest.SetAlphaFunction(D3D11_COMPARISON_GREATER);
             alphaTest.SetReferenceAlpha(0);
-            alphaTest.Apply(context, world * XMMatrixTranslation(4, 2.5f, 0), view, projection);
+            alphaTest.Apply(context.Get(), world * XMMatrixTranslation(4, 2.5f, 0), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
 
             // Alpha test, > 128.
             alphaTest.SetAlphaFunction(D3D11_COMPARISON_GREATER);
             alphaTest.SetReferenceAlpha(128);
-            alphaTest.Apply(context, world * XMMatrixTranslation(4, 1.5f, 0), view, projection);
+            alphaTest.Apply(context.Get(), world * XMMatrixTranslation(4, 1.5f, 0), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
 
             // Alpha test with fog.
@@ -730,26 +728,26 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             alphaTest.SetFogStart(fogstart);
             alphaTest.SetFogEnd(fogend);
             alphaTest.SetFogColor(Colors::Red);
-            alphaTest.Apply(context, world * XMMatrixTranslation(4, 0.5f, 2 - alphaFade * 6), view, projection);
+            alphaTest.Apply(context.Get(), world * XMMatrixTranslation(4, 0.5f, 2 - alphaFade * 6), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
             alphaTest.SetFogEnabled(false);
 
             // Alpha test, < animating value.
             alphaTest.SetAlphaFunction(D3D11_COMPARISON_LESS);
             alphaTest.SetReferenceAlpha(1 + (int)(alphaFade * 254));
-            alphaTest.Apply(context, world * XMMatrixTranslation(4, -0.5f, 0), view, projection);
+            alphaTest.Apply(context.Get(), world * XMMatrixTranslation(4, -0.5f, 0), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
 
             // Alpha test, = 255.
             alphaTest.SetAlphaFunction(D3D11_COMPARISON_EQUAL);
             alphaTest.SetReferenceAlpha(255);
-            alphaTest.Apply(context, world * XMMatrixTranslation(4, -1.5f, 0), view, projection);
+            alphaTest.Apply(context.Get(), world * XMMatrixTranslation(4, -1.5f, 0), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
 
             // Alpha test, != 0.
             alphaTest.SetAlphaFunction(D3D11_COMPARISON_NOT_EQUAL);
             alphaTest.SetReferenceAlpha(0);
-            alphaTest.Apply(context, world * XMMatrixTranslation(4, -2.5f, 0), view, projection);
+            alphaTest.Apply(context.Get(), world * XMMatrixTranslation(4, -2.5f, 0), view, projection);
             context->DrawIndexed(indexCount, 0, 0);
         }
 
@@ -760,32 +758,17 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         if ( frame == 10 )
         {
-            ID3D11Texture2D* backBufferTex = nullptr;
+            ComPtr<ID3D11Texture2D> backBufferTex;
             hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTex);
             if ( SUCCEEDED(hr) )
             {
-                hr = SaveWICTextureToFile( context, backBufferTex, GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
-                hr = SaveDDSTextureToFile( context, backBufferTex, L"SCREENSHOT.DDS" );
-                backBufferTex->Release();
+                hr = SaveWICTextureToFile( context.Get(), backBufferTex.Get(), GUID_ContainerFormatBmp, L"SCREENSHOT.BMP" );
+                hr = SaveDDSTextureToFile( context.Get(), backBufferTex.Get(), L"SCREENSHOT.DDS" );
             }
         }
 
         time++;
     }
-
-    vertexBuffer->Release();
-    indexBuffer->Release();
-    cat->Release();
-    opaqueCat->Release();
-    cubemap->Release();
-    overlay->Release();
-    depthStencilTexture->Release();
-    depthStencil->Release();
-    backBuffer->Release();
-    backBufferTexture->Release();
-    swapChain->Release();
-    context->Release();
-    device->Release();
 
     return 0;
 }
