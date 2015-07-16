@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DynamicAudioTest_Desktop_20
 		{4F150A30-CECB-49D1-8283-6A3F57438CF5} = {4F150A30-CECB-49D1-8283-6A3F57438CF5}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{969A1DFC-D0B0-4F6E-A24A-04313915D01F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -72,5 +74,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{67A53FFE-F9AC-42F1-A364-245FFF698ABA} = {969A1DFC-D0B0-4F6E-A24A-04313915D01F}
+		{AACAB780-4D98-486E-8D8D-6A8001E9F2CC} = {969A1DFC-D0B0-4F6E-A24A-04313915D01F}
+		{0B87D1D9-17CB-4CB9-87AC-E31083D743D5} = {969A1DFC-D0B0-4F6E-A24A-04313915D01F}
+		{4F150A30-CECB-49D1-8283-6A3F57438CF5} = {969A1DFC-D0B0-4F6E-A24A-04313915D01F}
 	EndGlobalSection
 EndGlobal
