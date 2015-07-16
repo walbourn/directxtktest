@@ -165,6 +165,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 #endif
 
     auto cube = GeometricPrimitive::CreateCube(context.Get(), 1.f, rhcoords );
+    auto box = GeometricPrimitive::CreateBox(context.Get(), XMFLOAT3(1.f/2.f, 2.f/2.f, 3.f/2.f), rhcoords);
     auto sphere = GeometricPrimitive::CreateSphere(context.Get(), 1.f, 16, rhcoords );
     auto geosphere = GeometricPrimitive::CreateGeoSphere(context.Get(), 1.f, 3, rhcoords );
     auto cylinder = GeometricPrimitive::CreateCylinder(context.Get(), 1.f, 1.f, 32, rhcoords );
@@ -277,19 +278,21 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         octa->Draw(world * XMMatrixTranslation(col8, row0, 0), view, projection, Colors::Lime);
         dodec->Draw(world * XMMatrixTranslation(col9, row0, 0), view, projection, Colors::Blue);
         iso->Draw(world * XMMatrixTranslation(col10, row0, 0), view, projection, Colors::Cyan);
+        box->Draw(world * XMMatrixTranslation(col8, row3, 0), view, projection, Colors::Magenta);
 
         // Draw textured shapes.
         cube->Draw(world * XMMatrixTranslation(col0, row1, 0), view, projection, Colors::White, reftxt.Get());
-        sphere->Draw(world * XMMatrixTranslation(col1, row1, 0), view, projection, Colors::Yellow, reftxt.Get());
-        geosphere->Draw(world * XMMatrixTranslation(col2, row1, 0), view, projection, Colors::White, reftxt.Get());
-        cylinder->Draw(world * XMMatrixTranslation(col3, row1, 0), view, projection, Colors::Cyan * 1.2f, reftxt.Get());
-        cone->Draw(world * XMMatrixTranslation(col4, row1, 0), view, projection, Colors::Yellow * 1.2f, reftxt.Get());
-        torus->Draw(world * XMMatrixTranslation(col5, row1, 0), view, projection, Colors::LightPink, reftxt.Get());
-        teapot->Draw(world * XMMatrixTranslation(col6, row1, 0), view, projection, Colors::CornflowerBlue * 1.5, reftxt.Get());
-        tetra->Draw(world * XMMatrixTranslation(col7, row1, 0), view, projection, Colors::White, reftxt.Get());
-        octa->Draw(world * XMMatrixTranslation(col8, row1, 0), view, projection, Colors::White, reftxt.Get());
-        dodec->Draw(world * XMMatrixTranslation(col9, row1, 0), view, projection, Colors::White, reftxt.Get());
-        iso->Draw(world * XMMatrixTranslation(col10, row1, 0), view, projection, Colors::White, reftxt.Get());
+        sphere->Draw(world * XMMatrixTranslation(col1, row1, 0), view, projection, Colors::Red, reftxt.Get());
+        geosphere->Draw(world * XMMatrixTranslation(col2, row1, 0), view, projection, Colors::Green, reftxt.Get());
+        cylinder->Draw(world * XMMatrixTranslation(col3, row1, 0), view, projection, Colors::Lime, reftxt.Get());
+        cone->Draw(world * XMMatrixTranslation(col4, row1, 0), view, projection, Colors::Yellow, reftxt.Get());
+        torus->Draw(world * XMMatrixTranslation(col5, row1, 0), view, projection, Colors::Blue, reftxt.Get());
+        teapot->Draw(world * XMMatrixTranslation(col6, row1, 0), view, projection, Colors::CornflowerBlue, reftxt.Get());
+        tetra->Draw(world * XMMatrixTranslation(col7, row1, 0), view, projection, Colors::Red, reftxt.Get());
+        octa->Draw(world * XMMatrixTranslation(col8, row1, 0), view, projection, Colors::Lime, reftxt.Get());
+        dodec->Draw(world * XMMatrixTranslation(col9, row1, 0), view, projection, Colors::Blue, reftxt.Get());
+        iso->Draw(world * XMMatrixTranslation(col10, row1, 0), view, projection, Colors::Cyan, reftxt.Get());
+        box->Draw(world * XMMatrixTranslation(col9, row3, 0), view, projection, Colors::Magenta, reftxt.Get());
 
         // Draw shapes in wireframe.
         cube->Draw(world * XMMatrixTranslation(col0, row2, 0), view, projection, Colors::Gray, nullptr, true);
@@ -303,6 +306,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         octa->Draw(world * XMMatrixTranslation(col8, row2, 0), view, projection, Colors::Gray, nullptr, true);
         dodec->Draw(world * XMMatrixTranslation(col9, row2, 0), view, projection, Colors::Gray, nullptr, true);
         iso->Draw(world * XMMatrixTranslation(col10, row2, 0), view, projection, Colors::Gray, nullptr, true);
+        box->Draw(world * XMMatrixTranslation(col10, row3, 0), view, projection, Colors::Gray, nullptr, true);
 
         // Draw shapes with alpha blending.
         cube->Draw(world * XMMatrixTranslation(col0, row3, 0), view, projection, Colors::White * alphaFade);
