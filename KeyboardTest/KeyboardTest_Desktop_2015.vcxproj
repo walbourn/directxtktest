@@ -165,9 +165,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="KeyboardTest.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="comic.spritefont" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="KeyboardTest.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="StepTimer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="texture.dds" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
