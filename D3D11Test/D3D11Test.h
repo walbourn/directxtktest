@@ -86,4 +86,9 @@ private:
 
     // Game state
     DX::StepTimer                                   m_timer;
+
+    std::unique_ptr<DirectX::BasicEffect>           m_effect;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>       m_inputLayout;
+
+    std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_batch;
 };

@@ -17,6 +17,7 @@
 #include "D3D11Test.h"
 
 using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
@@ -86,6 +87,19 @@ void Game::Render()
     Clear();
 
     // TODO: Add your rendering code here
+    m_effect->Apply(m_d3dContext.Get());
+
+    m_d3dContext->IASetInputLayout(m_inputLayout.Get());
+
+    m_batch->Begin();
+
+    VertexPositionColor v1(Vector3(0.f, 0.5f, 0.5f), Colors::Red);
+    VertexPositionColor v2(Vector3(0.5f, -0.5f, 0.5f), Colors::Green);
+    VertexPositionColor v3(Vector3(-0.5f, -0.5f, 0.5f), Colors::Blue);
+
+    m_batch->DrawTriangle(v1, v2, v3);
+
+    m_batch->End();
 
     Present();
 }
@@ -293,6 +307,21 @@ void Game::CreateDevice()
 #endif
 
     // TODO: Initialize device dependent objects here (independent of window size)
+    m_effect.reset(new BasicEffect(m_d3dDevice.Get()));
+    m_effect->SetVertexColorEnabled(true);
+
+    void const* shaderByteCode;
+    size_t byteCodeLength;
+
+    m_effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+    DX::ThrowIfFailed(
+            m_d3dDevice->CreateInputLayout(VertexPositionColor::InputElements,
+                VertexPositionColor::InputElementCount,
+                shaderByteCode, byteCodeLength,
+                m_inputLayout.ReleaseAndGetAddressOf()));
+
+    m_batch.reset(new PrimitiveBatch<VertexPositionColor>(m_d3dContext.Get()));
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -408,6 +437,9 @@ void Game::CreateResources()
 void Game::OnDeviceLost()
 {
     // TODO: Add Direct3D resource cleanup here
+    m_effect.reset();
+    m_batch.reset();
+    m_inputLayout.Reset();
 
     m_depthStencil.Reset();
     m_depthStencilView.Reset();
