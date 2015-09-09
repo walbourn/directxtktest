@@ -103,7 +103,7 @@ void Game::Tick()
 }
 
 // Updates the world
-void Game::Update(DX::StepTimer const& timer)
+void Game::Update(DX::StepTimer const&)
 {
     auto kb = m_keyboard->GetState();
 

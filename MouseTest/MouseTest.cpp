@@ -106,7 +106,7 @@ void Game::Tick()
 }
 
 // Updates the world
-void Game::Update(DX::StepTimer const& timer)
+void Game::Update(DX::StepTimer const&)
 {
     auto mouse = m_mouse->GetState();
     m_lastMode = mouse.positionMode;
@@ -381,6 +381,8 @@ void Game::SetDPI(float dpi)
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
     if (m_mouse)
         m_mouse->SetDpi(dpi);
+#else
+    UNREFERENCED_PARAMETER(dpi);
 #endif
 }
 
