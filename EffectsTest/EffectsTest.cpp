@@ -19,7 +19,7 @@
 #include "DirectXPackedVector.h"
 #include "DDSTextureLoader.h"
 #include "ScreenGrab.h"
-#include "../../Src/Bezier.h"
+#include "Bezier.h"
 
 #include <vector>
 #include <functional>
