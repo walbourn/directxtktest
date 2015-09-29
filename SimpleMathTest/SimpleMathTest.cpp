@@ -127,6 +127,31 @@ int TestV2()
         success = false;
     }
 
+    {
+        XMFLOAT2 xm(6.f, -2.f);
+        Vector2 vi(xm);
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON))
+        {
+            printf("ERROR: XMFLOAT2 ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT2 xm(6.f, -2.f);
+        Vector2 vi;
+        vi = xm;
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON))
+        {
+            printf("ERROR: XMFLOAT2 =\n");
+            success = false;
+        }
+    }
+
     v += v2;
     if ( v != Vector2(5,7) )
     {
@@ -985,6 +1010,33 @@ int TestV3()
     {
         printf("ERROR: !=\n");
         success = false;
+    }
+
+    {
+        XMFLOAT3 xm(6.f, -2.f, 7.f);
+        Vector3 vi(xm);
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON))
+        {
+            printf("ERROR: XMFLOAT3 ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT3 xm(6.f, -2.f, 7.f);
+        Vector3 vi;
+        vi = xm;
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON))
+        {
+            printf("ERROR: XMFLOAT3 =\n");
+            success = false;
+        }
     }
 
     Vector3 zero(0.f, 0.f, 0.f);
@@ -1877,6 +1929,35 @@ int TestV4()
     {
         printf("ERROR: !=\n");
         success = false;
+    }
+
+    {
+        XMFLOAT4 xm(6.f, -2.f, 7.f, 80.f);
+        Vector4 vi(xm);
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON)
+            || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
+        {
+            printf("ERROR: XMFLOAT4 ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT4 xm(6.f, -2.f, 7.f, 80.f);
+        Vector4 vi;
+        vi = xm;
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON)
+            || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
+        {
+            printf("ERROR: XMFLOAT4 =\n");
+            success = false;
+        }
     }
 
     Vector4 zero(0.f, 0.f, 0.f, 0.f);
@@ -2789,6 +2870,65 @@ int TestM()
     b = a;
     VerifyEqual(b, a);
 
+    {
+        XMFLOAT4X4 xm(6.f, -2.f, 7.f, 80.f,
+                      4.f, -3.f, 2.f, 1.f,
+                      125.f, 126.f, 127.f, 128.f,
+                      0.1f, 0.2f, 0.3f, 0.4f);
+        Matrix mi(xm);
+
+        if (!XMScalarNearEqual(xm._11, mi._11, EPSILON)
+            || !XMScalarNearEqual(xm._12, mi._12, EPSILON)
+            || !XMScalarNearEqual(xm._13, mi._13, EPSILON)
+            || !XMScalarNearEqual(xm._14, mi._14, EPSILON)
+            || !XMScalarNearEqual(xm._21, mi._21, EPSILON)
+            || !XMScalarNearEqual(xm._22, mi._22, EPSILON)
+            || !XMScalarNearEqual(xm._23, mi._23, EPSILON)
+            || !XMScalarNearEqual(xm._24, mi._24, EPSILON)
+            || !XMScalarNearEqual(xm._31, mi._31, EPSILON)
+            || !XMScalarNearEqual(xm._32, mi._32, EPSILON)
+            || !XMScalarNearEqual(xm._33, mi._33, EPSILON)
+            || !XMScalarNearEqual(xm._34, mi._34, EPSILON)
+            || !XMScalarNearEqual(xm._41, mi._41, EPSILON)
+            || !XMScalarNearEqual(xm._42, mi._42, EPSILON)
+            || !XMScalarNearEqual(xm._43, mi._43, EPSILON)
+            || !XMScalarNearEqual(xm._44, mi._44, EPSILON) )
+        {
+            printf("ERROR: XMFLOAT4X4 ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT4X4 xm(6.f, -2.f, 7.f, 80.f,
+                      4.f, -3.f, 2.f, 1.f,
+                      125.f, 126.f, 127.f, 128.f,
+                      0.1f, 0.2f, 0.3f, 0.4f);
+        Matrix mi;
+        mi = xm;
+
+        if (!XMScalarNearEqual(xm._11, mi._11, EPSILON)
+            || !XMScalarNearEqual(xm._12, mi._12, EPSILON)
+            || !XMScalarNearEqual(xm._13, mi._13, EPSILON)
+            || !XMScalarNearEqual(xm._14, mi._14, EPSILON)
+            || !XMScalarNearEqual(xm._21, mi._21, EPSILON)
+            || !XMScalarNearEqual(xm._22, mi._22, EPSILON)
+            || !XMScalarNearEqual(xm._23, mi._23, EPSILON)
+            || !XMScalarNearEqual(xm._24, mi._24, EPSILON)
+            || !XMScalarNearEqual(xm._31, mi._31, EPSILON)
+            || !XMScalarNearEqual(xm._32, mi._32, EPSILON)
+            || !XMScalarNearEqual(xm._33, mi._33, EPSILON)
+            || !XMScalarNearEqual(xm._34, mi._34, EPSILON)
+            || !XMScalarNearEqual(xm._41, mi._41, EPSILON)
+            || !XMScalarNearEqual(xm._42, mi._42, EPSILON)
+            || !XMScalarNearEqual(xm._43, mi._43, EPSILON)
+            || !XMScalarNearEqual(xm._44, mi._44, EPSILON) )
+        {
+            printf("ERROR: XMFLOAT4X4 =\n");
+            success = false;
+        }
+    }
+
     b += Matrix(4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1);
     VerifyEqual(b, Matrix(5, 5, 5, 5, 9, 9, 9, 9, 13, 13, 13, 13, 17, 17, 17, 17));
 
@@ -3217,6 +3357,35 @@ int TestP()
     c = b;
     VerifyEqual(c, b);
 
+    {
+        XMFLOAT4 xm(6.f, -2.f, 7.f, 80.f);
+        Plane vi(xm);
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON)
+            || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
+        {
+            printf("ERROR: XMFLOAT4 ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT4 xm(6.f, -2.f, 7.f, 80.f);
+        Plane vi;
+        vi = xm;
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON)
+            || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
+        {
+            printf("ERROR: XMFLOAT4 =\n");
+            success = false;
+        }
+    }
+
     VerifyEqual(c.Normal(), Vector3(5, 6, 7));
     c.Normal(Vector3(0, 1, 2));
     VerifyEqual(c.Normal(), Vector3(0, 1, 2));
@@ -3297,6 +3466,35 @@ int TestQ()
     VerifyEqual(c, a);
     c = b;
     VerifyEqual(c, b);
+
+    {
+        XMFLOAT4 xm(6.f, -2.f, 7.f, 80.f);
+        Quaternion vi(xm);
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON)
+            || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
+        {
+            printf("ERROR: XMFLOAT4 ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT4 xm(6.f, -2.f, 7.f, 80.f);
+        Quaternion vi;
+        vi = xm;
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON)
+            || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
+        {
+            printf("ERROR: XMFLOAT4 =\n");
+            success = false;
+        }
+    }
 
     c += a;
     VerifyEqual(c, Quaternion(6, 8, 10, 12));
@@ -3421,6 +3619,35 @@ int TestC()
     Color c;
     c = b;
     VerifyEqual(c, b);
+
+    {
+        XMFLOAT4 xm(6.f, -2.f, 7.f, 80.f);
+        Color vi(xm);
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON)
+            || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
+        {
+            printf("ERROR: XMFLOAT4 ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT4 xm(6.f, -2.f, 7.f, 80.f);
+        Color vi;
+        vi = xm;
+
+        if (!XMScalarNearEqual(xm.x, vi.x, EPSILON)
+            || !XMScalarNearEqual(xm.y, vi.y, EPSILON)
+            || !XMScalarNearEqual(xm.z, vi.z, EPSILON)
+            || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
+        {
+            printf("ERROR: XMFLOAT4 =\n");
+            success = false;
+        }
+    }
 
     c += a;
     VerifyEqual(c, Color(5, 7, 9, 8));
