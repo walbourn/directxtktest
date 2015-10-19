@@ -394,7 +394,7 @@ int __cdecl main()
         std::vector<uint8_t> audioBytes;
         audioBytes.resize( 44100 * 2 );
 
-        GenerateSineWave( reinterpret_cast<int16_t*>( &audioBytes.front() ), 44100, 440 );
+        GenerateSineWave( reinterpret_cast<int16_t*>( audioBytes.data() ), 44100, 440 );
 
         uint32_t buffNeededCount = 0;
 
@@ -407,7 +407,7 @@ int __cdecl main()
 
                             while( count < 3 )
                             {
-                                effect->SubmitBuffer( &audioBytes.front(), audioBytes.size() );
+                                effect->SubmitBuffer( audioBytes.data(), audioBytes.size() );
                                 ++count;
                             }
 

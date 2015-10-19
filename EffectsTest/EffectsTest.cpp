@@ -98,7 +98,7 @@ static void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FL
 
     D3D11_SUBRESOURCE_DATA dataDesc = { 0 };
 
-    dataDesc.pSysMem = &data.front();
+    dataDesc.pSysMem = data.data();
 
     HRESULT hr = device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer);
 
