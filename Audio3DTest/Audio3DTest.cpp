@@ -407,6 +407,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         listener.SetPosition( listenerMatrix.r[3] );
 
+#ifdef LH_COORDS
+        listener.SetOrientation(XMFLOAT3(0.f, 0.f, 1.f), XMFLOAT3(0.f, 1.f, 0.f));
+#else
+        listener.SetOrientation(XMFLOAT3(0.f, 0.f, -1.f), XMFLOAT3(0.f, 1.f, 0.f));
+#endif
+
         sphere->Draw(listenerMatrix, view, projection, Colors::Yellow);
 
         sphere->Draw(emitterMatrix, view, projection, Colors::Red);
@@ -416,7 +422,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         emitter.Update( emitterMatrix.r[3], g_XMIdentityR1, dt );
 
-        effect->Apply3D( listener, emitter );
+        effect->Apply3D( listener, emitter, rhcoords );
 
         if ( !audEngine->Update() )
         {
