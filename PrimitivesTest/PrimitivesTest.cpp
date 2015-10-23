@@ -177,6 +177,21 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     auto dodec = GeometricPrimitive::CreateDodecahedron(context.Get(), 0.5f, rhcoords );
     auto iso = GeometricPrimitive::CreateIcosahedron(context.Get(), 0.5f, rhcoords );
 
+    std::unique_ptr<GeometricPrimitive> customBox;
+    {
+        std::vector<VertexPositionNormalTexture> customVerts;
+        std::vector<uint16_t> customIndices;
+        GeometricPrimitive::CreateBox( customVerts, customIndices,  XMFLOAT3(1.f/2.f, 2.f/2.f, 3.f/2.f), rhcoords);
+
+        for( auto it = customVerts.begin(); it != customVerts.end(); ++it )
+        {
+            it->textureCoordinate.x *= 5.f;
+            it->textureCoordinate.y *= 5.f;
+        }
+
+        customBox = GeometricPrimitive::CreateCustom( context.Get(), customVerts, customIndices );
+    }
+
     ComPtr<ID3D11InputLayout> customIL;
     std::unique_ptr<BasicEffect> customEffect( new BasicEffect( device.Get() ) );
     customEffect->EnableDefaultLighting();
@@ -293,6 +308,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         dodec->Draw(world * XMMatrixTranslation(col9, row1, 0), view, projection, Colors::Blue, reftxt.Get());
         iso->Draw(world * XMMatrixTranslation(col10, row1, 0), view, projection, Colors::Cyan, reftxt.Get());
         box->Draw(world * XMMatrixTranslation(col9, row3, 0), view, projection, Colors::Magenta, reftxt.Get());
+        customBox->Draw(world * XMMatrixTranslation(col7, row3, 0), view, projection, Colors::White, reftxt.Get());
 
         // Draw shapes in wireframe.
         cube->Draw(world * XMMatrixTranslation(col0, row2, 0), view, projection, Colors::Gray, nullptr, true);
