@@ -2929,6 +2929,122 @@ int TestM()
         }
     }
 
+    {
+        XMFLOAT3X3 xm(6.f, -2.f, 7.f,
+                      4.f, -3.f, 2.f,
+                      125.f, 126.f, 127.f);
+        Matrix mi(xm);
+
+        if (!XMScalarNearEqual(xm._11, mi._11, EPSILON)
+            || !XMScalarNearEqual(xm._12, mi._12, EPSILON)
+            || !XMScalarNearEqual(xm._13, mi._13, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._14, EPSILON)
+            || !XMScalarNearEqual(xm._21, mi._21, EPSILON)
+            || !XMScalarNearEqual(xm._22, mi._22, EPSILON)
+            || !XMScalarNearEqual(xm._23, mi._23, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._24, EPSILON)
+            || !XMScalarNearEqual(xm._31, mi._31, EPSILON)
+            || !XMScalarNearEqual(xm._32, mi._32, EPSILON)
+            || !XMScalarNearEqual(xm._33, mi._33, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._34, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._41, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._42, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._43, EPSILON)
+            || !XMScalarNearEqual(1.f, mi._44, EPSILON) )
+        {
+            printf("ERROR: XMFLOAT3X3 ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT3X3 xm(6.f, -2.f, 7.f,
+                      4.f, -3.f, 2.f,
+                      125.f, 126.f, 127.f);
+        Matrix mi;
+        mi = xm;
+
+        if (!XMScalarNearEqual(xm._11, mi._11, EPSILON)
+            || !XMScalarNearEqual(xm._12, mi._12, EPSILON)
+            || !XMScalarNearEqual(xm._13, mi._13, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._14, EPSILON)
+            || !XMScalarNearEqual(xm._21, mi._21, EPSILON)
+            || !XMScalarNearEqual(xm._22, mi._22, EPSILON)
+            || !XMScalarNearEqual(xm._23, mi._23, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._24, EPSILON)
+            || !XMScalarNearEqual(xm._31, mi._31, EPSILON)
+            || !XMScalarNearEqual(xm._32, mi._32, EPSILON)
+            || !XMScalarNearEqual(xm._33, mi._33, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._34, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._41, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._42, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._43, EPSILON)
+            || !XMScalarNearEqual(1.f, mi._44, EPSILON) )
+        {
+            printf("ERROR: XMFLOAT3X3 =\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT4X3 xm(6.f, -2.f, 7.f,
+                      4.f, -3.f, 2.f,
+                      125.f, 126.f, 127.f,
+                      0.1f, 0.2f, 0.3f);
+        Matrix mi(xm);
+
+        if (!XMScalarNearEqual(xm._11, mi._11, EPSILON)
+            || !XMScalarNearEqual(xm._12, mi._12, EPSILON)
+            || !XMScalarNearEqual(xm._13, mi._13, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._14, EPSILON)
+            || !XMScalarNearEqual(xm._21, mi._21, EPSILON)
+            || !XMScalarNearEqual(xm._22, mi._22, EPSILON)
+            || !XMScalarNearEqual(xm._23, mi._23, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._24, EPSILON)
+            || !XMScalarNearEqual(xm._31, mi._31, EPSILON)
+            || !XMScalarNearEqual(xm._32, mi._32, EPSILON)
+            || !XMScalarNearEqual(xm._33, mi._33, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._34, EPSILON)
+            || !XMScalarNearEqual(xm._41, mi._41, EPSILON)
+            || !XMScalarNearEqual(xm._42, mi._42, EPSILON)
+            || !XMScalarNearEqual(xm._43, mi._43, EPSILON)
+            || !XMScalarNearEqual(1.f, mi._44, EPSILON) )
+        {
+            printf("ERROR: XMFLOAT4X3 ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        XMFLOAT4X3 xm(6.f, -2.f, 7.f,
+                      4.f, -3.f, 2.f,
+                      125.f, 126.f, 127.f,
+                      0.1f, 0.2f, 0.3f);
+        Matrix mi;
+        mi = xm;
+
+        if (!XMScalarNearEqual(xm._11, mi._11, EPSILON)
+            || !XMScalarNearEqual(xm._12, mi._12, EPSILON)
+            || !XMScalarNearEqual(xm._13, mi._13, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._14, EPSILON)
+            || !XMScalarNearEqual(xm._21, mi._21, EPSILON)
+            || !XMScalarNearEqual(xm._22, mi._22, EPSILON)
+            || !XMScalarNearEqual(xm._23, mi._23, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._24, EPSILON)
+            || !XMScalarNearEqual(xm._31, mi._31, EPSILON)
+            || !XMScalarNearEqual(xm._32, mi._32, EPSILON)
+            || !XMScalarNearEqual(xm._33, mi._33, EPSILON)
+            || !XMScalarNearEqual(0.f, mi._34, EPSILON)
+            || !XMScalarNearEqual(xm._41, mi._41, EPSILON)
+            || !XMScalarNearEqual(xm._42, mi._42, EPSILON)
+            || !XMScalarNearEqual(xm._43, mi._43, EPSILON)
+            || !XMScalarNearEqual(1.f, mi._44, EPSILON) )
+        {
+            printf("ERROR: XMFLOAT4X3 =\n");
+            success = false;
+        }
+    }
+
     b += Matrix(4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1);
     VerifyEqual(b, Matrix(5, 5, 5, 5, 9, 9, 9, 9, 13, 13, 13, 13, 17, 17, 17, 17));
 
