@@ -291,7 +291,7 @@ void Game::Render()
     // Row 0
     for (int vk = VK_F1; vk <= VK_F10; ++vk)
     {
-        wchar_t buff[5];
+        wchar_t buff[5] = { 0 };
         swprintf_s(buff, L"F%d", vk - VK_F1 + 1);
         m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, m_kb.IsKeyDown(static_cast<DirectX::Keyboard::Keys>(vk)) ? Colors::Red : Colors::LightGray);
 
@@ -304,7 +304,7 @@ void Game::Render()
 
     for (int vk = 0x30; vk <= 0x39; ++vk)
     {
-        wchar_t buff[3];
+        wchar_t buff[3] = { 0 };
         swprintf_s(buff, L"%d", vk - 0x30);
         m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, m_kb.IsKeyDown(static_cast<DirectX::Keyboard::Keys>(vk)) ? Colors::Red : Colors::LightGray);
 

@@ -249,7 +249,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         
         comicFont.DrawString(g_spriteBatch.get(), L"This is a larger block\nof text using a\nfont scaled to a\nsmaller size.\nSome c\x1234ha\x1543rac\x2453te\x1634r\x1563s are not in the font, but should show up as hyphens.", XMFLOAT2(10, 90), Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
 
-        wchar_t tmp[256];
+        wchar_t tmp[256] = { 0 };
         swprintf_s(tmp, L"%Iu frames", frame );
         
         nonproportionalFont.DrawString(g_spriteBatch.get(), tmp, XMFLOAT2(201, 130), Colors::Black);

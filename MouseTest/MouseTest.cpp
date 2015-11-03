@@ -216,7 +216,7 @@ void Game::Render()
     // Scroll Wheel
     pos.y += height * 2;
     {
-        wchar_t buff[16];
+        wchar_t buff[16] = { 0 };
         swprintf_s(buff, L"%d", m_ms.scrollWheelValue);
         m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, Colors::Black);
     }
