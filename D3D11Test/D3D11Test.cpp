@@ -113,8 +113,9 @@ void Game::Clear()
 
     m_d3dContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), m_depthStencilView.Get());
 
-    CD3D11_VIEWPORT viewPort(0.0f, 0.0f, static_cast<float>(m_outputWidth), static_cast<float>(m_outputHeight));
-    m_d3dContext->RSSetViewports(1, &viewPort);
+    Viewport viewPort(0.0f, 0.0f, static_cast<float>(m_outputWidth), static_cast<float>(m_outputHeight));
+
+    m_d3dContext->RSSetViewports(1, viewPort.Get11());
 }
 
 // Presents the backbuffer contents to the screen

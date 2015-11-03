@@ -3898,6 +3898,547 @@ int TestR()
 }
 
 
+//-------------------------------------------------------------------------------------
+int TestVP()
+{
+    // Viewport
+    bool success = true;
+
+    Viewport vp1;
+    if (!XMScalarNearEqual(vp1.x, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp1.y, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp1.width, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp1.height, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp1.minDepth, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp1.maxDepth, 1.f, EPSILON))
+    {
+            printf("ERROR: vp1 ctor\n");
+            success = false;
+    }
+
+    Viewport vp2(0.f, 0.f, 640.f, 480.f);
+    if (!XMScalarNearEqual(vp2.x, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp2.y, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp2.width, 640.f, EPSILON)
+        || !XMScalarNearEqual(vp2.height, 480.f, EPSILON)
+        || !XMScalarNearEqual(vp2.minDepth, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp2.maxDepth, 1.f, EPSILON))
+    {
+            printf("ERROR: vp2 ctor\n");
+            success = false;
+    }
+
+    Viewport vp3(0.f, 0.f, 1024, 768.f, 1.f, 100.f);
+    if (!XMScalarNearEqual(vp3.x, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp3.y, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp3.width, 1024.f, EPSILON)
+        || !XMScalarNearEqual(vp3.height, 768.f, EPSILON)
+        || !XMScalarNearEqual(vp3.minDepth, 1.f, EPSILON)
+        || !XMScalarNearEqual(vp3.maxDepth, 100.f, EPSILON))
+    {
+            printf("ERROR: vp3 ctor\n");
+            success = false;
+    }
+
+    Viewport vp4(0.f, 0.f, 1920.f, 1080.f);
+    if (!XMScalarNearEqual(vp4.x, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp4.y, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp4.width, 1920.f, EPSILON)
+        || !XMScalarNearEqual(vp4.height, 1080.f, EPSILON)
+        || !XMScalarNearEqual(vp4.minDepth, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp4.maxDepth, 1.f, EPSILON))
+    {
+            printf("ERROR: vp4 ctor\n");
+            success = false;
+    }
+
+    Viewport vp5(23.f, 42.f, 666.f, 1234.f);
+    if (!XMScalarNearEqual(vp5.x, 23.f, EPSILON)
+        || !XMScalarNearEqual(vp5.y, 42.f, EPSILON)
+        || !XMScalarNearEqual(vp5.width, 666.f, EPSILON)
+        || !XMScalarNearEqual(vp5.height, 1234.f, EPSILON)
+        || !XMScalarNearEqual(vp5.minDepth, 0.f, EPSILON)
+        || !XMScalarNearEqual(vp5.maxDepth, 1.f, EPSILON))
+    {
+            printf("ERROR: vp5 ctor\n");
+            success = false;
+    }
+
+    if ( vp1 == vp2 )
+    {
+        printf("ERROR: ==\n");
+        success = false;
+    }
+
+    if ( vp2 != vp2 )
+    {
+        printf("ERROR: !=\n");
+        success = false;
+    }
+
+    {
+        Viewport other(23.f, 42.f, 666.f, 1234.f, 0.f, 1.f);
+        Viewport vp(other);
+
+        if (!XMScalarNearEqual(vp.x, other.x, EPSILON)
+            || !XMScalarNearEqual(vp.y, other.y, EPSILON)
+            || !XMScalarNearEqual(vp.width, other.width, EPSILON)
+            || !XMScalarNearEqual(vp.height, other.height, EPSILON)
+            || !XMScalarNearEqual(vp.minDepth, other.minDepth, EPSILON)
+            || !XMScalarNearEqual(vp.maxDepth, other.maxDepth, EPSILON))
+        {
+            printf("ERROR: copy ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        Viewport other(23.f, 42.f, 666.f, 1234.f, 0.f, 1.f);
+        Viewport vp;
+        vp = other;
+
+        if (!XMScalarNearEqual(vp.x, other.x, EPSILON)
+            || !XMScalarNearEqual(vp.y, other.y, EPSILON)
+            || !XMScalarNearEqual(vp.width, other.width, EPSILON)
+            || !XMScalarNearEqual(vp.height, other.height, EPSILON)
+            || !XMScalarNearEqual(vp.minDepth, other.minDepth, EPSILON)
+            || !XMScalarNearEqual(vp.maxDepth, other.maxDepth, EPSILON))
+        {
+            printf("ERROR: =\n");
+            success = false;
+        }
+    }
+
+    {
+        RECT rct;
+        rct.left = 23;
+        rct.top = 42;
+        rct.right = rct.left + 666;
+        rct.bottom = rct.top + 1234;
+        Viewport vp(rct);
+
+        if (!XMScalarNearEqual(vp.x, 23.f, EPSILON)
+            || !XMScalarNearEqual(vp.y, 42.f, EPSILON)
+            || !XMScalarNearEqual(vp.width, 666.f, EPSILON)
+            || !XMScalarNearEqual(vp.height, 1234.f, EPSILON)
+            || !XMScalarNearEqual(vp.minDepth, 0.f, EPSILON)
+            || !XMScalarNearEqual(vp.maxDepth, 1.f, EPSILON))
+        {
+            printf("ERROR: RECT ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        RECT rct;
+        rct.left = 23;
+        rct.top = 42;
+        rct.right = rct.left + 666;
+        rct.bottom = rct.top + 1234;
+        Viewport vp;
+        vp = rct;
+
+        if (!XMScalarNearEqual(vp.x, 23.f, EPSILON)
+            || !XMScalarNearEqual(vp.y, 42.f, EPSILON)
+            || !XMScalarNearEqual(vp.width, 666.f, EPSILON)
+            || !XMScalarNearEqual(vp.height, 1234.f, EPSILON)
+            || !XMScalarNearEqual(vp.minDepth, 0.f, EPSILON)
+            || !XMScalarNearEqual(vp.maxDepth, 1.f, EPSILON))
+        {
+            printf("ERROR: RECT =\n");
+            success = false;
+        }
+    }
+
+    {
+        CD3D11_VIEWPORT d3d11vp(23.f, 42.f, 666.f, 1234.f, 0.f, 1.f);
+        Viewport vp(d3d11vp);
+
+        if (!XMScalarNearEqual(vp.x, d3d11vp.TopLeftX, EPSILON)
+            || !XMScalarNearEqual(vp.y, d3d11vp.TopLeftY, EPSILON)
+            || !XMScalarNearEqual(vp.width, d3d11vp.Width, EPSILON)
+            || !XMScalarNearEqual(vp.height, d3d11vp.Height, EPSILON)
+            || !XMScalarNearEqual(vp.minDepth, d3d11vp.MinDepth, EPSILON)
+            || !XMScalarNearEqual(vp.maxDepth, d3d11vp.MaxDepth, EPSILON))
+        {
+            printf("ERROR: D3D11_VIEWPORT ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        CD3D11_VIEWPORT d3d11vp(23.f, 42.f, 666.f, 1234.f, 0.f, 1.f);
+        Viewport vp;
+        vp = d3d11vp;
+
+        if (!XMScalarNearEqual(vp.x, d3d11vp.TopLeftX, EPSILON)
+            || !XMScalarNearEqual(vp.y, d3d11vp.TopLeftY, EPSILON)
+            || !XMScalarNearEqual(vp.width, d3d11vp.Width, EPSILON)
+            || !XMScalarNearEqual(vp.height, d3d11vp.Height, EPSILON)
+            || !XMScalarNearEqual(vp.minDepth, d3d11vp.MinDepth, EPSILON)
+            || !XMScalarNearEqual(vp.maxDepth, d3d11vp.MaxDepth, EPSILON))
+        {
+            printf("ERROR: D3D11_VIEWPORT =\n");
+            success = false;
+        }
+    }
+
+    {
+        D3D11_VIEWPORT d3d11vp = vp5;
+
+        if (!XMScalarNearEqual(vp5.x, d3d11vp.TopLeftX, EPSILON)
+            || !XMScalarNearEqual(vp5.y, d3d11vp.TopLeftY, EPSILON)
+            || !XMScalarNearEqual(vp5.width, d3d11vp.Width, EPSILON)
+            || !XMScalarNearEqual(vp5.height, d3d11vp.Height, EPSILON)
+            || !XMScalarNearEqual(vp5.minDepth, d3d11vp.MinDepth, EPSILON)
+            || !XMScalarNearEqual(vp5.maxDepth, d3d11vp.MaxDepth, EPSILON))
+        {
+            printf("ERROR: operator D3D11_VIEWPORT\n");
+            success = false;
+        }
+    }
+
+    {
+        const D3D11_VIEWPORT* d3d11vp = vp5.Get11();
+
+        if (!XMScalarNearEqual(vp5.x, d3d11vp->TopLeftX, EPSILON)
+            || !XMScalarNearEqual(vp5.y, d3d11vp->TopLeftY, EPSILON)
+            || !XMScalarNearEqual(vp5.width, d3d11vp->Width, EPSILON)
+            || !XMScalarNearEqual(vp5.height, d3d11vp->Height, EPSILON)
+            || !XMScalarNearEqual(vp5.minDepth, d3d11vp->MinDepth, EPSILON)
+            || !XMScalarNearEqual(vp5.maxDepth, d3d11vp->MaxDepth, EPSILON))
+        {
+            printf("ERROR: Get\n");
+            success = false;
+        }
+    }
+
+    {
+        if ( vp1.AspectRatio() != 0.f )
+        {
+            printf("ERROR: AspectRatio vp1\n");
+            success = false;
+        }
+
+        float expected = float(vp2.width) / float(vp2.height);
+        if ( !XMScalarNearEqual( vp2.AspectRatio(), expected, EPSILON ) )
+        {
+            printf("ERROR: AspectRatio vp2\n");
+            success = false;
+        }
+
+        expected = float(vp3.width) / float(vp3.height);
+        if ( !XMScalarNearEqual( vp3.AspectRatio(), expected, EPSILON ) )
+        {
+            printf("ERROR: AspectRatio vp3\n");
+            success = false;
+        }
+
+        expected = float(vp4.width) / float(vp4.height);
+        if ( !XMScalarNearEqual( vp4.AspectRatio(), expected, EPSILON ) )
+        {
+            printf("ERROR: AspectRatio vp4\n");
+            success = false;
+        }
+
+        expected = float(vp5.width) / float(vp5.height);
+        if ( !XMScalarNearEqual( vp5.AspectRatio(), expected, EPSILON ) )
+        {
+            printf("ERROR: AspectRatio vp3\n");
+            success = false;
+        }
+    }
+
+    {
+        Vector3 p = vp2.Project(Vector3(1, -1, 1), Matrix::Identity, Matrix::Identity, Matrix::Identity);
+        if (!XMVector3NearEqual(p, Vector3(640.f, 480.f, 1.f), VEPSILON))
+        {
+            printf("ERROR: Project %f %f %f ... 640 480 1\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        Vector3 r;
+        vp2.Project(Vector3(1, -1, 1), Matrix::Identity, Matrix::Identity, Matrix::Identity, r);
+        if (!XMVector3NearEqual(r, Vector3(640.f, 480.f, 1.f), VEPSILON))
+        {
+            printf("ERROR: Project(2) %f %f %f ... 640 480 1\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        p = vp3.Project(Vector3(1, -1, 1), Matrix::Identity, Matrix::Identity, Matrix::Identity);
+        if (!XMVector3NearEqual(p, Vector3(1024.f, 768.f, 100.f), VEPSILON))
+        {
+            printf("ERROR: Project %f %f %f ... 1024 748 100\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        vp3.Project(Vector3(1, -1, 1), Matrix::Identity, Matrix::Identity, Matrix::Identity, r);
+        if (!XMVector3NearEqual(r, Vector3(1024.f, 768.f, 100.f), VEPSILON))
+        {
+            printf("ERROR: Project(2) %f %f %f ... 1024 748 100\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        p = vp2.Unproject(Vector3(640.f, 480.f, 1), Matrix::Identity, Matrix::Identity, Matrix::Identity);
+        if (!XMVector3NearEqual(p, Vector3(1.f, -1.f, 1.f), VEPSILON))
+        {
+            printf("ERROR: Unproject %f %f %f ... 1 -1 1\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        vp2.Unproject(Vector3(640.f, 480.f, 1), Matrix::Identity, Matrix::Identity, Matrix::Identity, r);
+        if (!XMVector3NearEqual(r, Vector3(1.f, -1.f, 1.f), VEPSILON))
+        {
+            printf("ERROR: Unproject(2) %f %f %f ... 1 -1 1\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        p = vp3.Unproject(Vector3(1024.f, 768.f, 100.f), Matrix::Identity, Matrix::Identity, Matrix::Identity);
+        if (!XMVector3NearEqual(p, Vector3(1.f, -1.f, 1.f), VEPSILON))
+        {
+            printf("ERROR: Unproject %f %f %f ... 1 -1 1\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        vp3.Unproject(Vector3(1024.f, 768.f, 100.f), Matrix::Identity, Matrix::Identity, Matrix::Identity, r);
+        if (!XMVector3NearEqual(r, Vector3(1.f, -1.f, 1.f), VEPSILON))
+        {
+            printf("ERROR: Unproject(2) %f %f %f ... 1 -1 1\n", p.x, p.y, p.z);
+            success = false;
+        }
+    }
+
+    {
+        Matrix world = Matrix::CreateWorld(Vector3(1, 2, 3), Vector3::UnitX, Vector3::UnitZ);
+        Matrix view = Matrix::CreateLookAt(Vector3(10, 10, 10), Vector3(0, 0, 0), Vector3::UnitY);
+        Matrix proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, 640.f / 480.f, 0.1f, 100.f);
+
+        Vector3 p = vp2.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world);
+        if (!XMVector3NearEqual(p, Vector3(231.296143f, 265.606598, 0.993776858f), VEPSILON))
+        {
+            printf("ERROR: Project %f %f %f ... 231.296143 265.606598 0.993776858\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        Vector3 r;
+        vp2.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world, r);
+        if (!XMVector3NearEqual(r, Vector3(231.296143f, 265.606598, 0.993776858f), VEPSILON))
+        {
+            printf("ERROR: Project(2) %f %f %f ... 231.296143 265.606598 0.993776858\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        p = vp3.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world);
+        if (!XMVector3NearEqual(p, Vector3(370.073822f, 424.970551f, 99.3839111f), VEPSILON))
+        {
+            printf("ERROR: Project %f %f %f ... 370.073822 424.970551 99.3839111 \n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        vp3.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world, r);
+        if (!XMVector3NearEqual(r, Vector3(370.073822f, 424.970551f, 99.3839111f), VEPSILON))
+        {
+            printf("ERROR: Project(2) %f %f %f ... 370.073822 424.970551 99.3839111 \n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        p = vp2.Unproject(Vector3(231.f,265.f,0.993776858), proj, view, world);
+        if (!XMVector3NearEqual(p, Vector3(0.488145798f, 0.748996973f, 0.260956854f), VEPSILON))
+        {
+            printf("ERROR: Unproject %f %f %f ... 0.488145798 0.748996973 0.260956854\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        vp2.Unproject(Vector3(231.f, 265.f, 0.993776858), proj, view, world, r);
+        if (!XMVector3NearEqual(r, Vector3(0.488145798f, 0.748996973f, 0.260956854f), VEPSILON))
+        {
+            printf("ERROR: Unproject(2) %f %f %f ... 0.488145798 0.748996973 0.260956854\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        p = vp3.Unproject(Vector3(370.073822f,424.970551f,99.3839111f), proj, view, world);
+        if (!XMVector3NearEqual(p, Vector3(0.499990046f, 0.749911547f, 0.250027150f), VEPSILON))
+        {
+            printf("ERROR: Unproject %f %f %f ... 0.499990046 0.749911547 0.250027150\n", p.x, p.y, p.z);
+            success = false;
+        }
+
+        vp3.Unproject(Vector3(370.073822f, 424.970551f, 99.3839111f), proj, view, world, r);
+        if (!XMVector3NearEqual(r, Vector3(0.499990046f, 0.749911547f, 0.250027150f), VEPSILON))
+        {
+            printf("ERROR: Unproject(2) %f %f %f ... 0.499990046 0.749911547 0.250027150\n", p.x, p.y, p.z);
+            success = false;
+        }
+    }
+
+    {
+        RECT rct = Viewport::ComputeDisplayArea(DXGI_SCALING_NONE, 640, 480, 1024, 1024);
+        if (rct.left != 0
+            || rct.right != 640
+            || rct.top != 0
+            || rct.bottom != 480)
+        {
+            printf("ERROR: DisplayArea 480 none\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING_STRETCH, 640, 480, 1024, 1024);
+        if (rct.left != 0
+            || rct.right != 1024
+            || rct.top != 0
+            || rct.bottom != 1024)
+        {
+            printf("ERROR: DisplayArea 480 stretch\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING(2) /*DXGI_SCALING_ASPECT_RATIO_STRETCH*/, 640, 480, 1024, 1024);
+        if (rct.left != 0
+            || rct.right != 1024
+            || rct.top != 128
+            || rct.bottom != 896)
+        {
+            printf("ERROR: DisplayArea 480 aspectratio letter-box\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING(2) /*DXGI_SCALING_ASPECT_RATIO_STRETCH*/, 640, 480, 1024, 400);
+        if (rct.left != 245
+            || rct.right != 778
+            || rct.top != 0
+            || rct.bottom != 400)
+        {
+            printf("ERROR: DisplayArea 480 aspectratio pillar-box\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING_NONE, 1280, 720, 1024, 1024);
+        if (rct.left != 0
+            || rct.right != 1024
+            || rct.top != 0
+            || rct.bottom != 720)
+        {
+            printf("ERROR: DisplayArea 720 none\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING_STRETCH, 1280, 720, 1024, 1024);
+        if (rct.left != 0
+            || rct.right != 1024
+            || rct.top != 0
+            || rct.bottom != 1024)
+        {
+            printf("ERROR: DisplayArea 720 stretch\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING(2) /*DXGI_SCALING_ASPECT_RATIO_STRETCH*/, 1280, 720, 1024, 1024);
+        if (rct.left != 0
+            || rct.right != 1024
+            || rct.top != 224
+            || rct.bottom != 800)
+        {
+            printf("ERROR: DisplayArea 720 aspectratio letter-box\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING(2) /*DXGI_SCALING_ASPECT_RATIO_STRETCH*/, 1280, 720, 1024, 500);
+        if (rct.left != 67
+            || rct.right != 956
+            || rct.top != 0
+            || rct.bottom != 500)
+        {
+            printf("ERROR: DisplayArea 720 aspectratio pillar-box\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING_NONE, 1920, 1080, 1024, 1024);
+        if (rct.left != 0
+            || rct.right != 1024
+            || rct.top != 0
+            || rct.bottom != 1024)
+        {
+            printf("ERROR: DisplayArea 1080 none\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING_STRETCH, 1920, 1080, 1024, 1024);
+        if (rct.left != 0
+            || rct.right != 1024
+            || rct.top != 0
+            || rct.bottom != 1024)
+        {
+            printf("ERROR: DisplayArea 1080 stretch\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING(2) /*DXGI_SCALING_ASPECT_RATIO_STRETCH*/, 1920, 1080, 1024, 1024);
+        if (rct.left != 0
+            || rct.right != 1024
+            || rct.top != 224
+            || rct.bottom != 800)
+        {
+            printf("ERROR: DisplayArea 1080 aspectratio letter-box\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeDisplayArea(DXGI_SCALING(2) /*DXGI_SCALING_ASPECT_RATIO_STRETCH*/, 1920, 1080, 1024, 500);
+        if (rct.left != 67
+            || rct.right != 956
+            || rct.top != 0
+            || rct.bottom != 500)
+        {
+            printf("ERROR: DisplayArea 1080 aspectratio pillar-box\n");
+            success = false;
+        }
+    }
+
+    {
+        RECT rct = Viewport::ComputeTitleSafeArea(0, 0);
+
+        if (rct.left != 0
+            || rct.right != 0
+            || rct.top != 0
+            || rct.bottom != 0)
+        {
+            printf("ERROR: TitleSafe null\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeTitleSafeArea(640, 480);
+        if (rct.left != 64
+            || rct.right != 575
+            || rct.top != 48
+            || rct.bottom != 431)
+        {
+            printf("ERROR: TitleSafe 480p\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeTitleSafeArea(1280, 720);
+        if (rct.left != 128
+            || rct.right != 1151
+            || rct.top != 72
+            || rct.bottom != 647)
+        {
+            printf("ERROR: TitleSafe 720p\n");
+            success = false;
+        }
+
+        rct = Viewport::ComputeTitleSafeArea(1920, 1080);
+        if (rct.left != 192
+            || rct.right != 1727
+            || rct.top != 108
+            || rct.bottom != 971)
+        {
+            printf("ERROR: TitleSafe 1080p\n");
+            success = false;
+        }
+    }
+
+	return (success) ? 0 : 1;
+}
+
 template<typename T>
 int EnsureSorted(std::map<T, int>& map)
 {
@@ -3932,6 +4473,7 @@ int TestL()
     std::map<Quaternion, int> mapq;
     std::map<Color, int> mapc;
     std::map<Ray, int> mapr;
+    std::map<Viewport, int> mapvp;
 
     mapv2[ Vector2(3.f, 2.f) ] = 4;
     mapv2[ Vector2(1.f, 2.f) ] = 1;
@@ -4000,6 +4542,12 @@ int TestL()
     mapr[ Ray(Vector3(2, 2, 2), Vector3(2.f, 2.f, 3.f)) ] = 7;
     mapr[ Ray(Vector3(2, 2, 2), Vector3(2.f, 2.f, 1.f)) ] = 6;
 
+    mapvp[Viewport(0.f, 0.f, 1024, 768.f, 1.f, 100.f)] = 3;
+    mapvp[Viewport()] = 1;
+    mapvp[Viewport(0.f, 0.f, 1920.f, 1080.f)] = 4;
+    mapvp[Viewport(0.f, 0.f, 640.f, 480.f)] = 2;
+    mapvp[Viewport(23.f, 42.f, 666.f, 1234.f)] = 5;
+
     return EnsureSorted(mapv2) |
            EnsureSorted(mapv3) |
            EnsureSorted(mapv4) |
@@ -4007,7 +4555,8 @@ int TestL()
            EnsureSorted(mapp) |
            EnsureSorted(mapq) |
            EnsureSorted(mapc) |
-           EnsureSorted(mapr);
+           EnsureSorted(mapr) |
+           EnsureSorted(mapvp);
 }
 
 
@@ -4028,6 +4577,7 @@ static struct Test
     { "Quaternion", TestQ },
     { "Color", TestC },
     { "Ray", TestR },
+    { "Viewport", TestVP },
     { "std::less", TestL },
 };
 
