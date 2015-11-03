@@ -3737,6 +3737,15 @@ int TestC()
     VerifyEqual(c, b);
 
     {
+        Color x;
+        x = PackedVector::XMCOLOR(0x12345678);
+        VerifyNearEqual(x, Color(0.203922f, 0.337255f, 0.470588f, 0.070588f));
+
+        x = PackedVector::XMUBYTEN4(0x12345678);
+        VerifyNearEqual(x, Color(0.470588f, 0.337255f, 0.203922f, 0.070588f));
+    }
+
+    {
         XMFLOAT4 xm(6.f, -2.f, 7.f, 80.f);
         Color vi(xm);
 
