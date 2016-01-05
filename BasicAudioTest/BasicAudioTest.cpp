@@ -460,6 +460,59 @@ int __cdecl main()
             return 1;
         }
 
+        // Restart
+        printf("\nPlaying sound effect instance for 2 seconds...\n" );
+
+        effect->Play();
+
+        if( effect->IsLooped() )
+        {
+            printf("\nERROR: Play() should have put it into a non-looped mode\n" );
+            return 1;
+        }
+
+        startTick = GetTickCount64();
+
+        while ( effect->GetState() == PLAYING )
+        {
+            UPDATE
+
+            printf(".");
+            Sleep(1000);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if ( tick > startTick + 2000 )
+                break;
+        }
+
+        printf("\nRestarting...\n" );
+        effect->Stop();
+        effect->Play();
+
+        startTick = GetTickCount64();
+
+        while ( effect->GetState() == PLAYING )
+        {
+            UPDATE
+
+            printf(".");
+            Sleep(1000);
+        }
+
+        dur = GetTickCount64() - startTick;
+
+        if ( dur < effectDur )
+        {
+            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            return 1;
+        }
+        else if ( dur > ( effectDur + 2000 ) )
+        {
+            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            return 1;
+        }
+
         // Loop
         effect->Play(true);
 
@@ -728,6 +781,59 @@ int __cdecl main()
             return 1;
         }
 
+        // Restart
+        printf("\nPlaying sound effect instance for 2 seconds...\n" );
+
+        effect->Play();
+
+        if( effect->IsLooped() )
+        {
+            printf("\nERROR: Play() should have put it into a non-looped mode\n" );
+            return 1;
+        }
+
+        startTick = GetTickCount64();
+
+        while ( effect->GetState() == PLAYING )
+        {
+            UPDATE
+
+            printf(".");
+            Sleep(1000);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if ( tick > startTick + 2000 )
+                break;
+        }
+
+        printf("\nRestarting...\n" );
+        effect->Stop();
+        effect->Play();
+
+        startTick = GetTickCount64();
+
+        while ( effect->GetState() == PLAYING )
+        {
+            UPDATE
+
+            printf(".");
+            Sleep(1000);
+        }
+
+        dur = GetTickCount64() - startTick;
+
+        if ( dur < effectDur )
+        {
+            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            return 1;
+        }
+        else if ( dur > ( effectDur + 2000 ) )
+        {
+            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            return 1;
+        }
+
         // Loop
         effect->Play(true);
 
@@ -984,6 +1090,59 @@ int __cdecl main()
         }
 
         ULONGLONG dur = GetTickCount64() - startTick;
+
+        if ( dur < effectDur )
+        {
+            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            return 1;
+        }
+        else if ( dur > ( effectDur + 2000 ) )
+        {
+            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            return 1;
+        }
+
+        // Restart
+        printf("\nPlaying sound effect instance for 2 seconds...\n" );
+
+        effect->Play();
+
+        if( effect->IsLooped() )
+        {
+            printf("\nERROR: Play() should have put it into a non-looped mode\n" );
+            return 1;
+        }
+
+        startTick = GetTickCount64();
+
+        while ( effect->GetState() == PLAYING )
+        {
+            UPDATE
+
+            printf(".");
+            Sleep(1000);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if ( tick > startTick + 2000 )
+                break;
+        }
+
+        printf("\nRestarting...\n" );
+        effect->Stop();
+        effect->Play();
+
+        startTick = GetTickCount64();
+
+        while ( effect->GetState() == PLAYING )
+        {
+            UPDATE
+
+            printf(".");
+            Sleep(1000);
+        }
+
+        dur = GetTickCount64() - startTick;
 
         if ( dur < effectDur )
         {
