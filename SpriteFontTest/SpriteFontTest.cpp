@@ -18,10 +18,7 @@
 #include "DirectXColors.h"
 #include "ScreenGrab.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4005)
 #include <wincodec.h>
-#pragma warning(pop)
 
 #include <wrl/client.h>
 

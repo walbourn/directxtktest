@@ -22,10 +22,7 @@
 
 #include <wrl/client.h>
 
-#pragma warning(push)
-#pragma warning(disable : 4005)
 #include <wincodec.h>
-#pragma warning(pop)
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;

@@ -23,10 +23,7 @@ using namespace DirectX;
 
 
 //--------------------------------------------------------------------------------------
-#pragma warning(push)
-#pragma warning( disable: 4005 )
 #include <wrl.h>
-#pragma warning(pop)
 
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
 #pragma comment(lib,"mfplat.lib")
