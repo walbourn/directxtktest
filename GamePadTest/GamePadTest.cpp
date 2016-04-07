@@ -326,14 +326,14 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                 lastStr = L"Button RightShoulder was pressed\n";
             else if ( tracker.rightShoulder == GamePad::ButtonStateTracker::RELEASED )
                 lastStr = L"Button RightShoulder was released\n";
-            else if ( tracker.back == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button BACK was pressed\n";
-            else if ( tracker.back == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button BACK was released\n";
-            else if ( tracker.start == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button START was pressed\n";
-            else if ( tracker.start == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button START was released\n";
+            else if ( tracker.view == GamePad::ButtonStateTracker::PRESSED )
+                lastStr = L"Button BACK/VIEW was pressed\n";
+            else if ( tracker.view == GamePad::ButtonStateTracker::RELEASED )
+                lastStr = L"Button BACK/VIEW was released\n";
+            else if ( tracker.menu == GamePad::ButtonStateTracker::PRESSED )
+                lastStr = L"Button START/MENU was pressed\n";
+            else if ( tracker.menu == GamePad::ButtonStateTracker::RELEASED )
+                lastStr = L"Button START/MENU was released\n";
             else if ( tracker.dpadUp == GamePad::ButtonStateTracker::PRESSED )
                 lastStr = L"Button DPAD UP was pressed\n";
             else if ( tracker.dpadUp == GamePad::ButtonStateTracker::RELEASED )
@@ -350,6 +350,9 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                 lastStr = L"Button DPAD RIGHT was pressed\n";
             else if ( tracker.dpadRight == GamePad::ButtonStateTracker::RELEASED )
                 lastStr = L"Button DPAD RIGHT was released\n";
+
+            assert(tracker.back == tracker.view);
+            assert(tracker.start == tracker.menu);
 
             if ( lastStr )
             {
@@ -392,10 +395,10 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
             ctrlFont.DrawString(g_spriteBatch.get(), L"!", loc, color );
 
-            // Back/Start
-            ctrlFont.DrawString(g_spriteBatch.get(), L"#", XMFLOAT2(175, 75), state.IsBackPressed() ? Colors::White : Colors::Black);
+            // Back/Start (aka View/Menu)
+            ctrlFont.DrawString(g_spriteBatch.get(), L"#", XMFLOAT2(175, 75), state.IsViewPressed() ? Colors::White : Colors::Black);
 
-            ctrlFont.DrawString(g_spriteBatch.get(), L"%", XMFLOAT2(300, 75), state.IsStartPressed() ? Colors::White : Colors::Black);
+            ctrlFont.DrawString(g_spriteBatch.get(), L"%", XMFLOAT2(300, 75), state.IsMenuPressed() ? Colors::White : Colors::Black);
 
             // Triggers/Shoulders
             ctrlFont.DrawString(g_spriteBatch.get(), L"*", XMFLOAT2(500, 10), state.IsRightShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
