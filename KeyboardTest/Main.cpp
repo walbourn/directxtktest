@@ -58,7 +58,7 @@ public:
         CoreApplication::Resuming +=
             ref new EventHandler<Platform::Object^>(this, &ViewProvider::OnResuming);
 
-        m_game.reset(new Game);
+        g_game = std::make_unique<Game>();
     }
 
     virtual void Uninitialize()
@@ -326,7 +326,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     if (FAILED(hr))
         return 1;
 
-    g_game.reset(new Game);
+    g_game = std::make_unique<Game>();
 
     // Register class and create window
     {

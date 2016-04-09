@@ -141,13 +141,13 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     CommonStates states(device.Get());
 
-    g_spriteBatch.reset(new SpriteBatch(context.Get()));
+    g_spriteBatch = std::make_unique<SpriteBatch>(context.Get());
 
     SpriteFont ctrlFont(device.Get(), L"xboxController.spritefont");
 
     SpriteFont comic(device.Get(), L"comic.spritefont");
 
-    g_gamePad.reset( new GamePad );
+    g_gamePad = std::make_unique<GamePad>();
 
     // Singleton test
     {

@@ -134,7 +134,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
-    g_spriteBatch.reset( new SpriteBatch(context.Get()) );
+    g_spriteBatch = std::make_unique<SpriteBatch>(context.Get());
 
     SpriteFont comicFont(device.Get(), L"comic.spritefont");
     SpriteFont italicFont(device.Get(), L"italic.spritefont");

@@ -307,8 +307,7 @@ void Game::CreateDevice()
     }
 #endif
 
-    // TODO: Initialize device dependent objects here (independent of window size)
-    m_effect.reset(new BasicEffect(m_d3dDevice.Get()));
+    m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
     m_effect->SetVertexColorEnabled(true);
 
     void const* shaderByteCode;
@@ -322,7 +321,7 @@ void Game::CreateDevice()
                 shaderByteCode, byteCodeLength,
                 m_inputLayout.ReleaseAndGetAddressOf()));
 
-    m_batch.reset(new PrimitiveBatch<VertexPositionColor>(m_d3dContext.Get()));
+    m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(m_d3dContext.Get());
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

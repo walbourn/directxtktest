@@ -181,7 +181,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     CommonStates states(device.Get());
 
-    g_spriteBatch.reset( new SpriteBatch(context.Get()) );
+    g_spriteBatch = std::make_unique<SpriteBatch>(context.Get());
 
     bool quit = false;
 

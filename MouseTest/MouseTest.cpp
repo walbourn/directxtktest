@@ -55,7 +55,7 @@ void Game::Initialize(
     m_outputHeight = std::max( height, 1 );
     m_outputRotation = rotation;
 
-    m_mouse.reset(new Mouse);
+    m_mouse = std::make_unique<Mouse>();
 
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
     m_mouse->SetWindow(reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(m_window));
@@ -465,9 +465,9 @@ void Game::CreateDevice()
     }
 #endif
 
-    m_spriteBatch.reset(new SpriteBatch(m_d3dContext.Get()));
+    m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
 
-    m_comicFont.reset(new SpriteFont(m_d3dDevice.Get(), L"comic.spritefont"));
+    m_comicFont = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"comic.spritefont");
 
     m_room = GeometricPrimitive::CreateBox(m_d3dContext.Get(), XMFLOAT3(ROOM_BOUNDS[0], ROOM_BOUNDS[1], ROOM_BOUNDS[2]), false, true);
 
