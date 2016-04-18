@@ -58,7 +58,7 @@ public:
         CoreApplication::Resuming +=
             ref new EventHandler<Platform::Object^>(this, &ViewProvider::OnResuming);
 
-        g_game = std::make_unique<Game>();
+        m_game = std::make_unique<Game>();
     }
 
     virtual void Uninitialize()
