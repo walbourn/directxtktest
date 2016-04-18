@@ -71,3 +71,5 @@ namespace DX
 #include "SpriteFont.h"
 #include "VertexTypes.h"
 #include "WICTextureLoader.h"
+
+#include "PlatformHelpers.h"

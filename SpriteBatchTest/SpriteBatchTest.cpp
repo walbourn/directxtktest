@@ -19,6 +19,8 @@
 #include "DDSTextureLoader.h"
 #include "ScreenGrab.h"
 
+#include "PlatformHelpers.h"
+
 #include <wrl\client.h>
 
 #include <wincodec.h>

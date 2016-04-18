@@ -18,6 +18,8 @@
 #include "DirectXColors.h"
 #include "ScreenGrab.h"
 
+#include "PlatformHelpers.h"
+
 #include <wincodec.h>
 
 #include <wrl/client.h>

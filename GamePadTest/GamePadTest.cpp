@@ -22,6 +22,8 @@
 #include "SpriteBatch.h"
 #include "SpriteFont.h"
 
+#include "PlatformHelpers.h"
+
 #include <stdio.h>
 
 #include <wrl/client.h>
