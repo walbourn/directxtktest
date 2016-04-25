@@ -454,7 +454,6 @@ void Game::CreateDevice()
             D3D11_MESSAGE_ID hide [] =
             {
                 D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
-                // TODO: Add more message IDs here as needed 
             };
             D3D11_INFO_QUEUE_FILTER filter;
             memset(&filter, 0, sizeof(filter));

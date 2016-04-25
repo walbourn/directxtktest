@@ -48,13 +48,6 @@ void Game::Initialize(
     CreateDevice();
 
     CreateResources();
-
-    // TODO: Change the timer settings if you want something other than the default variable timestep mode.
-    // e.g. for 60 FPS fixed timestep update logic, call:
-    /*
-    m_timer.SetFixedTimeStep(true);
-    m_timer.SetTargetElapsedSeconds(1.0 / 60);
-    */
 }
 
 // Executes basic game loop.
@@ -69,12 +62,8 @@ void Game::Tick()
 }
 
 // Updates the world
-void Game::Update(DX::StepTimer const& timer)
+void Game::Update(DX::StepTimer const&)
 {
-    float elapsedTime = float(timer.GetElapsedSeconds());
-
-    // TODO: Add your game logic here
-    elapsedTime;
 }
 
 // Draws the scene
@@ -86,7 +75,6 @@ void Game::Render()
 
     Clear();
 
-    // TODO: Add your rendering code here
     m_effect->Apply(m_d3dContext.Get());
 
     m_d3dContext->IASetInputLayout(m_inputLayout.Get());
@@ -140,24 +128,19 @@ void Game::Present()
 // Message handlers
 void Game::OnActivated()
 {
-    // TODO: Game is becoming active window
 }
 
 void Game::OnDeactivated()
 {
-    // TODO: Game is becoming background window
 }
 
 void Game::OnSuspending()
 {
-    // TODO: Game is being power-suspended (or minimized)
 }
 
 void Game::OnResuming()
 {
     m_timer.ResetElapsedTime();
-
-    // TODO: Game is being power-resumed (or returning from minimize)
 }
 
 void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation)
@@ -167,11 +150,10 @@ void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotatio
     m_outputRotation = rotation;
 
     CreateResources();
-
-    // TODO: Game window is being resized
 }
 
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+
 void Game::ValidateDevice()
 {
     // The D3D Device is no longer valid if the default adapter changed since the device
@@ -230,7 +212,6 @@ void Game::ValidateDevice()
 // Properties
 void Game::GetDefaultSize(int& width, int& height) const
 {
-    // TODO: Change to desired default window size (note minimum size is 320x200)
     width = 800;
     height = 600;
 }
@@ -296,7 +277,6 @@ void Game::CreateDevice()
             D3D11_MESSAGE_ID hide [] =
             {
                 D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
-                // TODO: Add more message IDs here as needed 
             };
             D3D11_INFO_QUEUE_FILTER filter;
             memset(&filter, 0, sizeof(filter));
@@ -430,13 +410,10 @@ void Game::CreateResources()
     CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
     DX::ThrowIfFailed(m_d3dDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, m_depthStencilView.ReleaseAndGetAddressOf()));
     SetDebugObjectName(m_depthStencilView.Get(), "DepthStencil");
-
-    // TODO: Initialize windows-size dependent objects here
 }
 
 void Game::OnDeviceLost()
 {
-    // TODO: Add Direct3D resource cleanup here
     m_effect.reset();
     m_batch.reset();
     m_inputLayout.Reset();

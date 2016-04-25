@@ -77,7 +77,12 @@ public:
         window->Closed +=
             ref new TypedEventHandler<CoreWindow^, CoreWindowEventArgs^>(this, &ViewProvider::OnWindowClosed);
 
-        DisplayInformation^ currentDisplayInformation = DisplayInformation::GetForCurrentView();
+        auto dispatcher = CoreWindow::GetForCurrentThread()->Dispatcher;
+
+        dispatcher->AcceleratorKeyActivated +=
+            ref new TypedEventHandler<CoreDispatcher^, AcceleratorKeyEventArgs^>(this, &ViewProvider::OnAcceleratorKeyActivated);
+
+        auto currentDisplayInformation = DisplayInformation::GetForCurrentView();
 
         currentDisplayInformation->DpiChanged +=
             ref new TypedEventHandler<DisplayInformation^, Object^>(this, &ViewProvider::OnDpiChanged);
@@ -107,7 +112,7 @@ public:
         }
 
         m_game->Initialize(reinterpret_cast<IUnknown*>(window),
-            outputWidth, outputHeight, rotation);
+                           outputWidth, outputHeight, rotation );
 
         m_game->SetDPI(m_DPI);
     }
@@ -137,13 +142,40 @@ protected:
     // Event handlers
     void OnActivated(CoreApplicationView^ applicationView, IActivatedEventArgs^ args)
     {
+        if (args->Kind == ActivationKind::Launch)
+        {
+            auto launchArgs = static_cast<LaunchActivatedEventArgs^>(args);
+
+            if (launchArgs->PrelaunchActivated)
+            {
+                // Opt-out of Prelaunch
+                CoreApplication::Exit();
+                return;
+            }
+        }
+
         int w, h;
         m_game->GetDefaultSize(w, h);
 
-        // TODO - ApplicationView::PreferredLaunchWindowingMode(ApplicationViewWindowingMode_PreferredLaunchViewSize);
-        // TODO - ApplicationView::PreferredLaunchViewSize(Size(w, h));
+        m_DPI = DisplayInformation::GetForCurrentView()->LogicalDpi;
+
+        ApplicationView::PreferredLaunchWindowingMode = ApplicationViewWindowingMode::PreferredLaunchViewSize;
+
+        auto desiredSize = Size(ConvertPixelsToDips(w), ConvertPixelsToDips(h));
+
+        ApplicationView::PreferredLaunchViewSize = desiredSize;
+
+        auto view = ApplicationView::GetForCurrentView();
+
+        auto minSize = Size(ConvertPixelsToDips(320), ConvertPixelsToDips(200));
+
+        view->SetPreferredMinSize(minSize);
 
         CoreWindow::GetForCurrentThread()->Activate();
+
+        view->FullScreenSystemOverlayMode = FullScreenSystemOverlayMode::Minimal;
+
+        view->TryResizeView(desiredSize);
     }
 
     void OnSuspending(Platform::Object^ sender, SuspendingEventArgs^ args)
@@ -185,6 +217,25 @@ protected:
         m_exit = true;
     }
 
+    void OnAcceleratorKeyActivated(CoreDispatcher^, AcceleratorKeyEventArgs^ args)
+    {
+        if (args->EventType == CoreAcceleratorKeyEventType::SystemKeyDown
+            && args->VirtualKey == VirtualKey::Enter
+            && args->KeyStatus.IsMenuKeyDown
+            && !args->KeyStatus.WasKeyDown)
+        {
+            // Implements the classic ALT+ENTER fullscreen toggle
+            auto view = ApplicationView::GetForCurrentView();
+
+            if (view->IsFullScreenMode)
+                view->ExitFullScreenMode();
+            else
+                view->TryEnterFullScreenMode();
+
+            args->Handled = true;
+        }
+    }
+
     void OnDpiChanged(DisplayInformation^ sender, Object^ args)
     {
         m_DPI = sender->LogicalDpi;
@@ -218,6 +269,11 @@ private:
     inline int ConvertDipsToPixels(float dips) const
     {
         return int(dips * m_DPI / 96.f + 0.5f);
+    }
+
+    inline float ConvertPixelsToDips(int pixels) const
+    {
+        return (float(pixels) * 96.f / m_DPI);
     }
 
     DXGI_MODE_ROTATION ComputeDisplayRotation() const
