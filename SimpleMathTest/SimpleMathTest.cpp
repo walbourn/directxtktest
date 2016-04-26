@@ -5342,6 +5342,9 @@ int EnsureSorted(std::map<T, int>& map)
 int TestL()
 {
     // std::less
+    using Rectangle = SimpleMath::Rectangle;
+
+    std::map<Rectangle, int> maprct;
     std::map<Vector2, int> mapv2;
     std::map<Vector3, int> mapv3;
     std::map<Vector4, int> mapv4;
@@ -5349,8 +5352,17 @@ int TestL()
     std::map<Plane, int> mapp;
     std::map<Quaternion, int> mapq;
     std::map<Color, int> mapc;
-    std::map<Ray, int> mapr;
+    std::map<Ray, int> mapray;
     std::map<Viewport, int> mapvp;
+
+    maprct[Rectangle(0, 0, 100, 100)] = 3;
+    maprct[Rectangle(10, 20, 4, 5)] = 5;
+    maprct[Rectangle(12, 15, 100, 7)] = 6;
+    maprct[Rectangle(0, 0, 10, 23)] = 2;
+    maprct[Rectangle(10, 20, 0, 0)] = 4;
+    maprct[Rectangle(0, 0, 0, 0)] = 1;
+
+    Rectangle ab(12, 20, 2, 2);
 
     mapv2[ Vector2(3.f, 2.f) ] = 4;
     mapv2[ Vector2(1.f, 2.f) ] = 1;
@@ -5405,19 +5417,19 @@ int TestL()
     mapc[ Color(2.f, 2.f, 2.f, 3.f) ] = 5;
     mapc[ Color(2.f, 2.f, 2.f, 1.f) ] = 4;
 
-    mapr[ Ray(Vector3(3.f, 2.f, 3.f), Vector3(1, 1, 1)) ] = 12;
-    mapr[ Ray(Vector3(1.f, 2.f, 3.f), Vector3(2, 3, 4)) ] = 1;
-    mapr[ Ray(Vector3(2.f, 3.f, 3.f), Vector3(3, 5, 2)) ] = 11;
-    mapr[ Ray(Vector3(2.f, 1.f, 3.f), Vector3(4, 9, 5)) ] = 2;
-    mapr[ Ray(Vector3(2.f, 2.f, 3.f), Vector3(5, 8, 2)) ] = 10;
-    mapr[ Ray(Vector3(2.f, 2.f, 1.f), Vector3(6, 7, 1)) ] = 3;
+    mapray[ Ray(Vector3(3.f, 2.f, 3.f), Vector3(1, 1, 1)) ] = 12;
+    mapray[ Ray(Vector3(1.f, 2.f, 3.f), Vector3(2, 3, 4)) ] = 1;
+    mapray[ Ray(Vector3(2.f, 3.f, 3.f), Vector3(3, 5, 2)) ] = 11;
+    mapray[ Ray(Vector3(2.f, 1.f, 3.f), Vector3(4, 9, 5)) ] = 2;
+    mapray[ Ray(Vector3(2.f, 2.f, 3.f), Vector3(5, 8, 2)) ] = 10;
+    mapray[ Ray(Vector3(2.f, 2.f, 1.f), Vector3(6, 7, 1)) ] = 3;
 
-    mapr[ Ray(Vector3(2, 2, 2), Vector3(3.f, 2.f, 3.f)) ] = 9;
-    mapr[ Ray(Vector3(2, 2, 2), Vector3(1.f, 2.f, 3.f)) ] = 4;
-    mapr[ Ray(Vector3(2, 2, 2), Vector3(2.f, 3.f, 3.f)) ] = 8;
-    mapr[ Ray(Vector3(2, 2, 2), Vector3(2.f, 1.f, 3.f)) ] = 5;
-    mapr[ Ray(Vector3(2, 2, 2), Vector3(2.f, 2.f, 3.f)) ] = 7;
-    mapr[ Ray(Vector3(2, 2, 2), Vector3(2.f, 2.f, 1.f)) ] = 6;
+    mapray[ Ray(Vector3(2, 2, 2), Vector3(3.f, 2.f, 3.f)) ] = 9;
+    mapray[ Ray(Vector3(2, 2, 2), Vector3(1.f, 2.f, 3.f)) ] = 4;
+    mapray[ Ray(Vector3(2, 2, 2), Vector3(2.f, 3.f, 3.f)) ] = 8;
+    mapray[ Ray(Vector3(2, 2, 2), Vector3(2.f, 1.f, 3.f)) ] = 5;
+    mapray[ Ray(Vector3(2, 2, 2), Vector3(2.f, 2.f, 3.f)) ] = 7;
+    mapray[ Ray(Vector3(2, 2, 2), Vector3(2.f, 2.f, 1.f)) ] = 6;
 
     mapvp[Viewport(0.f, 0.f, 1024, 768.f, 1.f, 100.f)] = 3;
     mapvp[Viewport()] = 1;
@@ -5425,14 +5437,15 @@ int TestL()
     mapvp[Viewport(0.f, 0.f, 640.f, 480.f)] = 2;
     mapvp[Viewport(23.f, 42.f, 666.f, 1234.f)] = 5;
 
-    return EnsureSorted(mapv2) |
+    return EnsureSorted(maprct) |
+           EnsureSorted(mapv2) |
            EnsureSorted(mapv3) |
            EnsureSorted(mapv4) |
            EnsureSorted(mapm) |
            EnsureSorted(mapp) |
            EnsureSorted(mapq) |
            EnsureSorted(mapc) |
-           EnsureSorted(mapr) |
+           EnsureSorted(mapray) |
            EnsureSorted(mapvp);
 }
 
