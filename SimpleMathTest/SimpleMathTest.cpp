@@ -16,26 +16,29 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <vector>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 static const float EPSILON = 0.000001f;
 static const float EPSILON2 = 0.00001f;
+static const float EPSILON3 = 0.001f;
 
 static const XMVECTORF32 VEPSILON = { EPSILON, EPSILON, EPSILON, EPSILON };
 static const XMVECTORF32 VEPSILON2 = { EPSILON2, EPSILON2, EPSILON2, EPSILON2 };
+static const XMVECTORF32 VEPSILON3 = { EPSILON3, EPSILON3, EPSILON3, EPSILON3 };
 
 
-void FormatValue(bool value, char* output, size_t outputSize)               { strcpy_s(output, outputSize, value ? "true" : "false"); }
-void FormatValue(float value, char* output, size_t outputSize)              { sprintf_s(output, outputSize, "%f", value); }
-void FormatValue(uint32_t value, char* output, size_t outputSize)           { sprintf_s(output, outputSize, "%08x", value); }
-void FormatValue(Vector3 const& value, char* output, size_t outputSize)     { sprintf_s(output, outputSize, "%f %f %f", value.x, value.y, value.z); }
-void FormatValue(Vector4 const& value, char* output, size_t outputSize)     { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
-void FormatValue(Color const& value, char* output, size_t outputSize)       { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
-void FormatValue(Plane const& value, char* output, size_t outputSize)       { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
-void FormatValue(Quaternion const& value, char* output, size_t outputSize)  { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
-void FormatValue(Matrix const& value, char* output, size_t outputSize)      { sprintf_s(output, outputSize, "\n    %f %f %f %f\n    %f %f %f %f\n    %f %f %f %f\n    %f %f %f %f\n", value._11, value._12, value._13, value._14, value._21, value._22, value._23, value._24, value._31, value._32, value._33, value._34, value._41, value._42, value._43, value._44); }
+void FormatValue(bool value, char* output, size_t outputSize) { strcpy_s(output, outputSize, value ? "true" : "false"); }
+void FormatValue(float value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f", value); }
+void FormatValue(uint32_t value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%08x", value); }
+void FormatValue(Vector3 const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f", value.x, value.y, value.z); }
+void FormatValue(Vector4 const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
+void FormatValue(Color const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
+void FormatValue(Plane const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
+void FormatValue(Quaternion const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
+void FormatValue(Matrix const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "\n    %f %f %f %f\n    %f %f %f %f\n    %f %f %f %f\n    %f %f %f %f\n", value._11, value._12, value._13, value._14, value._21, value._22, value._23, value._24, value._31, value._32, value._33, value._34, value._41, value._42, value._43, value._44); }
 
 
 struct near_equal_to
@@ -53,9 +56,9 @@ struct near_equal_to
     bool operator() (CXMMATRIX a, CXMMATRIX b) const
     {
         return XMVector4NearEqual(a.r[0], b.r[0], VEPSILON) &&
-               XMVector4NearEqual(a.r[1], b.r[1], VEPSILON) &&
-               XMVector4NearEqual(a.r[2], b.r[2], VEPSILON) &&
-               XMVector4NearEqual(a.r[3], b.r[3], VEPSILON);
+            XMVector4NearEqual(a.r[1], b.r[1], VEPSILON) &&
+            XMVector4NearEqual(a.r[2], b.r[2], VEPSILON) &&
+            XMVector4NearEqual(a.r[3], b.r[3], VEPSILON);
     }
 };
 
@@ -86,6 +89,871 @@ bool VerifyValue(TValue const& value, TValue const& expected, TCompare const& co
 
 
 //-------------------------------------------------------------------------------------
+namespace
+{
+    std::vector<SimpleMath::Rectangle> CreateIntersectedRectangles(const SimpleMath::Rectangle& target)
+    {
+        using Rectangle = SimpleMath::Rectangle;
+
+        long x = target.x;
+        long y = target.y;
+        long w = target.width;
+        long h = target.height;
+        long hw = target.width / 2;
+        long hh = target.height / 2;
+        long cx = x + hw;
+        long cy = y + hh;
+
+        std::vector<Rectangle> rects = {
+            Rectangle(x - hw,  y - hh, w, h), // Left Upper coner
+            Rectangle(x,       y - hh, w, h), // Upper
+            Rectangle(cx,      y - hh, w, h), // Right Upper coner
+            Rectangle(cx,      y,      w, h), // Right
+            Rectangle(cx,      cy,     w, h), // Right bottom coner
+            Rectangle(x,       cy,     w, h), // Bottom
+            Rectangle(x - hw,  cy,     w, h), // Left Bottom coner
+            Rectangle(x - hw,  y,      w, h), // Left
+        };
+        return rects;
+    }
+
+    std::vector<SimpleMath::Rectangle> CreateDisjointedRectangles(const SimpleMath::Rectangle& target)
+    {
+        using Rectangle = SimpleMath::Rectangle;
+
+        long x = target.x;
+        long y = target.y;
+        long w = target.width;
+        long h = target.height;
+
+        std::vector<Rectangle> rects = {
+            Rectangle(x - w,   y - h,  w, h), // Left Upper coner
+            Rectangle(x,       y - h,  w, h), // Upper
+            Rectangle(x + w,   y - h,  w, h), // Right Upper coner
+            Rectangle(x + w,   y,      w, h), // Right
+            Rectangle(x + w,   y + h,  w, h), // Right bottom coner
+            Rectangle(x,       y + h,  w, h), // Bottom
+            Rectangle(x - w,   y + h,  w, h), // Left Bottom coner
+            Rectangle(x - w,   y,      w, h), // Left
+        };
+        return rects;
+    }
+}
+
+int TestRect()
+{
+    // Rectangle
+    bool success = true;
+
+    using Rectangle = SimpleMath::Rectangle;
+
+    Rectangle empty;
+    Rectangle rectZero(0, 0, 0, 0);
+    if (!(rectZero == empty))
+    {
+        printf("ERROR: ==\n");
+        success = false;
+    }
+
+    if (rectZero != empty)
+    {
+        printf("ERROR: !=\n");
+        success = false;
+    }
+
+    if (!empty.IsEmpty())
+    {
+        printf("ERROR: IsEmpty\n");
+        success = false;
+    }
+
+    Rectangle unit(0, 0, 1, 1);
+    if (unit.x != 0
+        || unit.y != 0
+        || unit.width != 1
+        || unit.height != 1)
+    {
+        printf("ERROR: Rectangle ctor unit\n");
+        success = false;
+    }
+
+    if (rectZero == unit)
+    {
+        printf("ERROR: ==\n");
+        success = false;
+    }
+
+    Rectangle simple(0, 0, 100, 100);
+    if (simple.x != 0
+        || simple.y != 0
+        || simple.width != 100
+        || simple.height != 100)
+    {
+        printf("ERROR: Rectangle ctor simple\n");
+        success = false;
+    }
+
+    if (unit == simple)
+    {
+        printf("ERROR: ==\n");
+        success = false;
+    }
+
+    Rectangle smallRect(50, 75, 100, 200);
+    if (smallRect.x != 50
+        || smallRect.y != 75
+        || smallRect.width != 100
+        || smallRect.height != 200)
+    {
+        printf("ERROR: Rectangle ctor sm\n");
+        success = false;
+    }
+
+    Rectangle bigRect(15, 32, 1920, 1080);
+    if (bigRect.x != 15
+        || bigRect.y != 32
+        || bigRect.width != 1920
+        || bigRect.height != 1080)
+    {
+        printf("ERROR: Rectangle ctor big\n");
+        success = false;
+    }
+
+    if (smallRect == bigRect)
+    {
+        printf("ERROR: ==\n");
+        success = false;
+    }
+
+    {
+        RECT rct = { 15, 32, 1920, 1080 };
+
+        Rectangle r(rct);
+
+        if (r.x != 15
+            || r.y != 32
+            || r.width != (1920 - 15)
+            || r.height != (1080 - 32))
+        {
+            printf("ERROR: RECT ctor\n");
+            success = false;
+        }
+    }
+
+    {
+        RECT smallRct = { 50, 75, 100 + 50, 200 + 75 };
+
+        if (smallRct != smallRect)
+        {
+            printf("ERROR: RECT != small\n");
+            success = false;
+        }
+
+        if (smallRect != smallRct)
+        {
+            printf("ERROR: RECT != small\n");
+            success = false;
+        }
+
+        RECT bigRct = { 15, 32, 1920 + 15, 1080 + 32 };
+
+        if (bigRct != bigRect)
+        {
+            printf("ERROR: RECT != big\n");
+            success = false;
+        }
+
+        if (bigRect != bigRct)
+        {
+            printf("ERROR: RECT != big\n");
+            success = false;
+        }
+
+        if (smallRect == bigRct)
+        {
+            printf("ERROR: RECT ==\n");
+            success = false;
+        }
+    }
+
+    {
+        RECT rct = bigRect;
+
+        if (rct.left != bigRect.x
+            || rct.right != (bigRect.x + bigRect.width)
+            || rct.top != bigRect.y
+            || rct.bottom != (bigRect.y + bigRect.height))
+        {
+            printf("ERROR: op RECT\n");
+            success = false;
+        }
+    }
+
+    {
+        Rectangle r = smallRect;
+        if (r.x != 50
+            || r.y != 75
+            || r.width != 100
+            || r.height != 200)
+        {
+            printf("ERROR: assignment opt\n");
+            success = false;
+        }
+
+        r = bigRect;
+        if (r.x != 15
+            || r.y != 32
+            || r.width != 1920
+            || r.height != 1080)
+        {
+            printf("ERROR: assignment opt\n");
+            success = false;
+        }
+    }
+
+    // Location/Center
+    {
+        Vector2 loc = smallRect.Location();
+        Vector2 ctr = smallRect.Center();
+
+        if (loc.x != float(smallRect.x)
+            || loc.y != float(smallRect.y)
+            || ctr.x != (float(smallRect.x) + float(smallRect.width / 2.f))
+            || ctr.y != (float(smallRect.y) + float(smallRect.height / 2.f)))
+        {
+            printf("ERROR: Location/Center small\n");
+            success = false;
+        }
+
+        loc = bigRect.Location();
+        ctr = bigRect.Center();
+
+        if (loc.x != float(bigRect.x)
+            || loc.y != float(bigRect.y)
+            || ctr.x != (float(bigRect.x) + float(bigRect.width / 2.f))
+            || ctr.y != (float(bigRect.y) + float(bigRect.height / 2.f)))
+        {
+            printf("ERROR: Location/Center big\n");
+            success = false;
+        }
+    }
+
+    // Contains
+    if (!simple.Contains(0, 0))
+    {
+        printf("ERROR: Contains 1\n");
+        success = false;
+    }
+
+    if ( !simple.Contains(Vector2(0.f,0.f)))
+    {
+        printf("ERROR: Contains v1\n");
+        success = false;
+    }
+
+    if (!simple.Contains(50, 50))
+    {
+        printf("ERROR: Contains 2\n");
+        success = false;
+    }
+
+    if (!simple.Contains(Vector2(50.f, 50.f)))
+    {
+        printf("ERROR: Contains 2v\n");
+        success = false;
+    }
+
+    if (simple.Contains(100, 0))
+    {
+        printf("ERROR: Contains 3\n");
+        success = false;
+    }
+
+    if (simple.Contains(Vector2(100.f, 0.f)))
+    {
+        printf("ERROR: Contains 3v\n");
+        success = false;
+    }
+
+    if (simple.Contains(0, 100))
+    {
+        printf("ERROR: Contains 4\n");
+        success = false;
+    }
+
+    if (simple.Contains(Vector2(0.f, 100.f)))
+    {
+        printf("ERROR: Contains 4v\n");
+        success = false;
+    }
+
+    if (simple.Contains(-1, 0))
+    {
+        printf("ERROR: Contains 5\n");
+        success = false;
+    }
+
+    if (simple.Contains(Vector2(-1.f, 0.f)))
+    {
+        printf("ERROR: Contains 5v\n");
+        success = false;
+    }
+
+    if (simple.Contains(0, -1))
+    {
+        printf("ERROR: Contains 6\n");
+        success = false;
+    }
+
+    if (simple.Contains(Vector2(0.f, -1.f)))
+    {
+        printf("ERROR: Contains 6v\n");
+        success = false;
+    }
+
+    {
+        Rectangle b = simple;
+        b.Inflate(-2, -2);
+
+        if (!simple.Contains(b))
+        {
+            printf("ERROR: Contains R1\n");
+            success = false;
+        }
+
+        if (!simple.Contains(simple))
+        {
+            printf("ERROR: Contains R2\n");
+            success = false;
+        }
+    }
+
+    {
+        Rectangle b = simple;
+        b.Inflate(-2, -2);
+
+        RECT c = b;
+        if (!simple.Contains(c))
+        {
+            printf("ERROR: Contains R3\n");
+            success = false;
+        }
+
+        RECT d = simple;
+        if (!simple.Contains(d))
+        {
+            printf("ERROR: Contains R4\n");
+            success = false;
+        }
+    }
+
+    if (!simple.Contains(unit))
+    {
+        printf("ERROR: Contains R5\n");
+        success = false;
+    }
+
+    if (unit.Contains(simple))
+    {
+        printf("ERROR: Contains R6\n");
+        success = false;
+    }
+
+    if (smallRect.Contains(unit))
+    {
+        printf("ERROR: Contains R7\n");
+        success = false;
+    }
+
+    if (bigRect.Contains(unit))
+    {
+        printf("ERROR: Contains R8\n");
+        success = false;
+    }
+
+    if (smallRect.Contains(bigRect))
+    {
+        printf("ERROR: Contains R9\n");
+        success = false;
+    }
+
+    if (!bigRect.Contains(smallRect))
+    {
+        printf("ERROR: Contains R10\n");
+        success = false;
+    }
+
+    {
+        auto rects1 = CreateIntersectedRectangles(simple);
+        for (auto& r : rects1)
+        {
+            if (simple.Contains(r))
+            {
+                printf("ERROR: Contains intersected\n");
+                success = false;
+            }
+        }
+
+        auto rects2 = CreateDisjointedRectangles(simple);
+        for (auto& r : rects2)
+        {
+            if (simple.Contains(r))
+            {
+                printf("ERROR: Contains disjointed\n");
+                success = false;
+            }
+        }
+    }
+
+    // Inflate
+    {
+        Rectangle r = smallRect;
+        r.Inflate(1, 2);
+        if (r.x != (50 - 1)
+            || r.y != (75 - 2)
+            || r.width != (100 + 1)
+            || r.height != (200 + 2))
+        {
+            printf("ERROR: Inflate\n");
+            success = false;
+        }
+
+        r = bigRect;
+        r.Inflate(-1, -2);
+        if (r.x != (15 + 1)
+            || r.y != (32 + 2)
+            || r.width != (1920 - 1)
+            || r.height != (1080 - 2))
+        {
+            printf("ERROR: Inflate\n");
+            success = false;
+        }
+    }
+
+    // Intersects
+    {
+        Rectangle b = simple;
+        b.Inflate(-2, -2);
+
+        if (!simple.Intersects(b))
+        {
+            printf("ERROR: Intersects R1\n");
+            success = false;
+        }
+
+        if (!simple.Intersects(simple))
+        {
+            printf("ERROR: Intersects R2\n");
+            success = false;
+        }
+    }
+
+    {
+        Rectangle b = simple;
+        b.Inflate(-2, -2);
+
+        RECT c = b;
+        if (!simple.Intersects(c))
+        {
+            printf("ERROR: Intersects R3\n");
+            success = false;
+        }
+
+        RECT d = simple;
+        if (!simple.Intersects(d))
+        {
+            printf("ERROR: Intersects R4\n");
+            success = false;
+        }
+    }
+
+    if (!simple.Intersects(unit))
+    {
+        printf("ERROR: Intersects R5\n");
+        success = false;
+    }
+
+    if (!unit.Intersects(simple))
+    {
+        printf("ERROR: Intersects R6\n");
+        success = false;
+    }
+
+    if (smallRect.Intersects(unit))
+    {
+        printf("ERROR: Intersects R7\n");
+        success = false;
+    }
+
+    if (bigRect.Intersects(unit))
+    {
+        printf("ERROR: Intersects R8\n");
+        success = false;
+    }
+
+    if (!smallRect.Intersects(bigRect))
+    {
+        printf("ERROR: Intersects R9\n");
+        success = false;
+    }
+
+    if (!bigRect.Intersects(smallRect))
+    {
+        printf("ERROR: Intersects R10\n");
+        success = false;
+    }
+
+    {
+        auto rects1 = CreateIntersectedRectangles(simple);
+        for (auto& r : rects1)
+        {
+            if (!simple.Intersects(r))
+            {
+                printf("ERROR: Intersects intersected\n");
+                success = false;
+            }
+        }
+
+        auto rects2 = CreateDisjointedRectangles(simple);
+        for (auto& r : rects2)
+        {
+            if (simple.Intersects(r))
+            {
+                printf("ERROR: Intersects disjointed\n");
+                success = false;
+            }
+        }
+    }
+
+    // Offset
+    {
+        Rectangle r = smallRect;
+        r.Offset(1, 2);
+        if (r.x != (50 + 1)
+            || r.y != (75 + 2)
+            || r.width != 100
+            || r.height != 200)
+        {
+            printf("ERROR: Offset\n");
+            success = false;
+        }
+
+        r = bigRect;
+        r.Offset(-1, -2);
+        if (r.x != (15 - 1)
+            || r.y != (32 - 2)
+            || r.width != 1920
+            || r.height != 1080)
+        {
+            printf("ERROR: Offset\n");
+            success = false;
+        }
+    }
+
+    // Intersect
+    {
+        Rectangle a(10, 20, 4, 5);
+        Rectangle b(12, 15, 100, 7);
+        Rectangle c(0, 0, 10, 23);
+        Rectangle d(10, 20, 0, 0);
+        Rectangle e(0, 0, 0, 0);
+
+        Rectangle ab(12, 20, 2, 2);
+        Rectangle ac(0, 0, 0, 0);
+        Rectangle ad(0, 0, 0, 0);
+        Rectangle ae(0, 0, 0, 0);
+        Rectangle bc(0, 0, 0, 0);
+
+        if (ab != Rectangle::Intersect(a, b))
+        {
+            printf("ERROR: Intersect 1\n");
+            success = false;
+        }
+
+        if (ac != Rectangle::Intersect(a, c))
+        {
+            printf("ERROR: Intersect 2\n");
+            success = false;
+        }
+
+        if (ad != Rectangle::Intersect(a, d))
+        {
+            printf("ERROR: Intersect 3\n");
+            success = false;
+        }
+
+        if (ae != Rectangle::Intersect(a, e))
+        {
+            printf("ERROR: Intersect 4\n");
+            success = false;
+        }
+
+        if (bc != Rectangle::Intersect(b, c))
+        {
+            printf("ERROR: Intersect 5\n");
+            success = false;
+        }
+
+        if (ab != Rectangle::Intersect(b, a))
+        {
+            printf("ERROR: Intersect 6\n");
+            success = false;
+        }
+
+        if (ac != Rectangle::Intersect(c, a))
+        {
+            printf("ERROR: Intersect 7\n");
+            success = false;
+        }
+
+        if (ad != Rectangle::Intersect(d, a))
+        {
+            printf("ERROR: Intersect 8\n");
+            success = false;
+        }
+
+        if (ae != Rectangle::Intersect(e, a))
+        {
+            printf("ERROR: Intersect 9\n");
+            success = false;
+        }
+
+        if (bc != Rectangle::Intersect(c, b))
+        {
+            printf("ERROR: Intersect 10\n");
+            success = false;
+        }
+    }
+
+    {
+        RECT a = { 10, 20, 10 + 4, 20 + 5 };
+        RECT b = { 12, 15, 12 + 100, 15 + 7 };
+        RECT c = { 0, 0, 10, 23 };
+        RECT d = { 10, 20, 10 + 0, 20 + 0 };
+        RECT e = { 0, 0, 0, 0 };
+
+        RECT ab = { 12, 20, 12 + 2, 20 + 2 };
+        RECT ac = { 0, 0, 0, 0 };
+        RECT ad = { 0, 0, 0, 0 };
+        RECT ae = { 0, 0, 0, 0 };
+        RECT bc = { 0, 0, 0, 0 };
+
+        if (ab != Rectangle::Intersect(a, b))
+        {
+            printf("ERROR: Intersect RECT 1\n");
+            success = false;
+        }
+
+        if (ac != Rectangle::Intersect(a, c))
+        {
+            printf("ERROR: Intersect RECT 2\n");
+            success = false;
+        }
+
+        if (ad != Rectangle::Intersect(a, d))
+        {
+            printf("ERROR: Intersect RECT 3\n");
+            success = false;
+        }
+
+        if (ae != Rectangle::Intersect(a, e))
+        {
+            printf("ERROR: Intersect RECT 4\n");
+            success = false;
+        }
+
+        if (bc != Rectangle::Intersect(b, c))
+        {
+            printf("ERROR: Intersect RECT 5\n");
+            success = false;
+        }
+
+        if (ab != Rectangle::Intersect(b, a))
+        {
+            printf("ERROR: Intersect RECT 6\n");
+            success = false;
+        }
+
+        if (ac != Rectangle::Intersect(c, a))
+        {
+            printf("ERROR: Intersect RECT 7\n");
+            success = false;
+        }
+
+        if (ad != Rectangle::Intersect(d, a))
+        {
+            printf("ERROR: Intersect RECT 8\n");
+            success = false;
+        }
+
+        if (ae != Rectangle::Intersect(e, a))
+        {
+            printf("ERROR: Intersect RECT 9\n");
+            success = false;
+        }
+
+        if (bc != Rectangle::Intersect(c, b))
+        {
+            printf("ERROR: Intersect RECT 10\n");
+            success = false;
+        }
+    }
+
+    // Union
+    {
+        Rectangle a(10, 20, 4, 5);
+        Rectangle b(12, 15, 100, 7);
+        Rectangle c(0, 0, 10, 23);
+        Rectangle d(10, 20, 0, 0);
+        Rectangle e(0, 0, 0, 0);
+
+        Rectangle ab(10, 15, 102, 10);
+        Rectangle ac(0, 0, 14, 25);
+        Rectangle ad(10, 20, 4, 5);
+        Rectangle ae(0, 0, 14, 25);
+        Rectangle bc(0, 0, 112, 23);
+
+        // Test non-ref overloads.
+        if (ab != Rectangle::Union(a, b))
+        {
+            printf("ERROR: Union 1\n");
+            success = false;
+        }
+
+        if (ac != Rectangle::Union(a, c))
+        {
+            printf("ERROR: Union 2\n");
+            success = false;
+        }
+
+        if (ad != Rectangle::Union(a, d))
+        {
+            printf("ERROR: Union 3\n");
+            success = false;
+        }
+
+        if (ae != Rectangle::Union(a, e))
+        {
+            printf("ERROR: Union 4\n");
+            success = false;
+        }
+
+        if (bc != Rectangle::Union(b, c))
+        {
+            printf("ERROR: Union 5\n");
+            success = false;
+        }
+
+        if (ab != Rectangle::Union(b, a))
+        {
+            printf("ERROR: Union 6\n");
+            success = false;
+        }
+
+        if (ac != Rectangle::Union(c, a))
+        {
+            printf("ERROR: Union 7\n");
+            success = false;
+        }
+
+        if (ad != Rectangle::Union(d, a))
+        {
+            printf("ERROR: Union 8\n");
+            success = false;
+        }
+
+        if (ae != Rectangle::Union(e, a))
+        {
+            printf("ERROR: Union 9\n");
+            success = false;
+        }
+
+        if (bc != Rectangle::Union(c, b))
+        {
+            printf("ERROR: Union 10\n");
+            success = false;
+        }
+    }
+
+    {
+        RECT a = { 10, 20, 10 + 4, 20 + 5 };
+        RECT b = { 12, 15, 12 + 100, 15 + 7 };
+        RECT c = { 0, 0, 10, 23 };
+        RECT d = { 10, 20, 10 + 0, 20 + 0 };
+        RECT e = { 0, 0, 0, 0 };
+
+        RECT ab = { 10, 15, 10 + 102, 15 + 10 };
+        RECT ac = { 0, 0, 14, 25 };
+        RECT ad = { 10, 20, 10 + 4, 20 + 5 };
+        RECT ae = { 0, 0, 14, 25 };
+        RECT bc = { 0, 0, 112, 23 };
+
+        // Test non-ref overloads.
+        if (ab != Rectangle::Union(a, b))
+        {
+            printf("ERROR: Union 1\n");
+            success = false;
+        }
+
+        if (ac != Rectangle::Union(a, c))
+        {
+            printf("ERROR: Union 2\n");
+            success = false;
+        }
+
+        if (ad != Rectangle::Union(a, d))
+        {
+            printf("ERROR: Union 3\n");
+            success = false;
+        }
+
+        if (ae != Rectangle::Union(a, e))
+        {
+            printf("ERROR: Union 4\n");
+            success = false;
+        }
+
+        if (bc != Rectangle::Union(b, c))
+        {
+            printf("ERROR: Union 5\n");
+            success = false;
+        }
+
+        if (ab != Rectangle::Union(b, a))
+        {
+            printf("ERROR: Union 6\n");
+            success = false;
+        }
+
+        if (ac != Rectangle::Union(c, a))
+        {
+            printf("ERROR: Union 7\n");
+            success = false;
+        }
+
+        if (ad != Rectangle::Union(d, a))
+        {
+            printf("ERROR: Union 8\n");
+            success = false;
+        }
+
+        if (ae != Rectangle::Union(e, a))
+        {
+            printf("ERROR: Union 9\n");
+            success = false;
+        }
+
+        if (bc != Rectangle::Union(c, b))
+        {
+            printf("ERROR: Union 10\n");
+            success = false;
+        }
+    }
+
+    return (success) ? 0 : 1;
+}
+
+//-------------------------------------------------------------------------------------
 int TestV2()
 {
 	// Vector2 
@@ -99,7 +967,7 @@ int TestV2()
 
     if ( upVector == rightVector )
     {
-        printf("ERROR: !=\n");
+        printf("ERROR: ==\n");
         success = false;
     }
 
@@ -3860,7 +4728,7 @@ int TestC()
 
 
 //-------------------------------------------------------------------------------------
-int TestR()
+int TestRay()
 {
 	// Ray
     bool success = true;
@@ -4223,7 +5091,7 @@ int TestVP()
         Matrix proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, 640.f / 480.f, 0.1f, 100.f);
 
         Vector3 p = vp2.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world);
-        if (!XMVector3NearEqual(p, Vector3(231.296143f, 265.606598, 0.993776858f), VEPSILON))
+        if (!XMVector3NearEqual(p, Vector3(231.296143f, 265.606598, 0.993776858f), VEPSILON3))
         {
             printf("ERROR: Project %f %f %f ... 231.296143 265.606598 0.993776858\n", p.x, p.y, p.z);
             success = false;
@@ -4231,49 +5099,49 @@ int TestVP()
 
         Vector3 r;
         vp2.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world, r);
-        if (!XMVector3NearEqual(r, Vector3(231.296143f, 265.606598, 0.993776858f), VEPSILON))
+        if (!XMVector3NearEqual(r, Vector3(231.296143f, 265.606598, 0.993776858f), VEPSILON3))
         {
             printf("ERROR: Project(2) %f %f %f ... 231.296143 265.606598 0.993776858\n", p.x, p.y, p.z);
             success = false;
         }
 
         p = vp3.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world);
-        if (!XMVector3NearEqual(p, Vector3(370.073822f, 424.970551f, 99.3839111f), VEPSILON))
+        if (!XMVector3NearEqual(p, Vector3(370.073822f, 424.970551f, 99.3839111f), VEPSILON3))
         {
             printf("ERROR: Project %f %f %f ... 370.073822 424.970551 99.3839111 \n", p.x, p.y, p.z);
             success = false;
         }
 
         vp3.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world, r);
-        if (!XMVector3NearEqual(r, Vector3(370.073822f, 424.970551f, 99.3839111f), VEPSILON))
+        if (!XMVector3NearEqual(r, Vector3(370.073822f, 424.970551f, 99.3839111f), VEPSILON3))
         {
             printf("ERROR: Project(2) %f %f %f ... 370.073822 424.970551 99.3839111 \n", p.x, p.y, p.z);
             success = false;
         }
 
         p = vp2.Unproject(Vector3(231.f,265.f,0.993776858), proj, view, world);
-        if (!XMVector3NearEqual(p, Vector3(0.488145798f, 0.748996973f, 0.260956854f), VEPSILON))
+        if (!XMVector3NearEqual(p, Vector3(0.488145798f, 0.748996973f, 0.260956854f), VEPSILON3))
         {
             printf("ERROR: Unproject %f %f %f ... 0.488145798 0.748996973 0.260956854\n", p.x, p.y, p.z);
             success = false;
         }
 
         vp2.Unproject(Vector3(231.f, 265.f, 0.993776858), proj, view, world, r);
-        if (!XMVector3NearEqual(r, Vector3(0.488145798f, 0.748996973f, 0.260956854f), VEPSILON))
+        if (!XMVector3NearEqual(r, Vector3(0.488145798f, 0.748996973f, 0.260956854f), VEPSILON3))
         {
             printf("ERROR: Unproject(2) %f %f %f ... 0.488145798 0.748996973 0.260956854\n", p.x, p.y, p.z);
             success = false;
         }
 
         p = vp3.Unproject(Vector3(370.073822f,424.970551f,99.3839111f), proj, view, world);
-        if (!XMVector3NearEqual(p, Vector3(0.499990046f, 0.749911547f, 0.250027150f), VEPSILON))
+        if (!XMVector3NearEqual(p, Vector3(0.499990046f, 0.749911547f, 0.250027150f), VEPSILON3))
         {
             printf("ERROR: Unproject %f %f %f ... 0.499990046 0.749911547 0.250027150\n", p.x, p.y, p.z);
             success = false;
         }
 
         vp3.Unproject(Vector3(370.073822f, 424.970551f, 99.3839111f), proj, view, world, r);
-        if (!XMVector3NearEqual(r, Vector3(0.499990046f, 0.749911547f, 0.250027150f), VEPSILON))
+        if (!XMVector3NearEqual(r, Vector3(0.499990046f, 0.749911547f, 0.250027150f), VEPSILON3))
         {
             printf("ERROR: Unproject(2) %f %f %f ... 0.499990046 0.749911547 0.250027150\n", p.x, p.y, p.z);
             success = false;
@@ -4415,30 +5283,30 @@ int TestVP()
         }
 
         rct = Viewport::ComputeTitleSafeArea(640, 480);
-        if (rct.left != 64
-            || rct.right != 575
-            || rct.top != 48
-            || rct.bottom != 431)
+        if (rct.left != 32
+            || rct.right != 607
+            || rct.top != 24
+            || rct.bottom != 455)
         {
             printf("ERROR: TitleSafe 480p\n");
             success = false;
         }
 
         rct = Viewport::ComputeTitleSafeArea(1280, 720);
-        if (rct.left != 128
-            || rct.right != 1151
-            || rct.top != 72
-            || rct.bottom != 647)
+        if (rct.left != 64
+            || rct.right != 1215
+            || rct.top != 36
+            || rct.bottom != 683)
         {
             printf("ERROR: TitleSafe 720p\n");
             success = false;
         }
 
         rct = Viewport::ComputeTitleSafeArea(1920, 1080);
-        if (rct.left != 192
-            || rct.right != 1727
-            || rct.top != 108
-            || rct.bottom != 971)
+        if (rct.left != 96
+            || rct.right != 1823
+            || rct.top != 54
+            || rct.bottom != 1025)
         {
             printf("ERROR: TitleSafe 1080p\n");
             success = false;
@@ -4578,14 +5446,15 @@ static struct Test
 	TestFN          func;
 } g_Tests[] = 
 { 
-	{ "Vector2", TestV2 },
+    { "Rectangle", TestRect },
+    { "Vector2", TestV2 },
     { "Vector3", TestV3 },
     { "Vector4", TestV4 },
     { "Matrix", TestM },
     { "Plane", TestP },
     { "Quaternion", TestQ },
     { "Color", TestC },
-    { "Ray", TestR },
+    { "Ray", TestRay },
     { "Viewport", TestVP },
     { "std::less", TestL },
 };
