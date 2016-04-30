@@ -87,13 +87,13 @@ typedef std::vector<uint16_t> IndexCollection;
 template<typename T>
 static void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FLAG bindFlags, _Out_ ID3D11Buffer** pBuffer)
 {
-    D3D11_BUFFER_DESC bufferDesc = { 0 };
+    D3D11_BUFFER_DESC bufferDesc = {};
 
     bufferDesc.ByteWidth = (UINT)data.size() * sizeof(T::value_type);
     bufferDesc.BindFlags = bindFlags;
     bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
-    D3D11_SUBRESOURCE_DATA dataDesc = { 0 };
+    D3D11_SUBRESOURCE_DATA dataDesc = {};
 
     dataDesc.pSysMem = data.data();
 
@@ -242,7 +242,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     wchar_t *const className = L"TestWindowClass";
 
-    WNDCLASSEX wndClass = { 0 };
+    WNDCLASSEX wndClass = {};
 
     wndClass.cbSize = sizeof(WNDCLASSEX);
     wndClass.lpfnWndProc = WndProc;
@@ -261,7 +261,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     RECT client;
     GetClientRect(hwnd, &client);
 
-    DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
+    DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 
     swapChainDesc.BufferCount = 1;
     swapChainDesc.BufferDesc.Width = client.right;
@@ -296,7 +296,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
-    D3D11_TEXTURE2D_DESC depthStencilDesc = { 0 };
+    D3D11_TEXTURE2D_DESC depthStencilDesc = {};
 
     depthStencilDesc.Width = client.right;
     depthStencilDesc.Height = client.bottom;
@@ -311,8 +311,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     if (FAILED(device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilTexture)))
         return 1;
 
-    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-    ZeroMemory(&depthStencilViewDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
     depthStencilViewDesc.Format = DXGI_FORMAT_UNKNOWN;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;

@@ -74,7 +74,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     wchar_t *const className = L"TestWindowClass";
 
-    WNDCLASSEX wndClass = { 0 };
+    WNDCLASSEX wndClass = {};
 
     wndClass.cbSize = sizeof(WNDCLASSEX);
     wndClass.lpfnWndProc = WndProc;
@@ -93,7 +93,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     RECT client;
     GetClientRect(hwnd, &client);
 
-    DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
+    DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 
     swapChainDesc.BufferCount = 1;
     swapChainDesc.BufferDesc.Width = client.right;
@@ -182,14 +182,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         VertexPositionNormalTexture( XMFLOAT3( -1.0f, 1.0f, 1.0f ), XMFLOAT3( 0.0f, 0.0f, 1.0f), XMFLOAT2( hi, 0.0f ) ),
     };
 
-    D3D11_BUFFER_DESC bd;
-    ZeroMemory( &bd, sizeof(bd) );
+    D3D11_BUFFER_DESC bd = {};
     bd.Usage = D3D11_USAGE_DEFAULT;
     bd.ByteWidth = sizeof( VertexPositionNormalTexture ) * 24;
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.CPUAccessFlags = 0;
-    D3D11_SUBRESOURCE_DATA InitData;
-    ZeroMemory( &InitData, sizeof(InitData) );
+    D3D11_SUBRESOURCE_DATA InitData = {};
     InitData.pSysMem = vertices;
 
     ComPtr<ID3D11Buffer> vertexBuffer;

@@ -178,7 +178,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     wchar_t *const className = L"TestWindowClass";
 
-    WNDCLASSEX wndClass = { 0 };
+    WNDCLASSEX wndClass = {};
 
     wndClass.cbSize = sizeof(WNDCLASSEX);
     wndClass.lpfnWndProc = WndProc;
@@ -191,7 +191,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
                                CW_USEDEFAULT, CW_USEDEFAULT, 1600, 720, nullptr, nullptr, hInstance, nullptr);
 
-    DEV_BROADCAST_DEVICEINTERFACE filter = {0};
+    DEV_BROADCAST_DEVICEINTERFACE filter = {};
     filter.dbcc_size = sizeof( filter );
     filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
     filter.dbcc_classguid = KSCATEGORY_AUDIO;
@@ -211,7 +211,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     std::unique_ptr<AudioEngine> audEngine( new AudioEngine( eflags ) );
     SetWindowLongPtr( hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>( audEngine.get() ) );
 
-    wchar_t deviceStr[ 256 ] = {0};
+    wchar_t deviceStr[ 256 ] = {};
     SetDeviceString( audEngine.get(), deviceStr, 256 );
 
     std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"heli.wav" ) );
@@ -229,7 +229,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     RECT client;
     GetClientRect(hwnd, &client);
 
-    DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
+    DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 
     swapChainDesc.BufferCount = 1;
     swapChainDesc.BufferDesc.Width = client.right;
@@ -264,7 +264,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
         return 1;
 
-    D3D11_TEXTURE2D_DESC depthStencilDesc = { 0 };
+    D3D11_TEXTURE2D_DESC depthStencilDesc = {};
 
     depthStencilDesc.Width = client.right;
     depthStencilDesc.Height = client.bottom;
@@ -279,8 +279,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     if (FAILED(device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilTexture)))
         return 1;
 
-    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-    ZeroMemory(&depthStencilViewDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
     depthStencilViewDesc.Format = DXGI_FORMAT_UNKNOWN;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
@@ -443,7 +442,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         auto stats = audEngine->GetStatistics();
 
-        wchar_t statsStr[256] = { 0 };
+        wchar_t statsStr[256] = {};
         swprintf_s( statsStr, L"Playing: %Iu / %Iu; Instances %Iu; Voices %Iu / %Iu / %Iu / %Iu; %Iu audio bytes",
                                 stats.playingOneShots, stats.playingInstances,
                                 stats.allocatedInstances, stats.allocatedVoices, stats.allocatedVoices3d,

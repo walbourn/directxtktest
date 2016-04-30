@@ -629,7 +629,7 @@ int __cdecl main()
         }
 
         uint32_t currentStreamBuffer = 0;
-        size_t bufferSize[MAX_BUFFER_COUNT] = { 0 };
+        size_t bufferSize[MAX_BUFFER_COUNT] = {};
         std::unique_ptr<uint8_t[]> buffers[MAX_BUFFER_COUNT];
 
         bool endofstream = false;

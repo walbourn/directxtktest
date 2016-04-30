@@ -291,7 +291,7 @@ void Game::Render()
     // Row 0
     for (int vk = VK_F1; vk <= VK_F10; ++vk)
     {
-        wchar_t buff[5] = { 0 };
+        wchar_t buff[5] = {};
         swprintf_s(buff, L"F%d", vk - VK_F1 + 1);
         m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, m_kb.IsKeyDown(static_cast<DirectX::Keyboard::Keys>(vk)) ? Colors::Red : Colors::LightGray);
 
@@ -304,7 +304,7 @@ void Game::Render()
 
     for (int vk = 0x30; vk <= 0x39; ++vk)
     {
-        wchar_t buff[3] = { 0 };
+        wchar_t buff[3] = {};
         swprintf_s(buff, L"%d", vk - 0x30);
         m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, m_kb.IsKeyDown(static_cast<DirectX::Keyboard::Keys>(vk)) ? Colors::Red : Colors::LightGray);
 
@@ -639,7 +639,7 @@ void Game::CreateResources()
         DX::ThrowIfFailed(hr);
 
         // Create a descriptor for the swap chain.
-        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = { 0 };
+        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = backBufferWidth;
         swapChainDesc.Height = backBufferHeight;
         swapChainDesc.Format = backBufferFormat;
@@ -659,7 +659,7 @@ void Game::CreateResources()
             nullptr, m_swapChain.GetAddressOf());
         DX::ThrowIfFailed(hr);
 #else
-        DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = { 0 };
+        DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = {};
         fsSwapChainDesc.Windowed = TRUE;
 
         hr = dxgiFactory2->CreateSwapChainForHwnd(

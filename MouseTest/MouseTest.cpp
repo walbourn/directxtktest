@@ -216,7 +216,7 @@ void Game::Render()
     // Scroll Wheel
     pos.y += height * 2;
     {
-        wchar_t buff[16] = { 0 };
+        wchar_t buff[16] = {};
         swprintf_s(buff, L"%d", m_ms.scrollWheelValue);
         m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, Colors::Black);
     }
@@ -527,7 +527,7 @@ void Game::CreateResources()
         DX::ThrowIfFailed(hr);
 
         // Create a descriptor for the swap chain.
-        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = { 0 };
+        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.Width = backBufferWidth;
         swapChainDesc.Height = backBufferHeight;
         swapChainDesc.Format = backBufferFormat;
@@ -547,7 +547,7 @@ void Game::CreateResources()
             nullptr, m_swapChain.GetAddressOf());
         DX::ThrowIfFailed(hr);
 #else
-        DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = { 0 };
+        DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = {};
         fsSwapChainDesc.Windowed = TRUE;
 
         hr = dxgiFactory2->CreateSwapChainForHwnd(

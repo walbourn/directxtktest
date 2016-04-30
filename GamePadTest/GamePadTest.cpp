@@ -87,7 +87,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     wchar_t *const className = L"TestWindowClass";
 
-    WNDCLASSEX wndClass = { 0 };
+    WNDCLASSEX wndClass = {};
 
     wndClass.cbSize = sizeof(WNDCLASSEX);
     wndClass.lpfnWndProc = WndProc;
@@ -106,7 +106,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     RECT client;
     GetClientRect(hwnd, &client);
 
-    DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
+    DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 
     swapChainDesc.BufferCount = 1;
     swapChainDesc.BufferDesc.Width = client.right;

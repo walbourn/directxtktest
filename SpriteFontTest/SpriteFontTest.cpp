@@ -79,7 +79,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     wchar_t *const className = L"TestWindowClass";
 
-    WNDCLASSEX wndClass = { 0 };
+    WNDCLASSEX wndClass = {};
 
     wndClass.cbSize = sizeof(WNDCLASSEX);
     wndClass.lpfnWndProc = WndProc;
@@ -101,7 +101,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     RECT client;
     GetClientRect(hwnd, &client);
 
-    DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
+    DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 
     swapChainDesc.BufferCount = 1;
     swapChainDesc.BufferDesc.Width = client.right;
@@ -248,7 +248,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         
         comicFont.DrawString(g_spriteBatch.get(), L"This is a larger block\nof text using a\nfont scaled to a\nsmaller size.\nSome c\x1234ha\x1543rac\x2453te\x1634r\x1563s are not in the font, but should show up as hyphens.", XMFLOAT2(10, 90), Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
 
-        wchar_t tmp[256] = { 0 };
+        wchar_t tmp[256] = {};
         swprintf_s(tmp, L"%Iu frames", frame );
         
         nonproportionalFont.DrawString(g_spriteBatch.get(), tmp, XMFLOAT2(201, 130), Colors::Black);
@@ -270,7 +270,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         japaneseFont.DrawString(g_spriteBatch.get(), L"\x79C1\x306F\x65E5\x672C\x8A9E\x304C\x8A71\x305B\x306A\x3044\x306E\x3067\x3001\n\x79C1\x306F\x3053\x308C\x304C\x4F55\x3092\x610F\x5473\x3059\x308B\x306E\x304B\x308F\x304B\x308A\x307E\x305B\x3093", XMFLOAT2(10, 512));
 
         {
-            char ascii[256] = {0};
+            char ascii[256] = {};
             int i = 0;
             for (size_t j = 32; j < 256; ++j)
             {
@@ -286,7 +286,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                 ascii[i++] = static_cast<char>(j + 1);
             }
 
-            wchar_t unicode[256] = { 0 };
+            wchar_t unicode[256] = {};
             if (!MultiByteToWideChar(437, MB_PRECOMPOSED, ascii, i, unicode, 256))
                 wcscpy_s(unicode, L"<ERROR!>\n");
 

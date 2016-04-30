@@ -82,13 +82,13 @@ private:
 template<typename T>
 static void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FLAG bindFlags, _Out_ ID3D11Buffer** pBuffer)
 {
-    D3D11_BUFFER_DESC bufferDesc = { 0 };
+    D3D11_BUFFER_DESC bufferDesc = {};
 
     bufferDesc.ByteWidth = (UINT)data.size() * sizeof(T::value_type);
     bufferDesc.BindFlags = bindFlags;
     bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
-    D3D11_SUBRESOURCE_DATA dataDesc = { 0 };
+    D3D11_SUBRESOURCE_DATA dataDesc = {};
 
     dataDesc.pSysMem = data.data();
 
@@ -266,8 +266,8 @@ HRESULT WaveFrontObj::Load( _In_z_ const wchar_t* szFileName )
 
     uint32_t curSubset = 0;
 
-    WCHAR strCommand[256] = {0};
-    WCHAR strMaterialFilename[MAX_PATH] = {0};
+    WCHAR strCommand[256] = {};
+    WCHAR strMaterialFilename[MAX_PATH] = {};
     for( ;; )
     {
         InFile >> strCommand;
@@ -421,7 +421,7 @@ HRESULT WaveFrontObj::Load( _In_z_ const wchar_t* szFileName )
         else if( 0 == wcscmp( strCommand, L"usemtl" ) )
         {
             // Material
-            WCHAR strName[MAX_PATH] = {0};
+            WCHAR strName[MAX_PATH] = {};
             InFile >> strName;
 
             bool bFound = false;
@@ -488,7 +488,7 @@ HRESULT WaveFrontObj::LoadMTL( _In_z_ const wchar_t* szFileName )
 
     auto curMaterial = materials.end();
 
-    WCHAR strCommand[256] = {0};
+    WCHAR strCommand[256] = {};
     for( ;; )
     {
         InFile >> strCommand;
@@ -498,7 +498,7 @@ HRESULT WaveFrontObj::LoadMTL( _In_z_ const wchar_t* szFileName )
         if( 0 == wcscmp( strCommand, L"newmtl" ) )
         {
             // Switching active materials
-            WCHAR strName[MAX_PATH] = {0};
+            WCHAR strName[MAX_PATH] = {};
             InFile >> strName;
 
             curMaterial = materials.end();
