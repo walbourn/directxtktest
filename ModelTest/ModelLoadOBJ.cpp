@@ -52,8 +52,8 @@ public:
 
         bool bSpecular;
 
-        WCHAR   strName[MAX_PATH];
-        WCHAR   strTexture[MAX_PATH];
+        wchar_t strName[MAX_PATH];
+        wchar_t strTexture[MAX_PATH];
 
         Material() :
             vAmbient( 0.2f, 0.2f, 0.2f ),
@@ -266,8 +266,8 @@ HRESULT WaveFrontObj::Load( _In_z_ const wchar_t* szFileName )
 
     uint32_t curSubset = 0;
 
-    WCHAR strCommand[256] = {};
-    WCHAR strMaterialFilename[MAX_PATH] = {};
+    wchar_t strCommand[256] = {};
+    wchar_t strMaterialFilename[MAX_PATH] = {};
     for( ;; )
     {
         InFile >> strCommand;
@@ -421,7 +421,7 @@ HRESULT WaveFrontObj::Load( _In_z_ const wchar_t* szFileName )
         else if( 0 == wcscmp( strCommand, L"usemtl" ) )
         {
             // Material
-            WCHAR strName[MAX_PATH] = {};
+            wchar_t strName[MAX_PATH] = {};
             InFile >> strName;
 
             bool bFound = false;
@@ -459,15 +459,15 @@ HRESULT WaveFrontObj::Load( _In_z_ const wchar_t* szFileName )
     // If an associated material file was found, read that in as well.
     if( *strMaterialFilename )
     {
-        WCHAR ext[_MAX_EXT];
-        WCHAR fname[_MAX_FNAME];
+        wchar_t ext[_MAX_EXT];
+        wchar_t fname[_MAX_FNAME];
         _wsplitpath_s( strMaterialFilename, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, ext, _MAX_EXT );
 
-        WCHAR drive[_MAX_DRIVE];
-        WCHAR dir[_MAX_DIR];
+        wchar_t drive[_MAX_DRIVE];
+        wchar_t dir[_MAX_DIR];
         _wsplitpath_s( szFileName, drive, _MAX_DRIVE, dir, _MAX_DIR, nullptr, 0, nullptr, 0 );
 
-        WCHAR szPath[ MAX_PATH ];
+        wchar_t szPath[ MAX_PATH ];
         _wmakepath_s( szPath, MAX_PATH, drive, dir, fname, ext );
 
         HRESULT hr = LoadMTL( szPath );
@@ -488,7 +488,7 @@ HRESULT WaveFrontObj::LoadMTL( _In_z_ const wchar_t* szFileName )
 
     auto curMaterial = materials.end();
 
-    WCHAR strCommand[256] = {};
+    wchar_t strCommand[256] = {};
     for( ;; )
     {
         InFile >> strCommand;
@@ -498,7 +498,7 @@ HRESULT WaveFrontObj::LoadMTL( _In_z_ const wchar_t* szFileName )
         if( 0 == wcscmp( strCommand, L"newmtl" ) )
         {
             // Switching active materials
-            WCHAR strName[MAX_PATH] = {};
+            wchar_t strName[MAX_PATH] = {};
             InFile >> strName;
 
             curMaterial = materials.end();

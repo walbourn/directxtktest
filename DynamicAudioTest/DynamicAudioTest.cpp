@@ -140,7 +140,7 @@ void GenerateSineWave( _Out_writes_(sampleRate) int16_t* data, int sampleRate, i
 
 
 //--------------------------------------------------------------------------------------
-HRESULT CreateMFReader(_In_z_ const WCHAR* mediaFile, _Outptr_ IMFSourceReader ** reader, _Out_ WAVEFORMATEX* wfx, _In_ size_t maxwfx)
+HRESULT CreateMFReader(_In_z_ const wchar_t* mediaFile, _Outptr_ IMFSourceReader ** reader, _Out_ WAVEFORMATEX* wfx, _In_ size_t maxwfx)
 {
     using namespace Microsoft::WRL;
 
