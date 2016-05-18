@@ -179,8 +179,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
 
-        D3D11_TEXTURE2D_DESC desc;
-        memset(&desc, 0, sizeof(desc));
+        D3D11_TEXTURE2D_DESC desc = {};
         desc.Width = desc.Height = desc.MipLevels = desc.ArraySize = 1;
         desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         desc.SampleDesc.Count = 1;
@@ -195,8 +194,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
             return 1;
         }
 
-        D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
-        memset(&SRVDesc, 0, sizeof(SRVDesc));
+        D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
         SRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         SRVDesc.Texture2D.MipLevels = 1;

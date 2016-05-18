@@ -321,8 +321,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     AudioEmitter emitter;
 
-    X3DAUDIO_CONE cone;
-    memset( &cone, 0, sizeof(cone) );
+    X3DAUDIO_CONE cone = {};
     cone.OuterVolume = 1.f;
     cone.OuterLPF = 1.f;
     cone.OuterReverb = 1.f;
