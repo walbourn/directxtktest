@@ -104,6 +104,17 @@ namespace
         long cx = x + hw;
         long cy = y + hh;
 
+#ifdef DIRECTX_EMULATE_MAKE_UNIQUE
+        std::vector<Rectangle> rects;
+        rects.push_back(Rectangle(x - hw,  y - hh, w, h)); // Left Upper corner
+        rects.push_back(Rectangle(x,       y - hh, w, h)); // Upper
+        rects.push_back(Rectangle(cx,      y - hh, w, h)); // Right Upper corner
+        rects.push_back(Rectangle(cx,      y,      w, h)); // Right
+        rects.push_back(Rectangle(cx,      cy,     w, h)); // Right bottom corner
+        rects.push_back(Rectangle(x,       cy,     w, h)); // Bottom
+        rects.push_back(Rectangle(x - hw,  cy,     w, h)); // Left Bottom corner
+        rects.push_back(Rectangle(x - hw,  y,      w, h)); // Left
+#else
         std::vector<Rectangle> rects = {
             Rectangle(x - hw,  y - hh, w, h), // Left Upper coner
             Rectangle(x,       y - hh, w, h), // Upper
@@ -114,6 +125,7 @@ namespace
             Rectangle(x - hw,  cy,     w, h), // Left Bottom coner
             Rectangle(x - hw,  y,      w, h), // Left
         };
+#endif
         return rects;
     }
 
@@ -126,6 +138,17 @@ namespace
         long w = target.width;
         long h = target.height;
 
+#ifdef DIRECTX_EMULATE_MAKE_UNIQUE
+        std::vector<Rectangle> rects;
+        rects.push_back(Rectangle(x - w,   y - h,  w, h)); // Left Upper corner
+        rects.push_back(Rectangle(x,       y - h,  w, h)); // Upper
+        rects.push_back(Rectangle(x + w,   y - h,  w, h)); // Right Upper corner
+        rects.push_back(Rectangle(x + w,   y,      w, h)); // Right
+        rects.push_back(Rectangle(x + w,   y + h,  w, h)); // Right bottom corner
+        rects.push_back(Rectangle(x,       y + h,  w, h)); // Bottom
+        rects.push_back(Rectangle(x - w,   y + h,  w, h)); // Left Bottom corner
+        rects.push_back(Rectangle(x - w,   y,      w, h)); // Left
+#else
         std::vector<Rectangle> rects = {
             Rectangle(x - w,   y - h,  w, h), // Left Upper coner
             Rectangle(x,       y - h,  w, h), // Upper
@@ -136,6 +159,7 @@ namespace
             Rectangle(x - w,   y + h,  w, h), // Left Bottom coner
             Rectangle(x - w,   y,      w, h), // Left
         };
+#endif
         return rects;
     }
 }
