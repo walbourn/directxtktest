@@ -350,6 +350,46 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                 lastStr = L"Button DPAD RIGHT was pressed\n";
             else if ( tracker.dpadRight == GamePad::ButtonStateTracker::RELEASED )
                 lastStr = L"Button DPAD RIGHT was released\n";
+            else if (tracker.leftStickUp == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button LEFT STICK was pressed UP\n";
+            else if (tracker.leftStickUp == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button LEFT STICK was released from UP\n";
+            else if (tracker.leftStickDown == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button LEFT STICK was pressed DOWN\n";
+            else if (tracker.leftStickDown == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button LEFT STICK was released from DOWN\n";
+            else if (tracker.leftStickLeft == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button LEFT STICK was pressed LEFT\n";
+            else if (tracker.leftStickLeft == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button LEFT STICK was released from LEFT\n";
+            else if (tracker.leftStickRight == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button LEFT STICK was pressed RIGHT\n";
+            else if (tracker.leftStickRight == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button LEFT STICK was released from RIGHT\n";
+            else if (tracker.rightStickUp == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button RIGHT STICK was pressed UP\n";
+            else if (tracker.rightStickUp == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button RIGHT STICK was released from UP\n";
+            else if (tracker.rightStickDown == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button RIGHT STICK was pressed DOWN\n";
+            else if (tracker.rightStickDown == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button RIGHT STICK was released from DOWN\n";
+            else if (tracker.rightStickLeft == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button RIGHT STICK was pressed LEFT\n";
+            else if (tracker.rightStickLeft == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button RIGHT STICK was released from LEFT\n";
+            else if (tracker.rightStickRight == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button RIGHT STICK was pressed RIGHT\n";
+            else if (tracker.rightStickRight == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button RIGHT STICK was released from RIGHT\n";
+            else if (tracker.leftTrigger == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button LEFT TRIGGER was pressed\n";
+            else if (tracker.leftTrigger == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button LEFT TRIGGER was released\n";
+            else if (tracker.rightTrigger == GamePad::ButtonStateTracker::PRESSED)
+                lastStr = L"Button RIGHT TRIGGER was pressed\n";
+            else if (tracker.rightTrigger == GamePad::ButtonStateTracker::RELEASED)
+                lastStr = L"Button RIGHT TRIGGER was released\n";
 
             assert(tracker.back == tracker.view);
             assert(tracker.start == tracker.menu);
@@ -397,8 +437,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
             // Back/Start (aka View/Menu)
             ctrlFont.DrawString(g_spriteBatch.get(), L"#", XMFLOAT2(175, 75), state.IsViewPressed() ? Colors::White : Colors::Black);
+            assert(state.IsViewPressed() == state.IsBackPressed());
+            assert(state.buttons.back == state.buttons.view);
 
             ctrlFont.DrawString(g_spriteBatch.get(), L"%", XMFLOAT2(300, 75), state.IsMenuPressed() ? Colors::White : Colors::Black);
+            assert(state.IsMenuPressed() == state.IsStartPressed());
+            assert(state.buttons.start == state.buttons.menu);
 
             // Triggers/Shoulders
             ctrlFont.DrawString(g_spriteBatch.get(), L"*", XMFLOAT2(500, 10), state.IsRightShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
