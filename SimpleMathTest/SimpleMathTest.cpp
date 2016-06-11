@@ -9,6 +9,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //-------------------------------------------------------------------------------------
 
+#include <d3d11.h>
 #include "SimpleMath.h"
 
 #include <stdio.h>
