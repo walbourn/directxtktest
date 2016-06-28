@@ -20,10 +20,13 @@
 #include <wrl/client.h>
 #include <wrl/event.h>
 
+#include "SimpleMath.h"
+
 using namespace DirectX;
+using namespace DirectX::SimpleMath;
+
 using Microsoft::WRL::ComPtr;
 
-// TODO - Move to DirectXHelpers.h
 // Helper sets a D3D resource name string (used by PIX and debug layer leak reporting).
 inline void SetDebugObjectName(_In_ ID3D12Object* object, _In_z_ const wchar_t * name)
 {
@@ -223,6 +226,12 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         cmdList->ResourceBarrier(1, &barrier);
 
         cmdList->ClearRenderTargetView(descHeap->GetCPUDescriptorHandleForHeapStart(), Colors::CornflowerBlue, 0, nullptr);
+
+        // Set the viewport and scissor rect.
+
+        Viewport viewPort(0.0f, 0.0f, static_cast<float>(client.right), static_cast<float>(client.bottom));
+        cmdList->RSSetViewports(1, viewPort.Get12());
+        cmdList->RSSetScissorRects(1, &client);
 
         // Scene is blank for this test
 
