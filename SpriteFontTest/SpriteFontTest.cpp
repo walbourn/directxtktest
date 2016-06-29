@@ -29,6 +29,8 @@ using Microsoft::WRL::ComPtr;
 
 std::unique_ptr<SpriteBatch> g_spriteBatch;
 
+static const float EPSILON = 0.000001f;
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
@@ -195,6 +197,29 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         MessageBox( hwnd, L"Get/SetLineSpacing failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
     }
     ctrlFont.SetLineSpacing(186.f);
+
+    // Measure tests
+    {
+        auto spinText = L"Spinning\nlike a cat";
+
+        auto drawSize = comicFont.MeasureString(spinText);
+
+        if ( fabs(XMVectorGetX(drawSize) - 136.f) > EPSILON
+             || fabs(XMVectorGetY(drawSize) - 85.4713516f) > EPSILON)
+        {
+            MessageBox( hwnd, L"MeasureString failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
+        }
+
+        auto rect = comicFont.MeasureDrawBounds(spinText, XMFLOAT2(150, 350));
+
+        if (rect.top != 361
+            || rect.bottom != 428
+            || rect.left != 157
+            || rect.right != 286)
+        {
+            MessageBox( hwnd, L"MeasureDrawBounds failed", L"SpriteFontTest", MB_OK | MB_ICONERROR );
+        }
+    }
 
     bool quit = false;
 
