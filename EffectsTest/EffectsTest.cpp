@@ -203,9 +203,7 @@ public:
 
     void Apply(ID3D11DeviceContext* context, CXMMATRIX world, CXMMATRIX view, CXMMATRIX projection)
     {
-        SetWorld(world);
-        SetView(view);
-        SetProjection(projection);
+        SetMatrices(world, view, projection);
 
         T::Apply(context);
 
