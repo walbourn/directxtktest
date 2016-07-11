@@ -274,7 +274,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         local = XMMatrixMultiply( world, local );
         cup->Draw( context.Get(), states, local, view, projection, false, [&]()
         {
-            ID3D11ShaderResourceView* srv = nullptr;
+            ID3D11ShaderResourceView* srv = defaultTex.Get();
             context->PSSetShaderResources( 0, 1, &srv );
         });
 

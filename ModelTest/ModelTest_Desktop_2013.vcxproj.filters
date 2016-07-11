@@ -8,90 +8,129 @@
     <Filter Include="Assets">
       <UniqueIdentifier>{49d32f73-f9f1-402d-8561-7ae95827b1cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Dwarf">
+      <UniqueIdentifier>{805a6130-3ee7-4d73-9238-0c9f9bf93b25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\VSStarter">
+      <UniqueIdentifier>{378f7c0e-2021-455d-88e2-1dfe0b00ce8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Cup">
+      <UniqueIdentifier>{5effa643-d878-425e-abe7-3b047c08d303}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Lightmap">
+      <UniqueIdentifier>{b927e2eb-207d-4969-8f74-2975781a7f29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Soldier">
+      <UniqueIdentifier>{6a510c27-43c9-43b8-abfa-bb95eb21712d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Tiny">
+      <UniqueIdentifier>{70b94936-d498-4db2-9870-67307f422c98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\CmoShip">
+      <UniqueIdentifier>{65dddf36-152a-43fc-9ee7-cfff5965479c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cup._obj">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="cup.mtl">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="gamelevel.cmo">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="teapot.cmo">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="dwarf.sdkmesh">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="soldier.sdkmesh">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="tiny.sdkmesh">
-      <Filter>Assets</Filter>
-    </None>
     <None Include="player_ship_a.vbo">
       <Filter>Assets</Filter>
     </None>
+    <None Include="dwarf.sdkmesh">
+      <Filter>Assets\Dwarf</Filter>
+    </None>
+    <None Include="teapot.cmo">
+      <Filter>Assets\VSStarter</Filter>
+    </None>
+    <None Include="cup._obj">
+      <Filter>Assets\Cup</Filter>
+    </None>
+    <None Include="cup.mtl">
+      <Filter>Assets\Cup</Filter>
+    </None>
+    <None Include="gamelevel.cmo">
+      <Filter>Assets\VSStarter</Filter>
+    </None>
+    <None Include="tiny.sdkmesh">
+      <Filter>Assets\Tiny</Filter>
+    </None>
+    <None Include="SimpleLightMap.sdkmesh">
+      <Filter>Assets\Lightmap</Filter>
+    </None>
+    <None Include="soldier.sdkmesh">
+      <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo">
+      <Filter>Assets\CmoShip</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="cup.jpg">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="_USERS_CHUCKW.WINGROUP_DESKTOP_VS 3D STARTER KIT_STARTERKIT_ASSETS_CUBEUVIMAGE.PNG.DDS">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__01.png.dds">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__03.png.dds">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__04.png.dds">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Armor.dds">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Body.dds">
-      <Filter>Assets</Filter>
-    </Image>
     <Image Include="cubemap.dds">
       <Filter>Assets</Filter>
     </Image>
     <Image Include="default.dds">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="DwarfHead.dds">
-      <Filter>Assets</Filter>
+    <Image Include="Armor.dds">
+      <Filter>Assets\Dwarf</Filter>
     </Image>
-    <Image Include="head_diff.dds">
-      <Filter>Assets</Filter>
+    <Image Include="Body.dds">
+      <Filter>Assets\Dwarf</Filter>
+    </Image>
+    <Image Include="DwarfHead.dds">
+      <Filter>Assets\Dwarf</Filter>
     </Image>
     <Image Include="Headgear.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Dwarf</Filter>
     </Image>
     <Image Include="Helmet.dds">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="jacket_diff.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Dwarf</Filter>
     </Image>
     <Image Include="Pack.dds">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="pants_diff.dds">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Tiny_skin.dds">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="upBody_diff.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Dwarf</Filter>
     </Image>
     <Image Include="Weapons.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Dwarf</Filter>
+    </Image>
+    <Image Include="_USERS_CHUCKW.WINGROUP_DESKTOP_VS 3D STARTER KIT_STARTERKIT_ASSETS_CUBEUVIMAGE.PNG.DDS">
+      <Filter>Assets\VSStarter</Filter>
+    </Image>
+    <Image Include="cup.jpg">
+      <Filter>Assets\Cup</Filter>
+    </Image>
+    <Image Include="Tiny_skin.dds">
+      <Filter>Assets\Tiny</Filter>
+    </Image>
+    <Image Include="Cement.dds">
+      <Filter>Assets\Lightmap</Filter>
+    </Image>
+    <Image Include="Plane001LightingMap.dds">
+      <Filter>Assets\Lightmap</Filter>
+    </Image>
+    <Image Include="StripeConcrete.dds">
+      <Filter>Assets\Lightmap</Filter>
+    </Image>
+    <Image Include="Text001LightingMap.dds">
+      <Filter>Assets\Lightmap</Filter>
+    </Image>
+    <Image Include="upBody_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="pants_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="jacket_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="head_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__01.png.dds">
+      <Filter>Assets\CmoShip</Filter>
+    </Image>
+    <Image Include="_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__03.png.dds">
+      <Filter>Assets\CmoShip</Filter>
+    </Image>
+    <Image Include="_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__04.png.dds">
+      <Filter>Assets\CmoShip</Filter>
     </Image>
   </ItemGroup>
 </Project>
