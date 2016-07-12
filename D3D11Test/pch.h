@@ -33,6 +33,11 @@
 
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
 #include <d3d11_3.h>
+#include <dxgi1_4.h>
+
+#ifdef _DEBUG
+#include <dxgidebug.h>
+#endif
 #else
 #include <d3d11_1.h>
 #endif
@@ -61,6 +66,7 @@ namespace DX
 #include "DirectXHelpers.h"
 #include "Effects.h"
 #include "GeometricPrimitive.h"
+#include "Keyboard.h"
 #include "Model.h"
 #include "PrimitiveBatch.h"
 #include "ScreenGrab.h"

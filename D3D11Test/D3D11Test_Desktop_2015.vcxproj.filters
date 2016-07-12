@@ -2,12 +2,30 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="D3D11Test.cpp" />
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11Test.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="StepTimer.h" />
+    <ClInclude Include="..\Common\DeviceResourcesPC.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{7380c774-f498-47b7-948a-44d2ced4caab}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Common\settings.manifest">
+      <Filter>Common</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>

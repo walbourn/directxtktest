@@ -4,10 +4,28 @@
     <ClCompile Include="D3D11Test.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11Test.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="StepTimer.h" />
+    <ClInclude Include="..\Common\DeviceResourcesPC.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{1c4489f6-bdcf-478d-b9ee-83269708b5d8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Common\settings.manifest">
+      <Filter>Common</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>
