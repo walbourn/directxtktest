@@ -98,7 +98,6 @@ void Game::Tick()
 // Updates the world
 void Game::Update(DX::StepTimer const&)
 {
-    // TODO -
     int player = -1;
 
     m_state.connected = false;

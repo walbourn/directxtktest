@@ -4,11 +4,19 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="KeyboardTest.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesUWP.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="StepTimer.h" />
     <ClInclude Include="KeyboardTest.h" />
+    <ClInclude Include="..\Common\DeviceResourcesUWP.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
@@ -17,24 +25,27 @@
     <Filter Include="Assets">
       <UniqueIdentifier>{d8fac03d-76f6-42ba-b0ec-73a0caffee76}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{6821b71f-b7d0-4ce0-b34e-274ae4b9b770}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Logo.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="SmallLogo.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="SplashScreen.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="StoreLogo.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="WideLogo.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
     <Image Include="texture.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\Common\Logo.scale-100.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\Common\SmallLogo.scale-100.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\Common\SplashScreen.scale-100.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\Common\StoreLogo.scale-100.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\Common\WideLogo.scale-100.png">
       <Filter>Assets</Filter>
     </Image>
   </ItemGroup>
