@@ -34,10 +34,6 @@
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
 #include <d3d11_3.h>
 #include <dxgi1_4.h>
-
-#ifdef _DEBUG
-#include <dxgidebug.h>
-#endif
 #else
 #include <d3d11_1.h>
 #endif
@@ -48,6 +44,10 @@
 #include <algorithm>
 #include <exception>
 #include <memory>
+
+#ifdef _DEBUG
+#include <dxgidebug.h>
+#endif
 
 namespace DX
 {

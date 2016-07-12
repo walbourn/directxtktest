@@ -4,10 +4,16 @@
     <ClCompile Include="GamePadTest.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
       <UniqueIdentifier>{e524cd03-98aa-4374-870d-889ece68069e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{4f6eaa07-696f-41a1-b2f7-722bc758a762}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -21,6 +27,16 @@
   <ItemGroup>
     <ClInclude Include="GamePadTest.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="StepTimer.h" />
+    <ClInclude Include="..\Common\DeviceResourcesPC.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Common\settings.manifest">
+      <Filter>Common</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>

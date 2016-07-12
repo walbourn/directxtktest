@@ -5,16 +5,27 @@
       <UniqueIdentifier>1f08d191-5d1b-4d8e-8ace-06bd64042e26</UniqueIdentifier>
       <Extensions>bmp;fbx;gif;jpg;jpeg;tga;tiff;tif;png</Extensions>
     </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{78decaef-1740-4ee8-9a28-246d4ad6f488}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="GamePadTest.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesUWP.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="StepTimer.h" />
     <ClInclude Include="GamePadTest.h" />
+    <ClInclude Include="..\Common\DeviceResourcesUWP.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
@@ -29,19 +40,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Logo.scale-100.png">
+    <Image Include="..\Common\Logo.scale-100.png">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="SmallLogo.scale-100.png">
+    <Image Include="..\Common\SmallLogo.scale-100.png">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="SplashScreen.scale-100.png">
+    <Image Include="..\Common\SplashScreen.scale-100.png">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="StoreLogo.scale-100.png">
+    <Image Include="..\Common\StoreLogo.scale-100.png">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="WideLogo.scale-100.png">
+    <Image Include="..\Common\WideLogo.scale-100.png">
       <Filter>Assets</Filter>
     </Image>
   </ItemGroup>

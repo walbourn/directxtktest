@@ -15,12 +15,16 @@
 
 #pragma once
 
-#include "pch.h"
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#include "DeviceResourcesUWP.h"
+#else
+#include "DeviceResourcesPC.h"
+#endif
 #include "StepTimer.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop
-class Game
+class Game : public DX::IDeviceNotify
 {
 public:
 
@@ -39,7 +43,10 @@ public:
 
     // Rendering helpers
     void Clear();
-    void Present();
+
+    // IDeviceNotify
+    virtual void OnDeviceLost() override;
+    virtual void OnDeviceRestored() override;
 
     // Messages
     void OnActivated();
@@ -57,34 +64,15 @@ public:
     // Properites
     void GetDefaultSize( int& width, int& height ) const;
 
-
 private:
 
     void Update(DX::StepTimer const& timer);
 
-    void CreateDevice();
-    void CreateResources();
-    
-    void OnDeviceLost();
+    void CreateDeviceDependentResources();
+    void CreateWindowSizeDependentResources();
 
-    // Application state
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-    IUnknown*                                       m_window;
-#else
-    HWND                                            m_window;
-#endif
-    int                                             m_outputWidth;
-    int                                             m_outputHeight;
-    DXGI_MODE_ROTATION                              m_outputRotation;
-
-    // Direct3D Objects
-    D3D_FEATURE_LEVEL                               m_featureLevel;
-    Microsoft::WRL::ComPtr<ID3D11Device1>           m_d3dDevice;
-    Microsoft::WRL::ComPtr<ID3D11DeviceContext1>    m_d3dContext;
-
-    // Rendering resources
-    Microsoft::WRL::ComPtr<IDXGISwapChain1>         m_swapChain;
-    Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_renderTargetView;
+    // Device resources.
+    std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
     // Game state
     DX::StepTimer                                   m_timer;

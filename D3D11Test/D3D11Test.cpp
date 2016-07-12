@@ -184,7 +184,6 @@ void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotatio
 }
 
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-
 void Game::ValidateDevice()
 {
     m_deviceResources->ValidateDevice();
@@ -202,6 +201,7 @@ void Game::GetDefaultSize(int& width, int& height) const
 void Game::CreateDeviceDependentResources()
 {
     auto device = m_deviceResources->GetD3DDevice();
+    auto context = m_deviceResources->GetD3DDeviceContext();
 
     m_effect = std::make_unique<BasicEffect>(device);
     m_effect->SetVertexColorEnabled(true);
@@ -217,7 +217,6 @@ void Game::CreateDeviceDependentResources()
                 shaderByteCode, byteCodeLength,
                 m_inputLayout.ReleaseAndGetAddressOf()));
 
-    auto context = m_deviceResources->GetD3DDeviceContext();
     m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
 }
 

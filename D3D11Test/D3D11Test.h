@@ -43,7 +43,6 @@ public:
 
     // Rendering helpers
     void Clear();
-    void Present();
 
     // IDeviceNotify
     virtual void OnDeviceLost() override;
