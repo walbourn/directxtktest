@@ -581,6 +581,13 @@ void Game::CreateResources()
     SetDebugObjectName(m_depthStencilView.Get(), "DepthStencil");
 
     m_proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(70.f), float(backBufferWidth) / float(backBufferHeight), 0.01f, 100.f);
+
+    CD3D11_VIEWPORT viewPort(0.0f, 0.0f, static_cast<float>(m_outputWidth), static_cast<float>(m_outputHeight));
+    m_spriteBatch->SetViewport(viewPort);
+
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
+    m_spriteBatch->SetRotation(m_outputRotation);
+#endif
 }
 
 void Game::OnDeviceLost()

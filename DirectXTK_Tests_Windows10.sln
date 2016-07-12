@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK", "..\DirectXTK_Windows10.vcxproj", "{F4776924-619C-42C7-88B2-82C947CCC9E7}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyboardTest_Windows10", "KeyboardTest\KeyboardTest_Windows10.vcxproj", "{1BDC589F-054B-40B1-8D94-4D14B59DEC95}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MouseTest_Windows10", "MouseTest\MouseTest_Windows10.vcxproj", "{8A103F71-2471-490E-9495-CDD5726B18D2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GamePadTest_Windows10", "GamePadTest\GamePadTest_Windows10.vcxproj", "{513A7B5A-05CE-4811-981C-646708FB7BBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +91,24 @@ Global
 		{8A103F71-2471-490E-9495-CDD5726B18D2}.Release|x86.ActiveCfg = Release|Win32
 		{8A103F71-2471-490E-9495-CDD5726B18D2}.Release|x86.Build.0 = Release|Win32
 		{8A103F71-2471-490E-9495-CDD5726B18D2}.Release|x86.Deploy.0 = Release|Win32
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Debug|ARM.ActiveCfg = Debug|ARM
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Debug|ARM.Build.0 = Debug|ARM
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Debug|ARM.Deploy.0 = Debug|ARM
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Debug|x64.ActiveCfg = Debug|x64
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Debug|x64.Build.0 = Debug|x64
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Debug|x64.Deploy.0 = Debug|x64
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Debug|x86.ActiveCfg = Debug|Win32
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Debug|x86.Build.0 = Debug|Win32
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Debug|x86.Deploy.0 = Debug|Win32
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Release|ARM.ActiveCfg = Release|ARM
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Release|ARM.Build.0 = Release|ARM
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Release|ARM.Deploy.0 = Release|ARM
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Release|x64.ActiveCfg = Release|x64
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Release|x64.Build.0 = Release|x64
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Release|x64.Deploy.0 = Release|x64
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Release|x86.ActiveCfg = Release|Win32
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Release|x86.Build.0 = Release|Win32
+		{513A7B5A-05CE-4811-981C-646708FB7BBB}.Release|x86.Deploy.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,5 +117,6 @@ Global
 		{70AA9C7E-9EF9-40BD-9490-29D395FAC820} = {91743623-2C82-4825-B518-60470957082D}
 		{1BDC589F-054B-40B1-8D94-4D14B59DEC95} = {91743623-2C82-4825-B518-60470957082D}
 		{8A103F71-2471-490E-9495-CDD5726B18D2} = {91743623-2C82-4825-B518-60470957082D}
+		{513A7B5A-05CE-4811-981C-646708FB7BBB} = {91743623-2C82-4825-B518-60470957082D}
 	EndGlobalSection
 EndGlobal

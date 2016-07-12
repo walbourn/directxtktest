@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: GamePadTest.cpp
 //
-// Developer unit test for DirectXTK GamePad
+// Developer unit test for DirectXTK Mouse
 //
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -13,143 +13,40 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
 
-#include "GamePad.h"
-#include "CommonStates.h"
-#include "VertexTypes.h"
-#include "DirectXColors.h"
-#include "DDSTextureLoader.h"
-#include "ScreenGrab.h"
-#include "SpriteBatch.h"
-#include "SpriteFont.h"
-
-#include "PlatformHelpers.h"
-
-#include <stdio.h>
-
-#include <wrl/client.h>
-
-#include <wincodec.h>
-
-#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
-#include <wrl.h>
-#pragma comment(lib,"RuntimeObject.lib")
-#endif
+#include "pch.h"
+#include "GamePadTest.h"
 
 using namespace DirectX;
+
 using Microsoft::WRL::ComPtr;
 
-std::unique_ptr<SpriteBatch> g_spriteBatch;
-std::unique_ptr<GamePad> g_gamePad;
-
-// Build for LH vs. RH coords
-//#define LH_COORDS
-
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+// Constructor.
+Game::Game() :
+    m_window(0),
+    m_outputWidth(800),
+    m_outputHeight(600),
+    m_outputRotation(DXGI_MODE_ROTATION_IDENTITY),
+    m_featureLevel(D3D_FEATURE_LEVEL_9_1),
+    m_lastStr(nullptr)
 {
-    switch (msg)
-    {
-        case WM_CLOSE:
-            DestroyWindow(hwnd);
-            return 0;
-
-        case WM_DESTROY:
-            PostQuitMessage(0);
-            return 0;
-
-        case WM_ACTIVATEAPP:
-            if (g_gamePad)
-            {
-                if (wParam)
-                {
-                    g_gamePad->Resume();
-                }
-                else
-                {
-                    g_gamePad->Suspend();
-                }
-            }
-            break;
-    }
-
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+    *m_lastStrBuff = 0;
 }
 
-
-int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCmdShow )
+// Initialize the Direct3D resources required to run.
+void Game::Initialize(
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    IUnknown* window,
+#else
+    HWND window,
+#endif
+    int width, int height, DXGI_MODE_ROTATION rotation)
 {
-    HRESULT hr;
+    m_window = window;
+    m_outputWidth = std::max( width, 1 );
+    m_outputHeight = std::max( height, 1 );
+    m_outputRotation = rotation;
 
-#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
-    Microsoft::WRL::Wrappers::RoInitializeWrapper initialize(RO_INIT_MULTITHREADED);
-    if (FAILED(initialize))
-        return 1;
-#endif
-
-    wchar_t *const className = L"TestWindowClass";
-
-    WNDCLASSEX wndClass = {};
-
-    wndClass.cbSize = sizeof(WNDCLASSEX);
-    wndClass.lpfnWndProc = WndProc;
-    wndClass.hInstance = hInstance;
-    wndClass.lpszClassName = className;
-    wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-    RegisterClassEx(&wndClass);
-
-    HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
-                               CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, nullptr, nullptr, hInstance, nullptr);
-
-    ShowWindow(hwnd, nCmdShow);
-    UpdateWindow(hwnd);
-
-    RECT client;
-    GetClientRect(hwnd, &client);
-
-    DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-
-    swapChainDesc.BufferCount = 1;
-    swapChainDesc.BufferDesc.Width = client.right;
-    swapChainDesc.BufferDesc.Height = client.bottom;
-    swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER;
-    swapChainDesc.OutputWindow = hwnd;
-    swapChainDesc.SampleDesc.Count = 1;
-    swapChainDesc.Windowed = TRUE;
-
-    D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_10_0;
-    
-    DWORD d3dFlags = 0;
-#ifdef _DEBUG
-    d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-    ComPtr<ID3D11Device> device;
-    ComPtr<ID3D11DeviceContext> context;
-    ComPtr<IDXGISwapChain> swapChain;
-    if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
-                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
-        return 1;
-
-    ComPtr<ID3D11Texture2D> backBufferTexture;
-    if (FAILED(hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture)))
-        return 1;
-
-    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { DXGI_FORMAT_UNKNOWN, D3D11_RTV_DIMENSION_TEXTURE2D };
-
-    ComPtr<ID3D11RenderTargetView> backBuffer;
-    if (FAILED(hr = device->CreateRenderTargetView(backBufferTexture.Get(), &renderTargetViewDesc, &backBuffer)))
-        return 1;
-
-    CommonStates states(device.Get());
-
-    g_spriteBatch = std::make_unique<SpriteBatch>(context.Get());
-
-    SpriteFont ctrlFont(device.Get(), L"xboxController.spritefont");
-
-    SpriteFont comic(device.Get(), L"comic.spritefont");
-
-    g_gamePad = std::make_unique<GamePad>();
+    m_gamePad = std::make_unique<GamePad>();
 
     // Singleton test
     {
@@ -157,23 +54,520 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         try
         {
-            std::unique_ptr<GamePad> gamePad2( new GamePad );
+            std::unique_ptr<GamePad> gamePad2(new GamePad);
         }
-        catch( ... )
+        catch (...)
         {
             thrown = true;
         }
 
-        if ( !thrown )
+        if (!thrown)
         {
-            MessageBox(hwnd, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+            throw std::exception("GamePad not acting like a singleton");
+#else
+            MessageBox(m_window, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
+#endif
         }
 
         auto state = GamePad::Get().GetState(0);
         state;
     }
 
-    ComPtr<ID3D11ShaderResourceView> defaultTex;
+    m_found.reset(new bool[GamePad::MAX_PLAYER_COUNT] );
+    memset(m_found.get(), 0, sizeof(bool) * GamePad::MAX_PLAYER_COUNT);
+
+    CreateDevice();
+
+    CreateResources();
+}
+
+// Executes basic game loop.
+void Game::Tick()
+{
+    m_timer.Tick([&]()
+    {
+        Update(m_timer);
+    });
+
+    Render();
+}
+
+// Updates the world
+void Game::Update(DX::StepTimer const&)
+{
+    // TODO -
+    int player = -1;
+
+    m_state.connected = false;
+
+    for (int j = 0; j < GamePad::MAX_PLAYER_COUNT; ++j)
+    {
+        XMVECTOR color = Colors::Black;
+        auto state2 = m_gamePad->GetState(j);
+        if (state2.IsConnected())
+        {
+            if (!m_found[j])
+            {
+                m_found[j] = true;
+
+                auto caps = m_gamePad->GetCapabilities(j);
+                if (caps.IsConnected())
+                {
+                    char buff[64];
+                    sprintf_s(buff, "Player %d -> type %u, id %I64u\n", j, caps.gamepadType, caps.id);
+                    OutputDebugStringA(buff);
+                }
+            }
+
+            if (player == -1)
+            {
+                player = j;
+                m_state = state2;
+            }
+        }
+        else if (m_found[j])
+        {
+            m_found[j] = false;
+
+            char buff[32];
+            sprintf_s(buff, "Player %d <- disconnected\n", j);
+            OutputDebugStringA(buff);
+        }
+    }
+
+    if (m_state.IsConnected())
+    {
+        m_tracker.Update(m_state);
+
+        if (m_tracker.a == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button A was pressed\n";
+        else if (m_tracker.a == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button A was released\n";
+        else if (m_tracker.b == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button B was pressed\n";
+        else if (m_tracker.b == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button B was released\n";
+        else if (m_tracker.x == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button X was pressed\n";
+        else if (m_tracker.x == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button X was released\n";
+        else if (m_tracker.y == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button Y was pressed\n";
+        else if (m_tracker.y == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button Y was released\n";
+        else if (m_tracker.leftStick == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button LeftStick was pressed\n";
+        else if (m_tracker.leftStick == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button LeftStick was released\n";
+        else if (m_tracker.rightStick == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button RightStick was pressed\n";
+        else if (m_tracker.rightStick == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button RightStick was released\n";
+        else if (m_tracker.leftShoulder == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button LeftShoulder was pressed\n";
+        else if (m_tracker.leftShoulder == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button LeftShoulder was released\n";
+        else if (m_tracker.rightShoulder == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button RightShoulder was pressed\n";
+        else if (m_tracker.rightShoulder == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button RightShoulder was released\n";
+        else if (m_tracker.view == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button BACK/VIEW was pressed\n";
+        else if (m_tracker.view == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button BACK/VIEW was released\n";
+        else if (m_tracker.menu == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button START/MENU was pressed\n";
+        else if (m_tracker.menu == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button START/MENU was released\n";
+        else if (m_tracker.dpadUp == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button DPAD UP was pressed\n";
+        else if (m_tracker.dpadUp == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button DPAD UP was released\n";
+        else if (m_tracker.dpadDown == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button DPAD DOWN was pressed\n";
+        else if (m_tracker.dpadDown == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button DPAD DOWN was released\n";
+        else if (m_tracker.dpadLeft == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button DPAD LEFT was pressed\n";
+        else if (m_tracker.dpadLeft == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button DPAD LEFT was released\n";
+        else if (m_tracker.dpadRight == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button DPAD RIGHT was pressed\n";
+        else if (m_tracker.dpadRight == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button DPAD RIGHT was released\n";
+        else if (m_tracker.leftStickUp == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button LEFT STICK was pressed UP\n";
+        else if (m_tracker.leftStickUp == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button LEFT STICK was released from UP\n";
+        else if (m_tracker.leftStickDown == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button LEFT STICK was pressed DOWN\n";
+        else if (m_tracker.leftStickDown == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button LEFT STICK was released from DOWN\n";
+        else if (m_tracker.leftStickLeft == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button LEFT STICK was pressed LEFT\n";
+        else if (m_tracker.leftStickLeft == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button LEFT STICK was released from LEFT\n";
+        else if (m_tracker.leftStickRight == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button LEFT STICK was pressed RIGHT\n";
+        else if (m_tracker.leftStickRight == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button LEFT STICK was released from RIGHT\n";
+        else if (m_tracker.rightStickUp == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button RIGHT STICK was pressed UP\n";
+        else if (m_tracker.rightStickUp == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button RIGHT STICK was released from UP\n";
+        else if (m_tracker.rightStickDown == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button RIGHT STICK was pressed DOWN\n";
+        else if (m_tracker.rightStickDown == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button RIGHT STICK was released from DOWN\n";
+        else if (m_tracker.rightStickLeft == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button RIGHT STICK was pressed LEFT\n";
+        else if (m_tracker.rightStickLeft == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button RIGHT STICK was released from LEFT\n";
+        else if (m_tracker.rightStickRight == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button RIGHT STICK was pressed RIGHT\n";
+        else if (m_tracker.rightStickRight == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button RIGHT STICK was released from RIGHT\n";
+        else if (m_tracker.leftTrigger == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button LEFT TRIGGER was pressed\n";
+        else if (m_tracker.leftTrigger == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button LEFT TRIGGER was released\n";
+        else if (m_tracker.rightTrigger == GamePad::ButtonStateTracker::PRESSED)
+            m_lastStr = L"Button RIGHT TRIGGER was pressed\n";
+        else if (m_tracker.rightTrigger == GamePad::ButtonStateTracker::RELEASED)
+            m_lastStr = L"Button RIGHT TRIGGER was released\n";
+
+        assert(m_tracker.back == m_tracker.view);
+        assert(m_tracker.start == m_tracker.menu);
+
+        m_gamePad->SetVibration(player, m_state.triggers.left, m_state.triggers.right);
+    }
+    else
+    {
+        m_lastStr = nullptr;
+        m_tracker.Reset();
+    }
+}
+
+// Draws the scene
+void Game::Render()
+{
+    // Don't try to render anything before the first Update.
+    if (m_timer.GetFrameCount() == 0)
+        return;
+
+    Clear();
+
+    m_spriteBatch->Begin();
+
+    int player = -1;
+
+    for (int j = 0; j < std::min(GamePad::MAX_PLAYER_COUNT, 4); ++j)
+    {
+        XMVECTOR color = m_found[j] ? Colors::White : Colors::Black;
+        m_ctrlFont->DrawString(m_spriteBatch.get(), L"$", XMFLOAT2(800.f, float(50 + j * 150)), color);
+    }
+
+    if (m_lastStr)
+    {
+        m_comicFont->DrawString(m_spriteBatch.get(), m_lastStr, XMFLOAT2(25.f, 650.f), Colors::Yellow);
+    }
+
+    // X Y A B
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"&", XMFLOAT2(325, 150), m_state.IsXPressed() ? Colors::White : Colors::Black);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"(", XMFLOAT2(400, 110), m_state.IsYPressed() ? Colors::White : Colors::Black);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"'", XMFLOAT2(400, 200), m_state.IsAPressed() ? Colors::White : Colors::Black);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L")", XMFLOAT2(475, 150), m_state.IsBPressed() ? Colors::White : Colors::Black);
+
+    // Left/Right sticks
+    auto loc = XMFLOAT2(10, 110);
+    loc.x -= m_state.IsLeftThumbStickLeft() ? 20.f : 0.f;
+    loc.x += m_state.IsLeftThumbStickRight() ? 20.f : 0.f;
+    loc.y -= m_state.IsLeftThumbStickUp() ? 20.f : 0.f;
+    loc.y += m_state.IsLeftThumbStickDown() ? 20.f : 0.f;
+
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L" ", loc, m_state.IsLeftStickPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0));
+
+    loc = XMFLOAT2(450, 300);
+    loc.x -= m_state.IsRightThumbStickLeft() ? 20.f : 0.f;
+    loc.x += m_state.IsRightThumbStickRight() ? 20.f : 0.f;
+    loc.y -= m_state.IsRightThumbStickUp() ? 20.f : 0.f;
+    loc.y += m_state.IsRightThumbStickDown() ? 20.f : 0.f;
+
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"\"", loc, m_state.IsRightStickPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0));
+
+    // DPad
+    XMVECTOR color = Colors::Black;
+    if (m_state.dpad.up || m_state.dpad.down || m_state.dpad.right || m_state.dpad.left)
+        color = Colors::White;
+
+    loc = XMFLOAT2(175, 300);
+    loc.x -= m_state.IsDPadLeftPressed() ? 20.f : 0.f;
+    loc.x += m_state.IsDPadRightPressed() ? 20.f : 0.f;
+    loc.y -= m_state.IsDPadUpPressed() ? 20.f : 0.f;
+    loc.y += m_state.IsDPadDownPressed() ? 20.f : 0.f;
+
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"!", loc, color);
+
+    // Back/Start (aka View/Menu)
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"#", XMFLOAT2(175, 75), m_state.IsViewPressed() ? Colors::White : Colors::Black);
+    assert(m_state.IsViewPressed() == m_state.IsBackPressed());
+    assert(m_state.buttons.back == m_state.buttons.view);
+
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"%", XMFLOAT2(300, 75), m_state.IsMenuPressed() ? Colors::White : Colors::Black);
+    assert(m_state.IsMenuPressed() == m_state.IsStartPressed());
+    assert(m_state.buttons.start == m_state.buttons.menu);
+
+    // Triggers/Shoulders
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"*", XMFLOAT2(500, 10), m_state.IsRightShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
+
+    loc = XMFLOAT2(450, 10);
+    loc.x += m_state.IsRightTriggerPressed() ? 5.f : 0.f;
+    color = XMVectorSet(m_state.triggers.right, m_state.triggers.right, m_state.triggers.right, 1.f);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"+", loc, color, 0, XMFLOAT2(0, 0), 0.5f);
+
+    loc = XMFLOAT2(130, 10);
+    loc.x -= m_state.IsLeftTriggerPressed() ? 5.f : 0.f;
+    color = XMVectorSet(m_state.triggers.left, m_state.triggers.left, m_state.triggers.left, 1.f);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L",", loc, color, 0, XMFLOAT2(0, 0), 0.5f);
+
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"-", XMFLOAT2(10, 10), m_state.IsLeftShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
+
+    // Sticks
+    RECT src = { 0, 0, 1, 1 };
+
+    RECT rc;
+    rc.top = 500;
+    rc.left = 10;
+    rc.bottom = 525;
+    rc.right = rc.left + int(((m_state.thumbSticks.leftX + 1.f) / 2.f) * 275);
+
+    m_spriteBatch->Draw(m_defaultTex.Get(), rc, &src);
+
+    rc.top = 550;
+    rc.bottom = 575;
+
+    rc.right = rc.left + int(((m_state.thumbSticks.leftY + 1.f) / 2.f) * 275);
+
+    m_spriteBatch->Draw(m_defaultTex.Get(), rc, &src);
+
+    rc.top = 500;
+    rc.left = 325;
+    rc.bottom = 525;
+    rc.right = rc.left + int(((m_state.thumbSticks.rightX + 1.f) / 2.f) * 275);
+
+    m_spriteBatch->Draw(m_defaultTex.Get(), rc, &src);
+
+    rc.top = 550;
+    rc.bottom = 575;
+
+    rc.right = rc.left + int(((m_state.thumbSticks.rightY + 1.f) / 2.f) * 275);
+
+    m_spriteBatch->Draw(m_defaultTex.Get(), rc, &src);
+
+    m_spriteBatch->End();
+
+    Present();
+}
+
+// Helper method to clear the backbuffers
+void Game::Clear()
+{
+    // Clear the views
+    m_d3dContext->ClearRenderTargetView(m_renderTargetView.Get(), Colors::CornflowerBlue);
+
+    m_d3dContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), nullptr);
+
+    CD3D11_VIEWPORT viewPort(0.0f, 0.0f, static_cast<float>(m_outputWidth), static_cast<float>(m_outputHeight));
+    m_d3dContext->RSSetViewports(1, &viewPort);
+}
+
+// Presents the backbuffer contents to the screen
+void Game::Present()
+{
+    // The first argument instructs DXGI to block until VSync, putting the application
+    // to sleep until the next VSync. This ensures we don't waste any cycles rendering
+    // frames that will never be displayed to the screen.
+    HRESULT hr = m_swapChain->Present(1, 0);
+
+    // If the device was reset we must completely reinitialize the renderer.
+    if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+    {
+        OnDeviceLost();
+    }
+    else
+    {
+        DX::ThrowIfFailed(hr);
+    }
+}
+
+// Message handlers
+void Game::OnActivated()
+{
+}
+
+void Game::OnDeactivated()
+{
+}
+
+void Game::OnSuspending()
+{
+}
+
+void Game::OnResuming()
+{
+    m_tracker.Reset();
+    m_timer.ResetElapsedTime();
+}
+
+void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation)
+{
+    m_outputWidth = std::max(width, 1);
+    m_outputHeight = std::max(height, 1);
+    m_outputRotation = rotation;
+
+    CreateResources();
+}
+
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+void Game::ValidateDevice()
+{
+    // The D3D Device is no longer valid if the default adapter changed since the device
+    // was created or if the device has been removed.
+
+    DXGI_ADAPTER_DESC previousDesc;
+    {
+        ComPtr<IDXGIDevice3> dxgiDevice;
+        HRESULT hr = m_d3dDevice.As(&dxgiDevice);
+        DX::ThrowIfFailed(hr);
+
+        ComPtr<IDXGIAdapter> deviceAdapter;
+        hr = dxgiDevice->GetAdapter(&deviceAdapter);
+        DX::ThrowIfFailed(hr);
+
+        ComPtr<IDXGIFactory2> dxgiFactory;
+        hr = deviceAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory));
+        DX::ThrowIfFailed(hr);
+
+        ComPtr<IDXGIAdapter1> previousDefaultAdapter;
+        hr = dxgiFactory->EnumAdapters1(0, previousDefaultAdapter.GetAddressOf());
+        DX::ThrowIfFailed(hr);
+
+        hr = previousDefaultAdapter->GetDesc(&previousDesc);
+        DX::ThrowIfFailed(hr);
+    }
+
+    DXGI_ADAPTER_DESC currentDesc;
+    {
+        ComPtr<IDXGIFactory2> currentFactory;
+        HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&currentFactory));
+        DX::ThrowIfFailed(hr);
+
+        ComPtr<IDXGIAdapter1> currentDefaultAdapter;
+        hr = currentFactory->EnumAdapters1(0, &currentDefaultAdapter);
+        DX::ThrowIfFailed(hr);
+
+        hr = currentDefaultAdapter->GetDesc(&currentDesc);
+        DX::ThrowIfFailed(hr);
+    }
+
+    // If the adapter LUIDs don't match, or if the device reports that it has been removed,
+    // a new D3D device must be created.
+
+    HRESULT hr = m_d3dDevice->GetDeviceRemovedReason();
+    if (previousDesc.AdapterLuid.LowPart != currentDesc.AdapterLuid.LowPart
+        || previousDesc.AdapterLuid.HighPart != currentDesc.AdapterLuid.HighPart
+        || FAILED(hr))
+    {
+        // Create a new device and swap chain.
+        OnDeviceLost();
+    }
+}
+#endif
+
+// Properties
+void Game::GetDefaultSize(int& width, int& height) const
+{
+    width = 1024;
+    height = 768;
+}
+
+// These are the resources that depend on the device.
+void Game::CreateDevice()
+{
+    // This flag adds support for surfaces with a different color channel ordering than the API default.
+    UINT creationFlags = 0;
+
+#ifdef _DEBUG
+    creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+    static const D3D_FEATURE_LEVEL featureLevels [] =
+    {
+        D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0,
+        D3D_FEATURE_LEVEL_9_3,
+        D3D_FEATURE_LEVEL_9_2,
+        D3D_FEATURE_LEVEL_9_1,
+    };
+
+    // Create the DX11 API device object, and get a corresponding context.
+    ComPtr<ID3D11Device> d3dDevice;
+    ComPtr<ID3D11DeviceContext> d3dContext;
+    HRESULT hr = D3D11CreateDevice(
+        nullptr,                                // specify null to use the default adapter
+        D3D_DRIVER_TYPE_HARDWARE,
+        nullptr,                                // leave as nullptr unless software device
+        creationFlags,                          // optionally set debug and Direct2D compatibility flags
+        featureLevels,                          // list of feature levels this app can support
+        _countof(featureLevels),                // number of entries in above list
+        D3D11_SDK_VERSION,                      // always set this to D3D11_SDK_VERSION
+        d3dDevice.GetAddressOf(),               // returns the Direct3D device created
+        &m_featureLevel,                        // returns feature level of device created
+        d3dContext.GetAddressOf()               // returns the device immediate context
+        );
+
+    DX::ThrowIfFailed(hr);
+
+    hr = d3dDevice.As(&m_d3dDevice);
+    DX::ThrowIfFailed(hr);
+
+    hr = d3dContext.As(&m_d3dContext);
+    DX::ThrowIfFailed(hr);
+
+#ifndef NDEBUG
+    ComPtr<ID3D11Debug> d3dDebug;
+    hr = m_d3dDevice.As(&d3dDebug);
+    if (SUCCEEDED(hr))
+    {
+        ComPtr<ID3D11InfoQueue> d3dInfoQueue;
+        hr = d3dDebug.As(&d3dInfoQueue);
+        if (SUCCEEDED(hr))
+        {
+#ifdef _DEBUG
+            d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
+            d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
+#endif
+            D3D11_MESSAGE_ID hide [] =
+            {
+                D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
+            };
+            D3D11_INFO_QUEUE_FILTER filter = {};
+            filter.DenyList.NumIDs = _countof(hide);
+            filter.DenyList.pIDList = hide;
+            d3dInfoQueue->AddStorageFilterEntries(&filter);
+        }
+    }
+#endif
+
+    m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
+
+    m_comicFont = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"comic.spritefont");
+
+    m_ctrlFont = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"xboxController.spritefont");
+
     {
         static const uint32_t s_pixel = 0xffffffff;
 
@@ -187,336 +581,133 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
         ComPtr<ID3D11Texture2D> tex;
-        hr = device->CreateTexture2D(&desc, &initData, &tex);
-
-        if (FAILED(hr))
-        {
-            return 1;
-        }
+        DX::ThrowIfFailed(m_d3dDevice->CreateTexture2D(&desc, &initData, &tex));
 
         D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
         SRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         SRVDesc.Texture2D.MipLevels = 1;
 
-        hr = device->CreateShaderResourceView(tex.Get(), &SRVDesc, &defaultTex);
-        if (FAILED(hr))
-        {
-            return 1;
-        }
+        DX::ThrowIfFailed(m_d3dDevice->CreateShaderResourceView(tex.Get(), &SRVDesc, m_defaultTex.ReleaseAndGetAddressOf()));
     }
+}
 
-    bool quit = false;
+// Allocate all memory resources that change on a window SizeChanged event.
+void Game::CreateResources()
+{
+    // Clear the previous window size specific context.
+    ID3D11RenderTargetView* nullViews [] = { nullptr };
+    m_d3dContext->OMSetRenderTargets(_countof(nullViews), nullViews, nullptr);
+    m_renderTargetView.Reset();
+    m_d3dContext->Flush();
 
-    D3D11_VIEWPORT vp = { 0, 0, (float)client.right, (float)client.bottom, 0, 1 };
+    UINT backBufferWidth = static_cast<UINT>(m_outputWidth);
+    UINT backBufferHeight = static_cast<UINT>(m_outputHeight);
+    DXGI_FORMAT backBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-    context->RSSetViewports(1, &vp);
-
-    context->OMSetRenderTargets(1, backBuffer.GetAddressOf(), nullptr);
-
-#ifdef LH_COORDS
-    context->RSSetState( states.CullCounterClockwise() );
-#else
-    context->RSSetState( states.CullClockwise() );
-#endif
-
-    size_t frame = 0;
-
-    std::unique_ptr<bool[]> found( new bool[ GamePad::MAX_PLAYER_COUNT ] );
-    memset( found.get(), 0, sizeof(bool) * GamePad::MAX_PLAYER_COUNT );
-
-    GamePad::ButtonStateTracker tracker;
-
-    const wchar_t * lastStr = nullptr;
-
-    while (!quit)
+    // If the swap chain already exists, resize it, otherwise create one.
+    if (m_swapChain)
     {
-        MSG msg;
+        HRESULT hr = m_swapChain->ResizeBuffers(2, backBufferWidth, backBufferHeight, backBufferFormat, 0);
 
-        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
         {
-            if (msg.message == WM_QUIT)
-                quit = true;
+            // If the device was removed for any reason, a new device and swap chain will need to be created.
+            OnDeviceLost();
 
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-
-        context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
-
-        g_spriteBatch->Begin();
-
-        GamePad::State state;
-        state.connected = false;
-
-        int player = -1;
-
-        for (int j = 0; j < GamePad::MAX_PLAYER_COUNT; ++j)
-        {
-            XMVECTOR color = Colors::Black;
-            auto state2 = g_gamePad->GetState(j);
-            if ( state2.IsConnected() )
-            {
-                if ( !found[j] )
-                {
-                    found[j] = true;
-
-                    auto caps = g_gamePad->GetCapabilities( j );
-                    if ( caps.IsConnected() )
-                    {
-                        char buff[ 64 ];
-                        sprintf_s(buff, "Player %d -> type %u, id %I64u\n", j, caps.gamepadType, caps.id);
-                        OutputDebugStringA( buff );                        
-                    }
-                }
-
-                color = Colors::White;
-
-                if (player == -1)
-                {
-                    player = j;
-                    state = state2;
-                }
-            }
-            else if ( found[j] )
-            {
-                found[ j ] = false;
-
-                char buff[ 32 ];
-                sprintf_s( buff, "Player %d <- disconnected\n", j );
-                OutputDebugStringA( buff );
-            }
-
-            ctrlFont.DrawString(g_spriteBatch.get(), L"$", XMFLOAT2(800.f, float( 50 + j * 150) ), color);
-        }
-
-        if (state.IsConnected())
-        {
-            tracker.Update( state );
-
-            if ( tracker.a == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button A was pressed\n";
-            else if ( tracker.a == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button A was released\n";
-            else if ( tracker.b == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button B was pressed\n";
-            else if ( tracker.b == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button B was released\n";
-            else if ( tracker.x == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button X was pressed\n";
-            else if ( tracker.x == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button X was released\n";
-            else if ( tracker.y == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button Y was pressed\n";
-            else if ( tracker.y == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button Y was released\n";
-            else if ( tracker.leftStick == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button LeftStick was pressed\n";
-            else if ( tracker.leftStick == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button LeftStick was released\n";
-            else if ( tracker.rightStick == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button RightStick was pressed\n";
-            else if ( tracker.rightStick == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button RightStick was released\n";
-            else if ( tracker.leftShoulder == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button LeftShoulder was pressed\n";
-            else if ( tracker.leftShoulder == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button LeftShoulder was released\n";
-            else if ( tracker.rightShoulder == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button RightShoulder was pressed\n";
-            else if ( tracker.rightShoulder == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button RightShoulder was released\n";
-            else if ( tracker.view == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button BACK/VIEW was pressed\n";
-            else if ( tracker.view == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button BACK/VIEW was released\n";
-            else if ( tracker.menu == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button START/MENU was pressed\n";
-            else if ( tracker.menu == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button START/MENU was released\n";
-            else if ( tracker.dpadUp == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button DPAD UP was pressed\n";
-            else if ( tracker.dpadUp == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button DPAD UP was released\n";
-            else if ( tracker.dpadDown == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button DPAD DOWN was pressed\n";
-            else if ( tracker.dpadDown == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button DPAD DOWN was released\n";
-            else if ( tracker.dpadLeft == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button DPAD LEFT was pressed\n";
-            else if ( tracker.dpadLeft == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button DPAD LEFT was released\n";
-            else if ( tracker.dpadRight == GamePad::ButtonStateTracker::PRESSED )
-                lastStr = L"Button DPAD RIGHT was pressed\n";
-            else if ( tracker.dpadRight == GamePad::ButtonStateTracker::RELEASED )
-                lastStr = L"Button DPAD RIGHT was released\n";
-            else if (tracker.leftStickUp == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button LEFT STICK was pressed UP\n";
-            else if (tracker.leftStickUp == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button LEFT STICK was released from UP\n";
-            else if (tracker.leftStickDown == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button LEFT STICK was pressed DOWN\n";
-            else if (tracker.leftStickDown == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button LEFT STICK was released from DOWN\n";
-            else if (tracker.leftStickLeft == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button LEFT STICK was pressed LEFT\n";
-            else if (tracker.leftStickLeft == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button LEFT STICK was released from LEFT\n";
-            else if (tracker.leftStickRight == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button LEFT STICK was pressed RIGHT\n";
-            else if (tracker.leftStickRight == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button LEFT STICK was released from RIGHT\n";
-            else if (tracker.rightStickUp == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button RIGHT STICK was pressed UP\n";
-            else if (tracker.rightStickUp == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button RIGHT STICK was released from UP\n";
-            else if (tracker.rightStickDown == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button RIGHT STICK was pressed DOWN\n";
-            else if (tracker.rightStickDown == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button RIGHT STICK was released from DOWN\n";
-            else if (tracker.rightStickLeft == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button RIGHT STICK was pressed LEFT\n";
-            else if (tracker.rightStickLeft == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button RIGHT STICK was released from LEFT\n";
-            else if (tracker.rightStickRight == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button RIGHT STICK was pressed RIGHT\n";
-            else if (tracker.rightStickRight == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button RIGHT STICK was released from RIGHT\n";
-            else if (tracker.leftTrigger == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button LEFT TRIGGER was pressed\n";
-            else if (tracker.leftTrigger == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button LEFT TRIGGER was released\n";
-            else if (tracker.rightTrigger == GamePad::ButtonStateTracker::PRESSED)
-                lastStr = L"Button RIGHT TRIGGER was pressed\n";
-            else if (tracker.rightTrigger == GamePad::ButtonStateTracker::RELEASED)
-                lastStr = L"Button RIGHT TRIGGER was released\n";
-
-            assert(tracker.back == tracker.view);
-            assert(tracker.start == tracker.menu);
-
-            if ( lastStr )
-            {
-                comic.DrawString( g_spriteBatch.get(), lastStr, XMFLOAT2( 25.f, 650.f ), Colors::Yellow );
-            }
-
-            // X Y A B
-            ctrlFont.DrawString(g_spriteBatch.get(), L"&", XMFLOAT2(325, 150), state.IsXPressed() ? Colors::White : Colors::Black);
-            ctrlFont.DrawString(g_spriteBatch.get(), L"(", XMFLOAT2(400, 110), state.IsYPressed() ? Colors::White : Colors::Black);
-            ctrlFont.DrawString(g_spriteBatch.get(), L"'", XMFLOAT2(400, 200), state.IsAPressed() ? Colors::White : Colors::Black);
-            ctrlFont.DrawString(g_spriteBatch.get(), L")", XMFLOAT2(475, 150), state.IsBPressed() ? Colors::White : Colors::Black);
-
-            // Left/Right sticks
-            auto loc = XMFLOAT2(10, 110);
-            loc.x -= state.IsLeftThumbStickLeft() ? 20.f : 0.f;
-            loc.x += state.IsLeftThumbStickRight() ? 20.f : 0.f;
-            loc.y -= state.IsLeftThumbStickUp() ? 20.f : 0.f;
-            loc.y += state.IsLeftThumbStickDown() ? 20.f : 0.f;
-
-            ctrlFont.DrawString(g_spriteBatch.get(), L" ", loc, state.IsLeftStickPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0));
-
-            loc = XMFLOAT2(450, 300);
-            loc.x -= state.IsRightThumbStickLeft() ? 20.f : 0.f;
-            loc.x += state.IsRightThumbStickRight() ? 20.f : 0.f;
-            loc.y -= state.IsRightThumbStickUp() ? 20.f : 0.f;
-            loc.y += state.IsRightThumbStickDown() ? 20.f : 0.f;
-
-            ctrlFont.DrawString(g_spriteBatch.get(), L"\"", loc, state.IsRightStickPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0));
-
-            // DPad
-            XMVECTOR color = Colors::Black;
-            if (state.dpad.up || state.dpad.down || state.dpad.right || state.dpad.left)
-                color = Colors::White;
-
-            loc = XMFLOAT2(175, 300);
-            loc.x -= state.IsDPadLeftPressed() ? 20.f : 0.f;
-            loc.x += state.IsDPadRightPressed() ? 20.f : 0.f;
-            loc.y -= state.IsDPadUpPressed() ? 20.f : 0.f;
-            loc.y += state.IsDPadDownPressed() ? 20.f : 0.f;
-
-            ctrlFont.DrawString(g_spriteBatch.get(), L"!", loc, color );
-
-            // Back/Start (aka View/Menu)
-            ctrlFont.DrawString(g_spriteBatch.get(), L"#", XMFLOAT2(175, 75), state.IsViewPressed() ? Colors::White : Colors::Black);
-            assert(state.IsViewPressed() == state.IsBackPressed());
-            assert(state.buttons.back == state.buttons.view);
-
-            ctrlFont.DrawString(g_spriteBatch.get(), L"%", XMFLOAT2(300, 75), state.IsMenuPressed() ? Colors::White : Colors::Black);
-            assert(state.IsMenuPressed() == state.IsStartPressed());
-            assert(state.buttons.start == state.buttons.menu);
-
-            // Triggers/Shoulders
-            ctrlFont.DrawString(g_spriteBatch.get(), L"*", XMFLOAT2(500, 10), state.IsRightShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
-
-            loc = XMFLOAT2(450, 10);
-            loc.x += state.IsRightTriggerPressed() ? 5.f : 0.f;
-            color = XMVectorSet(state.triggers.right, state.triggers.right, state.triggers.right, 1.f);
-            ctrlFont.DrawString(g_spriteBatch.get(), L"+", loc, color, 0, XMFLOAT2(0, 0), 0.5f);
-
-            loc = XMFLOAT2(130, 10);
-            loc.x -= state.IsLeftTriggerPressed() ? 5.f : 0.f;
-            color = XMVectorSet(state.triggers.left, state.triggers.left, state.triggers.left, 1.f);
-            ctrlFont.DrawString(g_spriteBatch.get(), L",", loc, color, 0, XMFLOAT2(0, 0), 0.5f);
-
-            ctrlFont.DrawString(g_spriteBatch.get(), L"-", XMFLOAT2(10, 10), state.IsLeftShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
-
-            // Sticks
-            RECT src = { 0, 0, 1, 1 };
-
-            RECT rc;
-            rc.top = 500;
-            rc.left = 10;
-            rc.bottom = 525;
-            rc.right = rc.left + int( ( (state.thumbSticks.leftX + 1.f) / 2.f) * 275);
-
-            g_spriteBatch->Draw(defaultTex.Get(), rc, &src);
-
-            rc.top = 550;
-            rc.bottom = 575;
-
-            rc.right = rc.left + int( ((state.thumbSticks.leftY + 1.f) / 2.f) * 275);
-
-            g_spriteBatch->Draw(defaultTex.Get(), rc, &src);
-
-            rc.top = 500;
-            rc.left = 325;
-            rc.bottom = 525;
-            rc.right = rc.left + int(((state.thumbSticks.rightX + 1.f) / 2.f) * 275);
-
-            g_spriteBatch->Draw(defaultTex.Get(), rc, &src);
-
-            rc.top = 550;
-            rc.bottom = 575;
-
-            rc.right = rc.left + int(((state.thumbSticks.rightY + 1.f) / 2.f) * 275);
-
-            g_spriteBatch->Draw(defaultTex.Get(), rc, &src);
-
-            g_gamePad->SetVibration(player, state.triggers.left, state.triggers.right);
+            // Everything is set up now. Do not continue execution of this method. OnDeviceLost will reenter this method 
+            // and correctly set up the new device.
+            return;
         }
         else
         {
-            lastStr = nullptr;
-            tracker.Reset();
-        }
-
-        g_spriteBatch->End();
-
-        swapChain->Present(1, 0);
-        ++frame;
-
-        if ( frame == 10 )
-        {
-            ComPtr<ID3D11Texture2D> backBufferTex;
-            hr = swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTex);
-            if ( SUCCEEDED(hr) )
-            {
-                hr = SaveWICTextureToFile(context.Get(), backBufferTex.Get(), GUID_ContainerFormatBmp, L"SCREENSHOT.BMP");
-                hr = SaveDDSTextureToFile(context.Get(), backBufferTex.Get(), L"SCREENSHOT.DDS" );
-            }
+            DX::ThrowIfFailed(hr);
         }
     }
+    else
+    {
+        // First, retrieve the underlying DXGI Device from the D3D Device
+        ComPtr<IDXGIDevice1> dxgiDevice;
+        DX::ThrowIfFailed(m_d3dDevice.As(&dxgiDevice));
 
-    g_spriteBatch.reset();
+        // Identify the physical adapter (GPU or card) this device is running on.
+        ComPtr<IDXGIAdapter> dxgiAdapter;
+        DX::ThrowIfFailed(dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf()));
 
-    return 0;
+        // And obtain the factory object that created it.
+        ComPtr<IDXGIFactory2> dxgiFactory;
+        DX::ThrowIfFailed(dxgiAdapter->GetParent( IID_PPV_ARGS( &dxgiFactory ) ) );
+
+        ComPtr<IDXGIFactory2> dxgiFactory2;
+        HRESULT hr = dxgiFactory.As(&dxgiFactory2);
+        DX::ThrowIfFailed(hr);
+
+        // Create a descriptor for the swap chain.
+        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+        swapChainDesc.Width = backBufferWidth;
+        swapChainDesc.Height = backBufferHeight;
+        swapChainDesc.Format = backBufferFormat;
+        swapChainDesc.SampleDesc.Count = 1;
+        swapChainDesc.SampleDesc.Quality = 0;
+        swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        swapChainDesc.BufferCount = 2;
+
+        // Create a SwapChain from a window.
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
+        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+        swapChainDesc.Scaling = DXGI_SCALING_NONE;
+        swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+
+        hr = dxgiFactory->CreateSwapChainForCoreWindow(m_d3dDevice.Get(),
+            m_window, &swapChainDesc,
+            nullptr, m_swapChain.GetAddressOf());
+        DX::ThrowIfFailed(hr);
+#else
+        DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = {};
+        fsSwapChainDesc.Windowed = TRUE;
+
+        hr = dxgiFactory2->CreateSwapChainForHwnd(
+            m_d3dDevice.Get(), m_window, &swapChainDesc,
+            &fsSwapChainDesc,
+            nullptr, m_swapChain.ReleaseAndGetAddressOf());
+        DX::ThrowIfFailed(hr);
+
+        // This template does not support 'full-screen' mode and prevents the ALT+ENTER shortcut from working
+        dxgiFactory->MakeWindowAssociation(m_window, DXGI_MWA_NO_ALT_ENTER);
+#endif
+    }
+
+    // Obtain the backbuffer for this window which will be the final 3D rendertarget.
+    ComPtr<ID3D11Texture2D> backBuffer;
+    DX::ThrowIfFailed(m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer));
+
+    // Create a view interface on the rendertarget to use on bind.
+    DX::ThrowIfFailed(m_d3dDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, m_renderTargetView.ReleaseAndGetAddressOf()));
+    SetDebugObjectName(backBuffer.Get(), "BackBuffer");
+
+    CD3D11_VIEWPORT viewPort(0.0f, 0.0f, static_cast<float>(m_outputWidth), static_cast<float>(m_outputHeight));
+    m_spriteBatch->SetViewport(viewPort);
+
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
+    m_spriteBatch->SetRotation(m_outputRotation);
+#endif
+}
+
+void Game::OnDeviceLost()
+{
+    m_spriteBatch.reset();
+    m_comicFont.reset();
+    m_ctrlFont.reset();
+
+    m_defaultTex.Reset();
+
+    m_renderTargetView.Reset();
+    m_swapChain.Reset();
+    m_d3dContext.Reset();
+    m_d3dDevice.Reset();
+
+    CreateDevice();
+
+    CreateResources();
 }
