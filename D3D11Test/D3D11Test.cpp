@@ -193,8 +193,8 @@ void Game::ValidateDevice()
 // Properties
 void Game::GetDefaultSize(int& width, int& height) const
 {
-    width = 800;
-    height = 600;
+    width = 1280;
+    height = 720;
 }
 
 // These are the resources that depend on the device.

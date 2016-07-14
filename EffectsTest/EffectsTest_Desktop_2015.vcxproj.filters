@@ -21,5 +21,17 @@
     <Image Include="overlay.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="spnza_bricks_a.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="spnza_bricks_a_normal.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="spnza_bricks_a_specular.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="default.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>

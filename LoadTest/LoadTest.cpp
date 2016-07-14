@@ -85,7 +85,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     RegisterClassEx(&wndClass);
 
     HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
-                               CW_USEDEFAULT, CW_USEDEFAULT, 640, 640, nullptr, nullptr, hInstance, nullptr);
+                               CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
@@ -264,12 +264,14 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     static const XMVECTORF32 At = { 0.0f, 1.0f, 0.0f, 0.0f };
     static const XMVECTORF32 Up = { 0.0f, 1.0f, 0.0f, 0.0f };
 
+    float aspect = (float)client.right / (float)client.bottom;
+
 #ifdef LH_COORDS
     XMMATRIX view = XMMatrixLookAtLH( eyePosition, At, Up );
-    XMMATRIX proj = XMMatrixPerspectiveFovLH( XM_PIDIV4, 1.f, 0.01f, 100.0f );
+    XMMATRIX proj = XMMatrixPerspectiveFovLH( XM_PIDIV4, aspect, 0.01f, 100.0f );
 #else
     XMMATRIX view = XMMatrixLookAtRH( eyePosition, At, Up );
-    XMMATRIX proj = XMMatrixPerspectiveFovRH( XM_PIDIV4, 1.f, 0.01f, 100.0f );
+    XMMATRIX proj = XMMatrixPerspectiveFovRH( XM_PIDIV4, aspect, 0.01f, 100.0f );
 #endif
 
     CBNeverChanges cbNever;

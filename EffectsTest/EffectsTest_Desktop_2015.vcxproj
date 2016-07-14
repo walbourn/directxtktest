@@ -169,8 +169,12 @@
   <ItemGroup>
     <Image Include="cat.dds" />
     <Image Include="cubemap.dds" />
+    <Image Include="default.dds" />
     <Image Include="opaqueCat.dds" />
     <Image Include="overlay.dds" />
+    <Image Include="spnza_bricks_a.DDS" />
+    <Image Include="spnza_bricks_a_normal.DDS" />
+    <Image Include="spnza_bricks_a_specular.DDS" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -45,6 +45,8 @@ struct TestVertex
         XMStoreFloat2(&this->textureCoordinate2, textureCoordinate * 3);
         XMStoreUByte4(&this->blendIndices, XMVectorSet(0, 1, 2, 3));
 
+        XMStoreFloat3(&this->tangent, g_XMZero);
+
         float u = XMVectorGetX(textureCoordinate) - 0.5f;
         float v = XMVectorGetY(textureCoordinate) - 0.5f;
 
@@ -58,12 +60,13 @@ struct TestVertex
 
     XMFLOAT3 position;
     XMFLOAT3 normal;
+    XMFLOAT3 tangent;
     XMFLOAT2 textureCoordinate;
     XMFLOAT2 textureCoordinate2;
     XMUBYTE4 blendIndices;
     XMFLOAT4 blendWeight;
 
-    static const int InputElementCount = 6;
+    static const int InputElementCount = 7;
     static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
 };
 
@@ -72,6 +75,7 @@ const D3D11_INPUT_ELEMENT_DESC TestVertex::InputElements[] =
 {
     { "SV_Position",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     { "NORMAL",       0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    { "TANGENT",      0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     { "TEXCOORD",     0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     { "TEXCOORD",     1, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     { "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT,      0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -81,6 +85,138 @@ const D3D11_INPUT_ELEMENT_DESC TestVertex::InputElements[] =
 
 typedef std::vector<TestVertex> VertexCollection;
 typedef std::vector<uint16_t> IndexCollection;
+
+
+struct aligned_deleter { void operator()(void* p) { _aligned_free(p); } };
+
+
+// Helper for computing tangents (see DirectXMesh <http://go.microsoft.com/fwlink/?LinkID=324981>)
+void ComputeTangents(const IndexCollection& indices, VertexCollection& vertices)
+{
+    static const float EPSILON = 0.0001f;
+    static const XMVECTORF32 s_flips = { 1.f, -1.f, -1.f, 1.f };
+
+    size_t nFaces = indices.size() / 3;
+    size_t nVerts = vertices.size();
+
+    std::unique_ptr<XMVECTOR[], aligned_deleter> temp(reinterpret_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts * 2, 16)));
+
+    memset(temp.get(), 0, sizeof(XMVECTOR) * nVerts * 2);
+
+    XMVECTOR* tangent1 = temp.get();
+    XMVECTOR* tangent2 = temp.get() + nVerts;
+
+    for (size_t face = 0; face < nFaces; ++face)
+    {
+        uint16_t i0 = indices[face * 3];
+        uint16_t i1 = indices[face * 3 + 1];
+        uint16_t i2 = indices[face * 3 + 2];
+
+        if (i0 >= nVerts
+            || i1 >= nVerts
+            || i2 >= nVerts)
+        {
+            throw std::exception("ComputeTangents");
+        }
+
+        XMVECTOR t0 = XMLoadFloat2(&vertices[i0].textureCoordinate);
+        XMVECTOR t1 = XMLoadFloat2(&vertices[i1].textureCoordinate);
+        XMVECTOR t2 = XMLoadFloat2(&vertices[i2].textureCoordinate);
+
+        XMVECTOR s = XMVectorMergeXY(t1 - t0, t2 - t0);
+
+        XMFLOAT4A tmp;
+        XMStoreFloat4A(&tmp, s);
+
+        float d = tmp.x * tmp.w - tmp.z * tmp.y;
+        d = (fabsf(d) <= EPSILON) ? 1.f : (1.f / d);
+        s *= d;
+        s = XMVectorMultiply(s, s_flips);
+
+        XMMATRIX m0;
+        m0.r[0] = XMVectorPermute<3, 2, 6, 7>(s, g_XMZero);
+        m0.r[1] = XMVectorPermute<1, 0, 4, 5>(s, g_XMZero);
+        m0.r[2] = m0.r[3] = g_XMZero;
+
+        XMVECTOR p0 = XMLoadFloat3(&vertices[i0].position);
+        XMVECTOR p1 = XMLoadFloat3(&vertices[i1].position);
+        XMVECTOR p2 = XMLoadFloat3(&vertices[i2].position);
+
+        XMMATRIX m1;
+        m1.r[0] = p1 - p0;
+        m1.r[1] = p2 - p0;
+        m1.r[2] = m1.r[3] = g_XMZero;
+
+        XMMATRIX uv = XMMatrixMultiply(m0, m1);
+
+        tangent1[i0] = XMVectorAdd(tangent1[i0], uv.r[0]);
+        tangent1[i1] = XMVectorAdd(tangent1[i1], uv.r[0]);
+        tangent1[i2] = XMVectorAdd(tangent1[i2], uv.r[0]);
+
+        tangent2[i0] = XMVectorAdd(tangent2[i0], uv.r[1]);
+        tangent2[i1] = XMVectorAdd(tangent2[i1], uv.r[1]);
+        tangent2[i2] = XMVectorAdd(tangent2[i2], uv.r[1]);
+    }
+
+    for (size_t j = 0; j < nVerts; ++j)
+    {
+        // Gram-Schmidt orthonormalization
+        XMVECTOR b0 = XMLoadFloat3(&vertices[j].normal);
+        b0 = XMVector3Normalize(b0);
+
+        XMVECTOR tan1 = tangent1[j];
+        XMVECTOR b1 = tan1 - XMVector3Dot(b0, tan1) * b0;
+        b1 = XMVector3Normalize(b1);
+
+        XMVECTOR tan2 = tangent2[j];
+        XMVECTOR b2 = tan2 - XMVector3Dot(b0, tan2) * b0 - XMVector3Dot(b1, tan2) * b1;
+        b2 = XMVector3Normalize(b2);
+
+        // handle degenerate vectors
+        float len1 = XMVectorGetX(XMVector3Length(b1));
+        float len2 = XMVectorGetY(XMVector3Length(b2));
+
+        if ((len1 <= EPSILON) || (len2 <= EPSILON))
+        {
+            if (len1 > 0.5f)
+            {
+                // Reset bi-tangent from tangent and normal
+                b2 = XMVector3Cross(b0, b1);
+            }
+            else if (len2 > 0.5f)
+            {
+                // Reset tangent from bi-tangent and normal
+                b1 = XMVector3Cross(b2, b0);
+            }
+            else
+            {
+                // Reset both tangent and bi-tangent from normal
+                XMVECTOR axis;
+
+                float d0 = fabs(XMVectorGetX(XMVector3Dot(g_XMIdentityR0, b0)));
+                float d1 = fabs(XMVectorGetX(XMVector3Dot(g_XMIdentityR1, b0)));
+                float d2 = fabs(XMVectorGetX(XMVector3Dot(g_XMIdentityR2, b0)));
+                if (d0 < d1)
+                {
+                    axis = (d0 < d2) ? g_XMIdentityR0 : g_XMIdentityR2;
+                }
+                else if (d1 < d2)
+                {
+                    axis = g_XMIdentityR1;
+                }
+                else
+                {
+                    axis = g_XMIdentityR2;
+                }
+
+                b1 = XMVector3Cross(b0, axis);
+                b2 = XMVector3Cross(b0, b1);
+            }
+        }
+
+        XMStoreFloat3(&vertices[j].tangent, b1);
+   }
+}
 
 
 // Helper for creating a D3D vertex or index buffer.
@@ -180,6 +316,9 @@ int CreateTeapot(ID3D11Device* device, ID3D11Buffer** vertexBuffer, ID3D11Buffer
         }
     }
 
+    // Compute tangents
+    ComputeTangents(indices, vertices);
+
     // Create the D3D buffers.
     CreateBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer);
     CreateBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer);
@@ -234,7 +373,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 
-int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCmdShow )
+int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCmdShow)
 {
     HRESULT hr;
 
@@ -251,7 +390,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     RegisterClassEx(&wndClass);
 
     HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, className, L"Test Window", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
-                               CW_USEDEFAULT, CW_USEDEFAULT, 1024, 720, nullptr, nullptr, hInstance, nullptr);
+        CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, nullptr, nullptr, hInstance, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
@@ -271,7 +410,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     swapChainDesc.Windowed = TRUE;
 
     D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_10_0;
-    
+
     DWORD d3dFlags = 0;
 #ifdef _DEBUG
     d3dFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -281,7 +420,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     ComPtr<ID3D11DeviceContext> context;
     ComPtr<IDXGISwapChain> swapChain;
     if (FAILED(hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, d3dFlags, &featureLevel, 1,
-                                                  D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
+        D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context)))
         return 1;
 
     ComPtr<ID3D11Texture2D> backBufferTexture;
@@ -325,6 +464,10 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     ComPtr<ID3D11ShaderResourceView> opaqueCat;
     ComPtr<ID3D11ShaderResourceView> cubemap;
     ComPtr<ID3D11ShaderResourceView> overlay;
+    ComPtr<ID3D11ShaderResourceView> defaultTex;
+    ComPtr<ID3D11ShaderResourceView> brickDiffuse;
+    ComPtr<ID3D11ShaderResourceView> brickNormal;
+    ComPtr<ID3D11ShaderResourceView> brickSpecular;
 
     if (FAILED(CreateDDSTextureFromFile(device.Get(), L"cat.dds", nullptr, &cat)))
         MessageBox(hwnd, L"Error loading cat.dds", L"EffectsTest", MB_ICONERROR);
@@ -338,10 +481,22 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     if (FAILED(CreateDDSTextureFromFile(device.Get(), L"overlay.dds", nullptr, &overlay)))
         MessageBox(hwnd, L"Error loading overlay.dds", L"EffectsTest", MB_ICONERROR);
 
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"default.dds", nullptr, &defaultTex)))
+        MessageBox(hwnd, L"Error loading default.dds", L"EffectsTest", MB_ICONERROR);
+
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"spnza_bricks_a.DDS", nullptr, &brickDiffuse)))
+        MessageBox(hwnd, L"Error loading spnza_bricks_a.dds", L"EffectsTest", MB_ICONERROR);
+
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"spnza_bricks_a_normal.DDS", nullptr, &brickNormal)))
+        MessageBox(hwnd, L"Error loading spnza_bricks_a_normal.dds", L"EffectsTest", MB_ICONERROR);
+
+    if (FAILED(CreateDDSTextureFromFile(device.Get(), L"spnza_bricks_a_specular.DDS", nullptr, &brickSpecular)))
+        MessageBox(hwnd, L"Error loading spnza_bricks_a_specular.dds", L"EffectsTest", MB_ICONERROR);
+
     // Create test geometry.
     ComPtr<ID3D11Buffer> vertexBuffer;
     ComPtr<ID3D11Buffer> indexBuffer;
-    
+
     int indexCount = CreateTeapot(device.Get(), &vertexBuffer, &indexBuffer);
 
     // Create the shaders.
@@ -392,6 +547,42 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     EffectWithDecl<AlphaTestEffect> alphaTest(device.Get(), [&](AlphaTestEffect* effect)
     {
         effect->SetTexture(cat.Get());
+    });
+
+    EffectWithDecl<NormalMapEffect> normalMapEffect(device.Get(), [&](NormalMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetDiffuseColor(Colors::White);
+        effect->SetTexture(brickDiffuse.Get());
+        effect->SetNormalTexture(brickNormal.Get());
+        effect->SetSpecularTexture(brickSpecular.Get());
+    });
+
+    EffectWithDecl<NormalMapEffect> normalMapEffectNoDiffuse(device.Get(), [&](NormalMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetDiffuseColor(Colors::White);
+        effect->SetTexture(defaultTex.Get());
+        effect->SetNormalTexture(brickNormal.Get());
+        effect->SetSpecularTexture(brickSpecular.Get());
+    });
+
+    EffectWithDecl<NormalMapEffect> normalMapEffectNormalsOnly(device.Get(), [&](NormalMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->DisableSpecular();
+        effect->SetDiffuseColor(Colors::White);
+        effect->SetTexture(defaultTex.Get());
+        effect->SetNormalTexture(brickNormal.Get());
+    });
+
+    EffectWithDecl<NormalMapEffect> normalMapEffectNoSpecular(device.Get(), [&](NormalMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->DisableSpecular();
+        effect->SetDiffuseColor(Colors::White);
+        effect->SetTexture(brickDiffuse.Get());
+        effect->SetNormalTexture(brickNormal.Get());
     });
 
     bool quit = false;
@@ -747,7 +938,30 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         context->OMSetBlendState(states.AlphaBlend(), Colors::White, 0xFFFFFFFF);
 
-        // TODO - NormalMapEffect
+        // NormalMapEffect
+        normalMapEffect.Apply(context.Get(), world * XMMatrixTranslation(5, 2.5f, 0), view, projection);
+        context->DrawIndexed(indexCount, 0, 0);
+
+        // NormalMapEffect no spec
+        normalMapEffectNoSpecular.Apply(context.Get(), world * XMMatrixTranslation(5, 1.5f, 0), view, projection);
+        context->DrawIndexed(indexCount, 0, 0);
+
+        // NormalMap with fog.
+        normalMapEffect.SetFogEnabled(true);
+        normalMapEffect.SetFogStart(fogstart);
+        normalMapEffect.SetFogEnd(fogend);
+        normalMapEffect.SetFogColor(Colors::Gray);
+        normalMapEffect.Apply(context.Get(), world * XMMatrixTranslation(5, 0.5f, 2 - alphaFade * 6), view, projection);
+        context->DrawIndexed(indexCount, 0, 0);
+        normalMapEffect.SetFogEnabled(false);
+
+        // NormalMap with default diffuse
+        normalMapEffectNoDiffuse.Apply(context.Get(), world * XMMatrixTranslation(5, -.5f, 0), view, projection);
+        context->DrawIndexed(indexCount, 0, 0);
+
+        // NormalMap with default diffuse no spec
+        normalMapEffectNormalsOnly.Apply(context.Get(), world * XMMatrixTranslation(5, -1.5f, 0), view, projection);
+        context->DrawIndexed(indexCount, 0, 0);
 
         swapChain->Present(1, 0);
         ++frame;
