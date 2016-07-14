@@ -47,5 +47,14 @@
     <Image Include="turret_diff.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="ground_norm.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="left_engine_norm.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="turret_norm.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>

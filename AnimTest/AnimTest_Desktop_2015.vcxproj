@@ -181,8 +181,11 @@
   <ItemGroup>
     <Image Include="default.dds" />
     <Image Include="ground_diff.dds" />
+    <Image Include="ground_norm.dds" />
     <Image Include="left_engine_diff.dds" />
+    <Image Include="left_engine_norm.dds" />
     <Image Include="turret_diff.dds" />
+    <Image Include="turret_norm.dds" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
