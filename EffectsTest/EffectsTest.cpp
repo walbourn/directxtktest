@@ -747,6 +747,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         context->OMSetBlendState(states.AlphaBlend(), Colors::White, 0xFFFFFFFF);
 
+        // TODO - NormalMapEffect
+
         swapChain->Present(1, 0);
         ++frame;
 

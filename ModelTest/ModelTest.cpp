@@ -404,6 +404,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         local = XMMatrixMultiply( XMMatrixScaling( 2.f, 2.f, 2.f ), XMMatrixTranslation( 2.5f, row1, 0.f ) );
         soldier->Draw( context.Get(), states, local, view, projection );
 
+        // TODO - NormalMapEffect model
+
         swapChain->Present(1, 0);
         ++frame;
 

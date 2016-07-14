@@ -200,7 +200,7 @@ std::unique_ptr<Model> CreateModelFromOBJ( _In_ ID3D11Device* d3dDevice, _In_ ID
                 info.specularColor = mat.vSpecular;
             }
 
-            info.texture = mat.strTexture;
+            info.diffuseTexture = mat.strTexture;
 
             effect = fxFactory.CreateEffect( info, deviceContext );
 
