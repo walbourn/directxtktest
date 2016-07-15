@@ -860,19 +860,58 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _
         context->DrawIndexed(indexCount, 0, 0);
         envmap.SetFresnelFactor(1);
 
-        // Environment map, animating the amount.
-        envmap.SetEnvironmentMapAmount(alphaFade);
-        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, -1.5f, 0), view, projection);
-        context->DrawIndexed(indexCount, 0, 0);
-        envmap.SetEnvironmentMapAmount(1);
-
         // Environment map, animating the amount, with no fresnel.
         envmap.SetEnvironmentMapAmount(alphaFade);
         envmap.SetFresnelFactor(0);
-        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, -2.5f, 0), view, projection);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, -1.5f, 0), view, projection);
         context->DrawIndexed(indexCount, 0, 0);
         envmap.SetEnvironmentMapAmount(1);
         envmap.SetFresnelFactor(1);
+
+        // Environment map, animating the amount.
+        envmap.SetEnvironmentMapAmount(alphaFade);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(2, -2.5f, 0), view, projection);
+        context->DrawIndexed(indexCount, 0, 0);
+        envmap.SetEnvironmentMapAmount(1);
+
+        envmap.SetPerPixelLighting(true);
+
+        {
+            envmap.SetLightEnabled(1, false);
+            envmap.SetLightEnabled(2, false);
+
+            {
+                // Light only from above + per pixel lighting, animating the fresnel factor.
+                envmap.SetLightDirection(0, XMVectorSet(0, -1, 0, 0));
+                envmap.SetFresnelFactor(alphaFade * 3);
+                envmap.Apply(context.Get(), world * XMMatrixTranslation(3, -0.5f, 0), view, projection);
+                context->DrawIndexed(indexCount, 0, 0);
+                envmap.SetFresnelFactor(1);
+
+                // Light only from the left + per pixel lighting, animating the amount, with no fresnel.
+                envmap.SetEnvironmentMapAmount(alphaFade);
+                envmap.SetFresnelFactor(0);
+                envmap.SetLightDirection(0, XMVectorSet(1, 0, 0, 0));
+                envmap.Apply(context.Get(), world * XMMatrixTranslation(3, -1.5f, 0), view, projection);
+                context->DrawIndexed(indexCount, 0, 0);
+                envmap.SetEnvironmentMapAmount(1);
+                envmap.SetFresnelFactor(1);
+
+                // Light only from straight in front + per pixel lighting with fog.
+                envmap.SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
+                envmap.SetFogEnabled(true);
+                envmap.SetFogStart(fogstart);
+                envmap.SetFogEnd(fogend);
+                envmap.SetFogColor(Colors::Gray);
+                envmap.Apply(context.Get(), world * XMMatrixTranslation(3, -2.5f, 2 - alphaFade * 6), view, projection);
+                context->DrawIndexed(indexCount, 0, 0);
+                envmap.SetFogEnabled(false);
+            }
+
+            envmap.EnableDefaultLighting();
+        }
+
+        envmap.SetPerPixelLighting(false);
 
         // Dual texture effect.
         dualTexture.Apply(context.Get(), world * XMMatrixTranslation(3, 2.5f, 0), view, projection);
