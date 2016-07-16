@@ -874,6 +874,18 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _
         context->DrawIndexed(indexCount, 0, 0);
         envmap.SetEnvironmentMapAmount(1);
 
+        // Environment map, with animating specular
+        envmap.SetEnvironmentMapSpecular(Colors::Blue * alphaFade);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(1, -1.5f, 0), view, projection);
+        context->DrawIndexed(indexCount, 0, 0);
+        envmap.SetEnvironmentMapSpecular(Colors::Black);
+
+        // Environment map, with single light vertex color
+        envmap.SetLightEnabled(1, false);
+        envmap.SetLightEnabled(2, false);
+        envmap.Apply(context.Get(), world * XMMatrixTranslation(1, -2.5f, 0), view, projection);
+        context->DrawIndexed(indexCount, 0, 0);
+
         envmap.SetPerPixelLighting(true);
 
         {
