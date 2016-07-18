@@ -12,6 +12,8 @@
 #include <d3d11.h>
 #include "SimpleMath.h"
 
+#include <DirectXColors.h>
+
 #include <stdio.h>
 
 #include <functional>
@@ -1033,6 +1035,27 @@ int TestV2()
     }
 
     {
+        Vector2 vc = Colors::CornflowerBlue;
+
+        if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 ctor\n");
+            success = false;
+        }
+
+        Vector2 vt;
+        vt = Colors::MidnightBlue;
+
+        if (!XMScalarNearEqual(vt.x, Colors::MidnightBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vt.y, Colors::MidnightBlue.f[1], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 =\n");
+            success = false;
+        }
+    }
+
+    {
         XMFLOAT2 xm(6.f, -2.f);
         Vector2 vi;
         vi = xm;
@@ -1961,6 +1984,29 @@ int TestV3()
         success = false;
     }
 
+    {
+        Vector3 vc = Colors::CornflowerBlue;
+
+        if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vc.z, Colors::CornflowerBlue.f[2], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 ctor\n");
+            success = false;
+        }
+
+        Vector3 vt;
+        vt = Colors::MidnightBlue;
+
+        if (!XMScalarNearEqual(vt.x, Colors::MidnightBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vt.y, Colors::MidnightBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vt.z, Colors::MidnightBlue.f[2], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 =\n");
+            success = false;
+        }
+    }
+
     v += v2;
     if ( v != Vector3(5,7,9) )
     {
@@ -2873,6 +2919,31 @@ int TestV4()
     {
         printf("ERROR: =\n");
         success = false;
+    }
+
+    {
+        Vector4 vc = Colors::CornflowerBlue;
+
+        if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vc.z, Colors::CornflowerBlue.f[2], EPSILON)
+            || !XMScalarNearEqual(vc.w, Colors::CornflowerBlue.f[3], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 ctor\n");
+            success = false;
+        }
+
+        Vector4 vt;
+        vt = Colors::MidnightBlue;
+
+        if (!XMScalarNearEqual(vt.x, Colors::MidnightBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vt.y, Colors::MidnightBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vt.z, Colors::MidnightBlue.f[2], EPSILON)
+            || !XMScalarNearEqual(vt.w, Colors::MidnightBlue.f[3], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 =\n");
+            success = false;
+        }
     }
 
     v += v2;
@@ -4395,6 +4466,31 @@ int TestP()
         }
     }
 
+    {
+        Plane vc = Colors::CornflowerBlue;
+
+        if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vc.z, Colors::CornflowerBlue.f[2], EPSILON)
+            || !XMScalarNearEqual(vc.w, Colors::CornflowerBlue.f[3], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 ctor\n");
+            success = false;
+        }
+
+        Plane vt;
+        vt = Colors::MidnightBlue;
+
+        if (!XMScalarNearEqual(vt.x, Colors::MidnightBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vt.y, Colors::MidnightBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vt.z, Colors::MidnightBlue.f[2], EPSILON)
+            || !XMScalarNearEqual(vt.w, Colors::MidnightBlue.f[3], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 =\n");
+            success = false;
+        }
+    }
+
     VerifyEqual(c.Normal(), Vector3(5, 6, 7));
     c.Normal(Vector3(0, 1, 2));
     VerifyEqual(c.Normal(), Vector3(0, 1, 2));
@@ -4501,6 +4597,31 @@ int TestQ()
             || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
         {
             printf("ERROR: XMFLOAT4 =\n");
+            success = false;
+        }
+    }
+
+    {
+        Quaternion vc = Colors::CornflowerBlue;
+
+        if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vc.z, Colors::CornflowerBlue.f[2], EPSILON)
+            || !XMScalarNearEqual(vc.w, Colors::CornflowerBlue.f[3], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 ctor\n");
+            success = false;
+        }
+
+        Quaternion vt;
+        vt = Colors::MidnightBlue;
+
+        if (!XMScalarNearEqual(vt.x, Colors::MidnightBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vt.y, Colors::MidnightBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vt.z, Colors::MidnightBlue.f[2], EPSILON)
+            || !XMScalarNearEqual(vt.w, Colors::MidnightBlue.f[3], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 =\n");
             success = false;
         }
     }
@@ -4663,6 +4784,31 @@ int TestC()
             || !XMScalarNearEqual(xm.w, vi.w, EPSILON))
         {
             printf("ERROR: XMFLOAT4 =\n");
+            success = false;
+        }
+    }
+
+    {
+        Color vc = Colors::CornflowerBlue;
+
+        if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vc.z, Colors::CornflowerBlue.f[2], EPSILON)
+            || !XMScalarNearEqual(vc.w, Colors::CornflowerBlue.f[3], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 ctor\n");
+            success = false;
+        }
+
+        Color vt;
+        vt = Colors::MidnightBlue;
+
+        if (!XMScalarNearEqual(vt.x, Colors::MidnightBlue.f[0], EPSILON)
+            || !XMScalarNearEqual(vt.y, Colors::MidnightBlue.f[1], EPSILON)
+            || !XMScalarNearEqual(vt.z, Colors::MidnightBlue.f[2], EPSILON)
+            || !XMScalarNearEqual(vt.w, Colors::MidnightBlue.f[3], EPSILON))
+        {
+            printf("ERROR: XMVECTORF32 =\n");
             success = false;
         }
     }
