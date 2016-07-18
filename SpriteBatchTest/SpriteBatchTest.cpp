@@ -293,6 +293,21 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         g_spriteBatch->End();
 
+        // Test alt samplers
+        RECT tileRect = { long(256), long(256), long(256 * 3), long(256 * 3) };
+
+        g_spriteBatch->Begin(SpriteSortMode_Deferred, states.NonPremultiplied(), states.PointClamp());
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(1100.f, 100.f), nullptr, Colors::White, time / 50, XMFLOAT2(128, 128));
+        g_spriteBatch->End();
+
+        g_spriteBatch->Begin(SpriteSortMode_Deferred, states.NonPremultiplied(), states.AnisotropicClamp());
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(1100.f, 350.f), &tileRect, Colors::White, time / 50, XMFLOAT2(256, 256));
+        g_spriteBatch->End();
+
+        g_spriteBatch->Begin(SpriteSortMode_Deferred, states.NonPremultiplied(), states.AnisotropicWrap());
+        g_spriteBatch->Draw(cat.Get(), XMFLOAT2(1100.f, 600.f), &tileRect, Colors::White, time / 50, XMFLOAT2(256, 256));
+        g_spriteBatch->End();
+
         swapChain->Present(1, 0);
         ++frame;
 
