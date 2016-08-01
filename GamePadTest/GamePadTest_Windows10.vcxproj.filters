@@ -31,7 +31,6 @@
     <AppxManifest Include="Package.appxmanifest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="GamePadTest_TemporaryKey.pfx" />
     <None Include="comic.spritefont">
       <Filter>Assets</Filter>
     </None>

@@ -22,9 +22,6 @@
     <AppxManifest Include="Package.appxmanifest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="D3D11Test_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Assets">
       <UniqueIdentifier>{d8fac03d-76f6-42ba-b0ec-73a0caffee76}</UniqueIdentifier>
     </Filter>

@@ -98,10 +98,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <PackageCertificateKeyFile>KeyboardTest_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>EEA41B107ABA5613ADEDC07B5C2F3DA4379B55A1</PackageCertificateThumbprint>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>Bin\Windows10\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Bin\Windows10\$(Platform)\$(Configuration)\</IntDir>
@@ -256,7 +252,6 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </None>
-    <None Include="KeyboardTest_TemporaryKey.pfx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

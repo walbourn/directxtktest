@@ -50,7 +50,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="KeyboardTest_TemporaryKey.pfx" />
     <None Include="comic.spritefont">
       <Filter>Assets</Filter>
     </None>

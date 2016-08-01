@@ -16,6 +16,10 @@
 #include "pch.h"
 #include "GamePadTest.h"
 
+#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#include <Windows.UI.Core.h>
+#endif
+
 using namespace DirectX;
 
 using Microsoft::WRL::ComPtr;
@@ -74,6 +78,19 @@ void Game::Initialize(
         state;
     }
 
+#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
+
+    m_ctrlChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
+    m_userChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
+    if (!m_ctrlChanged.IsValid() || !m_userChanged.IsValid())
+    {
+        throw std::exception("CreateEvent");
+    }
+
+    m_gamePad->RegisterEvents( m_ctrlChanged.Get(), m_userChanged.Get() );
+
+#endif
+
     m_found.reset(new bool[GamePad::MAX_PLAYER_COUNT] );
     memset(m_found.get(), 0, sizeof(bool) * GamePad::MAX_PLAYER_COUNT);
 
@@ -102,22 +119,79 @@ void Game::Update(DX::StepTimer const&)
 
     m_state.connected = false;
 
+#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
+
+    HANDLE events[2] = { m_ctrlChanged.Get(), m_userChanged.Get() };
+    switch (WaitForMultipleObjects(_countof(events), events, FALSE, 0))
+    {
+    case WAIT_OBJECT_0:
+        OutputDebugStringA("EVENT: Controller changed\n");
+        break;
+    case WAIT_OBJECT_0 + 1:
+        OutputDebugStringA("EVENT: User changed\n");
+        break;
+    }
+
+#endif
+
     for (int j = 0; j < GamePad::MAX_PLAYER_COUNT; ++j)
     {
         XMVECTOR color = Colors::Black;
         auto state2 = m_gamePad->GetState(j);
+        auto caps = m_gamePad->GetCapabilities(j);
+
+        assert(state2.IsConnected() == caps.IsConnected());
+
         if (state2.IsConnected())
         {
             if (!m_found[j])
             {
                 m_found[j] = true;
 
-                auto caps = m_gamePad->GetCapabilities(j);
                 if (caps.IsConnected())
                 {
-                    char buff[64];
-                    sprintf_s(buff, "Player %d -> type %u, id %I64u\n", j, caps.gamepadType, caps.id);
+#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+                    if (!caps.id.empty())
+                    {
+                        using namespace Microsoft::WRL;
+                        using namespace Microsoft::WRL::Wrappers;
+                        using namespace ABI::Windows::Foundation;
+                        using namespace ABI::Windows::System;
+
+                        ComPtr<IUserStatics> statics;
+                        DX::ThrowIfFailed(GetActivationFactory(HStringReference(RuntimeClass_Windows_System_User).Get(), statics.GetAddressOf()));
+
+                        ComPtr<IUser> user;
+                        HString str;
+                        str.Set(caps.id.c_str(), static_cast<unsigned int>(caps.id.length()));
+                        HRESULT hr = statics->GetFromId(str.Get(), user.GetAddressOf());
+                        if (SUCCEEDED(hr))
+                        {
+                            UserType userType = UserType_RemoteUser;
+                            DX::ThrowIfFailed(user->get_Type(&userType));
+
+                            char buff[1024] = {};
+                            sprintf_s(buff, "Player %d -> connected (type %u, id \"%ls\" (user found))\n", j, caps.gamepadType, caps.id.c_str());
+                            OutputDebugStringA(buff);
+                        }
+                        else
+                        {
+                            char buff[1024] = {};
+                            sprintf_s(buff, "Player %d -> connected (type %u, id \"%ls\" (user fail %08X))\n", j, caps.gamepadType, caps.id.c_str(), hr);
+                            OutputDebugStringA(buff);
+                        }
+                    }
+                    else
+                    {
+                        char buff[64] = {};
+                        sprintf_s(buff, "Player %d -> connected (type %u, id is empty!)\n", j, caps.gamepadType);
+                        OutputDebugStringA(buff);
+                    }
+#else
+                    char buff[64] = {};
+                    sprintf_s(buff, "Player %d -> connected (type %u, id %I64u)\n", j, caps.gamepadType, caps.id);
                     OutputDebugStringA(buff);
+#endif
                 }
             }
 
@@ -127,13 +201,16 @@ void Game::Update(DX::StepTimer const&)
                 m_state = state2;
             }
         }
-        else if (m_found[j])
+        else
         {
-            m_found[j] = false;
+            if (m_found[j])
+            {
+                m_found[j] = false;
 
-            char buff[32];
-            sprintf_s(buff, "Player %d <- disconnected\n", j);
-            OutputDebugStringA(buff);
+                char buff[32];
+                sprintf_s(buff, "Player %d <- disconnected\n", j);
+                OutputDebugStringA(buff);
+            }
         }
     }
 
@@ -245,6 +322,8 @@ void Game::Update(DX::StepTimer const&)
     }
     else
     {
+        memset(&m_state, 0, sizeof(GamePad::State));
+
         m_lastStr = nullptr;
         m_tracker.Reset();
     }
@@ -260,8 +339,6 @@ void Game::Render()
     Clear();
 
     m_spriteBatch->Begin();
-
-    int player = -1;
 
     for (int j = 0; j < std::min(GamePad::MAX_PLAYER_COUNT, 4); ++j)
     {
