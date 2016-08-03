@@ -122,7 +122,7 @@ namespace DX
                 // accumulate enough tiny errors that it would drop a frame. It is better to just round 
                 // small deviations down to zero to leave things running smoothly.
 
-                if (abs(static_cast<int64_t>(timeDelta - m_targetElapsedTicks)) < TicksPerSecond / 4000)
+                if (abs(static_cast<int32_t>(timeDelta - m_targetElapsedTicks)) < TicksPerSecond / 4000)
                 {
                     timeDelta = m_targetElapsedTicks;
                 }

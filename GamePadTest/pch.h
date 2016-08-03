@@ -62,3 +62,5 @@ namespace DX
 #include "DirectXHelpers.h"
 #include "SpriteBatch.h"
 #include "SpriteFont.h"
+
+#include "PlatformHelpers.h"
