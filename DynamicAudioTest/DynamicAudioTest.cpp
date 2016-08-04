@@ -13,6 +13,20 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
 
+#pragma warning(push)
+#pragma warning(disable : 4005)
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#define NODRAWTEXT
+#define NOMCX
+#define NOSERVICE
+#define NOHELP
+#pragma warning(pop)
+
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include "Audio.h"
 
 #include <stdio.h>
@@ -213,6 +227,14 @@ HRESULT CreateMFReader(_In_z_ const wchar_t* mediaFile, _Outptr_ IMFSourceReader
 //--------------------------------------------------------------------------------------
 int __cdecl main()
 {
+    if (!XMVerifyCPUSupport())
+    {
+        printf("ERROR: CPU failed DirectXMath init\n");
+        return 1;
+    }
+
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
     //
     // Initialize XAudio2
     //

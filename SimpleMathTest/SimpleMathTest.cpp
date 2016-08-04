@@ -9,6 +9,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //-------------------------------------------------------------------------------------
 
+#pragma warning(push)
+#pragma warning(disable : 4005)
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#define NODRAWTEXT
+#define NOGDI
+#define NOBITMAP
+#define NOMCX
+#define NOSERVICE
+#define NOHELP
+#pragma warning(pop)
+
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include <d3d11.h>
 #include "SimpleMath.h"
 
@@ -5645,6 +5661,8 @@ static struct Test
 
 int __cdecl main()
 {
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
     size_t npass = 0;
     bool success = true;
 

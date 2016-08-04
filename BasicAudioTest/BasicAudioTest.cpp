@@ -13,6 +13,22 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
 
+#pragma warning(push)
+#pragma warning(disable : 4005)
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#define NODRAWTEXT
+#define NOGDI
+#define NOBITMAP
+#define NOMCX
+#define NOSERVICE
+#define NOHELP
+#pragma warning(pop)
+
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include "Audio.h"
 
 #include <stdio.h>
@@ -135,6 +151,14 @@ void GenerateSineWave( _Out_writes_(sampleRate) int16_t* data, int sampleRate, i
 //--------------------------------------------------------------------------------------
 int __cdecl main()
 {
+    if (!XMVerifyCPUSupport())
+    {
+        printf("ERROR: CPU failed DirectXMath init\n");
+        return 1;
+    }
+
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
     //
     // Initialize XAudio2
     //
