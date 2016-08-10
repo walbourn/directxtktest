@@ -329,6 +329,13 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         cup->Draw( context.Get(), states, local, view, projection );
 
             // Fog settings
+#ifdef GAMMA_CORRECT_RENDERING
+        XMVECTORF32 fogColor;
+        fogColor.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
+#else
+        XMVECTOR fogColor = Colors::CornflowerBlue;
+#endif
+
         cup->UpdateEffects([&](IEffect* effect)
         {
             auto lights = dynamic_cast<IEffectLights*>(effect);
@@ -348,7 +355,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
                 fog->SetFogStart(6);
                 fog->SetFogEnd(8);
 #endif
-                fog->SetFogColor(Colors::CornflowerBlue);
+                fog->SetFogColor(fogColor);
             }
         });
         local = XMMatrixTranslation( -3.f, row0, cos(time) * 2.f );
