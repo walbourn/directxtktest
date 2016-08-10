@@ -13,6 +13,8 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
 
+#define GAMMA_CORRECT_RENDERING
+
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #define WIN32_LEAN_AND_MEAN
@@ -103,7 +105,11 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     swapChainDesc.BufferCount = 1;
     swapChainDesc.BufferDesc.Width = client.right;
     swapChainDesc.BufferDesc.Height = client.bottom;
+#ifdef GAMMA_CORRECT_RENDERING
+    swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+#else
     swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+#endif
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER;
     swapChainDesc.OutputWindow = hwnd;
     swapChainDesc.SampleDesc.Count = 1;
@@ -163,6 +169,10 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
     CommonStates states(device.Get());
     DGSLEffectFactory fx(device.Get());
+
+#ifdef GAMMA_CORRECT_RENDERING
+    fx.EnableForceSRGB(true);
+#endif
 
 #ifdef LH_COORDS
     bool ccw = false;
@@ -231,7 +241,13 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         
         float time = (float)(counter.QuadPart - start.QuadPart) / (float)freq.QuadPart;
 
+#ifdef GAMMA_CORRECT_RENDERING
+        XMVECTORF32 color;
+        color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
+        context->ClearRenderTargetView(backBuffer.Get(), color);
+#else
         context->ClearRenderTargetView(backBuffer.Get(), Colors::CornflowerBlue);
+#endif
         context->ClearDepthStencilView(depthStencil.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
         // Compute camera matrices.
@@ -288,7 +304,13 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         teapotTest->UpdateEffects([&](IEffect* effect)
         {
             auto dgsl = reinterpret_cast<DGSLEffect*>( effect );
+#ifdef GAMMA_CORRECT_RENDERING
+            XMVECTORF32 color;
+            color.v = XMColorSRGBToRGB(Colors::Gray);
+            dgsl->SetDiffuseColor( color );
+#else
             dgsl->SetDiffuseColor( Colors::Gray );
+#endif
             dgsl->DisableSpecular();
             dgsl->SetLightEnabled( 0, true );
             dgsl->SetLightEnabled( 1, true );
@@ -302,8 +324,16 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         teapotTest->UpdateEffects([&](IEffect* effect)
         {
             auto dgsl = reinterpret_cast<DGSLEffect*>( effect );
+#ifdef GAMMA_CORRECT_RENDERING
+            XMVECTORF32 color;
+            color.v = XMColorSRGBToRGB(Colors::Red);
+            dgsl->SetDiffuseColor(color);
+            color.v = XMColorSRGBToRGB(Colors::White);
+            dgsl->SetSpecularColor(color);
+#else
             dgsl->SetDiffuseColor( Colors::Red );
             dgsl->SetSpecularColor( Colors::White );
+#endif
             dgsl->SetSpecularPower( 16 );
             dgsl->SetLightEnabled( 0, true );
             dgsl->SetLightEnabled( 1, false );
@@ -317,7 +347,13 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         teapotTest->UpdateEffects([&](IEffect* effect)
         {
             auto dgsl = reinterpret_cast<DGSLEffect*>( effect );
+#ifdef GAMMA_CORRECT_RENDERING
+            XMVECTORF32 color;
+            color.v = XMColorSRGBToRGB(Colors::Green);
+            dgsl->SetDiffuseColor(color);
+#else
             dgsl->SetDiffuseColor( Colors::Green );
+#endif
             dgsl->SetLightEnabled( 0, false );
             dgsl->SetLightEnabled( 1, true );
             dgsl->SetLightEnabled( 2, true );
