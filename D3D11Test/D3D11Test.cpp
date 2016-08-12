@@ -66,16 +66,6 @@ void Game::Initialize(
         OutputDebugStringA("SimpleMath::Rectangle operator test A failed!");
         throw ref new Platform::Exception(E_FAIL);
     }
-
-    ABI::Windows::Foundation::Rect test3 = test1;
-    if (test1.x != long(test3.X)
-        && test1.y != long(test3.Y)
-        && test1.width != long(test3.Width)
-        && test1.height != long(test3.Height))
-    {
-        OutputDebugStringA("SimpleMath::Rectangle operator test B failed!");
-        throw ref new Platform::Exception(E_FAIL);
-    }
 #endif
 }
 
