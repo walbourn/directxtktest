@@ -167,6 +167,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
     SpriteFont multicoloredFont(device.Get(), L"multicolored.spritefont");
     SpriteFont japaneseFont(device.Get(), L"japanese.spritefont");
     SpriteFont ctrlFont(device.Get(), L"xboxController.spritefont");
+    SpriteFont ctrlOneFont(device.Get(), L"xboxOneController.spritefont");
     SpriteFont consolasFont(device.Get(), L"consolas.spritefont");
 
     if ( comicFont.GetDefaultCharacter() != 0 )
@@ -340,6 +341,8 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
 
         ctrlFont.DrawString(g_spriteBatch.get(), L" !\"\n#$%\n&'()\n*+,-", XMFLOAT2(650, 130), Colors::White, 0.f, XMFLOAT2(0.f, 0.f), 0.5f);
 
+        ctrlOneFont.DrawString(g_spriteBatch.get(), L" !\"\n#$%\n&'()\n*+,-", XMFLOAT2(950, 130), Colors::White, 0.f, XMFLOAT2(0.f, 0.f), 0.5f);
+
         UINT w, h;
 
         switch( g_spriteBatch->GetRotation() )
@@ -359,7 +362,7 @@ int WINAPI wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, 
         for( UINT x = 0; x < w; x += 100 )
         {
             swprintf_s( tmp, L"%u\n", x );
-            nonproportionalFont.DrawString( g_spriteBatch.get(), tmp, XMFLOAT2( float(x), float( h - 100 ) ), Colors::Yellow );
+            nonproportionalFont.DrawString( g_spriteBatch.get(), tmp, XMFLOAT2( float(x), float( h - 75 ) ), Colors::Yellow );
         }
 
         for( UINT y = 0; y < h; y += 100 )

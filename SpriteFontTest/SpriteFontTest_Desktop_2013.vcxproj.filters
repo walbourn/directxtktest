@@ -29,6 +29,9 @@
     <None Include="consolas.spritefont">
       <Filter>Assets</Filter>
     </None>
+    <None Include="XboxOneController.spritefont">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
