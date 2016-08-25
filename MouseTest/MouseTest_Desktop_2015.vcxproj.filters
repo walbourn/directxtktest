@@ -1,10 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="MouseTest.cpp" />
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="..\Common\MainPC.cpp">
       <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
@@ -30,7 +32,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MouseTest.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="..\Common\DeviceResourcesPC.h">
       <Filter>Common</Filter>
@@ -38,6 +39,7 @@
     <ClInclude Include="..\Common\StepTimer.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="Game.h" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\Common\settings.manifest">

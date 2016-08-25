@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>ac98cf4b-bb32-465e-8dc3-adab970c79fd</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>ac775509-9301-4166-baaf-ee6a6c788494</UniqueIdentifier>
+      <Extensions>bmp;dds;fbx;gif;jpg;jpeg;tga;tiff;tif;png</Extensions>
+    </Filter>
+    <Filter Include="Assets\Logos">
+      <UniqueIdentifier>{767b7406-4636-46cc-a4a9-09a8259d870c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Soldier">
+      <UniqueIdentifier>{d1897fa2-32a2-46dd-9ac3-266a84d3ebcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Tank">
+      <UniqueIdentifier>{fd74e13d-c5b4-4f41-b807-29ad49b0c0fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\VSStarter">
+      <UniqueIdentifier>{0fb89225-1dc5-4707-9c05-215695bde4e9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesUWP.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\MainUWP.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="..\Common\DeviceResourcesUWP.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="PackageUWP.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Common\Logo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\SmallLogo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\SplashScreen.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\StoreLogo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\WideLogo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="ground_diff.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="ground_norm.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="left_engine_diff.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="left_engine_norm.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="turret_diff.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="turret_norm.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="head_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="jacket_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="pants_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="upBody_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="default.dds">
+      <Filter>Assets</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TankScene.sdkmesh">
+      <Filter>Assets\Tank</Filter>
+    </None>
+    <None Include="soldier.sdkmesh">
+      <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="teapot.cmo">
+      <Filter>Assets\VSStarter</Filter>
+    </None>
+  </ItemGroup>
+</Project>

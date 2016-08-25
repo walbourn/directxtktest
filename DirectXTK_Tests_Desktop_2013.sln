@@ -1,91 +1,47 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.40418.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_Desktop_2013", "..\DirectXTK_Desktop_2013.vcxproj", "{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpriteBatchTest_Desktop_2013", "SpriteBatchTest\SpriteBatchTest_Desktop_2013.vcxproj", "{828531CE-0C3C-4B9A-884C-3726623C4666}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4D16B144-34CC-42E7-8078-A5504ECF2C9E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PrimitivesTest_Desktop_2013", "PrimitivesTest\PrimitivesTest_Desktop_2013.vcxproj", "{DA8EBCA6-B579-4210-B718-C80FD1FF4688}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EffectsTest_Desktop_2013", "EffectsTest\EffectsTest_Desktop_2013.vcxproj", "{73D86084-E42E-48AE-A7AD-609784B13304}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LoadTest_Desktop_2013", "LoadTest\LoadTest_Desktop_2013.vcxproj", "{5304DBDA-A842-4E40-B187-8C4DD9E93654}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpriteFontTest_Desktop_2013", "SpriteFontTest\SpriteFontTest_Desktop_2013.vcxproj", "{E78B7F1D-F6FD-44F9-A715-B2280E517B6C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelTest_Desktop_2013", "ModelTest\ModelTest_Desktop_2013.vcxproj", "{7F3B9A57-102D-4370-9EDA-1BF79FDE908E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleMathTest_Desktop_2013", "SimpleMathTest\SimpleMathTest_Desktop_2013.vcxproj", "{790758E2-27F9-48EB-B3A7-B8828F54EDD6}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DGSLTest_Desktop_2013", "DGSLTest\DGSLTest_Desktop_2013.vcxproj", "{5D68BEC8-0B2E-40AF-B8A0-491F9C45148A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTKAudio_Desktop_2013_Win8", "..\Audio\DirectXTKAudio_Desktop_2013_Win8.vcxproj", "{4F150A30-CECB-49D1-8283-6A3F57438CF5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Audio3DTest_Desktop_2013_Win8", "Audio3DTest\Audio3DTest_Desktop_2013_Win8.vcxproj", "{28E0E100-6368-4BAD-AF65-832248DD0B73}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4F150A30-CECB-49D1-8283-6A3F57438CF5} = {4F150A30-CECB-49D1-8283-6A3F57438CF5}
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicAudioTest_Desktop_2013_Win8", "BasicAudioTest\BasicAudioTest_Desktop_2013_Win8.vcxproj", "{C81EFCF2-0DD3-4BF6-BB74-B2CC876CFA4B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4F150A30-CECB-49D1-8283-6A3F57438CF5} = {4F150A30-CECB-49D1-8283-6A3F57438CF5}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DynamicAudioTest_Desktop_2013_Win8", "DynamicAudioTest\DynamicAudioTest_Desktop_2013_Win8.vcxproj", "{C0702EBA-C4C6-4530-9AE3-8D74BF7D7644}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4F150A30-CECB-49D1-8283-6A3F57438CF5} = {4F150A30-CECB-49D1-8283-6A3F57438CF5}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GamePadTest_Desktop_2013", "GamePadTest\GamePadTest_Desktop_2013.vcxproj", "{C526C2CB-1E62-4ABD-AAD1-05B52BEDDA6C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnimTest_Desktop_2013", "AnimTest\AnimTest_Desktop_2013.vcxproj", "{68B6C0D1-60A6-45B9-AD0B-86FB10407A53}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3D11Test_Desktop_2013", "D3D11Test\D3D11Test_Desktop_2013.vcxproj", "{BAD524A1-A164-4B82-83C7-A38E2601E6A5}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyboardTest_Desktop_2013", "KeyboardTest\KeyboardTest_Desktop_2013.vcxproj", "{AC25E98A-7B4F-4799-B00B-5F327D837CE0}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MouseTest_Desktop_2013", "MouseTest\MouseTest_Desktop_2013.vcxproj", "{2510E3E7-F869-42A6-A8A1-BF1EDB69172C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderTest_Desktop_2013", "ShaderTest\ShaderTest_Desktop_2013.vcxproj", "{C32AD958-C6E8-413D-94D9-5EF11D7967DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -329,6 +285,18 @@ Global
 		{2510E3E7-F869-42A6-A8A1-BF1EDB69172C}.Release|Win32.Build.0 = Release|Win32
 		{2510E3E7-F869-42A6-A8A1-BF1EDB69172C}.Release|x64.ActiveCfg = Release|x64
 		{2510E3E7-F869-42A6-A8A1-BF1EDB69172C}.Release|x64.Build.0 = Release|x64
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Debug|Win32.Build.0 = Debug|Win32
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Debug|x64.ActiveCfg = Debug|x64
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Debug|x64.Build.0 = Debug|x64
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Release|Win32.ActiveCfg = Release|Win32
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Release|Win32.Build.0 = Release|Win32
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Release|x64.ActiveCfg = Release|x64
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -350,5 +318,6 @@ Global
 		{BAD524A1-A164-4B82-83C7-A38E2601E6A5} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{AC25E98A-7B4F-4799-B00B-5F327D837CE0} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{2510E3E7-F869-42A6-A8A1-BF1EDB69172C} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
+		{C32AD958-C6E8-413D-94D9-5EF11D7967DA} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 	EndGlobalSection
 EndGlobal

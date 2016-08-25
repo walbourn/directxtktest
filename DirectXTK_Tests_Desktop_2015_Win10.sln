@@ -13,9 +13,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Audio3DTest_Desktop_2015_Wi
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicAudioTest_Desktop_2015_Win10", "BasicAudioTest\BasicAudioTest_Desktop_2015_Win10.vcxproj", "{C81EFCF2-0DD3-4BF6-BB74-B2CC876CFA4B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E0B52AE7-E160-4D32-BF3F-910B785E5A8E} = {E0B52AE7-E160-4D32-BF3F-910B785E5A8E}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DynamicAudioTest_Desktop_2015_Win10", "DynamicAudioTest\DynamicAudioTest_Desktop_2015_Win10.vcxproj", "{C0702EBA-C4C6-4530-9AE3-8D74BF7D7644}"
 	ProjectSection(ProjectDependencies) = postProject

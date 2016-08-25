@@ -1,8 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ModelTest.cpp" />
     <ClCompile Include="ModelLoadOBJ.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\MainPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
@@ -28,6 +35,9 @@
     </Filter>
     <Filter Include="Assets\VSStarter">
       <UniqueIdentifier>{d79830ca-0073-4d4e-8755-543629a2079d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{eaa36dfc-4f6c-4e25-8534-40ad9861f239}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,6 +70,9 @@
     </None>
     <None Include="soldier.sdkmesh">
       <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="cup.sdkmesh">
+      <Filter>Assets\Cup</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -132,5 +145,20 @@
     <Image Include="upBody_diff.dds">
       <Filter>Assets\Soldier</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="..\Common\DeviceResourcesPC.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Common\settings.manifest">
+      <Filter>Common</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>

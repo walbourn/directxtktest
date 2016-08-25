@@ -1,37 +1,100 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="DGSLTest.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Assets">
       <UniqueIdentifier>{49d32f73-f9f1-402d-8561-7ae95827b1cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{321e8b71-f670-4513-9faf-859cd437260f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\CmoShip">
+      <UniqueIdentifier>{9fdfddd7-a4b9-4965-bd2a-7dbc7121d323}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Soldier">
+      <UniqueIdentifier>{bf5382e0-a12c-42d2-acbc-026ace8bd2eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\VSStarter">
+      <UniqueIdentifier>{900c994b-9e3b-4740-8a5c-d59059cb7622}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="teapot.cmo">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="tiny.sdkmesh">
-      <Filter>Assets</Filter>
-    </None>
     <None Include="_USERS_CHUCKW.WINGROUP_DESKTOP_VS 3D STARTER KIT_STARTERKIT_ASSETS_CUBEUVIMAGE.PNG.DDS">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="Tiny_skin.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\VSStarter</Filter>
     </None>
     <None Include="GlowEffect.cso">
-      <Filter>Assets</Filter>
+      <Filter>Assets\VSStarter</Filter>
     </None>
-    <None Include="teapot_phong.cmo">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="teapot_unlit.cmo">
-      <Filter>Assets</Filter>
+    <None Include="teapot.cmo">
+      <Filter>Assets\VSStarter</Filter>
     </None>
     <None Include="teapot_lambert.cmo">
-      <Filter>Assets</Filter>
+      <Filter>Assets\VSStarter</Filter>
     </None>
+    <None Include="teapot_phong.cmo">
+      <Filter>Assets\VSStarter</Filter>
+    </None>
+    <None Include="teapot_unlit.cmo">
+      <Filter>Assets\VSStarter</Filter>
+    </None>
+    <None Include="25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo">
+      <Filter>Assets\CmoShip</Filter>
+    </None>
+    <None Include="soldier.sdkmesh">
+      <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="gamelevel.cmo">
+      <Filter>Assets\VSStarter</Filter>
+    </None>
+    <None Include="_Users_ChuckW.WINGROUP_Desktop_VS 3D Starter Kit_StarterKit_Assets_GlowEffect.dgsl.cso">
+      <Filter>Assets\VSStarter</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\MainPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="pch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\DeviceResourcesPC.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Common\settings.manifest">
+      <Filter>Common</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__01.png.dds">
+      <Filter>Assets\CmoShip</Filter>
+    </Image>
+    <Image Include="_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__03.png.dds">
+      <Filter>Assets\CmoShip</Filter>
+    </Image>
+    <Image Include="_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__04.png.dds">
+      <Filter>Assets\CmoShip</Filter>
+    </Image>
+    <Image Include="head_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="jacket_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="pants_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="upBody_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
   </ItemGroup>
 </Project>

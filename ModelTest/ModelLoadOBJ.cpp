@@ -15,35 +15,7 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
 
-#pragma warning(push)
-#pragma warning(disable : 4005)
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#define NODRAWTEXT
-#define NOGDI
-#define NOBITMAP
-#define NOMCX
-#define NOSERVICE
-#define NOHELP
-#pragma warning(pop)
-
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
-#include <windows.h>
-
-#include "DirectXHelpers.h"
-#include "Effects.h"
-#include "Model.h"
-#include "VertexTypes.h"
-
-#include <algorithm>
-#include <fstream>
-#include <vector>
-#include <unordered_map>
-
-#include "PlatformHelpers.h"
+#include "pch.h"
 
 using namespace DirectX;
 

@@ -10,7 +10,9 @@
 
 #include <winapifamily.h>
 
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+#include <xdk.h>
+#elif !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #include <WinSDKVer.h>
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
@@ -38,11 +40,19 @@
 
 #include <wrl.h>
 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+#include <d3d11_x.h>
+#else
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
 #include <d3d11_3.h>
 #include <dxgi1_4.h>
 #else
 #include <d3d11_1.h>
+#endif
+
+#ifdef _DEBUG
+#include <dxgidebug.h>
+#endif
 #endif
 
 #include <DirectXMath.h>
@@ -53,26 +63,44 @@
 #include <memory>
 #include <stdexcept>
 
-#ifdef _DEBUG
-#include <dxgidebug.h>
-#endif
-
-namespace DX
-{
-    inline void ThrowIfFailed(HRESULT hr)
-    {
-        if (FAILED(hr))
-        {
-            // Set a breakpoint on this line to catch DirectX API errors
-            throw std::exception();
-        }
-    }
-}
+#include <stdio.h>
 
 #include "GamePad.h"
+#include "GraphicsMemory.h"
+#include "Keyboard.h"
+#include "Mouse.h"
 
 #include "DirectXHelpers.h"
 #include "SpriteBatch.h"
 #include "SpriteFont.h"
 
 #include "PlatformHelpers.h"
+
+namespace DX
+{
+    // Helper class for COM exceptions
+    class com_exception : public std::exception
+    {
+    public:
+        com_exception(HRESULT hr) : result(hr) {}
+
+        virtual const char* what() const override
+        {
+            static char s_str[64] = { 0 };
+            sprintf_s(s_str, "Failure with HRESULT of %08X", result);
+            return s_str;
+        }
+
+    private:
+        HRESULT result;
+    };
+
+    // Helper utility converts D3D API failures into exceptions.
+    inline void ThrowIfFailed(HRESULT hr)
+    {
+        if (FAILED(hr))
+        {
+            throw com_exception(hr);
+        }
+    }
+}
