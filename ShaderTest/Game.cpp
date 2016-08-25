@@ -804,6 +804,7 @@ void Game::CreateDeviceDependentResources()
     {
         effect->SetVertexColorEnabled(true);
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // BasicEffect (textured)
@@ -834,6 +835,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetVertexColorEnabled(true);
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // BasicEffect (vertex lighting)
@@ -860,6 +862,7 @@ void Game::CreateDeviceDependentResources()
         effect->EnableDefaultLighting();
         effect->SetVertexColorEnabled(true);
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_basic.emplace_back(std::make_unique<EffectWithDecl<BasicEffect>>(device, [=](BasicEffect* effect)
@@ -893,6 +896,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetVertexColorEnabled(true);
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // BasicEffect (per pixel light)
@@ -923,6 +927,7 @@ void Game::CreateDeviceDependentResources()
         effect->EnableDefaultLighting();
         effect->SetVertexColorEnabled(true);
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_basic.emplace_back(std::make_unique<EffectWithDecl<BasicEffect>>(device, [=](BasicEffect* effect)
@@ -960,6 +965,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetVertexColorEnabled(true);
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // BasicEffect (one light vertex lighting)
@@ -994,6 +1000,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
         effect->SetVertexColorEnabled(true);
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_basic.emplace_back(std::make_unique<EffectWithDecl<BasicEffect>>(device, [=](BasicEffect* effect)
@@ -1035,6 +1042,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetVertexColorEnabled(true);
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     //--- SkinnedEFfect --------------------------------------------------------------------
@@ -1051,6 +1059,7 @@ void Game::CreateDeviceDependentResources()
         effect->EnableDefaultLighting();
         effect->SetTexture(m_defaultTex.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_skinning.emplace_back(std::make_unique<EffectWithDecl<SkinnedEffect>>(device, [=](SkinnedEffect* effect)
@@ -1066,6 +1075,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetWeightsPerVertex(2);
         effect->SetTexture(m_defaultTex.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_skinning.emplace_back(std::make_unique<EffectWithDecl<SkinnedEffect>>(device, [=](SkinnedEffect* effect)
@@ -1081,6 +1091,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetWeightsPerVertex(1);
         effect->SetTexture(m_defaultTex.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // SkinnedEFfect (one light vertex lighting)
@@ -1097,6 +1108,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
         effect->SetTexture(m_defaultTex.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_skinning.emplace_back(std::make_unique<EffectWithDecl<SkinnedEffect>>(device, [=](SkinnedEffect* effect)
@@ -1114,6 +1126,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetWeightsPerVertex(2);
         effect->SetTexture(m_defaultTex.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_skinning.emplace_back(std::make_unique<EffectWithDecl<SkinnedEffect>>(device, [=](SkinnedEffect* effect)
@@ -1131,6 +1144,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetWeightsPerVertex(1);
         effect->SetTexture(m_defaultTex.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // SkinnedEFfect (per pixel lighting)
@@ -1147,6 +1161,7 @@ void Game::CreateDeviceDependentResources()
         effect->EnableDefaultLighting();
         effect->SetTexture(m_defaultTex.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_skinning.emplace_back(std::make_unique<EffectWithDecl<SkinnedEffect>>(device, [=](SkinnedEffect* effect)
@@ -1164,6 +1179,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetWeightsPerVertex(2);
         effect->SetTexture(m_defaultTex.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_skinning.emplace_back(std::make_unique<EffectWithDecl<SkinnedEffect>>(device, [=](SkinnedEffect* effect)
@@ -1181,6 +1197,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetWeightsPerVertex(1);
         effect->SetTexture(m_defaultTex.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     //--- EnvironmentMapEffect -------------------------------------------------------------
@@ -1199,6 +1216,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // EnvironmentMapEffect (no fresnel)
@@ -1217,6 +1235,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // EnvironmentMapEffect (specular)
@@ -1237,6 +1256,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // EnvironmentMapEffect (fresnel + specular)
@@ -1255,6 +1275,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // EnvironmentMapEffect (one light vertex lighting)
@@ -1271,6 +1292,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
@@ -1288,6 +1310,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
@@ -1307,6 +1330,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
@@ -1324,6 +1348,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // EnvironmentMapEffect (per pixel lighting)
@@ -1344,6 +1369,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
@@ -1365,6 +1391,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     //--- DualTextureEFfect ----------------------------------------------------------------
@@ -1380,6 +1407,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetTexture2(m_overlay.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_dual.emplace_back(std::make_unique<EffectWithDecl<DualTextureEffect>>(device, [=](DualTextureEffect* effect)
@@ -1395,6 +1423,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_defaultTex.Get());
         effect->SetTexture2(m_overlay.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     //--- AlphaTestEffect ------------------------------------------------------------------
@@ -1409,6 +1438,7 @@ void Game::CreateDeviceDependentResources()
     {
         effect->SetTexture(m_cat.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_alphTest.emplace_back(std::make_unique<EffectWithDecl<AlphaTestEffect>>(device, [=](AlphaTestEffect* effect)
@@ -1422,6 +1452,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetVertexColorEnabled(true);
         effect->SetTexture(m_cat.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // AlphaTestEffect (eg/ne)
@@ -1436,6 +1467,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetAlphaFunction(D3D11_COMPARISON_NOT_EQUAL);
         effect->SetTexture(m_cat.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_alphTest.emplace_back(std::make_unique<EffectWithDecl<AlphaTestEffect>>(device, [=](AlphaTestEffect* effect)
@@ -1451,6 +1483,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetVertexColorEnabled(true);
         effect->SetTexture(m_cat.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     //--- NormalMapEffect ------------------------------------------------------------------
@@ -1469,23 +1502,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_brickDiffuse.Get());
         effect->SetNormalTexture(m_brickNormal.Get());
         effect->SetFogEnabled(true);
-    }));
-
-    m_normalMap.emplace_back(std::make_unique<EffectWithDecl<NormalMapEffect>>(device, [=](NormalMapEffect* effect)
-    {
-        effect->EnableDefaultLighting();
-        effect->SetVertexColorEnabled(true);
-        effect->SetTexture(m_brickDiffuse.Get());
-        effect->SetNormalTexture(m_brickNormal.Get());
-    }));
-
-    m_normalMap.emplace_back(std::make_unique<EffectWithDecl<NormalMapEffect>>(device, [=](NormalMapEffect* effect)
-    {
-        effect->EnableDefaultLighting();
-        effect->SetVertexColorEnabled(true);
-        effect->SetTexture(m_brickDiffuse.Get());
-        effect->SetNormalTexture(m_brickNormal.Get());
-        effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     // NormalMapEffect (specular)
@@ -1504,6 +1521,26 @@ void Game::CreateDeviceDependentResources()
         effect->SetNormalTexture(m_brickNormal.Get());
         effect->SetSpecularTexture(m_brickSpecular.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
+    }));
+
+    // NormalMapEffect (vertex color)
+    m_normalMap.emplace_back(std::make_unique<EffectWithDecl<NormalMapEffect>>(device, [=](NormalMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetVertexColorEnabled(true);
+        effect->SetTexture(m_brickDiffuse.Get());
+        effect->SetNormalTexture(m_brickNormal.Get());
+    }));
+
+    m_normalMap.emplace_back(std::make_unique<EffectWithDecl<NormalMapEffect>>(device, [=](NormalMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetVertexColorEnabled(true);
+        effect->SetTexture(m_brickDiffuse.Get());
+        effect->SetNormalTexture(m_brickNormal.Get());
+        effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     m_normalMap.emplace_back(std::make_unique<EffectWithDecl<NormalMapEffect>>(device, [=](NormalMapEffect* effect)
@@ -1523,6 +1560,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetNormalTexture(m_brickNormal.Get());
         effect->SetSpecularTexture(m_brickSpecular.Get());
         effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
     }));
 
     //--- DGSLEffect -----------------------------------------------------------------------
