@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: Game.cpp
 //
-// Developer unit test for basic Direct3D 11 support
+// Developer unit test for DirectXTK ?
 //
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -16,8 +16,11 @@
 #include "pch.h"
 #include "Game.h"
 
-#define GAMMA_CORRECT_RENDERING
-#define USE_FAST_SEMANTICS
+//#define GAMMA_CORRECT_RENDERING
+//#define USE_FAST_SEMANTICS
+
+// Build for LH vs. RH coords
+//#define LH_COORDS
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -69,21 +72,6 @@ void Game::Initialize(
 
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
-
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-    // SimpleMath interop tests for Windows Runtime types
-    Rectangle test1(10, 20, 50, 100);
-
-    Windows::Foundation::Rect test2 = test1;
-    if (test1.x != long(test2.X)
-        && test1.y != long(test2.Y)
-        && test1.width != long(test2.Width)
-        && test1.height != long(test2.Height))
-    {
-        OutputDebugStringA("SimpleMath::Rectangle operator test A failed!");
-        throw ref new Platform::Exception(E_FAIL);
-    }
-#endif
 }
 
 #pragma region Frame Update
@@ -132,96 +120,8 @@ void Game::Render()
 
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    m_effect->Apply(context);
-
-    context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-    context->OMSetDepthStencilState(m_states->DepthNone(), 0);
-    context->RSSetState(m_states->CullNone());
-
-    context->IASetInputLayout(m_inputLayout.Get());
-
-    m_batch->Begin();
-
-    XMVECTORF32 red, green, blue, dred, dgreen, dblue, yellow, cyan, magenta, gray, dgray;
-#ifdef GAMMA_CORRECT_RENDERING
-    red.v = XMColorSRGBToRGB(Colors::Red);
-    green.v = XMColorSRGBToRGB(Colors::Green);
-    blue.v = XMColorSRGBToRGB(Colors::Blue);
-    dred.v = XMColorSRGBToRGB(Colors::DarkRed);
-    dgreen.v = XMColorSRGBToRGB(Colors::DarkGreen);
-    dblue.v = XMColorSRGBToRGB(Colors::DarkBlue);
-    yellow.v = XMColorSRGBToRGB(Colors::Yellow);
-    cyan.v = XMColorSRGBToRGB(Colors::Cyan);
-    magenta.v = XMColorSRGBToRGB(Colors::Magenta);
-    gray.v = XMColorSRGBToRGB(Colors::Gray);
-    dgray.v = XMColorSRGBToRGB(Colors::DarkGray);
-#else
-    red.v = Colors::Red;
-    green.v = Colors::Green;
-    blue.v = Colors::Blue;
-    dred.v = Colors::DarkRed;
-    dgreen.v = Colors::DarkGreen;
-    dblue.v = Colors::DarkBlue;
-    yellow.v = Colors::Yellow;
-    cyan.v = Colors::Cyan;
-    magenta.v = Colors::Magenta;
-    gray.v = Colors::Gray;
-    dgray.v = Colors::DarkGray;
-#endif
-
-    // Point
-    {
-        VertexPositionColor points[]
-        {
-            { Vector3(-0.75f, -0.75f, 0.5f), red },
-            { Vector3(-0.75f, -0.5f,  0.5f), green },
-            { Vector3(-0.75f, -0.25f, 0.5f), blue },
-            { Vector3(-0.75f,  0.0f,  0.5f), yellow },
-            { Vector3(-0.75f,  0.25f, 0.5f), magenta },
-            { Vector3(-0.75f,  0.5f,  0.5f), cyan },
-            { Vector3(-0.75f,  0.75f, 0.5f), Colors::White },
-        };
-
-        m_batch->Draw(D3D_PRIMITIVE_TOPOLOGY_POINTLIST, points, _countof(points));
-    }
-
-    // Lines
-    {
-        VertexPositionColor lines[] =
-        {
-            { Vector3(-0.75f, -0.85f, 0.5f), red },{ Vector3(0.75f, -0.85f, 0.5f), dred },
-            { Vector3(-0.75f, -0.90f, 0.5f), green },{ Vector3(0.75f, -0.90f, 0.5f), dgreen },
-            { Vector3(-0.75f, -0.95f, 0.5f), blue },{ Vector3(0.75f, -0.95f, 0.5f), dblue },
-        };
-
-        m_batch->DrawLine(lines[0], lines[1]);
-        m_batch->DrawLine(lines[2], lines[3]);
-        m_batch->DrawLine(lines[4], lines[5]);
-    }
-
-    // Triangle
-    {
-        VertexPositionColor v1(Vector3(0.f, 0.5f, 0.5f), red);
-        VertexPositionColor v2(Vector3(0.5f, -0.5f, 0.5f), green);
-        VertexPositionColor v3(Vector3(-0.5f, -0.5f, 0.5f), blue);
-
-        m_batch->DrawTriangle(v1, v2, v3);
-    }
-
-    // Quads
-    {
-        VertexPositionColor quad[] =
-        {
-            { Vector3(0.75f, 0.75f, 0.5), gray },
-            { Vector3(0.95f, 0.75f, 0.5), gray },
-            { Vector3(0.95f, -0.75f, 0.5), dgray },
-            { Vector3(0.75f, -0.75f, 0.5), dgray },
-        };
-
-        m_batch->DrawQuad(quad[0], quad[1], quad[2], quad[3]);
-    }
-
-    m_batch->End();
+    // TODO: Add your rendering code here.
+    context;
 
     // Show the new frame.
     m_deviceResources->Present();
@@ -310,44 +210,25 @@ void Game::GetDefaultSize(int& width, int& height) const
 void Game::CreateDeviceDependentResources()
 {
     auto device = m_deviceResources->GetD3DDevice();
-    auto context = m_deviceResources->GetD3DDeviceContext();
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_graphicsMemory = std::make_unique<GraphicsMemory>(device, m_deviceResources->GetBackBufferCount());
 #endif
 
-    m_effect = std::make_unique<BasicEffect>(device);
-    m_effect->SetVertexColorEnabled(true);
-
-    void const* shaderByteCode;
-    size_t byteCodeLength;
-
-    m_effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-
-    DX::ThrowIfFailed(
-            device->CreateInputLayout(VertexPositionColor::InputElements,
-                VertexPositionColor::InputElementCount,
-                shaderByteCode, byteCodeLength,
-                m_inputLayout.ReleaseAndGetAddressOf()));
-
-    m_states = std::make_unique<CommonStates>(device);
-
-    m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
+    // TODO: Initialize device dependent objects here (independent of window size).
+    device;
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    SetDebugObjectName(m_deviceResources->GetDepthStencilView(), "DepthStencil");
+    // TODO: Initialize windows-size dependent objects here.
 }
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
 void Game::OnDeviceLost()
 {
-    m_effect.reset();
-    m_states.reset();
-    m_batch.reset();
-    m_inputLayout.Reset();
+    // TODO: Add Direct3D resource cleanup here.
 }
 
 void Game::OnDeviceRestored()

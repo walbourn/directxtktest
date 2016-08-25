@@ -25,7 +25,7 @@
 
 
 // A basic game implementation that creates a D3D11 device and
-// provides a game loop
+// provides a game loop.
 class Game
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     : public DX::IDeviceNotify
@@ -69,7 +69,7 @@ public:
     void ValidateDevice();
 #endif
 
-    // Properites
+    // Properties
     void GetDefaultSize( int& width, int& height ) const;
     const wchar_t* GetAppName() const { return L"D3D11Test (DirectX 11)"; }
 
@@ -83,7 +83,7 @@ private:
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
-    // Game state
+    // Rendering loop timer.
     DX::StepTimer                                   m_timer;
 
     // Input devices.

@@ -96,7 +96,7 @@ void Game::Initialize(
 }
 
 #pragma region Frame Update
-// Executes basic game loop.
+// Executes the basic game loop.
 void Game::Tick()
 {
     m_timer.Tick([&]()
@@ -107,7 +107,7 @@ void Game::Tick()
     Render();
 }
 
-// Updates the world
+// Updates the world.
 void Game::Update(DX::StepTimer const&)
 {
     auto kb = m_keyboard->GetState();
@@ -202,12 +202,14 @@ void Game::Update(DX::StepTimer const&)
 #pragma endregion
 
 #pragma region Frame Render
-// Draws the scene
+// Draws the scene.
 void Game::Render()
 {
     // Don't try to render anything before the first Update.
     if (m_timer.GetFrameCount() == 0)
+    {
         return;
+    }
 
     Clear();
 
@@ -272,7 +274,7 @@ void Game::Render()
     m_deviceResources->Present();
 }
 
-// Helper method to clear the backbuffers
+// Helper method to clear the back buffers.
 void Game::Clear()
 {
     // Clear the views.

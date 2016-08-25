@@ -22,8 +22,9 @@
 #endif
 #include "StepTimer.h"
 
+
 // A basic game implementation that creates a D3D11 device and
-// provides a game loop
+// provides a game loop.
 class Game : public DX::IDeviceNotify
 {
 public:
@@ -58,7 +59,7 @@ public:
     void ValidateDevice();
 #endif
 
-    // Properites
+    // Properties
     void GetDefaultSize( int& width, int& height ) const;
     const wchar_t* GetAppName() const { return L"KeyboardTest (DirectX 11)"; }
 
@@ -72,10 +73,10 @@ private:
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
-    // Game state
+    // Rendering loop timer.
     DX::StepTimer                                   m_timer;
     
-    // Test content
+    // DirectXTK Test Objects
     std::unique_ptr<DirectX::SpriteBatch>               m_spriteBatch;
     std::unique_ptr<DirectX::SpriteFont>                m_comicFont;
     std::unique_ptr<DirectX::Keyboard>                  m_keyboard;

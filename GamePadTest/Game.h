@@ -23,8 +23,9 @@
 #endif
 #include "StepTimer.h"
 
+
 // A basic game implementation that creates a D3D11 device and
-// provides a game loop
+// provides a game loop.
 class Game
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     : public DX::IDeviceNotify
@@ -68,7 +69,7 @@ public:
     void ValidateDevice();
 #endif
 
-    // Properites
+    // Properties
     void GetDefaultSize( int& width, int& height ) const;
     const wchar_t* GetAppName() const { return L"GamePadTest (DirectX 11)"; }
 
@@ -82,10 +83,10 @@ private:
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
-    // Game state
+    // Rendering loop timer.
     DX::StepTimer                                   m_timer;
 
-    // Test content
+    // DirectXTK Test Objects
 #if defined(_XBOX_ONE) && defined(_TITLE)
     std::unique_ptr<DirectX::GraphicsMemory>            m_graphicsMemory;
 #endif
