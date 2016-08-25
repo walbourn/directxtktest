@@ -76,6 +76,7 @@
 
 #include "DDSTextureLoader.h"
 #include "Effects.h"
+#include "GamePad.h"
 #include "GeometricPrimitive.h"
 #include "GraphicsMemory.h"
 #include "Keyboard.h"

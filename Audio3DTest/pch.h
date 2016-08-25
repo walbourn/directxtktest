@@ -76,6 +76,7 @@
 
 #include "Audio.h"
 #include "Keyboard.h"
+#include "GamePad.h"
 #include "GeometricPrimitive.h"
 #include "GraphicsMemory.h"
 #include "Mouse.h"

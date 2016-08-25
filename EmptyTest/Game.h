@@ -87,6 +87,7 @@ private:
     DX::StepTimer                           m_timer;
 
     // Input devices.
+    std::unique_ptr<DirectX::GamePad>       m_gamePad;
     std::unique_ptr<DirectX::Keyboard>      m_keyboard;
 
     // DirectXTK Test Objects
