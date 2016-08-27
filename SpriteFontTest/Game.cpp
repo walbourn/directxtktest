@@ -17,6 +17,7 @@
 #include "Game.h"
 
 #define GAMMA_CORRECT_RENDERING
+#define USE_FAST_SEMANTICS
 
 namespace
 {
@@ -32,7 +33,9 @@ Game::Game() :
     m_frame(0)
 {
     // 2D only rendering
-#ifdef GAMMA_CORRECT_RENDERING
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_UNKNOWN, 2, true);
+#elif defined(GAMMA_CORRECT_RENDERING)
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_UNKNOWN);
 #else
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_UNKNOWN);

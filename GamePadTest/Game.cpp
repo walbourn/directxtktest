@@ -15,6 +15,9 @@
 #include "pch.h"
 #include "Game.h"
 
+#define GAMMA_CORRECT_RENDERING
+#define USE_FAST_SEMANTICS
+
 #if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
 #include <Windows.UI.Core.h>
 #endif
@@ -29,7 +32,14 @@ Game::Game() :
 {
     *m_lastStrBuff = 0;
 
+    // 2D only rendering
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_UNKNOWN, 2, true);
+#elif defined(GAMMA_CORRECT_RENDERING)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_UNKNOWN);
+#else
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_UNKNOWN);
+#endif
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     m_deviceResources->RegisterDeviceNotify(this);
@@ -74,10 +84,10 @@ void Game::Initialize(
 
         if (!thrown)
         {
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-            throw std::exception("GamePad not acting like a singleton");
-#else
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
             MessageBox(window, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
+#else
+            throw std::exception("GamePad not acting like a singleton");
 #endif
         }
 
@@ -347,6 +357,13 @@ void Game::Render()
         return;
     }
 
+    XMVECTORF32 yellow;
+#ifdef GAMMA_CORRECT_RENDERING
+    yellow.v = XMColorSRGBToRGB(Colors::Yellow);
+#else
+    yellow.v = Colors::Yellow;
+#endif
+
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_deviceResources->Prepare();
 #endif
@@ -363,7 +380,7 @@ void Game::Render()
 
     if (m_lastStr)
     {
-        m_comicFont->DrawString(m_spriteBatch.get(), m_lastStr, XMFLOAT2(25.f, 650.f), Colors::Yellow);
+        m_comicFont->DrawString(m_spriteBatch.get(), m_lastStr, XMFLOAT2(25.f, 650.f), yellow);
     }
 
     // X Y A B
@@ -475,7 +492,13 @@ void Game::Clear()
     auto context = m_deviceResources->GetD3DDeviceContext();
     auto renderTarget = m_deviceResources->GetRenderTargetView();
 
-    context->ClearRenderTargetView(renderTarget, Colors::CornflowerBlue);
+    XMVECTORF32 color;
+#ifdef GAMMA_CORRECT_RENDERING
+    color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
+#else
+    color.v = Colors::CornflowerBlue;
+#endif
+    context->ClearRenderTargetView(renderTarget, color);
     context->OMSetRenderTargets(1, &renderTarget, nullptr);
 
     // Set the viewport.

@@ -18,7 +18,8 @@
 
 #pragma warning(disable : 4238)
 
-//#define GAMMA_CORRECT_RENDERING
+#define GAMMA_CORRECT_RENDERING
+#define USE_FAST_SEMANTICS
 
 // Build for LH vs. RH coords
 //#define LH_COORDS
@@ -99,7 +100,7 @@ namespace
         case D3D11_RESOURCE_DIMENSION_TEXTURE1D:
             {
                 ComPtr<ID3D11Texture1D> tex;
-                DX::ThrowIfFailed(res->QueryInterface(IID_PPV_ARGS(tex.GetAddressOf())));
+                DX::ThrowIfFailed(res->QueryInterface(IID_GRAPHICS_PPV_ARGS(tex.GetAddressOf())));
 
                 D3D11_TEXTURE1D_DESC desc;
                 tex->GetDesc(&desc);
@@ -117,7 +118,7 @@ namespace
         case D3D11_RESOURCE_DIMENSION_TEXTURE2D:
             {
                 ComPtr<ID3D11Texture2D> tex;
-                DX::ThrowIfFailed(res->QueryInterface(IID_PPV_ARGS(tex.GetAddressOf())));
+                DX::ThrowIfFailed(res->QueryInterface(IID_GRAPHICS_PPV_ARGS(tex.GetAddressOf())));
 
                 D3D11_TEXTURE2D_DESC desc;
                 tex->GetDesc(&desc);
@@ -136,7 +137,7 @@ namespace
         case D3D11_RESOURCE_DIMENSION_TEXTURE3D:
             {
                 ComPtr<ID3D11Texture3D> tex;
-                DX::ThrowIfFailed(res->QueryInterface(IID_PPV_ARGS(tex.GetAddressOf())));
+                DX::ThrowIfFailed(res->QueryInterface(IID_GRAPHICS_PPV_ARGS(tex.GetAddressOf())));
 
                 D3D11_TEXTURE3D_DESC desc;
                 tex->GetDesc(&desc);
@@ -160,7 +161,9 @@ namespace
 Game::Game() :
     m_frame(0)
 {
-#ifdef GAMMA_CORRECT_RENDERING
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2, true);
+#elif defined(GAMMA_CORRECT_RENDERING)
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB);
 #else
     m_deviceResources = std::make_unique<DX::DeviceResources>();

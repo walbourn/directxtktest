@@ -17,6 +17,7 @@
 #include "Game.h"
 
 //#define GAMMA_CORRECT_RENDERING
+#define USE_FAST_SEMANTICS
 
 // Build for LH vs. RH coords
 //#define LH_COORDS
@@ -45,7 +46,9 @@ Game::Game()
         DXGI_FORMAT_B8G8R8A8_UNORM,
 #endif
 
-#ifdef FEATURE_LEVEL_9_X
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+        DXGI_FORMAT_D32_FLOAT, 2, true
+#elif defined(FEATURE_LEVEL_9_X)
         DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_1
 #else
         DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0

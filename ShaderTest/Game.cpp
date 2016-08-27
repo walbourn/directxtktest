@@ -19,7 +19,7 @@
 #pragma warning(disable : 4238)
 
 #define GAMMA_CORRECT_RENDERING
-// #define USE_FAST_SEMANTICS
+#define USE_FAST_SEMANTICS
 
 using namespace DirectX;
 using namespace DirectX::PackedVector; 
