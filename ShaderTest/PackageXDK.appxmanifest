@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest"
+         xmlns:mx="http://schemas.microsoft.com/appx/2013/xbox/manifest"
+         IgnorableNamespaces="mx">
+  
+  <Identity Name="072f244f-66c6-4cca-9fd8-a55b3ae6dc76"
+            Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
+            Version="1.0.0.0" />
+  
+  <Properties>
+    <DisplayName>ShaderTest (DirectX 11)</DisplayName>
+    <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
+    <Logo>StoreLogo.png</Logo>
+    <Description>ShaderTest</Description>
+  </Properties>
+  
+  <Prerequisites>
+    <OSMinVersion>6.2</OSMinVersion>
+    <OSMaxVersionTested>6.2</OSMaxVersionTested>
+  </Prerequisites>
+  
+  <Resources>
+    <Resource Language="en-us"/>
+  </Resources>
+  
+  <Applications>
+    <Application Id="App" 
+        Executable="$targetnametoken$.exe" 
+        EntryPoint="ShaderTest.App">
+        <VisualElements 
+            DisplayName="ShaderTest (DirectX 11)"
+            Logo="Logo.png"
+            SmallLogo="SmallLogo.png"
+            Description="ShaderTest"
+            ForegroundText="light"
+            BackgroundColor="#464646">
+            <SplashScreen Image="SplashScreen.png" />
+        </VisualElements>
+        <Extensions>
+          <mx:Extension Category="xbox.system.resources">
+            <mx:XboxSystemResources />
+          </mx:Extension>
+        </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClientServer" />
+  </Capabilities>
+</Package>

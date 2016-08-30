@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest"
+         xmlns:mx="http://schemas.microsoft.com/appx/2013/xbox/manifest"
+         IgnorableNamespaces="mx">
+  
+  <Identity Name="04feceab-6ab8-41bc-bc40-67f09d1ef753"
+            Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
+            Version="1.0.0.0" />
+  
+  <Properties>
+    <DisplayName>SpriteFontTest (DirectX 11)</DisplayName>
+    <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
+    <Logo>StoreLogo.png</Logo>
+    <Description>SpriteFontTest</Description>
+  </Properties>
+  
+  <Prerequisites>
+    <OSMinVersion>6.2</OSMinVersion>
+    <OSMaxVersionTested>6.2</OSMaxVersionTested>
+  </Prerequisites>
+  
+  <Resources>
+    <Resource Language="en-us"/>
+  </Resources>
+  
+  <Applications>
+    <Application Id="App" 
+        Executable="$targetnametoken$.exe" 
+        EntryPoint="SpriteFontTest.App">
+        <VisualElements 
+            DisplayName="SpriteFontTest (DirectX 11)"
+            Logo="Logo.png"
+            SmallLogo="SmallLogo.png"
+            Description="SpriteFontTest"
+            ForegroundText="light"
+            BackgroundColor="#464646">
+            <SplashScreen Image="SplashScreen.png" />
+        </VisualElements>
+        <Extensions>
+          <mx:Extension Category="xbox.system.resources">
+            <mx:XboxSystemResources />
+          </mx:Extension>
+        </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClientServer" />
+  </Capabilities>
+  <Extensions>
+    <mx:PackageExtension Category="windows.kinect">
+      <mx:Kinect IsVersionLocked="false">
+        <mx:AudioPipeline Version="1.14.8" />
+        <mx:SpeechPipeline Version="1.14.8" />
+        <mx:VisionPipeline Version="1.14.8" />
+      </mx:Kinect>
+    </mx:PackageExtension>
+  </Extensions>
+</Package>
