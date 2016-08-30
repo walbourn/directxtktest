@@ -112,6 +112,7 @@ private:
     std::unique_ptr<DirectX::Model>         m_soldier;
     std::unique_ptr<DirectX::Model>         m_dwarf;
     std::unique_ptr<DirectX::Model>         m_lmap;
+    std::unique_ptr<DirectX::Model>         m_nmap;
 
     std::unique_ptr<DirectX::EffectFactory> m_fxFactory;
 

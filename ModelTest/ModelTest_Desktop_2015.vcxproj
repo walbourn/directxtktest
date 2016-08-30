@@ -182,6 +182,7 @@
     <None Include="cup._obj" />
     <None Include="dwarf.sdkmesh" />
     <None Include="gamelevel.cmo" />
+    <None Include="Helmet.sdkmesh" />
     <None Include="player_ship_a.vbo" />
     <None Include="SimpleLightMap.sdkmesh" />
     <None Include="soldier.sdkmesh" />
@@ -199,6 +200,9 @@
     <Image Include="Headgear.dds" />
     <Image Include="head_diff.dds" />
     <Image Include="Helmet.dds" />
+    <Image Include="Helmet_diff.dds" />
+    <Image Include="Helmet_norm.dds" />
+    <Image Include="Helmet_spec.dds" />
     <Image Include="jacket_diff.dds" />
     <Image Include="Pack.dds" />
     <Image Include="pants_diff.dds" />

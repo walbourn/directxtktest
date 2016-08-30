@@ -309,6 +309,10 @@ void Game::Render()
     local = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, XM_PI, roll), local);
     m_lmap->Draw(context, *m_states, local, m_view, m_projection);
 
+    local = XMMatrixMultiply(XMMatrixScaling(0.05f, 0.05f, 0.05f), XMMatrixTranslation(-5.0f, row1, 0.f));
+    local = XMMatrixMultiply(world, local);
+    m_nmap->Draw(context, *m_states, local, m_view, m_projection);
+
     m_soldier->UpdateEffects([&](IEffect* effect)
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
@@ -327,8 +331,6 @@ void Game::Render()
     });
     local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(2.5f, row1, 0.f));
     m_soldier->Draw(context, *m_states, local, m_view, m_projection);
-
-    // TODO - NormalMapEffect model
     
     // Show the new frame.
     m_deviceResources->Present();
@@ -485,6 +487,7 @@ void Game::CreateDeviceDependentResources()
     m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, !ccw);
     m_dwarf = Model::CreateFromSDKMESH(device, L"dwarf.sdkmesh", *m_fxFactory, !ccw);
     m_lmap = Model::CreateFromSDKMESH(device, L"SimpleLightMap.sdkmesh", *m_fxFactory, !ccw);
+    m_nmap = Model::CreateFromSDKMESH(device, L"Helmet.sdkmesh", *m_fxFactory, !ccw);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -526,6 +529,7 @@ void Game::OnDeviceLost()
     m_soldier.reset();
     m_dwarf.reset();
     m_lmap.reset();
+    m_nmap.reset();
 
     m_fxFactory.reset();
 

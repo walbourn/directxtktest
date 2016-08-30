@@ -32,6 +32,9 @@
     <Filter Include="Assets\Logos">
       <UniqueIdentifier>{6aabd3c6-75b7-4311-8b0e-9dc581354cdd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Normalmap">
+      <UniqueIdentifier>{baf8276a-b56f-4660-afde-270f97e6576f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -142,6 +145,15 @@
     <Image Include="..\Common\Logo.scale-100.png">
       <Filter>Assets\Logos</Filter>
     </Image>
+    <Image Include="Helmet_diff.dds">
+      <Filter>Assets\Normalmap</Filter>
+    </Image>
+    <Image Include="Helmet_norm.dds">
+      <Filter>Assets\Normalmap</Filter>
+    </Image>
+    <Image Include="Helmet_spec.dds">
+      <Filter>Assets\Normalmap</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo">
@@ -176,6 +188,9 @@
     </None>
     <None Include="player_ship_a.vbo">
       <Filter>Assets</Filter>
+    </None>
+    <None Include="Helmet.sdkmesh">
+      <Filter>Assets\Normalmap</Filter>
     </None>
   </ItemGroup>
 </Project>

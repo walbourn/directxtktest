@@ -39,6 +39,9 @@
     <Filter Include="Common">
       <UniqueIdentifier>{eaa36dfc-4f6c-4e25-8534-40ad9861f239}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Normalmap">
+      <UniqueIdentifier>{7d6d2dbc-7d90-4d9e-a814-be294e962999}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="player_ship_a.vbo">
@@ -73,6 +76,9 @@
     </None>
     <None Include="cup.sdkmesh">
       <Filter>Assets\Cup</Filter>
+    </None>
+    <None Include="Helmet.sdkmesh">
+      <Filter>Assets\Normalmap</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +150,15 @@
     </Image>
     <Image Include="upBody_diff.dds">
       <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="Helmet_diff.dds">
+      <Filter>Assets\Normalmap</Filter>
+    </Image>
+    <Image Include="Helmet_norm.dds">
+      <Filter>Assets\Normalmap</Filter>
+    </Image>
+    <Image Include="Helmet_spec.dds">
+      <Filter>Assets\Normalmap</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
