@@ -9,6 +9,9 @@
     <ClCompile Include="..\Common\MainUWP.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\TextConsole.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -17,6 +20,9 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TextConsole.h">
       <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -73,6 +79,9 @@
       <Filter>Assets</Filter>
     </None>
     <None Include="comic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="Courier_16.spritefont">
       <Filter>Assets</Filter>
     </None>
   </ItemGroup>

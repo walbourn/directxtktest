@@ -22,6 +22,7 @@
 #include "DeviceResourcesPC.h"
 #endif
 #include "StepTimer.h"
+#include "TextConsole.h"
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -114,8 +115,15 @@ private:
     std::unique_ptr<DirectX::WaveBank>      m_wbXWMA;
 #endif
 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    std::unique_ptr<DirectX::SoundEffect>   m_alarmXMA;
+    std::unique_ptr<DirectX::WaveBank>      m_wbXMA;
+#endif
+
     std::unique_ptr<DirectX::WaveBank>      m_wbPCM;
     std::unique_ptr<DirectX::WaveBank>      m_wbADPCM;
+
+    std::unique_ptr<DX::TextConsole> m_console;
 
     bool m_critError;
     bool m_retrydefault;

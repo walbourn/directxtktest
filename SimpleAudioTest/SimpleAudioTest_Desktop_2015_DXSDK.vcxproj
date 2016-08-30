@@ -176,12 +176,14 @@
   <ItemGroup>
     <ClInclude Include="..\Common\DeviceResourcesPC.h" />
     <ClInclude Include="..\Common\StepTimer.h" />
+    <ClInclude Include="..\Common\TextConsole.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\DeviceResourcesPC.cpp" />
     <ClCompile Include="..\Common\MainPC.cpp" />
+    <ClCompile Include="..\Common\TextConsole.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -195,6 +197,7 @@
     <None Include="..\BasicAudioTest\droid.xwb" />
     <None Include="..\BasicAudioTest\xwmadroid.xwb" />
     <None Include="comic.spritefont" />
+    <None Include="Courier_16.spritefont" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\BasicAudioTest\Alarm01.wav" />
