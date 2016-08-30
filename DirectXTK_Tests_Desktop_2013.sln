@@ -43,6 +43,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MouseTest_Desktop_2013", "M
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderTest_Desktop_2013", "ShaderTest\ShaderTest_Desktop_2013.vcxproj", "{C32AD958-C6E8-413D-94D9-5EF11D7967DA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleAudioTest_Desktop_2013", "SimpleAudioTest\SimpleAudioTest_Desktop_2013.vcxproj", "{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -297,6 +299,18 @@ Global
 		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Release|Win32.Build.0 = Release|Win32
 		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Release|x64.ActiveCfg = Release|x64
 		{C32AD958-C6E8-413D-94D9-5EF11D7967DA}.Release|x64.Build.0 = Release|x64
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Debug|Win32.Build.0 = Debug|Win32
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Debug|x64.ActiveCfg = Debug|x64
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Debug|x64.Build.0 = Debug|x64
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Release|Win32.ActiveCfg = Release|Win32
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Release|Win32.Build.0 = Release|Win32
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Release|x64.ActiveCfg = Release|x64
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -319,5 +333,6 @@ Global
 		{AC25E98A-7B4F-4799-B00B-5F327D837CE0} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{2510E3E7-F869-42A6-A8A1-BF1EDB69172C} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{C32AD958-C6E8-413D-94D9-5EF11D7967DA} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
+		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 	EndGlobalSection
 EndGlobal

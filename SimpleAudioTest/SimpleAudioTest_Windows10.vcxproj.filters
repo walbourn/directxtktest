@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesUWP.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\MainUWP.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="..\Common\DeviceResourcesUWP.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{ed90d6ec-6bd1-47e7-a34d-003fd8145a66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{313aea1c-c326-4044-a56a-e7a4b2dd315f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Logos">
+      <UniqueIdentifier>{38a8e167-f02f-4cec-868c-ec2c149d2d54}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Common\Logo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\SmallLogo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\SplashScreen.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\StoreLogo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\WideLogo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\BasicAudioTest\Alarm01.wav">
+      <Filter>Assets</Filter>
+    </Media>
+    <Media Include="..\BasicAudioTest\Alarm01_adpcm.wav">
+      <Filter>Assets</Filter>
+    </Media>
+    <Media Include="..\BasicAudioTest\Alarm01_float.wav">
+      <Filter>Assets</Filter>
+    </Media>
+    <Media Include="..\BasicAudioTest\Alarm01_xwma.wav">
+      <Filter>Assets</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\BasicAudioTest\ADPCMdroid.xwb">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\BasicAudioTest\droid.xwb">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\BasicAudioTest\xwmadroid.xwb">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="comic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="PackageUWP.appxmanifest" />
+  </ItemGroup>
+</Project>

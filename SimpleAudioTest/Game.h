@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: Game.h
 //
-// Developer unit test for DirectXTK for Audio - Positional
+// Developer unit test for DirectXTK - Simple Audio Test (UI-based BasicAudioTest)
 //
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -75,7 +75,7 @@ public:
 
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
-    const wchar_t* GetAppName() const { return L"Audio3DTest (DirectX 11)"; }
+    const wchar_t* GetAppName() const { return L"SimpleAudioTest (DirectX 11)"; }
 
 private:
 
@@ -94,31 +94,34 @@ private:
     std::unique_ptr<DirectX::GamePad>       m_gamePad;
     std::unique_ptr<DirectX::Keyboard>      m_keyboard;
     DirectX::Keyboard::KeyboardStateTracker m_keyboardButtons;
+    DirectX::GamePad::ButtonStateTracker    m_gamepadButtons;
 
     // DirectXTK Test Objects
 #if defined(_XBOX_ONE) && defined(_TITLE)
-    std::unique_ptr<DirectX::GraphicsMemory>        m_graphicsMemory;
+    std::unique_ptr<DirectX::GraphicsMemory> m_graphicsMemory;
 #endif
 
-    std::unique_ptr<DirectX::AudioEngine>           m_audEngine;
-    std::unique_ptr<DirectX::SoundEffect>           m_soundEffect;
-    std::unique_ptr<DirectX::SoundEffectInstance>   m_effect;
-    std::unique_ptr<DirectX::GeometricPrimitive>    m_sphere;
-    std::unique_ptr<DirectX::SpriteBatch>           m_spriteBatch;
-    std::unique_ptr<DirectX::SpriteFont>            m_comicFont;
+    std::unique_ptr<DirectX::AudioEngine>   m_audEngine;
+    std::unique_ptr<DirectX::SpriteBatch>   m_spriteBatch;
+    std::unique_ptr<DirectX::SpriteFont>    m_comicFont;
 
-    DirectX::AudioListener m_listener;
-    DirectX::AudioEmitter  m_emitter;
+    std::unique_ptr<DirectX::SoundEffect>   m_alarmPCM;
+    std::unique_ptr<DirectX::SoundEffect>   m_alarmADPCM;
+    std::unique_ptr<DirectX::SoundEffect>   m_alarmFLOAT;
 
-    DirectX::SimpleMath::Matrix m_view;
-    DirectX::SimpleMath::Matrix m_projection;
+#if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+    std::unique_ptr<DirectX::SoundEffect>   m_alarmXWMA;
+    std::unique_ptr<DirectX::WaveBank>      m_wbXWMA;
+#endif
 
-    DirectX::SimpleMath::Matrix m_listenerMatrix;
-    DirectX::SimpleMath::Matrix m_emitterMatrix;
+    std::unique_ptr<DirectX::WaveBank>      m_wbPCM;
+    std::unique_ptr<DirectX::WaveBank>      m_wbADPCM;
 
     bool m_critError;
     bool m_retrydefault;
     bool m_newAudio;
 
     wchar_t m_deviceStr[256];
+
+    bool m_gamepadPresent;
 };
