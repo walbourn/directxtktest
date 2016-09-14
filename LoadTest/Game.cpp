@@ -16,6 +16,11 @@
 #include "pch.h"
 #include "Game.h"
 
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#include <Windows.ApplicationModel.h>
+#include <Windows.Storage.h>
+#endif
+
 #pragma warning(disable : 4238)
 
 #define GAMMA_CORRECT_RENDERING
@@ -290,56 +295,113 @@ void Game::Render()
     m_effect->SetTexture(m_dxlogo.Get());
     m_cube->Draw(m_effect.get(), m_layout.Get());
 
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-
     if (m_frame == 10)
     {
+        OutputDebugStringA("******** SCREENSHOT TEST BEGIN *************\n");
+
+        bool success = true;
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+        const wchar_t sspath[MAX_PATH] = L"T:\\";
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+        wchar_t sspath[MAX_PATH] = {};
+
+        using namespace Microsoft::WRL;
+        using namespace Microsoft::WRL::Wrappers;
+        using namespace ABI::Windows::Foundation;
+
+        ComPtr<ABI::Windows::Storage::IApplicationDataStatics> appStatics;
+        DX::ThrowIfFailed(GetActivationFactory(HStringReference(RuntimeClass_Windows_Storage_ApplicationData).Get(), appStatics.GetAddressOf()));
+
+        ComPtr<ABI::Windows::Storage::IApplicationData> appData;
+        DX::ThrowIfFailed(appStatics->get_Current(appData.GetAddressOf()));
+
+        // Temporary folder
+        {
+            ComPtr<ABI::Windows::Storage::IStorageFolder> folder;
+            DX::ThrowIfFailed(appData->get_TemporaryFolder(folder.GetAddressOf()));
+
+            ComPtr<ABI::Windows::Storage::IStorageItem> item;
+            DX::ThrowIfFailed(folder.As(&item));
+
+            HString folderName;
+            DX::ThrowIfFailed(item->get_Path(folderName.GetAddressOf()));
+
+            unsigned int len;
+            PCWSTR szPath = folderName.GetRawBuffer(&len);
+            if (wcscpy_s(sspath, MAX_PATH, szPath) > 0
+                || wcscat_s(sspath, L"\\") > 0)
+            {
+                throw std::exception("TemporaryFolder");
+            }
+        }
+#else
+        const wchar_t sspath[MAX_PATH] = L".";
+#endif
+
+        OutputDebugStringA("Output path: ");
+        OutputDebugStringW(sspath);
+        OutputDebugStringA("\n");
+
+        wchar_t sspng[MAX_PATH] = {};
+        wchar_t ssjpg[MAX_PATH] = {};
+        wchar_t ssbmp[MAX_PATH] = {};
+        wchar_t sstif[MAX_PATH] = {};
+        wchar_t ssdds[MAX_PATH] = {};
+
+        swprintf_s(sspng, L"%ls\\SCREENSHOT.PNG", sspath);
+        swprintf_s(ssjpg, L"%ls\\SCREENSHOT.JPG", sspath);
+        swprintf_s(ssbmp, L"%ls\\SCREENSHOT.BMP", sspath);
+        swprintf_s(sstif, L"%ls\\SCREENSHOT.TIF", sspath);
+        swprintf_s(ssdds, L"%ls\\SCREENSHOT.DDS", sspath);
+
+        DeleteFileW(sspng);
+        DeleteFileW(ssjpg);
+        DeleteFileW(ssbmp);
+        DeleteFileW(sstif);
+        DeleteFileW(ssdds);
+
         auto context = m_deviceResources->GetD3DDeviceContext();
         auto backBufferTex = m_deviceResources->GetRenderTarget();
 
-        OutputDebugStringA("******** SCREENSHOT TEST BEGIN *************\n");
+        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatPng, sspng));
 
-        DeleteFileW(L"SCREENSHOT.PNG");
-        DeleteFileW(L"SCREENSHOT.JPG");
-        DeleteFileW(L"SCREENSHOT.BMP");
-        DeleteFileW(L"SCREENSHOT.TIF");
-        DeleteFileW(L"SCREENSHOT.DDS");
-
-        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatPng, L"SCREENSHOT.PNG"));
-
-        if (GetFileAttributesW(L"SCREENSHOT.PNG") != INVALID_FILE_ATTRIBUTES)
+        if (GetFileAttributesW(sspng) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.PNG\n");
         }
         else
         {
             OutputDebugStringA("ERROR: Missing SCREENSHOT.PNG!\n");
+            success = false;
         }
 
-        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatJpeg, L"SCREENSHOT.JPG"));
+        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatJpeg, ssjpg));
 
-        if (GetFileAttributesW(L"SCREENSHOT.JPG") != INVALID_FILE_ATTRIBUTES)
+        if (GetFileAttributesW(ssjpg) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.JPG\n");
         }
         else
         {
             OutputDebugStringA("ERROR: Missing SCREENSHOT.JPG!\n");
+            success = false;
         }
 
-        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatBmp, L"SCREENSHOT.BMP",
+        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatBmp, ssbmp,
             &GUID_WICPixelFormat16bppBGR565));
 
-        if (GetFileAttributesW(L"SCREENSHOT.BMP") != INVALID_FILE_ATTRIBUTES)
+        if (GetFileAttributesW(ssbmp) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.BMP\n");
         }
         else
         {
             OutputDebugStringA("ERROR: Missing SCREENSHOT.BMP!\n");
+            success = false;
         }
 
-        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatTiff, L"SCREENSHOT.TIF", nullptr,
+        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatTiff, sstif, nullptr,
             [&](IPropertyBag2* props)
         {
             PROPBAG2 options[2] = { 0, 0 };
@@ -356,29 +418,35 @@ void Game::Render()
             (void)props->Write(2, options, varValues);
         }));
 
-        if (GetFileAttributesW(L"SCREENSHOT.TIF") != INVALID_FILE_ATTRIBUTES)
+        if (GetFileAttributesW(sstif) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.TIF\n");
         }
         else
         {
             OutputDebugStringA("ERROR: Missing SCREENSHOT.TIF!\n");
+            success = false;
         }
 
-        DX::ThrowIfFailed(SaveDDSTextureToFile(context, backBufferTex, L"SCREENSHOT.DDS"));
+        DX::ThrowIfFailed(SaveDDSTextureToFile(context, backBufferTex, ssdds));
 
-        if (GetFileAttributesW(L"SCREENSHOT.DDS") != INVALID_FILE_ATTRIBUTES)
+        if (GetFileAttributesW(ssdds) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.DDS\n");
         }
         else
         {
             OutputDebugStringA("ERROR: Missing SCREENSHOT.DDS!\n");
+            success = false;
         }
 
+        // TODO - pass in staging texture with read access
+
+        // ScreenGrab of an MSAA resource is tested elsewhere
+
+        OutputDebugStringA(success ? "Passed\n" : "Failed\n");
         OutputDebugStringA("********* SCREENSHOT TEST END **************\n");
     }
-#endif
 
     // Show the new frame.
     m_deviceResources->Present();
