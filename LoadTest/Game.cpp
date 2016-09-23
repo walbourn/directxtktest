@@ -1036,6 +1036,27 @@ void Game::UnitTests(bool success)
         }
     }
 
+    {
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> tex;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"cup_small.jpg",
+            0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+            WIC_LOADER_IGNORE_SRGB, res.GetAddressOf(), tex.GetAddressOf()));
+
+        if (!ValidateDesc(tex.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM, 1))
+        {
+            OutputDebugStringA("FAILED: cup_small.jpg (ignore srgb) srv desc unexpected\n");
+            success = false;
+        }
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 512, 683))
+        {
+            OutputDebugStringA("FAILED: cup_small.jpg (ignore srgb) res desc unexpected\n");
+            success = false;
+        }
+    }
+
     OutputDebugStringA(success ? "Passed\n" : "Failed\n");
     OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
 }
