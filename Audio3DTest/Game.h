@@ -45,11 +45,6 @@ public:
 
     // Basic game loop
     void Tick();
-    void Render();
-    void AudioRender();
-
-    // Rendering helpers
-    void Clear();
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     // IDeviceNotify
@@ -80,6 +75,10 @@ public:
 private:
 
     void Update(DX::StepTimer const& timer);
+    void Render();
+    void AudioRender();
+
+    void Clear();
 
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
