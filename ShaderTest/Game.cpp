@@ -29,6 +29,8 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
+    const float SWAP_TIME = 10.f;
+
     const float ortho_width = 6.f;
     const float ortho_height = 6.f;
 
@@ -40,13 +42,14 @@ namespace
             XMStoreFloat3(&this->normal, normal);
             XMStoreFloat2(&this->textureCoordinate, textureCoordinate);
             XMStoreFloat2(&this->textureCoordinate2, textureCoordinate * 3);
-            XMStoreUByte4(&this->blendIndices, XMVectorSet(0, 0, 0, 0));
+            XMStoreUByte4(&this->blendIndices, g_XMZero);
 
             XMStoreFloat3(&this->tangent, g_XMZero);
 
-            XMStoreFloat4(&this->blendWeight, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+            XMStoreFloat4(&this->blendWeight, g_XMIdentityR0);
 
-            this->color = color;
+            XMVECTOR clr = XMLoadUByteN4(reinterpret_cast<XMUBYTEN4*>(&color));
+            XMStoreFloat4(&this->color, clr);
         }
 
         XMFLOAT3 position;
@@ -56,7 +59,7 @@ namespace
         XMFLOAT2 textureCoordinate2;
         XMUBYTE4 blendIndices;
         XMFLOAT4 blendWeight;
-        XMUBYTE4 color;
+        XMFLOAT4 color;
 
         static const int InputElementCount = 8;
         static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
@@ -72,7 +75,7 @@ namespace
         { "TEXCOORD",     1, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT,      0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "BLENDWEIGHT",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",        0, DXGI_FORMAT_R8G8B8A8_UNORM,     0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",        0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
 
@@ -209,9 +212,69 @@ namespace
     }
 
 
+    struct TestCompressedVertex
+    {
+        TestCompressedVertex(const TestVertex& bn)
+        {
+            position = bn.position;
+            blendIndices = bn.blendIndices;
+
+            XMVECTOR v = XMLoadFloat3(&bn.normal);
+            v = v * g_XMOneHalf;
+            v += g_XMOneHalf;
+            XMStoreFloat3PK(&this->normal, v);
+
+            v = XMLoadFloat3(&bn.tangent);
+            v = v * g_XMOneHalf;
+            v += g_XMOneHalf;
+            XMStoreFloat3PK(&this->tangent, v);
+
+            v = XMLoadFloat2(&bn.textureCoordinate);
+            XMStoreHalf2(&this->textureCoordinate, v);
+
+            v = XMLoadFloat2(&bn.textureCoordinate2);
+            XMStoreHalf2(&this->textureCoordinate2, v);
+
+            v = XMLoadFloat4(&bn.blendWeight);
+            XMStoreUByteN4(&this->blendWeight, v);
+
+            v = XMLoadFloat4(&bn.color);
+            XMStoreColor(&this->color, v);
+        }
+
+        XMFLOAT3 position;
+        XMFLOAT3PK normal;
+        XMFLOAT3PK tangent;
+        XMHALF2 textureCoordinate;
+        XMHALF2 textureCoordinate2;
+        XMUBYTE4 blendIndices;
+        XMUBYTEN4 blendWeight;
+        XMCOLOR color;
+
+        static const int InputElementCount = 8;
+        static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
+    };
+
+
+    const D3D11_INPUT_ELEMENT_DESC TestCompressedVertex::InputElements[] =
+    {
+        { "SV_Position",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL",       0, DXGI_FORMAT_R11G11B10_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TANGENT",      0, DXGI_FORMAT_R11G11B10_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",     0, DXGI_FORMAT_R16G16_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",     1, DXGI_FORMAT_R16G16_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT,   0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "BLENDWEIGHT",  0, DXGI_FORMAT_R8G8B8A8_UNORM,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",        0, DXGI_FORMAT_B8G8R8A8_UNORM,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+
     // Helper for creating a D3D vertex or index buffer.
     template<typename T>
-    static void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FLAG bindFlags, _Out_ ID3D11Buffer** pBuffer)
+    static void CreateBuffer(
+        _In_ ID3D11Device* device,
+        T const& data,
+        D3D11_BIND_FLAG bindFlags,
+        _Outptr_ ID3D11Buffer** pBuffer)
     {
         D3D11_BUFFER_DESC bufferDesc = {};
 
@@ -231,8 +294,28 @@ namespace
 
 
     // Helper for creating a D3D input layout.
-    static void CreateInputLayout(_In_ ID3D11Device* device, IEffect* effect, _Out_ ID3D11InputLayout** pInputLayout)
+    static void CreateInputLayout(
+        _In_ ID3D11Device* device,
+        IEffect* effect,
+        _Outptr_ ID3D11InputLayout** pInputLayout,
+        _Outptr_opt_ ID3D11InputLayout** pCompresedInputLayout = nullptr)
     {
+        auto ibasic = dynamic_cast<BasicEffect*>(effect);
+        if (ibasic)
+            ibasic->SetBiasedVertexNormals(false);
+
+        auto ienvmap = dynamic_cast<EnvironmentMapEffect*>(effect);
+        if (ienvmap)
+            ienvmap->SetBiasedVertexNormals(false);
+
+        auto inmap = dynamic_cast<NormalMapEffect*>(effect);
+        if (inmap)
+            inmap->SetBiasedVertexNormalsAndTangents(false);
+
+        auto iskin = dynamic_cast<SkinnedEffect*>(effect);
+        if (iskin)
+            iskin->SetBiasedVertexNormals(false);
+
         void const* shaderByteCode;
         size_t byteCodeLength;
 
@@ -243,13 +326,47 @@ namespace
             shaderByteCode, byteCodeLength,
             pInputLayout);
 
-        if (FAILED(hr))
-            throw std::exception();
+        DX::ThrowIfFailed(hr);
+
+        if (pCompresedInputLayout)
+        {
+            if (ibasic)
+            {
+                ibasic->SetBiasedVertexNormals(true);
+                ibasic->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+            }
+            else if (ienvmap)
+            {
+                ienvmap->SetBiasedVertexNormals(true);
+                ienvmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+            }
+            else if (inmap)
+            {
+                inmap->SetBiasedVertexNormalsAndTangents(true);
+                inmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+            }
+            else if (iskin)
+            {
+                iskin->SetBiasedVertexNormals(true);
+                iskin->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+            }
+
+            hr = device->CreateInputLayout(TestCompressedVertex::InputElements,
+                TestCompressedVertex::InputElementCount,
+                shaderByteCode, byteCodeLength,
+                pCompresedInputLayout);
+
+            DX::ThrowIfFailed(hr);
+        }
     }
 
 
     // Creates a cube primitive.
-    UINT CreateCube(ID3D11Device* device, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer)
+    UINT CreateCube(
+        _In_ ID3D11Device* device,
+        _Outptr_ ID3D11Buffer** vertexBuffer,
+        _Outptr_ ID3D11Buffer** compressedVertexBuffer,
+        _Outptr_ ID3D11Buffer** indexBuffer)
     {
         VertexCollection vertices;
         IndexCollection indices;
@@ -322,11 +439,24 @@ namespace
         CreateBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer);
         CreateBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer);
 
+        // Create the compressed version
+        std::vector<TestCompressedVertex> cvertices;
+        cvertices.reserve(vertices.size());
+        for (auto&i : vertices)
+        {
+            TestCompressedVertex cv(i);
+            cvertices.emplace_back(std::move(cv));
+        }
+
+        CreateBuffer(device, cvertices, D3D11_BIND_VERTEX_BUFFER, compressedVertexBuffer);
+
         return (int)indices.size();
     }
 }
 
-Game::Game()
+Game::Game() :
+    m_showCompressed(false),
+    m_delay(0)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2, true);
@@ -371,6 +501,8 @@ void Game::Initialize(
 
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
+
+    m_delay = SWAP_TIME;
 }
 
 #pragma region Frame Update
@@ -386,10 +518,11 @@ void Game::Tick()
 }
 
 // Updates the world.
-void Game::Update(DX::StepTimer const&)
+void Game::Update(DX::StepTimer const& timer)
 {
     auto pad = m_gamePad->GetState(0);
     auto kb = m_keyboard->GetState();
+
     if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
     {
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
@@ -397,6 +530,33 @@ void Game::Update(DX::StepTimer const&)
 #else
         Windows::ApplicationModel::Core::CoreApplication::Exit();
 #endif
+    }
+
+    if (pad.IsConnected())
+    {
+        m_gamePadButtons.Update(pad);
+    }
+    else
+    {
+        m_gamePadButtons.Reset();
+    }
+
+    m_keyboardButtons.Update(kb);
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space) || (m_gamePadButtons.y == GamePad::ButtonStateTracker::PRESSED))
+    {
+        m_showCompressed = !m_showCompressed;
+        m_delay = SWAP_TIME;
+    }
+    else if (!kb.Space && !(pad.IsConnected() && pad.IsYPressed()))
+    {
+        m_delay -= static_cast<float>(timer.GetElapsedSeconds());
+
+        if (m_delay <= 0.f)
+        {
+            m_showCompressed = !m_showCompressed;
+            m_delay = SWAP_TIME;
+        }
     }
 }
 #pragma endregion
@@ -442,10 +602,20 @@ void Game::Render()
     context->PSSetSamplers(0, 2, samplers);
 
     // Set the vertex and index buffer.
-    UINT vertexStride = sizeof(TestVertex);
-    UINT vertexOffset = 0;
+    if (m_showCompressed)
+    {
+        UINT vertexStride = sizeof(TestCompressedVertex);
+        UINT vertexOffset = 0;
 
-    context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
+        context->IASetVertexBuffers(0, 1, m_compressedVB.GetAddressOf(), &vertexStride, &vertexOffset);
+    }
+    else
+    {
+        UINT vertexStride = sizeof(TestVertex);
+        UINT vertexOffset = 0;
+
+        context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
+    }
 
     context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
@@ -461,7 +631,7 @@ void Game::Render()
         {
             for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
             {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
+                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
                 context->DrawIndexed(m_indexCount, 0, 0);
 
                 ++it;
@@ -497,7 +667,7 @@ void Game::Render()
             for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
             {
                 (*it)->SetBoneTransforms(bones, 4);
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
+                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
                 context->DrawIndexed(m_indexCount, 0, 0);
 
                 ++it;
@@ -524,7 +694,7 @@ void Game::Render()
         {
             for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
             {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
+                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
                 context->DrawIndexed(m_indexCount, 0, 0);
 
                 ++it;
@@ -551,7 +721,7 @@ void Game::Render()
         {
             for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
             {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
+                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
                 context->DrawIndexed(m_indexCount, 0, 0);
 
                 ++it;
@@ -578,7 +748,7 @@ void Game::Render()
         {
             for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
             {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
+                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
                 context->DrawIndexed(m_indexCount, 0, 0);
 
                 ++it;
@@ -605,7 +775,7 @@ void Game::Render()
         {
             for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
             {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
+                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
                 context->DrawIndexed(m_indexCount, 0, 0);
 
                 ++it;
@@ -624,6 +794,7 @@ void Game::Render()
     }
 
     // DGSLEffect
+    if (!m_showCompressed)
     {
         auto it = m_dgsl.begin();
         assert(it != m_dgsl.end());
@@ -686,6 +857,8 @@ void Game::Clear()
 // Message handlers
 void Game::OnActivated()
 {
+    m_gamePadButtons.Reset();
+    m_keyboardButtons.Reset();
 }
 
 void Game::OnDeactivated()
@@ -699,6 +872,8 @@ void Game::OnSuspending()
 void Game::OnResuming()
 {
     m_timer.ResetElapsedTime();
+    m_gamePadButtons.Reset();
+    m_keyboardButtons.Reset();
 }
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
@@ -780,6 +955,7 @@ void Game::CreateDeviceDependentResources()
     // Create test geometry.
     m_indexCount = CreateCube(device,
         m_vertexBuffer.ReleaseAndGetAddressOf(),
+        m_compressedVB.ReleaseAndGetAddressOf(),
         m_indexBuffer.ReleaseAndGetAddressOf());
 
     //--- BasicEffect ----------------------------------------------------------------------
@@ -1735,6 +1911,7 @@ void Game::OnDeviceLost()
     m_brickSpecular.Reset();
 
     m_vertexBuffer.Reset();
+    m_compressedVB.Reset();
     m_indexBuffer.Reset();
 }
 

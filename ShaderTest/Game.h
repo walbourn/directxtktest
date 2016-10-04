@@ -89,6 +89,9 @@ private:
     std::unique_ptr<DirectX::GamePad>       m_gamePad;
     std::unique_ptr<DirectX::Keyboard>      m_keyboard;
 
+    DirectX::GamePad::ButtonStateTracker    m_gamePadButtons;
+    DirectX::Keyboard::KeyboardStateTracker m_keyboardButtons;
+
     // DirectXTK Test Objects
 #if defined(_XBOX_ONE) && defined(_TITLE)
     std::unique_ptr<DirectX::GraphicsMemory>    m_graphicsMemory;
@@ -103,20 +106,37 @@ private:
         {
             setEffectParameters(this);
 
-            CreateInputLayout(device, this, &inputLayout);
+            CreateInputLayout(device, this, &inputLayout, &compressedInputLayout);
         }
 
-        void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection)
+        void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool showCompressed)
         {
             SetMatrices(world, view, projection);
 
+            auto ibasic = dynamic_cast<BasicEffect*>(this);
+            if (ibasic)
+                ibasic->SetBiasedVertexNormals(showCompressed);
+
+            auto ienvmap = dynamic_cast<EnvironmentMapEffect*>(this);
+            if (ienvmap)
+                ienvmap->SetBiasedVertexNormals(showCompressed);
+
+            auto inmap = dynamic_cast<NormalMapEffect*>(this);
+            if (inmap)
+                inmap->SetBiasedVertexNormalsAndTangents(showCompressed);
+
+            auto iskin = dynamic_cast<SkinnedEffect*>(this);
+            if (iskin)
+                iskin->SetBiasedVertexNormals(showCompressed);
+
             T::Apply(context);
 
-            context->IASetInputLayout(inputLayout.Get());
+            context->IASetInputLayout((showCompressed) ? compressedInputLayout.Get() : inputLayout.Get());
         }
 
     private:
         Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
+        Microsoft::WRL::ComPtr<ID3D11InputLayout> compressedInputLayout;
     };
 
     template<typename T>
@@ -155,6 +175,7 @@ private:
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::DGSLEffect>>> m_dgsl;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>    m_compressedVB;
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_indexBuffer;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cat;
@@ -169,4 +190,8 @@ private:
     DirectX::SimpleMath::Matrix             m_projection;
 
     UINT                                    m_indexCount;
+
+    bool                                    m_showCompressed;
+
+    float                                   m_delay;
 };
