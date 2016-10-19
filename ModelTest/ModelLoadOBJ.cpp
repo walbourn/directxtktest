@@ -84,6 +84,9 @@ static void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FL
         device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer)
     );
 
+    assert(pBuffer != 0);
+    _Analysis_assume_(pBuffer != 0);
+
     SetDebugObjectName(*pBuffer, "ModelOBJ");
 }
 
@@ -101,6 +104,9 @@ static void CreateInputLayout(_In_ ID3D11Device* device, IEffect* effect, _Out_ 
                                   shaderByteCode, byteCodeLength,
                                   pInputLayout)
     );
+
+    assert(pInputLayout != 0);
+    _Analysis_assume_(pInputLayout != 0);
 
     SetDebugObjectName(*pInputLayout, "ModelOBJ");
 }

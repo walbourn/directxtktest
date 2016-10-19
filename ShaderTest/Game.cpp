@@ -287,9 +287,10 @@ namespace
         dataDesc.pSysMem = data.data();
 
         HRESULT hr = device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer);
+        DX::ThrowIfFailed(hr);
 
-        if (FAILED(hr))
-            throw std::exception();
+        assert(pBuffer != 0);
+        _Analysis_assume_(pBuffer != 0);
     }
 
 
@@ -325,8 +326,10 @@ namespace
             TestVertex::InputElementCount,
             shaderByteCode, byteCodeLength,
             pInputLayout);
-
         DX::ThrowIfFailed(hr);
+
+        assert(pInputLayout != 0);
+        _Analysis_assume_(pInputLayout != 0);
 
         if (pCompresedInputLayout)
         {
@@ -355,8 +358,10 @@ namespace
                 TestCompressedVertex::InputElementCount,
                 shaderByteCode, byteCodeLength,
                 pCompresedInputLayout);
-
             DX::ThrowIfFailed(hr);
+
+            assert(pCompresedInputLayout != 0);
+            _Analysis_assume_(pCompresedInputLayout != 0);
         }
     }
 

@@ -179,6 +179,28 @@ void Game::Initialize(
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
 
+    // Enumerate devices
+
+    {
+        auto enumList = AudioEngine::GetRendererDetails();
+
+        if (enumList.empty())
+        {
+            OutputDebugStringA("\nERROR: Audio device enumeration results in no devices\n");
+        }
+        else
+        {
+            char buff[1024] = {};
+            sprintf_s(buff,"\nINFO: Found %zu audio devices:\n", enumList.size());
+            OutputDebugStringA(buff);
+            for (auto it = enumList.cbegin(); it != enumList.cend(); ++it)
+            {
+                sprintf_s(buff, "\t\"%ls\"\n", it->description.c_str());
+                OutputDebugStringA(buff);
+            }
+        }
+    }
+
     // Initialize audio
     AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
 
