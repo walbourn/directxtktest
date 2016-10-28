@@ -191,7 +191,7 @@ void Game::Initialize(
         else
         {
             char buff[1024] = {};
-            sprintf_s(buff,"\nINFO: Found %zu audio devices:\n", enumList.size());
+            sprintf_s(buff,"\nINFO: Found %Iu audio devices:\n", enumList.size());
             OutputDebugStringA(buff);
             for (auto it = enumList.cbegin(); it != enumList.cend(); ++it)
             {

@@ -84,7 +84,7 @@ void TextConsole::Clear()
 
 
 _Use_decl_annotations_
-void TextConsole::Write(_In_z_ const wchar_t *str)
+void TextConsole::Write(const wchar_t *str)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 

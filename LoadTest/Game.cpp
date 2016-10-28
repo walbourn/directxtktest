@@ -295,14 +295,31 @@ void Game::Render()
     m_effect->SetTexture(m_dxlogo.Get());
     m_cube->Draw(m_effect.get(), m_layout.Get());
 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    UINT decompressFlags = D3D11X_DECOMPRESS_PROPAGATE_COLOR_CLEAR;
+#endif
+
     if (m_frame == 10)
     {
         OutputDebugStringA("******** SCREENSHOT TEST BEGIN *************\n");
 
         bool success = true;
 
+        auto context = m_deviceResources->GetD3DDeviceContext();
+        auto backBufferTex = m_deviceResources->GetRenderTarget();
+
 #if defined(_XBOX_ONE) && defined(_TITLE)
         const wchar_t sspath[MAX_PATH] = L"T:\\";
+
+#ifdef USE_FAST_SEMANTICS
+        context->DecompressResource(
+            backBufferTex, 0, nullptr,
+            backBufferTex, 0, nullptr,
+            m_deviceResources->GetBackBufferFormat(), decompressFlags);
+#endif
+
+        decompressFlags = 0;
+
 #elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
         wchar_t sspath[MAX_PATH] = {};
 
@@ -360,9 +377,6 @@ void Game::Render()
         DeleteFileW(ssbmp);
         DeleteFileW(sstif);
         DeleteFileW(ssdds);
-
-        auto context = m_deviceResources->GetD3DDeviceContext();
-        auto backBufferTex = m_deviceResources->GetRenderTarget();
 
         DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatPng, sspng));
 
@@ -449,10 +463,11 @@ void Game::Render()
     }
 
     // Show the new frame.
-    m_deviceResources->Present();
-
 #if defined(_XBOX_ONE) && defined(_TITLE)
+    m_deviceResources->Present(decompressFlags);
     m_graphicsMemory->Commit();
+#else
+    m_deviceResources->Present();
 #endif
 }
 
