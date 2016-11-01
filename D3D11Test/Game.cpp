@@ -71,7 +71,7 @@ void Game::Initialize(
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
 
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#if defined(__cplusplus_winrt)
     // SimpleMath interop tests for Windows Runtime types
     Rectangle test1(10, 20, 50, 100);
 
