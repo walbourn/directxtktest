@@ -83,6 +83,8 @@ void Game::Initialize(
         state;
     }
 
+    OutputDebugStringA(m_keyboard->IsConnected() ? "INFO: Keyboard is connected\n" : "INFO: No keyboard found\n");
+
     m_deviceResources->CreateDeviceResources();
     CreateDeviceDependentResources();
 

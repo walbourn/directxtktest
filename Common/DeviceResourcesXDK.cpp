@@ -85,7 +85,7 @@ void DX::DeviceResources::CreateDeviceResources()
     DX::ThrowIfFailed(device.As(&m_d3dDevice));
     DX::ThrowIfFailed(context.As(&m_d3dContext));
 
-#if _XDK_VER >= 0x38390835
+#if _XDK_VER >= 0x3839084B /* XDK Edition 161000 */
     if (s_render4K)
     {
         D3D11X_GPU_HARDWARE_CONFIGURATION hwConfig = {};

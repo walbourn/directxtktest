@@ -88,6 +88,8 @@ void Game::Initialize(
         state;
     }
 
+    OutputDebugStringA(m_mouse->IsConnected() ? "INFO: Mouse is connected\n" : "INFO: No mouse found\n");
+
     m_deviceResources->CreateDeviceResources();
     CreateDeviceDependentResources();
 
