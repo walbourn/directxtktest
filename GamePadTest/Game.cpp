@@ -235,101 +235,103 @@ void Game::Update(DX::StepTimer const&)
     {
         m_tracker.Update(m_state);
 
-        if (m_tracker.a == GamePad::ButtonStateTracker::PRESSED)
+        using ButtonState = GamePad::ButtonStateTracker::ButtonState;
+
+        if (m_tracker.a == ButtonState::PRESSED)
             m_lastStr = L"Button A was pressed\n";
-        else if (m_tracker.a == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.a == ButtonState::RELEASED)
             m_lastStr = L"Button A was released\n";
-        else if (m_tracker.b == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.b == ButtonState::PRESSED)
             m_lastStr = L"Button B was pressed\n";
-        else if (m_tracker.b == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.b == ButtonState::RELEASED)
             m_lastStr = L"Button B was released\n";
-        else if (m_tracker.x == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.x == ButtonState::PRESSED)
             m_lastStr = L"Button X was pressed\n";
-        else if (m_tracker.x == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.x == ButtonState::RELEASED)
             m_lastStr = L"Button X was released\n";
-        else if (m_tracker.y == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.y == ButtonState::PRESSED)
             m_lastStr = L"Button Y was pressed\n";
-        else if (m_tracker.y == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.y == ButtonState::RELEASED)
             m_lastStr = L"Button Y was released\n";
-        else if (m_tracker.leftStick == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.leftStick == ButtonState::PRESSED)
             m_lastStr = L"Button LeftStick was pressed\n";
-        else if (m_tracker.leftStick == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.leftStick == ButtonState::RELEASED)
             m_lastStr = L"Button LeftStick was released\n";
-        else if (m_tracker.rightStick == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.rightStick == ButtonState::PRESSED)
             m_lastStr = L"Button RightStick was pressed\n";
-        else if (m_tracker.rightStick == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.rightStick == ButtonState::RELEASED)
             m_lastStr = L"Button RightStick was released\n";
-        else if (m_tracker.leftShoulder == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.leftShoulder == ButtonState::PRESSED)
             m_lastStr = L"Button LeftShoulder was pressed\n";
-        else if (m_tracker.leftShoulder == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.leftShoulder == ButtonState::RELEASED)
             m_lastStr = L"Button LeftShoulder was released\n";
-        else if (m_tracker.rightShoulder == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.rightShoulder == ButtonState::PRESSED)
             m_lastStr = L"Button RightShoulder was pressed\n";
-        else if (m_tracker.rightShoulder == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.rightShoulder == ButtonState::RELEASED)
             m_lastStr = L"Button RightShoulder was released\n";
-        else if (m_tracker.view == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.view == ButtonState::PRESSED)
             m_lastStr = L"Button BACK/VIEW was pressed\n";
-        else if (m_tracker.view == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.view == ButtonState::RELEASED)
             m_lastStr = L"Button BACK/VIEW was released\n";
-        else if (m_tracker.menu == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.menu == ButtonState::PRESSED)
             m_lastStr = L"Button START/MENU was pressed\n";
-        else if (m_tracker.menu == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.menu == ButtonState::RELEASED)
             m_lastStr = L"Button START/MENU was released\n";
-        else if (m_tracker.dpadUp == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.dpadUp == ButtonState::PRESSED)
             m_lastStr = L"Button DPAD UP was pressed\n";
-        else if (m_tracker.dpadUp == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.dpadUp == ButtonState::RELEASED)
             m_lastStr = L"Button DPAD UP was released\n";
-        else if (m_tracker.dpadDown == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.dpadDown == ButtonState::PRESSED)
             m_lastStr = L"Button DPAD DOWN was pressed\n";
-        else if (m_tracker.dpadDown == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.dpadDown == ButtonState::RELEASED)
             m_lastStr = L"Button DPAD DOWN was released\n";
-        else if (m_tracker.dpadLeft == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.dpadLeft == ButtonState::PRESSED)
             m_lastStr = L"Button DPAD LEFT was pressed\n";
-        else if (m_tracker.dpadLeft == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.dpadLeft == ButtonState::RELEASED)
             m_lastStr = L"Button DPAD LEFT was released\n";
-        else if (m_tracker.dpadRight == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.dpadRight == ButtonState::PRESSED)
             m_lastStr = L"Button DPAD RIGHT was pressed\n";
-        else if (m_tracker.dpadRight == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.dpadRight == ButtonState::RELEASED)
             m_lastStr = L"Button DPAD RIGHT was released\n";
-        else if (m_tracker.leftStickUp == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.leftStickUp == ButtonState::PRESSED)
             m_lastStr = L"Button LEFT STICK was pressed UP\n";
-        else if (m_tracker.leftStickUp == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.leftStickUp == ButtonState::RELEASED)
             m_lastStr = L"Button LEFT STICK was released from UP\n";
-        else if (m_tracker.leftStickDown == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.leftStickDown == ButtonState::PRESSED)
             m_lastStr = L"Button LEFT STICK was pressed DOWN\n";
-        else if (m_tracker.leftStickDown == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.leftStickDown == ButtonState::RELEASED)
             m_lastStr = L"Button LEFT STICK was released from DOWN\n";
-        else if (m_tracker.leftStickLeft == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.leftStickLeft == ButtonState::PRESSED)
             m_lastStr = L"Button LEFT STICK was pressed LEFT\n";
-        else if (m_tracker.leftStickLeft == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.leftStickLeft == ButtonState::RELEASED)
             m_lastStr = L"Button LEFT STICK was released from LEFT\n";
-        else if (m_tracker.leftStickRight == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.leftStickRight == ButtonState::PRESSED)
             m_lastStr = L"Button LEFT STICK was pressed RIGHT\n";
-        else if (m_tracker.leftStickRight == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.leftStickRight == ButtonState::RELEASED)
             m_lastStr = L"Button LEFT STICK was released from RIGHT\n";
-        else if (m_tracker.rightStickUp == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.rightStickUp == ButtonState::PRESSED)
             m_lastStr = L"Button RIGHT STICK was pressed UP\n";
-        else if (m_tracker.rightStickUp == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.rightStickUp == ButtonState::RELEASED)
             m_lastStr = L"Button RIGHT STICK was released from UP\n";
-        else if (m_tracker.rightStickDown == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.rightStickDown == ButtonState::PRESSED)
             m_lastStr = L"Button RIGHT STICK was pressed DOWN\n";
-        else if (m_tracker.rightStickDown == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.rightStickDown == ButtonState::RELEASED)
             m_lastStr = L"Button RIGHT STICK was released from DOWN\n";
-        else if (m_tracker.rightStickLeft == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.rightStickLeft == ButtonState::PRESSED)
             m_lastStr = L"Button RIGHT STICK was pressed LEFT\n";
-        else if (m_tracker.rightStickLeft == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.rightStickLeft == ButtonState::RELEASED)
             m_lastStr = L"Button RIGHT STICK was released from LEFT\n";
-        else if (m_tracker.rightStickRight == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.rightStickRight == ButtonState::PRESSED)
             m_lastStr = L"Button RIGHT STICK was pressed RIGHT\n";
-        else if (m_tracker.rightStickRight == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.rightStickRight == ButtonState::RELEASED)
             m_lastStr = L"Button RIGHT STICK was released from RIGHT\n";
-        else if (m_tracker.leftTrigger == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.leftTrigger == ButtonState::PRESSED)
             m_lastStr = L"Button LEFT TRIGGER was pressed\n";
-        else if (m_tracker.leftTrigger == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.leftTrigger == ButtonState::RELEASED)
             m_lastStr = L"Button LEFT TRIGGER was released\n";
-        else if (m_tracker.rightTrigger == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_tracker.rightTrigger == ButtonState::PRESSED)
             m_lastStr = L"Button RIGHT TRIGGER was pressed\n";
-        else if (m_tracker.rightTrigger == GamePad::ButtonStateTracker::RELEASED)
+        else if (m_tracker.rightTrigger == ButtonState::RELEASED)
             m_lastStr = L"Button RIGHT TRIGGER was released\n";
 
         assert(m_tracker.back == m_tracker.view);

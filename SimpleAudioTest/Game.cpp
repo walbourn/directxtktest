@@ -334,40 +334,42 @@ void Game::Update(DX::StepTimer const&)
 #endif
         }
 
-        if (m_gamepadButtons.a == GamePad::ButtonStateTracker::PRESSED)
+        using ButtonState = GamePad::ButtonStateTracker::ButtonState;
+
+        if (m_gamepadButtons.a == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"PCM alarm started");
             m_alarmPCM->Play();
         }
-        if (m_gamepadButtons.x == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamepadButtons.x == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"ADPCM alarm started");
             m_alarmADPCM->Play();
         }
-        if (m_gamepadButtons.y == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamepadButtons.y == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"FLOAT32 alarm started");
             m_alarmFLOAT->Play();
         }
 
-        if (m_gamepadButtons.dpadDown == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamepadButtons.dpadDown == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"PCM Wavebank started");
             m_wbPCM->Play(8);
         }
-        if (m_gamepadButtons.dpadLeft == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamepadButtons.dpadLeft == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"ADPCM Wavebank started");
             m_wbADPCM->Play(8);
         }
 
 #if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
-        if (m_gamepadButtons.b == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamepadButtons.b == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"xWMA alarm started");
             m_alarmXWMA->Play();
         }
-        if (m_gamepadButtons.dpadRight == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamepadButtons.dpadRight == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"xWMA Wavebank started");
             m_wbXWMA->Play(8);
@@ -375,19 +377,19 @@ void Game::Update(DX::StepTimer const&)
 #endif
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
-        if (m_gamepadButtons.rightStick == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamepadButtons.rightStick == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"XMA2 alarm started");
             m_alarmXMA->Play();
         }
-        if (m_gamepadButtons.dpadUp == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamepadButtons.dpadUp == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"XMA2 Wavebank started");
             m_wbXMA->Play(8);
         }
 #endif
 
-        if (m_gamepadButtons.menu == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamepadButtons.menu == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"Voice pool trimmed");
             m_audEngine->TrimVoicePool();

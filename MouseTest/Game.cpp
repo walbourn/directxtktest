@@ -169,32 +169,34 @@ void Game::Update(DX::StepTimer const&)
 
     m_tracker.Update(mouse);
 
-    if (m_tracker.leftButton == Mouse::ButtonStateTracker::ButtonState::PRESSED)
+    using ButtonState = Mouse::ButtonStateTracker::ButtonState;
+
+    if (m_tracker.leftButton == ButtonState::PRESSED)
         m_lastStr = L"LeftButton was pressed";
-    else if (m_tracker.leftButton == Mouse::ButtonStateTracker::ButtonState::RELEASED)
+    else if (m_tracker.leftButton == ButtonState::RELEASED)
         m_lastStr = L"LeftButton was released";
-    else if (m_tracker.rightButton == Mouse::ButtonStateTracker::ButtonState::PRESSED)
+    else if (m_tracker.rightButton == ButtonState::PRESSED)
         m_lastStr = L"RightButton was pressed";
-    else if (m_tracker.rightButton == Mouse::ButtonStateTracker::ButtonState::RELEASED)
+    else if (m_tracker.rightButton == ButtonState::RELEASED)
         m_lastStr = L"RightButton was released";
-    else if (m_tracker.middleButton == Mouse::ButtonStateTracker::ButtonState::PRESSED)
+    else if (m_tracker.middleButton == ButtonState::PRESSED)
         m_lastStr = L"MiddleButton was pressed";
-    else if (m_tracker.middleButton == Mouse::ButtonStateTracker::ButtonState::RELEASED)
+    else if (m_tracker.middleButton == ButtonState::RELEASED)
         m_lastStr = L"MiddleButton was released";
-    else if (m_tracker.xButton1 == Mouse::ButtonStateTracker::ButtonState::PRESSED)
+    else if (m_tracker.xButton1 == ButtonState::PRESSED)
         m_lastStr = L"XButton1 was pressed";
-    else if (m_tracker.xButton1 == Mouse::ButtonStateTracker::ButtonState::RELEASED)
+    else if (m_tracker.xButton1 == ButtonState::RELEASED)
         m_lastStr = L"XButton1 was released";
-    else if (m_tracker.xButton2 == Mouse::ButtonStateTracker::ButtonState::PRESSED)
+    else if (m_tracker.xButton2 == ButtonState::PRESSED)
         m_lastStr = L"XButton2 was pressed";
-    else if (m_tracker.xButton2 == Mouse::ButtonStateTracker::ButtonState::RELEASED)
+    else if (m_tracker.xButton2 == ButtonState::RELEASED)
         m_lastStr = L"XButton2 was released";
 
-    if (m_tracker.leftButton == Mouse::ButtonStateTracker::ButtonState::PRESSED)
+    if (m_tracker.leftButton == ButtonState::PRESSED)
     {
         m_mouse->SetMode(Mouse::MODE_RELATIVE);
     }
-    else if (m_tracker.leftButton == Mouse::ButtonStateTracker::ButtonState::RELEASED)
+    else if (m_tracker.leftButton == ButtonState::RELEASED)
     {
         m_mouse->SetMode(Mouse::MODE_ABSOLUTE);
     }
