@@ -367,10 +367,6 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
 
         // Load source image
-        if (pConv != conversion.begin())
-            wprintf(L".");
-        fflush(stdout);
-
 #ifdef _DEBUG
         OutputDebugStringW(pConv->szSrc);
         OutputDebugStringA("\n");
@@ -380,27 +376,48 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         if (usedds)
         {
             hr = DirectX::CreateDDSTextureFromFileEx(device.Get(), pConv->szSrc, 0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0, false, tex.GetAddressOf(), nullptr, nullptr);
-            if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && isdds)))
+            if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+            {
+                wprintf(L"ERROR: DDSTexture file not not found:\n%ls\n", pConv->szSrc);
+                return 1;
+            }
+            else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && isdds)))
             {
 #ifdef _DEBUG
                 char buff[128] = {};
                 sprintf_s(buff, "DDSTexture failed with %08X\n", hr);
                 OutputDebugStringA(buff);
 #endif
+                wprintf(L"!");
+            }
+            else
+            {
+                wprintf(SUCCEEDED(hr) ? L"*" : L".");
             }
         }
         else
         {
             hr = DirectX::CreateWICTextureFromFileEx(device.Get(), pConv->szSrc, 0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0, DirectX::WIC_LOADER_DEFAULT, tex.GetAddressOf(), nullptr);
-            if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != WINCODEC_ERR_COMPONENTNOTFOUND && hr != E_OUTOFMEMORY && hr != WINCODEC_ERR_BADHEADER)
+            if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+            {
+                wprintf(L"ERROR: WICTexture file not found:\n%ls\n", pConv->szSrc);
+                return 1;
+            }
+            else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != WINCODEC_ERR_COMPONENTNOTFOUND && hr != E_OUTOFMEMORY && hr != WINCODEC_ERR_BADHEADER)
             {
 #ifdef _DEBUG
                 char buff[128] = {};
                 sprintf_s(buff, "WICTexture failed with %08X\n", hr);
                 OutputDebugStringA(buff);
 #endif
+                wprintf(L"!");
+            }
+            else
+            {
+                wprintf(SUCCEEDED(hr) ? L"*" : L".");
             }
         }
+        fflush(stdout);
     }
 
     wprintf(L"\n");
