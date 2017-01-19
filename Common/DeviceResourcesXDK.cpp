@@ -85,7 +85,7 @@ void DX::DeviceResources::CreateDeviceResources()
     DX::ThrowIfFailed(device.As(&m_d3dDevice));
     DX::ThrowIfFailed(context.As(&m_d3dContext));
 
-#if _XDK_VER >= 0x3839084B /* XDK Edition 161000 */
+#if _XDK_VER >= 0x38390868 /* XDK Edition 161000 */
     if (s_render4K)
     {
         D3D11X_GPU_HARDWARE_CONFIGURATION hwConfig = {};
@@ -104,7 +104,7 @@ void DX::DeviceResources::CreateDeviceResources()
 #elif defined(_DEBUG)
     if (s_render4K)
     {
-        OutputDebugStringA("WARNING: 4K UHD detection not supported prior to November 2016 XDK; using 1080p\n");
+        OutputDebugStringA("WARNING: 4K UHD detection not supported prior to October 2016 XDK; using 1080p\n");
     }
 #endif
 }
