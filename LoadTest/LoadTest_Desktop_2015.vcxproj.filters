@@ -39,6 +39,9 @@
     <Image Include="tree02S_pmalpha.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="lenaNV12.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />

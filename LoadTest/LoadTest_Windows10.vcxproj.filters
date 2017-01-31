@@ -81,5 +81,8 @@
     <Image Include="cup_small.jpg">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="lenaNV12.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>

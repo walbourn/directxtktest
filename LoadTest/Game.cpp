@@ -1072,6 +1072,21 @@ void Game::UnitTests(bool success)
         }
     }
 
+#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP
+    if ( m_deviceResources->GetD3DDevice1() )
+#endif
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"lenaNV12.dds", res.GetAddressOf(), nullptr));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_NV12, 1, 200, 200))
+        {
+            OutputDebugStringA("FAILED: lenaNV12.dds res desc unexpected\n");
+            success = false;
+        }
+    }
+
     OutputDebugStringA(success ? "Passed\n" : "Failed\n");
     OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
 }
