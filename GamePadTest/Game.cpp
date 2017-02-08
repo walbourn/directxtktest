@@ -133,8 +133,6 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const&)
 {
-    int player = -1;
-
     m_state.connected = false;
 
 #if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
@@ -211,12 +209,6 @@ void Game::Update(DX::StepTimer const&)
 #endif
                 }
             }
-
-            if (player == -1)
-            {
-                player = j;
-                m_state = state2;
-            }
         }
         else
         {
@@ -230,6 +222,8 @@ void Game::Update(DX::StepTimer const&)
             }
         }
     }
+
+    m_state = m_gamePad->GetState(-1);
 
     if (m_state.IsConnected())
     {
@@ -337,7 +331,7 @@ void Game::Update(DX::StepTimer const&)
         assert(m_tracker.back == m_tracker.view);
         assert(m_tracker.start == m_tracker.menu);
 
-        m_gamePad->SetVibration(player, m_state.triggers.left, m_state.triggers.right);
+        m_gamePad->SetVibration(-1, m_state.triggers.left, m_state.triggers.right);
     }
     else
     {
