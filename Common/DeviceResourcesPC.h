@@ -80,6 +80,11 @@ namespace DX
             s_debugForceWarp = enable;
         }
 
+        static void DebugSetAdapter(int adapter)
+        {
+            s_debugAdapterOrdinal = adapter;
+        }
+
     private:
         void GetHardwareAdapter(IDXGIAdapter1** ppAdapter);
 
@@ -115,5 +120,6 @@ namespace DX
 
         // Debugging options
         static bool s_debugForceWarp;
+        static int s_debugAdapterOrdinal;
     };
 }
