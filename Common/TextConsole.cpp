@@ -130,7 +130,7 @@ void TextConsole::Format(const wchar_t* strFormat, ...)
     if (m_tempBuffer.size() < len)
         m_tempBuffer.resize(len);
 
-    memset(m_tempBuffer.data(), 0, len);
+    memset(m_tempBuffer.data(), 0, sizeof(wchar_t) * len);
 
     vswprintf_s(m_tempBuffer.data(), m_tempBuffer.size(), strFormat, argList);
 
@@ -158,8 +158,8 @@ void TextConsole::SetWindow(const RECT& layout)
     float lineSpacing = m_font->GetLineSpacing();
     unsigned int rows = std::max<unsigned int>(1, static_cast<unsigned int>(float(layout.bottom - layout.top) / lineSpacing));
 
-    auto charSize = m_font->MeasureString(L"M");
-    unsigned int columns = std::max<unsigned int>(1, static_cast<unsigned int>(float(layout.right - layout.left) / XMVectorGetX(charSize)));
+    RECT fontLayout = m_font->MeasureDrawBounds(L"X", XMFLOAT2(0,0));
+    unsigned int columns = std::max<unsigned int>(1, static_cast<unsigned int>(float(layout.right - layout.left) / float(fontLayout.right - fontLayout.left)));
 
     std::unique_ptr<wchar_t[]> buffer(new wchar_t[(columns + 1) * rows]);
     memset(buffer.get(), 0, sizeof(wchar_t) * (columns + 1) * rows);
@@ -213,6 +213,15 @@ void TextConsole::RestoreDevice(ID3D11DeviceContext* context, const wchar_t* fon
     m_font = std::make_unique<SpriteFont>(device.Get(), fontName);
 
     m_font->SetDefaultCharacter(L' ');
+}
+
+
+void TextConsole::SetViewport(const D3D11_VIEWPORT& viewPort)
+{
+    if (m_batch)
+    {
+        m_batch->SetViewport(viewPort);
+    }
 }
 
 
