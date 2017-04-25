@@ -180,7 +180,6 @@ void Game::Initialize(
     CreateWindowSizeDependentResources();
 
     // Enumerate devices
-#if 0 // BUGBUG Doesn't work from STA thread (without /ZW build for library)
     {
         auto enumList = AudioEngine::GetRendererDetails();
 
@@ -200,7 +199,6 @@ void Game::Initialize(
             }
         }
     }
-#endif
 
     // Initialize audio
     AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
