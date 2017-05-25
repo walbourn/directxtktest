@@ -24,6 +24,9 @@
 // Build for LH vs. RH coords
 //#define LH_COORDS
 
+// Build with master limiter set or not
+#define USE_MASTER_LIMITER
+
 // Build with Reverb enabled or not
 #define USE_REVERB
 
@@ -152,6 +155,10 @@ void Game::Initialize(
 
 #ifdef USE_REVERB
     eflags = eflags | AudioEngine_EnvironmentalReverb | AudioEngine_ReverbUseFilters;
+#endif
+
+#ifdef USE_MASTER_LIMITER
+    eflags = eflags | AudioEngine_UseMasteringLimiter;
 #endif
 
     m_audEngine = std::make_unique<AudioEngine>(eflags);
