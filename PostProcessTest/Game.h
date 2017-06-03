@@ -80,17 +80,37 @@ private:
     void CreateWindowSizeDependentResources();
 
     // Device resources.
-    std::unique_ptr<DX::DeviceResources>    m_deviceResources;
+    std::unique_ptr<DX::DeviceResources>                m_deviceResources;
 
     // Rendering loop timer.
-    DX::StepTimer                           m_timer;
+    DX::StepTimer                                       m_timer;
 
     // Input devices.
-    std::unique_ptr<DirectX::GamePad>       m_gamePad;
-    std::unique_ptr<DirectX::Keyboard>      m_keyboard;
+    std::unique_ptr<DirectX::GamePad>                   m_gamePad;
+    std::unique_ptr<DirectX::Keyboard>                  m_keyboard;
+
+    DirectX::GamePad::ButtonStateTracker                m_gamePadButtons;
+    DirectX::Keyboard::KeyboardStateTracker             m_keyboardButtons;
 
     // DirectXTK Test Objects
 #if defined(_XBOX_ONE) && defined(_TITLE)
-    std::unique_ptr<DirectX::GraphicsMemory> m_graphicsMemory;
+    std::unique_ptr<DirectX::GraphicsMemory>            m_graphicsMemory;
 #endif
+
+    DirectX::SimpleMath::Matrix                         m_world;
+    DirectX::SimpleMath::Matrix                         m_view;
+    DirectX::SimpleMath::Matrix                         m_proj;
+
+    std::unique_ptr<DirectX::BasicPostProcess>          m_basicPostProcess;
+    int                                                 m_scene;
+
+    std::unique_ptr<DirectX::SpriteBatch>               m_spriteBatch;
+    std::unique_ptr<DirectX::SpriteFont>                m_font;
+    std::unique_ptr<DirectX::GeometricPrimitive>        m_shape;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_texture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_background;
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D>             m_sceneTex;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_sceneSRV;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView>      m_sceneRT;
 };

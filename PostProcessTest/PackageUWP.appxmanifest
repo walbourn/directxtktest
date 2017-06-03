@@ -33,12 +33,12 @@
       EntryPoint="PostProcessTest.App">
       <uap:VisualElements
         DisplayName="PostProcessTest"
-        Square150x150Logo="Assets\Logo.png"
-        Square44x44Logo="Assets\SmallLogo.png"
+        Square150x150Logo="Logo.png"
+        Square44x44Logo="SmallLogo.png"
         Description="PostProcessTest"
         BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\WideLogo.png"/>
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:DefaultTile Wide310x150Logo="WideLogo.png"/>
+        <uap:SplashScreen Image="SplashScreen.png" />
       </uap:VisualElements>
     </Application>
   </Applications>

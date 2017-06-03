@@ -34,4 +34,17 @@
       <Filter>Common</Filter>
     </Manifest>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="earth.bmp">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="sunset.jpg">
+      <Filter>Assets</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="comic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+  </ItemGroup>
 </Project>
