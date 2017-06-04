@@ -29,7 +29,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const int MaxScene = 4;
+    const int MaxScene = 10;
 }
 
 // Constructor.
@@ -117,6 +117,12 @@ void Game::Update(DX::StepTimer const& timer)
             if (m_scene >= MaxScene)
                 m_scene = 0;
         }
+        else if (m_gamePadButtons.b == GamePad::ButtonStateTracker::PRESSED)
+        {
+            --m_scene;
+            if (m_scene < 0)
+                m_scene = MaxScene - 1;
+        }
     }
     else
     {
@@ -125,11 +131,17 @@ void Game::Update(DX::StepTimer const& timer)
 
     m_keyboardButtons.Update(kb);
 
-    if ( m_keyboardButtons.IsKeyPressed(Keyboard::Space))
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
     {
         ++m_scene;
         if (m_scene >= MaxScene)
             m_scene = 0;
+    }
+    else if (m_keyboardButtons.IsKeyPressed(Keyboard::Back))
+    {
+        --m_scene;
+        if (m_scene < 0)
+            m_scene = MaxScene - 1;
     }
 
     float time = float(timer.GetTotalSeconds());
@@ -165,6 +177,7 @@ void Game::Render()
     // Post process.
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     context->OMSetRenderTargets(1, &renderTarget, nullptr);
+    m_basicPostProcess->SetSourceTexture(m_sceneSRV.Get());
 
     const wchar_t* descstr = nullptr;
     switch (m_scene)
@@ -189,6 +202,108 @@ void Game::Render()
         descstr = L"Downscale 4x4";
         m_basicPostProcess->Set(BasicPostProcess::DownScale_4x4);
         break;
+
+    case 4:
+        descstr = L"GaussianBlur 5x5";
+        m_basicPostProcess->Set(BasicPostProcess::GaussianBlur_5x5);
+        m_basicPostProcess->SetGaussianParameter(1.f);
+        break;
+
+    case 5:
+        descstr = L"GaussianBlur 5x5 (2X)";
+        m_basicPostProcess->Set(BasicPostProcess::GaussianBlur_5x5);
+        m_basicPostProcess->SetGaussianParameter(2.f);
+        break;
+
+    case 6:
+        descstr = L"BloomExtract";
+        m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+        m_basicPostProcess->SetBloomExtractParameter(0.25f);
+        break;
+
+    case 7:
+        {
+            descstr = L"BloomBlur (extract + horizontal)";
+        
+            // Pass 1
+            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetBloomExtractParameter(0.25f);
+
+            auto blurRT1 = m_blur1RT.Get();
+            context->OMSetRenderTargets(1, &blurRT1, nullptr);
+
+            m_basicPostProcess->Process(context);
+
+            // Pass 2
+            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
+
+            context->OMSetRenderTargets(1, &renderTarget, nullptr);
+
+            m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
+        }
+        break;
+
+    case 8:
+        {
+            descstr = L"BloomBlur (extract + vertical)";
+        
+            // Pass 1
+            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetBloomExtractParameter(0.25f);
+
+            auto blurRT1 = m_blur1RT.Get();
+            context->OMSetRenderTargets(1, &blurRT1, nullptr);
+
+            m_basicPostProcess->Process(context);
+
+            // Pass 2
+            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
+
+            context->OMSetRenderTargets(1, &renderTarget, nullptr);
+
+            m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
+        }
+        break;
+
+    case 9:
+        {
+            descstr = L"BloomBlur (3 pass)";
+
+            // Pass 1
+            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetBloomExtractParameter(0.25f);
+
+            auto blurRT1 = m_blur1RT.Get();
+            context->OMSetRenderTargets(1, &blurRT1, nullptr);
+
+            m_basicPostProcess->Process(context);
+
+            // Pass 2
+            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
+
+            auto blurRT2 = m_blur2RT.Get();
+            context->OMSetRenderTargets(1, &blurRT2, nullptr);
+
+            m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
+
+            m_basicPostProcess->Process(context);
+
+            // Pass 3
+            m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
+
+            context->OMSetRenderTargets(1, &renderTarget, nullptr);
+
+            m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
+        }
+        break;
+
+        // TODO - BloomCombine
+        // TODO - SampleLuminanceInitial
+        // TODO - SampleLuminanceFinal
+        // TODO - Merge
     }
 
     m_basicPostProcess->Process(context);
@@ -331,7 +446,7 @@ void Game::CreateWindowSizeDependentResources()
     UINT width = size.right - size.left;
     UINT height = size.bottom - size.top;
 
-    // Create additional render targets
+    // Create scene render target
     auto device = m_deviceResources->GetD3DDevice();
 
     CD3D11_TEXTURE2D_DESC sceneDesc(
@@ -340,11 +455,26 @@ void Game::CreateWindowSizeDependentResources()
 
     DX::ThrowIfFailed(device->CreateTexture2D(&sceneDesc, nullptr, m_sceneTex.GetAddressOf()));
 
-    DX::ThrowIfFailed(device->CreateRenderTargetView(m_sceneTex.Get(), nullptr, m_sceneRT.ReleaseAndGetAddressOf()));
-
     DX::ThrowIfFailed(device->CreateShaderResourceView(m_sceneTex.Get(), nullptr, m_sceneSRV.ReleaseAndGetAddressOf()));
 
-    m_basicPostProcess->SetSourceTexture(m_sceneSRV.Get());
+    DX::ThrowIfFailed(device->CreateRenderTargetView(m_sceneTex.Get(), nullptr, m_sceneRT.ReleaseAndGetAddressOf()));
+
+    // Create additional render targets
+    CD3D11_TEXTURE2D_DESC blurDesc(
+        m_deviceResources->GetBackBufferFormat(), width, height,
+        1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+
+    DX::ThrowIfFailed(device->CreateTexture2D(&blurDesc, nullptr, m_blur1Tex.GetAddressOf()));
+
+    DX::ThrowIfFailed(device->CreateShaderResourceView(m_blur1Tex.Get(), nullptr, m_blur1SRV.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(device->CreateRenderTargetView(m_blur1Tex.Get(), nullptr, m_blur1RT.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(device->CreateTexture2D(&blurDesc, nullptr, m_blur2Tex.GetAddressOf()));
+
+    DX::ThrowIfFailed(device->CreateShaderResourceView(m_blur2Tex.Get(), nullptr, m_blur2SRV.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(device->CreateRenderTargetView(m_blur2Tex.Get(), nullptr, m_blur2RT.ReleaseAndGetAddressOf()));
 
     // Setup matrices
     m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
@@ -366,6 +496,14 @@ void Game::OnDeviceLost()
     m_sceneTex.Reset();
     m_sceneSRV.Reset();
     m_sceneRT.Reset();
+
+    m_blur1Tex.Reset();
+    m_blur1SRV.Reset();
+    m_blur1RT.Reset();
+
+    m_blur2Tex.Reset();
+    m_blur2SRV.Reset();
+    m_blur2RT.Reset();
 }
 
 void Game::OnDeviceRestored()
