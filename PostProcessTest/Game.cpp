@@ -29,7 +29,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const int MaxScene = 10;
+    const int MaxScene = 13;
 }
 
 // Constructor.
@@ -178,6 +178,7 @@ void Game::Render()
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     context->OMSetRenderTargets(1, &renderTarget, nullptr);
     m_basicPostProcess->SetSourceTexture(m_sceneSRV.Get());
+    m_dualPostProcess->SetSourceTexture(m_sceneSRV.Get());
 
     const wchar_t* descstr = nullptr;
     switch (m_scene)
@@ -186,46 +187,59 @@ void Game::Render()
     default:
         descstr = L"Copy (passthrough)";
         m_basicPostProcess->Set(BasicPostProcess::Copy);
+        m_basicPostProcess->Process(context);
         break;
 
     case 1:
         descstr = L"Monochrome";
         m_basicPostProcess->Set(BasicPostProcess::Monochrome);
+        m_basicPostProcess->Process(context);
         break;
 
     case 2:
-        descstr = L"Downscale 2x2";
-        m_basicPostProcess->Set(BasicPostProcess::DownScale_2x2);
+        descstr = L"Sepia";
+        m_basicPostProcess->Set(BasicPostProcess::Sepia);
+        m_basicPostProcess->Process(context);
         break;
 
     case 3:
-        descstr = L"Downscale 4x4";
-        m_basicPostProcess->Set(BasicPostProcess::DownScale_4x4);
+        descstr = L"Downscale 2x2";
+        m_basicPostProcess->Set(BasicPostProcess::DownScale_2x2);
+        m_basicPostProcess->Process(context);
         break;
 
     case 4:
-        descstr = L"GaussianBlur 5x5";
-        m_basicPostProcess->Set(BasicPostProcess::GaussianBlur_5x5);
-        m_basicPostProcess->SetGaussianParameter(1.f);
+        descstr = L"Downscale 4x4";
+        m_basicPostProcess->Set(BasicPostProcess::DownScale_4x4);
+        m_basicPostProcess->Process(context);
         break;
 
     case 5:
-        descstr = L"GaussianBlur 5x5 (2X)";
+        descstr = L"GaussianBlur 5x5";
         m_basicPostProcess->Set(BasicPostProcess::GaussianBlur_5x5);
-        m_basicPostProcess->SetGaussianParameter(2.f);
+        m_basicPostProcess->SetGaussianParameter(1.f);
+        m_basicPostProcess->Process(context);
         break;
 
     case 6:
-        descstr = L"BloomExtract";
-        m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
-        m_basicPostProcess->SetBloomExtractParameter(0.25f);
+        descstr = L"GaussianBlur 5x5 (2X)";
+        m_basicPostProcess->Set(BasicPostProcess::GaussianBlur_5x5);
+        m_basicPostProcess->SetGaussianParameter(2.f);
+        m_basicPostProcess->Process(context);
         break;
 
     case 7:
+        descstr = L"BloomExtract";
+        m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+        m_basicPostProcess->SetBloomExtractParameter(0.25f);
+        m_basicPostProcess->Process(context);
+        break;
+
+    case 8:
         {
             descstr = L"BloomBlur (extract + horizontal)";
         
-            // Pass 1
+            // Pass 1 (scene -> blur1)
             m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);
 
@@ -234,21 +248,22 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-            // Pass 2
+            // Pass 2 (blur1 -> rt)
             m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
 
             context->OMSetRenderTargets(1, &renderTarget, nullptr);
 
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
+            m_basicPostProcess->Process(context);
         }
         break;
 
-    case 8:
+    case 9:
         {
             descstr = L"BloomBlur (extract + vertical)";
         
-            // Pass 1
+            // Pass 1 (scene -> blur1)
             m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);
 
@@ -257,21 +272,22 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-            // Pass 2
+            // Pass 2 (blur1 -> rt)
             m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
 
             context->OMSetRenderTargets(1, &renderTarget, nullptr);
 
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
+            m_basicPostProcess->Process(context);
         }
         break;
 
-    case 9:
+    case 10:
         {
-            descstr = L"BloomBlur (3 pass)";
+            descstr = L"BloomBlur (extract + horz + vert)";
 
-            // Pass 1
+            // Pass 1 (scene -> blur1)
             m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);
 
@@ -280,7 +296,7 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-            // Pass 2
+            // Pass 2 (blur1 -> blur2)
             m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
 
@@ -288,25 +304,106 @@ void Game::Render()
             context->OMSetRenderTargets(1, &blurRT2, nullptr);
 
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
-
             m_basicPostProcess->Process(context);
 
-            // Pass 3
+            // Pass 3 (blur2 -> rt)
             m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
 
             context->OMSetRenderTargets(1, &renderTarget, nullptr);
 
             m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
+            m_basicPostProcess->Process(context);
         }
         break;
 
-        // TODO - BloomCombine
+    case 11:
+        {
+            descstr = L"Bloom";
+
+            // Pass 1 (scene->blur1)
+            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetBloomExtractParameter(0.25f);
+
+            auto blurRT1 = m_blur1RT.Get();
+            context->OMSetRenderTargets(1, &blurRT1, nullptr);
+
+            m_basicPostProcess->Process(context);
+
+            // Pass 2 (blur1 -> blur2)
+            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
+
+            auto blurRT2 = m_blur2RT.Get();
+            context->OMSetRenderTargets(1, &blurRT2, nullptr);
+
+            m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
+            m_basicPostProcess->Process(context);
+
+            // Pass 3 (blur2 -> blur1)
+            m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
+
+            context->OMSetRenderTargets(1, &blurRT1, nullptr);
+
+            m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
+            m_basicPostProcess->Process(context);
+
+            // Pass 4 (scene+blur1 -> rt)
+            m_dualPostProcess->Set(DualPostProcess::BloomCombine);
+            m_dualPostProcess->SetBloomCombineParameters(1.25f, 1.f, 1.f, 1.f);
+
+            context->OMSetRenderTargets(1, &renderTarget, nullptr);
+
+            m_dualPostProcess->SetSourceTexture2(m_blur1SRV.Get());
+            m_dualPostProcess->Process(context);
+        }
+        break;
+
+    case 12:
+        {
+            descstr = L"Bloom (Saturated)";
+
+            // Pass 1 (scene->blur1)
+            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetBloomExtractParameter(0.25f);
+
+            auto blurRT1 = m_blur1RT.Get();
+            context->OMSetRenderTargets(1, &blurRT1, nullptr);
+
+            m_basicPostProcess->Process(context);
+
+            // Pass 2 (blur1 -> blur2)
+            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
+
+            auto blurRT2 = m_blur2RT.Get();
+            context->OMSetRenderTargets(1, &blurRT2, nullptr);
+
+            m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
+            m_basicPostProcess->Process(context);
+
+            // Pass 3 (blur2 -> blur1)
+            m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
+
+            context->OMSetRenderTargets(1, &blurRT1, nullptr);
+
+            m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
+            m_basicPostProcess->Process(context);
+
+            // Pass 4 (scene+blur1 -> rt)
+            m_dualPostProcess->Set(DualPostProcess::BloomCombine);
+            m_dualPostProcess->SetBloomCombineParameters(2.f, 1.f, 2.f, 0.f);
+
+            context->OMSetRenderTargets(1, &renderTarget, nullptr);
+
+            m_dualPostProcess->SetSourceTexture2(m_blur1SRV.Get());
+            m_dualPostProcess->Process(context);
+        }
+        break;
+
         // TODO - SampleLuminanceInitial
         // TODO - SampleLuminanceFinal
         // TODO - Merge
     }
-
-    m_basicPostProcess->Process(context);
 
     // Draw UI.
     auto size = m_deviceResources->GetOutputSize();
@@ -319,7 +416,7 @@ void Game::Render()
 
     // Clear binding to avoid SDK debug warning
     ID3D11ShaderResourceView* nullsrv[] = { nullptr, nullptr };
-    context->PSSetShaderResources(0, 1, nullsrv);
+    context->PSSetShaderResources(0, 2, nullsrv);
 
     // Show the new frame.
     m_deviceResources->Present();
@@ -436,6 +533,8 @@ void Game::CreateDeviceDependentResources()
 
     // Setup post processing
     m_basicPostProcess = std::make_unique<BasicPostProcess>(device);
+
+    m_dualPostProcess = std::make_unique<DualPostProcess>(device);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -487,6 +586,9 @@ void Game::CreateWindowSizeDependentResources()
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
 void Game::OnDeviceLost()
 {
+    m_basicPostProcess.reset();
+    m_dualPostProcess.reset();
+
     m_spriteBatch.reset();
     m_font.reset();
     m_shape.reset();

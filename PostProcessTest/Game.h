@@ -102,6 +102,7 @@ private:
     DirectX::SimpleMath::Matrix                         m_proj;
 
     std::unique_ptr<DirectX::BasicPostProcess>          m_basicPostProcess;
+    std::unique_ptr<DirectX::DualPostProcess>           m_dualPostProcess;
     int                                                 m_scene;
 
     std::unique_ptr<DirectX::SpriteBatch>               m_spriteBatch;
