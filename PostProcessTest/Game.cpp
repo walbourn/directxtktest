@@ -452,11 +452,6 @@ void Game::Render()
         m_toneMapPostProcess->Process(context);
         break;
 
-        // TODO - SampleLuminanceInitial
-        // TODO - SampleLuminanceFinal
-        // TODO - BrightPassFilter
-        // TODO - AdaptLuminance
-
         // TODO - HDR10, HDR10_Saturate, HDR10_Reinhard, HDR10_Filmic
     }
 
