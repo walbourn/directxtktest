@@ -72,6 +72,7 @@
 
 #include <stdio.h>
 
+#include "DDSTextureLoader.h"
 #include "GamePad.h"
 #include "GeometricPrimitive.h"
 #include "GraphicsMemory.h"

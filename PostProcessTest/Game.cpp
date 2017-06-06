@@ -19,9 +19,6 @@
 //#define GAMMA_CORRECT_RENDERING
 //#define USE_FAST_SEMANTICS
 
-// Build for LH vs. RH coords
-//#define LH_COORDS
-
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -29,15 +26,19 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const int MaxScene = 13;
+    const int MaxScene = 19;
 }
 
 // Constructor.
 Game::Game() :
     m_scene(0)
 {
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef defined(USE_FAST_SEMANTICS)
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2, true);
+#else
+    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2);
+#endif
 #elif defined(GAMMA_CORRECT_RENDERING)
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0);
 #else
@@ -111,13 +112,15 @@ void Game::Update(DX::StepTimer const& timer)
     {
         m_gamePadButtons.Update(pad);
 
-        if (m_gamePadButtons.a == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamePadButtons.a == GamePad::ButtonStateTracker::PRESSED
+            || m_gamePadButtons.dpadRight == GamePad::ButtonStateTracker::PRESSED)
         {
             ++m_scene;
             if (m_scene >= MaxScene)
                 m_scene = 0;
         }
-        else if (m_gamePadButtons.b == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_gamePadButtons.b == GamePad::ButtonStateTracker::PRESSED
+                 || m_gamePadButtons.dpadLeft == GamePad::ButtonStateTracker::PRESSED)
         {
             --m_scene;
             if (m_scene < 0)
@@ -160,7 +163,7 @@ void Game::Render()
         return;
     }
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
     m_deviceResources->Prepare();
 #endif
 
@@ -169,16 +172,23 @@ void Game::Render()
     auto context = m_deviceResources->GetD3DDeviceContext();
 
     m_spriteBatch->Begin();
-    m_spriteBatch->Draw(m_background.Get(), m_deviceResources->GetOutputSize());
+    m_spriteBatch->Draw(m_scene >= 16 ? m_hdrTexture.Get() : m_background.Get(), m_deviceResources->GetOutputSize());
     m_spriteBatch->End();
 
     m_shape->Draw(m_world, m_view, m_proj, Colors::White, m_texture.Get());
 
     // Post process.
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+    context->DecompressResource(m_sceneTex.Get(), 0, nullptr,
+        m_sceneTex.Get(), 0, nullptr,
+        DXGI_FORMAT_R16G16B16A16_FLOAT, D3D11X_DECOMPRESS_PROPAGATE_COLOR_CLEAR);
+#endif
+
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     context->OMSetRenderTargets(1, &renderTarget, nullptr);
     m_basicPostProcess->SetSourceTexture(m_sceneSRV.Get());
     m_dualPostProcess->SetSourceTexture(m_sceneSRV.Get());
+    m_toneMapPostProcess->SetHDRSourceTexture(m_sceneSRV.Get());
 
     const wchar_t* descstr = nullptr;
     switch (m_scene)
@@ -186,51 +196,51 @@ void Game::Render()
     case 0:
     default:
         descstr = L"Copy (passthrough)";
-        m_basicPostProcess->Set(BasicPostProcess::Copy);
+        m_basicPostProcess->SetEffect(BasicPostProcess::Copy);
         m_basicPostProcess->Process(context);
         break;
 
     case 1:
         descstr = L"Monochrome";
-        m_basicPostProcess->Set(BasicPostProcess::Monochrome);
+        m_basicPostProcess->SetEffect(BasicPostProcess::Monochrome);
         m_basicPostProcess->Process(context);
         break;
 
     case 2:
         descstr = L"Sepia";
-        m_basicPostProcess->Set(BasicPostProcess::Sepia);
+        m_basicPostProcess->SetEffect(BasicPostProcess::Sepia);
         m_basicPostProcess->Process(context);
         break;
 
     case 3:
         descstr = L"Downscale 2x2";
-        m_basicPostProcess->Set(BasicPostProcess::DownScale_2x2);
+        m_basicPostProcess->SetEffect(BasicPostProcess::DownScale_2x2);
         m_basicPostProcess->Process(context);
         break;
 
     case 4:
         descstr = L"Downscale 4x4";
-        m_basicPostProcess->Set(BasicPostProcess::DownScale_4x4);
+        m_basicPostProcess->SetEffect(BasicPostProcess::DownScale_4x4);
         m_basicPostProcess->Process(context);
         break;
 
     case 5:
         descstr = L"GaussianBlur 5x5";
-        m_basicPostProcess->Set(BasicPostProcess::GaussianBlur_5x5);
+        m_basicPostProcess->SetEffect(BasicPostProcess::GaussianBlur_5x5);
         m_basicPostProcess->SetGaussianParameter(1.f);
         m_basicPostProcess->Process(context);
         break;
 
     case 6:
         descstr = L"GaussianBlur 5x5 (2X)";
-        m_basicPostProcess->Set(BasicPostProcess::GaussianBlur_5x5);
+        m_basicPostProcess->SetEffect(BasicPostProcess::GaussianBlur_5x5);
         m_basicPostProcess->SetGaussianParameter(2.f);
         m_basicPostProcess->Process(context);
         break;
 
     case 7:
         descstr = L"BloomExtract";
-        m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+        m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
         m_basicPostProcess->SetBloomExtractParameter(0.25f);
         m_basicPostProcess->Process(context);
         break;
@@ -240,7 +250,7 @@ void Game::Render()
             descstr = L"BloomBlur (extract + horizontal)";
         
             // Pass 1 (scene -> blur1)
-            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);
 
             auto blurRT1 = m_blur1RT.Get();
@@ -249,7 +259,7 @@ void Game::Render()
             m_basicPostProcess->Process(context);
 
             // Pass 2 (blur1 -> rt)
-            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
 
             context->OMSetRenderTargets(1, &renderTarget, nullptr);
@@ -264,7 +274,7 @@ void Game::Render()
             descstr = L"BloomBlur (extract + vertical)";
         
             // Pass 1 (scene -> blur1)
-            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);
 
             auto blurRT1 = m_blur1RT.Get();
@@ -273,7 +283,7 @@ void Game::Render()
             m_basicPostProcess->Process(context);
 
             // Pass 2 (blur1 -> rt)
-            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
 
             context->OMSetRenderTargets(1, &renderTarget, nullptr);
@@ -288,7 +298,7 @@ void Game::Render()
             descstr = L"BloomBlur (extract + horz + vert)";
 
             // Pass 1 (scene -> blur1)
-            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);
 
             auto blurRT1 = m_blur1RT.Get();
@@ -297,7 +307,7 @@ void Game::Render()
             m_basicPostProcess->Process(context);
 
             // Pass 2 (blur1 -> blur2)
-            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
 
             auto blurRT2 = m_blur2RT.Get();
@@ -321,7 +331,7 @@ void Game::Render()
             descstr = L"Bloom";
 
             // Pass 1 (scene->blur1)
-            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);
 
             auto blurRT1 = m_blur1RT.Get();
@@ -330,7 +340,7 @@ void Game::Render()
             m_basicPostProcess->Process(context);
 
             // Pass 2 (blur1 -> blur2)
-            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
 
             auto blurRT2 = m_blur2RT.Get();
@@ -348,7 +358,7 @@ void Game::Render()
             m_basicPostProcess->Process(context);
 
             // Pass 4 (scene+blur1 -> rt)
-            m_dualPostProcess->Set(DualPostProcess::BloomCombine);
+            m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
             m_dualPostProcess->SetBloomCombineParameters(1.25f, 1.f, 1.f, 1.f);
 
             context->OMSetRenderTargets(1, &renderTarget, nullptr);
@@ -363,7 +373,7 @@ void Game::Render()
             descstr = L"Bloom (Saturated)";
 
             // Pass 1 (scene->blur1)
-            m_basicPostProcess->Set(BasicPostProcess::BloomExtract);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);
 
             auto blurRT1 = m_blur1RT.Get();
@@ -372,7 +382,7 @@ void Game::Render()
             m_basicPostProcess->Process(context);
 
             // Pass 2 (blur1 -> blur2)
-            m_basicPostProcess->Set(BasicPostProcess::BloomBlur);
+            m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
 
             auto blurRT2 = m_blur2RT.Get();
@@ -390,7 +400,7 @@ void Game::Render()
             m_basicPostProcess->Process(context);
 
             // Pass 4 (scene+blur1 -> rt)
-            m_dualPostProcess->Set(DualPostProcess::BloomCombine);
+            m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
             m_dualPostProcess->SetBloomCombineParameters(2.f, 1.f, 2.f, 0.f);
 
             context->OMSetRenderTargets(1, &renderTarget, nullptr);
@@ -400,9 +410,54 @@ void Game::Render()
         }
         break;
 
+    case 13:
+        descstr = L"Merge (90%/10%)";
+        m_dualPostProcess->SetEffect(DualPostProcess::Merge);
+        m_dualPostProcess->SetSourceTexture2(m_hdrTexture.Get());
+        m_dualPostProcess->SetMergeParameters(0.9f, 0.1f);
+        m_dualPostProcess->Process(context);
+        break;
+
+    case 14:
+        descstr = L"Merge (50%/%50%)";
+        m_dualPostProcess->SetEffect(DualPostProcess::Merge);
+        m_dualPostProcess->SetSourceTexture2(m_hdrTexture.Get());
+        m_dualPostProcess->SetMergeParameters(0.5f, 0.5f);
+        m_dualPostProcess->Process(context);
+        break;
+
+    case 15:
+        descstr = L"Merge (10%/%90%)";
+        m_dualPostProcess->SetEffect(DualPostProcess::Merge);
+        m_dualPostProcess->SetSourceTexture2(m_hdrTexture.Get());
+        m_dualPostProcess->SetMergeParameters(0.1f, 0.9f);
+        m_dualPostProcess->Process(context);
+        break;
+
+    case 16:
+        descstr = L"ToneMap (Saturate)";
+        m_toneMapPostProcess->SetEffect(ToneMapPostProcess::Saturate);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+    case 17:
+        descstr = L"ToneMap (Reinhard)";
+        m_toneMapPostProcess->SetEffect(ToneMapPostProcess::Reinhard);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+    case 18:
+        descstr = L"ToneMap (Filmic)";
+        m_toneMapPostProcess->SetEffect(ToneMapPostProcess::Filmic);
+        m_toneMapPostProcess->Process(context);
+        break;
+
         // TODO - SampleLuminanceInitial
         // TODO - SampleLuminanceFinal
-        // TODO - Merge
+        // TODO - BrightPassFilter
+        // TODO - AdaptLuminance
+
+        // TODO - HDR10, HDR10_Saturate, HDR10_Reinhard, HDR10_Filmic
     }
 
     // Draw UI.
@@ -419,7 +474,11 @@ void Game::Render()
     context->PSSetShaderResources(0, 2, nullsrv);
 
     // Show the new frame.
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+    m_deviceResources->Present(0);
+#else
     m_deviceResources->Present();
+#endif
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_graphicsMemory->Commit();
@@ -447,6 +506,8 @@ void Game::Clear()
     // Set the viewport.
     auto viewport = m_deviceResources->GetScreenViewport();
     context->RSSetViewports(1, &viewport);
+
+    m_spriteBatch->SetViewport(viewport);
 }
 #pragma endregion
 
@@ -531,10 +592,16 @@ void Game::CreateDeviceDependentResources()
         CreateWICTextureFromFile(device, L"sunset.jpg", nullptr, m_background.ReleaseAndGetAddressOf())
     );
 
+    DX::ThrowIfFailed(
+        CreateDDSTextureFromFile(device, L"HDR_029_Sky_Cloudy_Ref.DDS", nullptr, m_hdrTexture.ReleaseAndGetAddressOf())
+    );
+
     // Setup post processing
     m_basicPostProcess = std::make_unique<BasicPostProcess>(device);
 
     m_dualPostProcess = std::make_unique<DualPostProcess>(device);
+
+    m_toneMapPostProcess = std::make_unique<ToneMapPostProcess>(device);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -588,12 +655,14 @@ void Game::OnDeviceLost()
 {
     m_basicPostProcess.reset();
     m_dualPostProcess.reset();
+    m_toneMapPostProcess.reset();
 
     m_spriteBatch.reset();
     m_font.reset();
     m_shape.reset();
     m_texture.Reset();
     m_background.Reset();
+    m_hdrTexture.Reset();
 
     m_sceneTex.Reset();
     m_sceneSRV.Reset();

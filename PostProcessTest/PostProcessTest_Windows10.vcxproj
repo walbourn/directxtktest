@@ -246,6 +246,7 @@
     <Image Include="..\Common\StoreLogo.scale-100.png" />
     <Image Include="..\Common\WideLogo.scale-100.png" />
     <Image Include="earth.bmp" />
+    <Image Include="HDR_029_Sky_Cloudy_Ref.DDS" />
     <Image Include="sunset.jpg" />
   </ItemGroup>
   <ItemGroup>

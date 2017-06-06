@@ -188,6 +188,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="earth.bmp" />
+    <Image Include="HDR_029_Sky_Cloudy_Ref.DDS" />
     <Image Include="sunset.jpg" />
   </ItemGroup>
   <ItemGroup>

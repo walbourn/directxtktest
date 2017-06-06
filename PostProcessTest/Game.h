@@ -103,6 +103,7 @@ private:
 
     std::unique_ptr<DirectX::BasicPostProcess>          m_basicPostProcess;
     std::unique_ptr<DirectX::DualPostProcess>           m_dualPostProcess;
+    std::unique_ptr<DirectX::ToneMapPostProcess>        m_toneMapPostProcess;
     int                                                 m_scene;
 
     std::unique_ptr<DirectX::SpriteBatch>               m_spriteBatch;
@@ -110,6 +111,7 @@ private:
     std::unique_ptr<DirectX::GeometricPrimitive>        m_shape;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_texture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_background;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_hdrTexture;
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D>             m_sceneTex;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_sceneSRV;

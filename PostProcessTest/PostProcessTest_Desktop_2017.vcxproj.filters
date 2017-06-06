@@ -41,6 +41,9 @@
     <Image Include="sunset.jpg">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="HDR_029_Sky_Cloudy_Ref.DDS">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="comic.spritefont">
