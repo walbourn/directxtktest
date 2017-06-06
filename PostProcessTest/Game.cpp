@@ -34,7 +34,7 @@ Game::Game() :
     m_scene(0)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)
-#ifdef defined(USE_FAST_SEMANTICS)
+#ifdef USE_FAST_SEMANTICS
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2, true);
 #else
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2);
