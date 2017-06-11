@@ -26,7 +26,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const int MaxScene = 19;
+    const int MaxScene = 24;
 }
 
 // Constructor.
@@ -435,24 +435,62 @@ void Game::Render()
         break;
 
     case 16:
-        descstr = L"ToneMap (Saturate)";
-        m_toneMapPostProcess->SetEffect(ToneMapPostProcess::Saturate);
+        descstr = L"ToneMap (None)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::None);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::Linear);
         m_toneMapPostProcess->Process(context);
         break;
 
     case 17:
-        descstr = L"ToneMap (Reinhard)";
-        m_toneMapPostProcess->SetEffect(ToneMapPostProcess::Reinhard);
+        descstr = L"ToneMap (Saturate)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Saturate);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::Linear);
         m_toneMapPostProcess->Process(context);
         break;
 
     case 18:
-        descstr = L"ToneMap (Filmic)";
-        m_toneMapPostProcess->SetEffect(ToneMapPostProcess::Filmic);
+        descstr = L"ToneMap (Reinhard)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Reinhard);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::Linear);
         m_toneMapPostProcess->Process(context);
         break;
 
-        // TODO - HDR10, HDR10_Saturate, HDR10_Reinhard, HDR10_Filmic
+    case 19:
+        descstr = L"ToneMap (Filmic)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Filmic);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::Linear);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+    case 20:
+        descstr = L"ToneMap (SRGB)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::None);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::SRGB);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+    case 21:
+        descstr = L"ToneMap (Saturate SRGB)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Saturate);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::SRGB);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+    case 22:
+        descstr = L"ToneMap (Reinhard SRGB)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Reinhard);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::SRGB);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+    case 23:
+        descstr = L"ToneMap (Filmic SRGB)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Filmic);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::SRGB);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+        // ST2084 scenarios and MRT are convered in the HDRTest
     }
 
     // Draw UI.
