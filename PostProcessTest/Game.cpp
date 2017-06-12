@@ -177,6 +177,8 @@ void Game::Render()
 
     m_shape->Draw(m_world, m_view, m_proj, Colors::White, m_texture.Get());
 
+    // TODO - Sync
+
     // Post process.
 #if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
     context->DecompressResource(m_sceneTex.Get(), 0, nullptr,
@@ -258,6 +260,8 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
+            // TODO - Sync
+
             // Pass 2 (blur1 -> rt)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
@@ -281,6 +285,8 @@ void Game::Render()
             context->OMSetRenderTargets(1, &blurRT1, nullptr);
 
             m_basicPostProcess->Process(context);
+
+            // TODO - Sync
 
             // Pass 2 (blur1 -> rt)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
@@ -306,6 +312,8 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
+            // TODO - Sync
+
             // Pass 2 (blur1 -> blur2)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
@@ -315,6 +323,8 @@ void Game::Render()
 
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
             m_basicPostProcess->Process(context);
+
+            // TODO - Sync
 
             // Pass 3 (blur2 -> rt)
             m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
@@ -339,6 +349,8 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
+            // TODO - Sync
+
             // Pass 2 (blur1 -> blur2)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
@@ -349,6 +361,8 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
             m_basicPostProcess->Process(context);
 
+            // TODO - Sync
+
             // Pass 3 (blur2 -> blur1)
             m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
 
@@ -356,6 +370,8 @@ void Game::Render()
 
             m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
             m_basicPostProcess->Process(context);
+
+            // TODO - Sync
 
             // Pass 4 (scene+blur1 -> rt)
             m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
@@ -381,6 +397,8 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
+            // TODO - Sync
+
             // Pass 2 (blur1 -> blur2)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
             m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
@@ -391,6 +409,8 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
             m_basicPostProcess->Process(context);
 
+            // TODO - Sync
+
             // Pass 3 (blur2 -> blur1)
             m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
 
@@ -398,6 +418,8 @@ void Game::Render()
 
             m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
             m_basicPostProcess->Process(context);
+
+            // TODO - Sync
 
             // Pass 4 (scene+blur1 -> rt)
             m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
