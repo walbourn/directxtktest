@@ -16,8 +16,7 @@
 #include "pch.h"
 #include "Game.h"
 
-//#define GAMMA_CORRECT_RENDERING
-//#define USE_FAST_SEMANTICS
+#define USE_FAST_SEMANTICS
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -26,7 +25,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const int MaxScene = 24;
+    const int MaxScene = 27;
 }
 
 // Constructor.
@@ -35,14 +34,12 @@ Game::Game() :
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #ifdef USE_FAST_SEMANTICS
-    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2, true);
+    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_D32_FLOAT, 2, true);
 #else
-    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2);
+    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_D32_FLOAT, 2);
 #endif
-#elif defined(GAMMA_CORRECT_RENDERING)
-    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0);
 #else
-    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0);
+    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0);
 #endif
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
@@ -177,7 +174,9 @@ void Game::Render()
 
     m_shape->Draw(m_world, m_view, m_proj, Colors::White, m_texture.Get());
 
-    // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+    context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
     // Post process.
 #if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
@@ -191,6 +190,7 @@ void Game::Render()
     m_basicPostProcess->SetSourceTexture(m_sceneSRV.Get());
     m_dualPostProcess->SetSourceTexture(m_sceneSRV.Get());
     m_toneMapPostProcess->SetHDRSourceTexture(m_sceneSRV.Get());
+    m_toneMapPostProcess->SetExposure(0.f);
 
     const wchar_t* descstr = nullptr;
     switch (m_scene)
@@ -260,7 +260,9 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 2 (blur1 -> rt)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
@@ -286,7 +288,9 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 2 (blur1 -> rt)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
@@ -312,7 +316,9 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 2 (blur1 -> blur2)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
@@ -324,7 +330,9 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 3 (blur2 -> rt)
             m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
@@ -349,7 +357,9 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 2 (blur1 -> blur2)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
@@ -361,17 +371,24 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 3 (blur2 -> blur1)
             m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
+
+            ID3D11ShaderResourceView* nullsrv[] = { nullptr, nullptr };
+            context->PSSetShaderResources(0, 2, nullsrv);
 
             context->OMSetRenderTargets(1, &blurRT1, nullptr);
 
             m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 4 (scene+blur1 -> rt)
             m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
@@ -397,7 +414,9 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 2 (blur1 -> blur2)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
@@ -409,17 +428,24 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 3 (blur2 -> blur1)
             m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
+
+            ID3D11ShaderResourceView* nullsrv[] = { nullptr, nullptr };
+            context->PSSetShaderResources(0, 2, nullsrv);
 
             context->OMSetRenderTargets(1, &blurRT1, nullptr);
 
             m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
             m_basicPostProcess->Process(context);
 
-            // TODO - Sync
+#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+            context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
+#endif
 
             // Pass 4 (scene+blur1 -> rt)
             m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
@@ -478,8 +504,8 @@ void Game::Render()
         break;
 
     case 19:
-        descstr = L"ToneMap (Filmic)";
-        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Filmic);
+        descstr = L"ToneMap (ACES Filmic)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::ACESFilmic);
         m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::Linear);
         m_toneMapPostProcess->Process(context);
         break;
@@ -506,9 +532,33 @@ void Game::Render()
         break;
 
     case 23:
-        descstr = L"ToneMap (Filmic SRGB)";
-        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Filmic);
+        descstr = L"ToneMap (ACES Filmic SRGB)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::ACESFilmic);
         m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::SRGB);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+    case 24:
+        descstr = L"ToneMap (Saturate SRGB EV 2)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Saturate);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::SRGB);
+        m_toneMapPostProcess->SetExposure(2.f);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+    case 25:
+        descstr = L"ToneMap (Reinhard SRGB EV 2)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::Reinhard);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::SRGB);
+        m_toneMapPostProcess->SetExposure(2.f);
+        m_toneMapPostProcess->Process(context);
+        break;
+
+    case 26:
+        descstr = L"ToneMap (ACES Filmic SRGB, EV 2)";
+        m_toneMapPostProcess->SetOperator(ToneMapPostProcess::ACESFilmic);
+        m_toneMapPostProcess->SetTransferFunction(ToneMapPostProcess::SRGB);
+        m_toneMapPostProcess->SetExposure(2.f);
         m_toneMapPostProcess->Process(context);
         break;
 
