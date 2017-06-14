@@ -77,6 +77,8 @@ void Game::Initialize(
 
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
+
+    ShaderTest();
 }
 
 #pragma region Frame Update
@@ -790,3 +792,91 @@ void Game::OnDeviceRestored()
 }
 #endif
 #pragma endregion
+
+
+// Attempt to bind every possible shader combination for validation
+void Game::ShaderTest()
+{
+    assert(m_sceneTex != 0 && m_sceneRT != 0);
+    assert(m_hdrTexture != 0);
+    assert(m_background != 0);
+
+    auto context = m_deviceResources->GetD3DDeviceContext();
+
+    auto viewport = m_deviceResources->GetScreenViewport();
+    context->RSSetViewports(1, &viewport);
+
+    auto renderTarget = m_sceneRT.Get();
+    context->OMSetRenderTargets(1, &renderTarget, nullptr);
+
+    // Basic
+    m_basicPostProcess->SetSourceTexture(m_hdrTexture.Get());
+
+    for (int j = 0; j < static_cast<int>(BasicPostProcess::Effect_Max); ++j)
+    {
+        m_basicPostProcess->SetEffect( static_cast<BasicPostProcess::Effect>(j));
+        m_basicPostProcess->Process(context);
+    }
+
+    // Dual
+    m_dualPostProcess->SetSourceTexture(m_hdrTexture.Get());
+    m_dualPostProcess->SetSourceTexture2(m_background.Get());
+
+    for (int j = 0; j < static_cast<int>(DualPostProcess::Effect_Max); ++j)
+    {
+        m_dualPostProcess->SetEffect(static_cast<DualPostProcess::Effect>(j));
+        m_dualPostProcess->Process(context);
+    }
+
+    // ToneMap
+    m_toneMapPostProcess->SetHDRSourceTexture(m_hdrTexture.Get());
+    for (int op = 0; op < static_cast<int>(ToneMapPostProcess::Operator_Max); ++op)
+    {
+        for (int tf = 0; tf < static_cast<int>(ToneMapPostProcess::TransferFunction_Max); ++tf)
+        {
+            m_toneMapPostProcess->SetOperator(static_cast<ToneMapPostProcess::Operator>(op));
+            m_toneMapPostProcess->SetTransferFunction(static_cast<ToneMapPostProcess::TransferFunction>(tf));
+            m_toneMapPostProcess->Process(context);
+        }
+    }
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    ComPtr<ID3D11Texture2D> tex;
+    ComPtr<ID3D11RenderTargetView> rtv;
+    {
+        auto size = m_deviceResources->GetOutputSize();
+
+        UINT width = size.right - size.left;
+        UINT height = size.bottom - size.top;
+
+        CD3D11_TEXTURE2D_DESC desc(
+            m_deviceResources->GetBackBufferFormat(), width, height,
+            1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+
+        auto device = m_deviceResources->GetD3DDevice();
+
+        DX::ThrowIfFailed(device->CreateTexture2D(&desc, nullptr, tex.GetAddressOf()));
+
+        DX::ThrowIfFailed(device->CreateRenderTargetView(tex.Get(), nullptr, rtv.GetAddressOf()));
+
+        m_toneMapPostProcess->SetMRTOutput(true);
+
+        ID3D11RenderTargetView* rtvs[2] = { m_sceneRT.Get(), rtv.Get() };
+        context->OMSetRenderTargets(2, rtvs, nullptr);
+
+        for (int op = 0; op < static_cast<int>(ToneMapPostProcess::Operator_Max); ++op)
+        {
+            for (int tf = 0; tf < static_cast<int>(ToneMapPostProcess::TransferFunction_Max); ++tf)
+            {
+                m_toneMapPostProcess->SetOperator(static_cast<ToneMapPostProcess::Operator>(op));
+                m_toneMapPostProcess->SetTransferFunction(static_cast<ToneMapPostProcess::TransferFunction>(tf));
+                m_toneMapPostProcess->Process(context);
+            }
+        }
+
+        m_toneMapPostProcess->SetMRTOutput(false);
+    }
+#endif
+
+    context->ClearState();
+}

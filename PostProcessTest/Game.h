@@ -79,6 +79,8 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 
+    void ShaderTest();
+
     // Device resources.
     std::unique_ptr<DX::DeviceResources>                m_deviceResources;
 
