@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Math", "Math", "{FEDC257A-6
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fuzzloaders_Desktop_2013", "fuzzloaders\fuzzloaders_Desktop_2013.vcxproj", "{65A50BAD-23BA-426B-9D72-2BD06F31F13B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostProcessTest_Desktop_2013", "PostProcessTest\PostProcessTest_Desktop_2013.vcxproj", "{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -331,6 +333,18 @@ Global
 		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Release|Win32.Build.0 = Release|Win32
 		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Release|x64.ActiveCfg = Release|x64
 		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Release|x64.Build.0 = Release|x64
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Debug|Win32.Build.0 = Debug|Win32
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Debug|x64.ActiveCfg = Debug|x64
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Debug|x64.Build.0 = Debug|x64
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Release|Win32.ActiveCfg = Release|Win32
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Release|Win32.Build.0 = Release|Win32
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Release|x64.ActiveCfg = Release|x64
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -354,5 +368,6 @@ Global
 		{2510E3E7-F869-42A6-A8A1-BF1EDB69172C} = {6B01B4E0-55E4-4C48-ABC9-46E9B8EE7DDD}
 		{C32AD958-C6E8-413D-94D9-5EF11D7967DA} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{A68E36DF-FD6C-4061-9E09-CF31D6EBC2A2} = {1F9C38F7-D90C-48CC-BBFC-388049A7BD42}
+		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 	EndGlobalSection
 EndGlobal
