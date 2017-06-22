@@ -94,8 +94,8 @@ void DX::DeviceResources::CreateDeviceResources()
             OutputDebugStringA("INFO: Swapchain using 4k (3840 x 2160)\n");
 #endif
         }
-#endif
     }
+#endif
 }
 
 // These resources need to be recreated every time the window size is changed.
