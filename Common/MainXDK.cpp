@@ -48,8 +48,7 @@ public:
         window->Closed +=
             ref new TypedEventHandler<CoreWindow^, CoreWindowEventArgs^>(this, &ViewProvider::OnWindowClosed);
 
-        // Moved Game::Initialize to OnActivated to handle command-line parameters
-        m_window = reinterpret_cast<IUnknown*>(window);
+        m_game->Initialize(reinterpret_cast<IUnknown*>(window), 0, 0, DXGI_MODE_ROTATION_IDENTITY);
     }
 
     virtual void Load(Platform::String^ entryPoint)
@@ -71,25 +70,11 @@ protected:
     void OnActivated(CoreApplicationView^ applicationView, IActivatedEventArgs^ args)
     {
         CoreWindow::GetForCurrentThread()->Activate();
-
-        if (args->Kind == Windows::ApplicationModel::Activation::ActivationKind::Launch)
-        {
-            auto launchArgs = (ILaunchActivatedEventArgs^)args;
-
-            const wchar_t* commandLine = launchArgs->Arguments->Data();
-
-            if (wcsstr(commandLine, L"-render4K") != 0)
-            {
-                DX::DeviceResources::DebugRender4K(true);
-            }
-        }
-
-        m_game->Initialize(m_window.Get(), 1920, 1080, DXGI_MODE_ROTATION_IDENTITY);
     }
 
     void OnSuspending(Platform::Object^ sender, SuspendingEventArgs^ args)
     {
-        SuspendingDeferral^ deferral = args->SuspendingOperation->GetDeferral();
+        auto deferral = args->SuspendingOperation->GetDeferral();
 
         create_task([this, deferral]()
         {
@@ -112,7 +97,6 @@ protected:
 private:
     bool                    m_exit;
     std::unique_ptr<Game>   m_game;
-    Microsoft::WRL::ComPtr<IUnknown> m_window;
 };
 
 ref class ViewProviderFactory : IFrameworkViewSource
@@ -127,10 +111,8 @@ public:
 
 // Entry point
 [Platform::MTAThread]
-int main(Platform::Array<Platform::String^>^ argv)
+int __cdecl main(Platform::Array<Platform::String^>^ /*argv*/)
 {
-    UNREFERENCED_PARAMETER(argv);
-
     auto viewProviderFactory = ref new ViewProviderFactory();
     CoreApplication::Run(viewProviderFactory);
     return 0;
