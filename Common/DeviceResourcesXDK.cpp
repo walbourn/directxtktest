@@ -83,7 +83,7 @@ void DX::DeviceResources::CreateDeviceResources()
     DX::ThrowIfFailed(device.As(&m_d3dDevice));
     DX::ThrowIfFailed(context.As(&m_d3dContext));
 
-#if _XDK_VER >= 0x3F5B03F5 /* XDK Edition 170600 */
+#if _XDK_VER >= 0x3F6803E9 /* XDK Edition 170600 */
     {
         D3D11X_GPU_HARDWARE_CONFIGURATION hwConfig = {};
         m_d3dDevice->GetGpuHardwareConfiguration(&hwConfig);
