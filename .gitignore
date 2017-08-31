@@ -17,6 +17,7 @@
 *.ilk
 *.VC.db
 .vs
+Thumbs.db
 Bin
 Debug
 Durango
