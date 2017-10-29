@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_Desktop_2017_Win10", "..\DirectXTK_Desktop_2017_Win10.vcxproj", "{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}"
 EndProject
@@ -34,6 +34,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Audio", "Audio", "{B2E111BD-C45E-4155-B9B8-D4D065772C76}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Input", "Input", "{950E2175-DCCB-4A4E-8A83-A4B0A8CF8A5B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HDRTest_Desktop_2017_Win10", "HDRTest\HDRTest_Desktop_2017_Win10.vcxproj", "{C56638CF-151A-41CB-BFBE-70002B98061D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,6 +133,18 @@ Global
 		{C3281769-B603-4C38-A765-29F9EA00C84E}.Release|Win32.Build.0 = Release|Win32
 		{C3281769-B603-4C38-A765-29F9EA00C84E}.Release|x64.ActiveCfg = Release|x64
 		{C3281769-B603-4C38-A765-29F9EA00C84E}.Release|x64.Build.0 = Release|x64
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Debug|Win32.Build.0 = Debug|Win32
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Debug|x64.ActiveCfg = Debug|x64
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Debug|x64.Build.0 = Debug|x64
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Release|Win32.ActiveCfg = Release|Win32
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Release|Win32.Build.0 = Release|Win32
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Release|x64.ActiveCfg = Release|x64
+		{C56638CF-151A-41CB-BFBE-70002B98061D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,5 +156,9 @@ Global
 		{C526C2CB-1E62-4ABD-AAD1-05B52BEDDA6C} = {950E2175-DCCB-4A4E-8A83-A4B0A8CF8A5B}
 		{BAD524A1-A164-4B82-83C7-A38E2601E6A5} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{C3281769-B603-4C38-A765-29F9EA00C84E} = {B2E111BD-C45E-4155-B9B8-D4D065772C76}
+		{C56638CF-151A-41CB-BFBE-70002B98061D} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C794377C-1D03-46C7-B778-B7B54141B666}
 	EndGlobalSection
 EndGlobal

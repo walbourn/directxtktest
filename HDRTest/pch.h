@@ -20,7 +20,7 @@
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #include <xdk.h>
-#elif !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
+#elif !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
 #include <WinSDKVer.h>
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
@@ -33,7 +33,6 @@
 #define NOMINMAX
 #define NODRAWTEXT
 #define NOGDI
-#define NOBITMAP
 #define NOMCX
 #define NOSERVICE
 #define NOHELP
@@ -44,7 +43,6 @@
 #include <crtdbg.h>
 
 #include <windows.h>
-#include <Dbt.h>
 #endif
 
 #include <wrl.h>
@@ -57,10 +55,7 @@
 #include <dxgi1_6.h>
 #else
 #include <d3d11_1.h>
-
-#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
 #include <dxgi1_6.h>
-#endif
 #endif
 
 #ifdef _DEBUG
@@ -78,14 +73,11 @@
 
 #include <stdio.h>
 
-#include "Audio.h"
-#include "Keyboard.h"
 #include "GamePad.h"
-#include "GeometricPrimitive.h"
 #include "GraphicsMemory.h"
+#include "Keyboard.h"
 #include "Mouse.h"
 #include "SimpleMath.h"
-#include "SpriteFont.h"
 
 #include "PlatformHelpers.h"
 

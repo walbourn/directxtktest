@@ -47,7 +47,7 @@ Game::Game()
 #endif
 
 #if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
-        DXGI_FORMAT_D32_FLOAT, 2, true
+        DXGI_FORMAT_D32_FLOAT, 2, DX::DeviceResources::c_FastSemantics
 #elif defined(FEATURE_LEVEL_9_X)
         DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_1
 #else
