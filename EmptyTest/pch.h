@@ -57,7 +57,11 @@
 #include <d3d11_1.h>
 
 #if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#if defined(NTDDI_WIN10_RS2)
 #include <dxgi1_6.h>
+#else
+#include <dxgi1_5.h>
+#endif
 #endif
 #endif
 
