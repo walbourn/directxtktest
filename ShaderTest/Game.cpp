@@ -21,6 +21,8 @@
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
+extern void ExitGame();
+
 using namespace DirectX;
 using namespace DirectX::PackedVector; 
 using namespace DirectX::SimpleMath;
@@ -536,11 +538,7 @@ void Game::Update(DX::StepTimer const& timer)
 
     if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
     {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-        PostQuitMessage(0);
-#else
-        Windows::ApplicationModel::Core::CoreApplication::Exit();
-#endif
+        ExitGame();
     }
 
     if (pad.IsConnected())

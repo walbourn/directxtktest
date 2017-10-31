@@ -16,6 +16,8 @@
 #include "pch.h"
 #include "Game.h"
 
+extern void ExitGame();
+
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -117,11 +119,7 @@ void Game::Update(DX::StepTimer const&)
 
     if (kb.Escape)
     {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-        PostQuitMessage(0);
-#else
-        Windows::ApplicationModel::Core::CoreApplication::Exit();
-#endif
+        ExitGame();
     }
 
     if (m_keyboardButtons.IsKeyPressed(Keyboard::Home))

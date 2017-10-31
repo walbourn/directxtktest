@@ -23,6 +23,8 @@
 #endif
 #include "StepTimer.h"
 
+#include "RenderTexture.h"
+
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -93,4 +95,8 @@ private:
 #if defined(_XBOX_ONE) && defined(_TITLE)
     std::unique_ptr<DirectX::GraphicsMemory> m_graphicsMemory;
 #endif
+
+    // HDR resources
+    std::unique_ptr<DirectX::ToneMapPostProcess>    m_toneMap;
+    std::unique_ptr<DX::RenderTexture>              m_hdrScene;
 };

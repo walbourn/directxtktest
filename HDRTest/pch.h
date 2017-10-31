@@ -77,6 +77,7 @@
 #include "GraphicsMemory.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "PostProcess.h"
 #include "SimpleMath.h"
 
 #include "PlatformHelpers.h"

@@ -167,6 +167,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\DeviceResourcesPC.h" />
+    <ClInclude Include="..\Common\RenderTexture.h" />
     <ClInclude Include="..\Common\StepTimer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />
@@ -174,6 +175,7 @@
   <ItemGroup>
     <ClCompile Include="..\Common\DeviceResourcesPC.cpp" />
     <ClCompile Include="..\Common\MainPC.cpp" />
+    <ClCompile Include="..\Common\RenderTexture.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

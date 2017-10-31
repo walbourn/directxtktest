@@ -4,7 +4,7 @@
 //
 
 #include "pch.h"
-#include "DeviceResources.h"
+#include "DeviceResourcesXDK.h"
 
 using namespace DirectX;
 using namespace DX;

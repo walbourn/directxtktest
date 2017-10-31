@@ -4,6 +4,10 @@
 
 #pragma once
 
+#if _XDK_VER < 0x295A04AA /* XDK Edition: 160300 */
+#error This code requires the March 2016 XDK or later
+#endif
+
 namespace DX
 {
     // Controls all the DirectX device resources.

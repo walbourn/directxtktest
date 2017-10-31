@@ -19,6 +19,8 @@
 //#define GAMMA_CORRECT_RENDERING
 //#define USE_FAST_SEMANTICS
 
+extern void ExitGame();
+
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -332,11 +334,7 @@ void Game::Update(DX::StepTimer const&)
 
         if (pad.IsViewPressed())
         {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-            PostQuitMessage(0);
-#else
-            Windows::ApplicationModel::Core::CoreApplication::Exit();
-#endif
+            ExitGame();
         }
 
         using ButtonState = GamePad::ButtonStateTracker::ButtonState;
@@ -451,11 +449,7 @@ void Game::Update(DX::StepTimer const&)
 
     if (kb.Escape)
     {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-        PostQuitMessage(0);
-#else
-        Windows::ApplicationModel::Core::CoreApplication::Exit();
-#endif
+        ExitGame();
     }
 }
 #pragma endregion

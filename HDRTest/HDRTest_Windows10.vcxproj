@@ -217,6 +217,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\DeviceResourcesUWP.h" />
+    <ClInclude Include="..\Common\RenderTexture.h" />
     <ClInclude Include="..\Common\StepTimer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />
@@ -224,6 +225,7 @@
   <ItemGroup>
     <ClCompile Include="..\Common\DeviceResourcesUWP.cpp" />
     <ClCompile Include="..\Common\MainUWP.cpp" />
+    <ClCompile Include="..\Common\RenderTexture.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

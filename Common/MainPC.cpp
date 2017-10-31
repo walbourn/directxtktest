@@ -383,3 +383,10 @@ void ParseCommandLine(_In_ LPWSTR lpCmdLine)
 
     LocalFree(argv);
 }
+
+
+// Exit helper
+void ExitGame()
+{
+    PostQuitMessage(0);
+}

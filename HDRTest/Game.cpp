@@ -21,6 +21,8 @@
 // Build for LH vs. RH coords
 //#define LH_COORDS
 
+extern void ExitGame();
+
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -47,6 +49,9 @@ Game::Game()
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     m_deviceResources->RegisterDeviceNotify(this);
 #endif
+
+    // Set up for HDR rendering.
+    m_hdrScene = std::make_unique<DX::RenderTexture>(DXGI_FORMAT_R16G16B16A16_FLOAT);
 }
 
 // Initialize the Direct3D resources required to run.
@@ -100,11 +105,7 @@ void Game::Update(DX::StepTimer const&)
     auto kb = m_keyboard->GetState();
     if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
     {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-        PostQuitMessage(0);
-#else
-        Windows::ApplicationModel::Core::CoreApplication::Exit();
-#endif
+        ExitGame();
     }
 }
 #pragma endregion
@@ -128,7 +129,42 @@ void Game::Render()
     auto context = m_deviceResources->GetD3DDeviceContext();
 
     // TODO: Add your rendering code here.
-    context;
+
+    // Tonemap the frame.
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    m_hdrScene->EndScene(context);
+#endif
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    ID3D11RenderTargetView* renderTargets[2] = { m_deviceResources->GetRenderTargetView(), m_deviceResources->GetGameDVRRenderTargetView() };
+    context->OMSetRenderTargets(2, renderTargets, nullptr);
+#else
+    auto renderTarget = m_deviceResources->GetRenderTargetView();
+    context->OMSetRenderTargets(1, &renderTarget, nullptr);
+
+    switch (m_deviceResources->GetColorSpace())
+    {
+    default:
+        m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
+        m_toneMap->SetTransferFunction((m_deviceResources->GetBackBufferFormat() == DXGI_FORMAT_R16G16B16A16_FLOAT) ? ToneMapPostProcess::Linear : ToneMapPostProcess::SRGB);
+        break;
+
+    case DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020:
+        m_toneMap->SetOperator(ToneMapPostProcess::None);
+        m_toneMap->SetTransferFunction(ToneMapPostProcess::ST2084);
+        break;
+
+    case DXGI_COLOR_SPACE_RGB_FULL_G10_NONE_P709:
+        m_toneMap->SetOperator(ToneMapPostProcess::None);
+        m_toneMap->SetTransferFunction(ToneMapPostProcess::Linear);
+        break;
+    }
+#endif
+
+    m_toneMap->Process(context);
+
+    ID3D11ShaderResourceView* nullsrv[] = { nullptr };
+    context->PSSetShaderResources(0, 1, nullsrv);
 
     // Show the new frame.
     m_deviceResources->Present();
@@ -143,11 +179,11 @@ void Game::Clear()
 {
     // Clear the views.
     auto context = m_deviceResources->GetD3DDeviceContext();
-    auto renderTarget = m_deviceResources->GetRenderTargetView();
+    auto renderTarget = m_hdrScene->GetRenderTargetView();
     auto depthStencil = m_deviceResources->GetDepthStencilView();
 
     XMVECTORF32 color;
-    color.v = Colors::CornflowerBlue;
+    color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
     context->ClearRenderTargetView(renderTarget, color);
     context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
@@ -219,19 +255,39 @@ void Game::CreateDeviceDependentResources()
 #endif
 
     // TODO: Initialize device dependent objects here (independent of window size).
-    device;
+    
+    // Set the device for the HDR helper
+    m_hdrScene->SetDevice(device);
+
+    m_toneMap = std::make_unique<ToneMapPostProcess>(device);
+    m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
+    m_toneMap->SetTransferFunction(ToneMapPostProcess::SRGB);
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    m_toneMap->SetMRTOutput(true);
+#endif
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
     // TODO: Initialize windows-size dependent objects here.
+
+    // Set windows size for HDR.
+    auto size = m_deviceResources->GetOutputSize();
+    m_hdrScene->SetWindow(size);
+
+    m_toneMap->SetHDRSourceTexture(m_hdrScene->GetShaderResourceView());
 }
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
 void Game::OnDeviceLost()
 {
     // TODO: Add Direct3D resource cleanup here.
+
+    m_toneMap.reset();
+
+    m_hdrScene->ReleaseDevice();
 }
 
 void Game::OnDeviceRestored()
