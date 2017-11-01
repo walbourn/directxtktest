@@ -117,3 +117,10 @@ int __cdecl main(Platform::Array<Platform::String^>^ /*argv*/)
     CoreApplication::Run(viewProviderFactory);
     return 0;
 }
+
+
+// Exit helper
+void ExitGame()
+{
+    Windows::ApplicationModel::Core::CoreApplication::Exit();
+}

@@ -25,6 +25,8 @@
 // Build FL 10.0 vs. 9.1
 //#define FEATURE_LEVEL_9_X
 
+extern void ExitGame();
+
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -47,7 +49,7 @@ Game::Game()
 #endif
 
 #if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
-        DXGI_FORMAT_D32_FLOAT, 2, true
+        DXGI_FORMAT_D32_FLOAT, 2, DX::DeviceResources::c_FastSemantics
 #elif defined(FEATURE_LEVEL_9_X)
         DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_1
 #else
@@ -119,11 +121,7 @@ void Game::Update(DX::StepTimer const&)
     auto kb = m_keyboard->GetState();
     if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
     {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-        PostQuitMessage(0);
-#else
-        Windows::ApplicationModel::Core::CoreApplication::Exit();
-#endif
+        ExitGame();
     }
 }
 #pragma endregion

@@ -19,6 +19,8 @@
 //#define GAMMA_CORRECT_RENDERING
 //#define USE_FAST_SEMANTICS
 
+extern void ExitGame();
+
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -125,8 +127,14 @@ Game::Game() :
     *m_deviceStr = 0;
 
     // 2D only rendering
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
-    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_UNKNOWN, 2, true);
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2,
+        DX::DeviceResources::c_Enable4K_UHD
+#ifdef USE_FAST_SEMANTICS
+        | DX::DeviceResources::c_FastSemantics
+#endif
+        );
 #elif defined(GAMMA_CORRECT_RENDERING)
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_UNKNOWN);
 #else
@@ -326,11 +334,7 @@ void Game::Update(DX::StepTimer const&)
 
         if (pad.IsViewPressed())
         {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-            PostQuitMessage(0);
-#else
-            Windows::ApplicationModel::Core::CoreApplication::Exit();
-#endif
+            ExitGame();
         }
 
         using ButtonState = GamePad::ButtonStateTracker::ButtonState;
@@ -445,11 +449,7 @@ void Game::Update(DX::StepTimer const&)
 
     if (kb.Escape)
     {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-        PostQuitMessage(0);
-#else
-        Windows::ApplicationModel::Core::CoreApplication::Exit();
-#endif
+        ExitGame();
     }
 }
 #pragma endregion
