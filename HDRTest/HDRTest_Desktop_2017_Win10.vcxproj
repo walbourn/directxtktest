@@ -192,6 +192,13 @@
   <ItemGroup>
     <Manifest Include="..\Common\settings.manifest" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="HDR_029_Sky_Cloudy_Ref.DDS" />
+    <Image Include="HDR_112_River_Road_2_Ref.DDS" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="comic.spritefont" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

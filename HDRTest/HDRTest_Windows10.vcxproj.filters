@@ -50,8 +50,19 @@
     <Image Include="..\Common\WideLogo.scale-100.png">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="HDR_029_Sky_Cloudy_Ref.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="HDR_112_River_Road_2_Ref.DDS">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageUWP.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="comic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
 </Project>
