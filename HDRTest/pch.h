@@ -73,12 +73,17 @@
 
 #include <stdio.h>
 
+#include "DDSTextureLoader.h"
+#include "Effects.h"
 #include "GamePad.h"
+#include "GeometricPrimitive.h"
 #include "GraphicsMemory.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "PostProcess.h"
 #include "SimpleMath.h"
+#include "SpriteBatch.h"
+#include "SpriteFont.h"
 
 #include "PlatformHelpers.h"
 

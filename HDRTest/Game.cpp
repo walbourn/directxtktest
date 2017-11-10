@@ -21,12 +21,37 @@
 // Build for LH vs. RH coords
 //#define LH_COORDS
 
+// For UWP/PC, this tests using a linear F16 swapchain intead of HDR10
+//#define TEST_HDR_LINEAR
+
 extern void ExitGame();
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
+
+namespace
+{
+    const XMVECTORF32 c_BrightYellow = { 2.f, 2.f, 0.f, 1.f };
+
+    const XMVECTORF32 c_DimWhite = { .5f, .5f, .5f, 1.f };
+    const XMVECTORF32 c_BrightWhite = { 2.f, 2.f, 2.f, 1.f };
+    const XMVECTORF32 c_VeryBrightWhite = { 4.f, 4.f, 4.f, 1.f };
+
+    const float row0 = -2.f;
+
+    const float col0 = -5.f;
+    const float col1 = -3.5f;
+    const float col2 = -1.f;
+    const float col3 = 1.f;
+    const float col4 = 3.5f;
+    const float col5 = 5.f;
+}
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+extern bool g_HDRMode;
+#endif
 
 // Constructor.
 Game::Game()
@@ -41,7 +66,12 @@ Game::Game()
         | DX::DeviceResources::c_EnableHDR);
 #else
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_D32_FLOAT, 2,
+#if defined(TEST_HDR_LINEAR)
+        DXGI_FORMAT_R16G16B16A16_FLOAT,
+#else
+        DXGI_FORMAT_R10G10B10A2_UNORM,
+#endif
+        DXGI_FORMAT_D32_FLOAT, 2,
         D3D_FEATURE_LEVEL_10_0,
         DX::DeviceResources::c_EnableHDR);
 #endif
@@ -128,7 +158,103 @@ void Game::Render()
 
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Add your rendering code here.
+    auto vp = m_deviceResources->GetOutputSize();
+    auto safeRect = Viewport::ComputeTitleSafeArea(vp.right - vp.left, vp.bottom - vp.top);
+
+    long w = safeRect.right - safeRect.left;
+    long h = safeRect.bottom - safeRect.top;
+
+    m_batch->Begin();
+
+    RECT r = { safeRect.left, safeRect.top,
+        safeRect.left + ( w / 2 ),
+        safeRect.top + (h / 2) };
+    m_batch->Draw(m_hdrImage1.Get(), r);
+
+    r = { safeRect.left + (w/2), safeRect.top,
+        safeRect.left + (w / 2) + (w / 4),
+        safeRect.top + (h / 4) };
+    m_batch->Draw(m_hdrImage2.Get(), r, c_DimWhite);
+
+    r = { safeRect.left + (w / 2) + (w / 4), safeRect.top,
+        safeRect.left + (w / 2) + (w / 4) * 2,
+        safeRect.top + (h / 4) };
+    m_batch->Draw(m_hdrImage2.Get(), r);
+
+    r = { safeRect.left + (w / 2), safeRect.top + (h/4),
+        safeRect.left + (w / 2) + (w / 4),
+        safeRect.top + (h / 4) * 2 };
+    m_batch->Draw(m_hdrImage2.Get(), r, c_BrightWhite);
+
+    r = { safeRect.left + (w / 2) + (w / 4), safeRect.top + (h / 4),
+        safeRect.left + (w / 2) + (w / 4) * 2,
+        safeRect.top + (h / 4) * 2 };
+    m_batch->Draw(m_hdrImage2.Get(), r, c_VeryBrightWhite);
+
+    m_batch->End();
+
+
+    // Time-based animation
+    float time = static_cast<float>(m_timer.GetTotalSeconds());
+
+    float alphaFade = (sin(time * 2) + 1) / 2;
+
+    if (alphaFade >= 1)
+        alphaFade = 1 - FLT_EPSILON;
+
+    float yaw = time * 0.4f;
+    float pitch = time * 0.7f;
+    float roll = time * 1.1f;
+
+    XMMATRIX world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+    XMVECTOR quat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+
+    m_flatEffect->SetMatrices(world* XMMatrixTranslation(col0, row0, 0), m_view, m_projection);
+    m_flatEffect->SetTexture(m_hdrImage1.Get());
+    m_shape->Draw(m_flatEffect.get(), m_flatInputLayout.Get());
+
+    m_flatEffect->SetMatrices(world* XMMatrixTranslation(col1, row0, 0), m_view, m_projection);
+    m_flatEffect->SetTexture(m_hdrImage2.Get());
+    m_shape->Draw(m_flatEffect.get(), m_flatInputLayout.Get());
+
+    m_shape->Draw(world* XMMatrixTranslation(col2, row0, 0), m_view, m_projection, Colors::White, m_hdrImage1.Get());
+    m_shape->Draw(world* XMMatrixTranslation(col3, row0, 0), m_view, m_projection, Colors::White, m_hdrImage2.Get());
+
+    m_brightEffect->SetMatrices(world* XMMatrixTranslation(col4, row0, 0), m_view, m_projection);
+    m_brightEffect->SetTexture(m_hdrImage1.Get());
+    m_shape->Draw(m_brightEffect.get(), m_brightInputLayout.Get());
+
+    m_brightEffect->SetMatrices(world* XMMatrixTranslation(col5, row0, 0), m_view, m_projection);
+    m_brightEffect->SetTexture(m_hdrImage2.Get());
+    m_shape->Draw(m_brightEffect.get(), m_brightInputLayout.Get());
+
+    // Render HUD
+    m_batch->Begin();
+
+    const wchar_t* info = nullptr;
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    info = (g_HDRMode) ? L"TV in HDR Mode" : L"TV in SDR Mode";
+#else
+    switch (m_deviceResources->GetColorSpace())
+    {
+    default:
+        info = L"SRGB";
+        break;
+
+    case DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020:
+        info = L"HDR10";
+        break;
+
+    case DXGI_COLOR_SPACE_RGB_FULL_G10_NONE_P709:
+        info = L"Linear";
+        break;
+    }
+#endif
+
+    m_font->DrawString(m_batch.get(), info, XMFLOAT2(float(safeRect.right - (safeRect.right / 4)), float(safeRect.bottom - (h/16))), c_BrightYellow);
+
+    m_batch->End();
 
     // Tonemap the frame.
 #if defined(_XBOX_ONE) && defined(_TITLE)
@@ -213,6 +339,14 @@ void Game::OnResuming()
     m_timer.ResetElapsedTime();
 }
 
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
+void Game::OnWindowMoved()
+{
+    auto r = m_deviceResources->GetOutputSize();
+    m_deviceResources->WindowSizeChanged(r.right, r.bottom);
+}
+#endif
+
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
 void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation)
 {
@@ -254,8 +388,40 @@ void Game::CreateDeviceDependentResources()
     m_graphicsMemory = std::make_unique<GraphicsMemory>(device, m_deviceResources->GetBackBufferCount());
 #endif
 
-    // TODO: Initialize device dependent objects here (independent of window size).
-    
+    auto context = m_deviceResources->GetD3DDeviceContext();
+
+#ifdef LH_COORDS
+    m_shape = GeometricPrimitive::CreateCube(context, 1.f, false);
+#else
+    m_shape = GeometricPrimitive::CreateCube(context);
+#endif
+
+    m_flatEffect = std::make_unique<BasicEffect>(device);
+    m_flatEffect->SetTextureEnabled(true);
+    m_flatEffect->SetAmbientLightColor(Colors::White);
+    m_flatEffect->DisableSpecular();
+    m_shape->CreateInputLayout(m_flatEffect.get(), m_flatInputLayout.ReleaseAndGetAddressOf());
+
+    m_brightEffect = std::make_unique<BasicEffect>(device);
+    m_brightEffect->SetTextureEnabled(true);
+    m_brightEffect->EnableDefaultLighting();
+    m_brightEffect->SetLightDiffuseColor(0, Colors::White);
+    m_brightEffect->SetLightDiffuseColor(1, c_VeryBrightWhite);
+    m_brightEffect->SetLightDiffuseColor(2, Colors::White);
+    m_shape->CreateInputLayout(m_brightEffect.get(), m_brightInputLayout.ReleaseAndGetAddressOf());
+
+    m_batch = std::make_unique<SpriteBatch>(context);
+
+    m_font = std::make_unique<SpriteFont>(device, L"comic.spritefont");
+
+    DX::ThrowIfFailed(
+        CreateDDSTextureFromFile(device, L"HDR_029_Sky_Cloudy_Ref.dds", nullptr, m_hdrImage1.ReleaseAndGetAddressOf())
+    );
+
+    DX::ThrowIfFailed(
+        CreateDDSTextureFromFile(device, L"HDR_112_River_Road_2_Ref.dds", nullptr, m_hdrImage2.ReleaseAndGetAddressOf())
+    );
+
     // Set the device for the HDR helper
     m_hdrScene->SetDevice(device);
 
@@ -271,19 +437,47 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    // TODO: Initialize windows-size dependent objects here.
+    static const XMVECTORF32 cameraPosition = { 0, 0, 7 };
+
+    auto size = m_deviceResources->GetOutputSize();
+    float aspect = (float)size.right / (float)size.bottom;
+
+#ifdef LH_COORDS
+    m_view = XMMatrixLookAtLH(cameraPosition, g_XMZero, XMVectorSet(0, 1, 0, 0));
+    m_projection = XMMatrixPerspectiveFovLH(1, aspect, 1, 10);
+#else
+    m_view = XMMatrixLookAtRH(cameraPosition, g_XMZero, XMVectorSet(0, 1, 0, 0));
+    m_projection = XMMatrixPerspectiveFovRH(1, aspect, 1, 10);
+#endif
 
     // Set windows size for HDR.
-    auto size = m_deviceResources->GetOutputSize();
     m_hdrScene->SetWindow(size);
 
     m_toneMap->SetHDRSourceTexture(m_hdrScene->GetShaderResourceView());
+
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    m_batch->SetRotation(m_deviceResources->GetRotation());
+#endif
+
+    m_batch->SetViewport(m_deviceResources->GetScreenViewport());
 }
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
 void Game::OnDeviceLost()
 {
-    // TODO: Add Direct3D resource cleanup here.
+    m_batch.reset();
+    m_font.reset();
+
+    m_shape.reset();
+
+    m_flatEffect.reset();
+    m_brightEffect.reset();
+
+    m_hdrImage1.Reset();
+    m_hdrImage2.Reset();
+
+    m_flatInputLayout.Reset();
+    m_brightInputLayout.Reset();
 
     m_toneMap.reset();
 

@@ -15,6 +15,8 @@ using namespace Windows::UI::Core;
 using namespace Windows::Foundation;
 using namespace DirectX;
 
+bool g_HDRMode = false;
+
 ref class ViewProvider sealed : public IFrameworkView
 {
 public:
@@ -35,7 +37,25 @@ public:
         CoreApplication::Resuming +=
             ref new EventHandler<Platform::Object^>(this, &ViewProvider::OnResuming);
 
+        CoreApplication::DisableKinectGpuReservation = true;
+
         m_game = std::make_unique<Game>();
+        if (m_game->RequestHDRMode())
+        {
+            // Request HDR mode.
+            auto determineHDR = Concurrency::create_task(
+                Windows::Xbox::Graphics::Display::DisplayConfiguration::TrySetHdrModeAsync()
+            );
+
+            // In a real game, you'd do some initialization here to hide the HDR mode switch.
+
+            // Finish up HDR mode detection (waiting for async if needed)
+            g_HDRMode = determineHDR.get()->HdrEnabled;
+
+#ifdef _DEBUG
+            OutputDebugStringA((g_HDRMode) ? "INFO: Display in HDR Mode\n" : "INFO: Display in SDR Mode\n");
+#endif
+        }
     }
 
     virtual void Uninitialize()

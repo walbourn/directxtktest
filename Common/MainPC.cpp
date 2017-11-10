@@ -110,7 +110,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     }
 
     // Main message loop
-    MSG msg = { 0 };
+    MSG msg = {};
     while (WM_QUIT != msg.message)
     {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -159,6 +159,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             hdc = BeginPaint(hWnd, &ps);
             EndPaint(hWnd, &ps);
+        }
+        break;
+
+    case WM_MOVE:
+        if (game)
+        {
+            game->OnWindowMoved();
         }
         break;
 

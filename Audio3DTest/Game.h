@@ -58,6 +58,10 @@ public:
     void OnSuspending();
     void OnResuming();
 
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
+    void OnWindowMoved();
+#endif
+
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     void OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation);
 #endif
@@ -71,6 +75,7 @@ public:
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
     const wchar_t* GetAppName() const { return L"Audio3DTest (DirectX 11)"; }
+    bool RequestHDRMode() const { return m_deviceResources ? (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_EnableHDR) != 0 : false; }
 
 private:
 

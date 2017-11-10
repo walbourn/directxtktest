@@ -59,6 +59,10 @@ public:
     void OnSuspending();
     void OnResuming();
 
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
+    void OnWindowMoved();
+#endif
+
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     void OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation);
 #endif
@@ -70,6 +74,7 @@ public:
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
     const wchar_t* GetAppName() const { return L"HDRTest (DirectX 11)"; }
+    bool RequestHDRMode() const { return m_deviceResources ? (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_EnableHDR) != 0 : false; }
 
 private:
 
@@ -99,4 +104,22 @@ private:
     // HDR resources
     std::unique_ptr<DirectX::ToneMapPostProcess>    m_toneMap;
     std::unique_ptr<DX::RenderTexture>              m_hdrScene;
+
+    // Test resources.
+    std::unique_ptr<DirectX::SpriteBatch>               m_batch;
+    std::unique_ptr<DirectX::SpriteFont>                m_font;
+
+    std::unique_ptr<DirectX::GeometricPrimitive>        m_shape;
+
+    std::unique_ptr<DirectX::BasicEffect>               m_flatEffect;
+    std::unique_ptr<DirectX::BasicEffect>               m_brightEffect;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_hdrImage1;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_hdrImage2;
+
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>           m_flatInputLayout;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>           m_brightInputLayout;
+
+    DirectX::SimpleMath::Matrix                         m_view;
+    DirectX::SimpleMath::Matrix                         m_projection;
 };
