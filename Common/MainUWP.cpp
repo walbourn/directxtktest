@@ -47,6 +47,33 @@ public:
             ref new EventHandler<Platform::Object^>(this, &ViewProvider::OnResuming);
 
         m_game = std::make_unique<Game>();
+        if (m_game->RequestHDRMode())
+        {
+            using namespace Windows::Graphics::Display::Core;
+
+            auto displayInfo = HdmiDisplayInformation::GetForCurrentView();
+            if (displayInfo)
+            {
+                auto modes = displayInfo->GetSupportedDisplayModes();
+
+                for (unsigned i = 0; i < modes->Size; i++)
+                {
+                    auto mode = modes->GetAt(i);
+
+                    if (mode->ColorSpace == HdmiDisplayColorSpace::BT2020 &&
+                        mode->ResolutionHeightInRawPixels == 2160 &&
+                        mode->ResolutionWidthInRawPixels == 3840 &&
+                        mode->StereoEnabled == false &&
+                        mode->RefreshRate >= 59.0 && mode->RefreshRate <= 60.0)
+                    {
+                        displayInfo->RequestSetCurrentDisplayModeAsync(mode, HdmiDisplayHdrOption::Eotf2084);
+#ifdef _DEBUG
+                        OutputDebugStringA("INFO: TV in HDR mode\n");
+#endif
+                    }
+                }
+            }
+        }
 
 #ifdef AUDIO_WATCHER
         using namespace Windows::Devices::Enumeration;
