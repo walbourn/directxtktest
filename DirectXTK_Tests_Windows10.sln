@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK", "..\DirectXTK_Windows10.vcxproj", "{F4776924-619C-42C7-88B2-82C947CCC9E7}"
 EndProject
@@ -44,6 +44,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostProcessTest_Windows10", "PostProcessTest\PostProcessTest_Windows10.vcxproj", "{12A25C83-2BA6-49CC-9DCB-074B410EB6C4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HDRTest_Windows10", "HDRTest\HDRTest_Windows10.vcxproj", "{E527E4BD-665A-4732-8FD8-65574DF0C0B2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PBRTest_Windows10", "PBRTest\PBRTest_Windows10.vcxproj", "{B9CBEABA-7973-4E59-A57B-2827A1228C6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -373,6 +375,24 @@ Global
 		{E527E4BD-665A-4732-8FD8-65574DF0C0B2}.Release|x86.ActiveCfg = Release|Win32
 		{E527E4BD-665A-4732-8FD8-65574DF0C0B2}.Release|x86.Build.0 = Release|Win32
 		{E527E4BD-665A-4732-8FD8-65574DF0C0B2}.Release|x86.Deploy.0 = Release|Win32
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Debug|ARM.ActiveCfg = Debug|ARM
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Debug|ARM.Build.0 = Debug|ARM
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Debug|ARM.Deploy.0 = Debug|ARM
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Debug|x64.ActiveCfg = Debug|x64
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Debug|x64.Build.0 = Debug|x64
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Debug|x64.Deploy.0 = Debug|x64
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Debug|x86.ActiveCfg = Debug|Win32
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Debug|x86.Build.0 = Debug|Win32
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Debug|x86.Deploy.0 = Debug|Win32
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Release|ARM.ActiveCfg = Release|ARM
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Release|ARM.Build.0 = Release|ARM
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Release|ARM.Deploy.0 = Release|ARM
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Release|x64.ActiveCfg = Release|x64
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Release|x64.Build.0 = Release|x64
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Release|x64.Deploy.0 = Release|x64
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Release|x86.ActiveCfg = Release|Win32
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Release|x86.Build.0 = Release|Win32
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D}.Release|x86.Deploy.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -395,6 +415,7 @@ Global
 		{721C6820-8CDD-464E-B5B6-A53DE5C6D17C} = {87989B14-27D6-4AB0-AFDD-620A4A678130}
 		{12A25C83-2BA6-49CC-9DCB-074B410EB6C4} = {91743623-2C82-4825-B518-60470957082D}
 		{E527E4BD-665A-4732-8FD8-65574DF0C0B2} = {91743623-2C82-4825-B518-60470957082D}
+		{B9CBEABA-7973-4E59-A57B-2827A1228C6D} = {91743623-2C82-4825-B518-60470957082D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4D9A73D-6818-4D9D-B0FD-38FF8C480751}
