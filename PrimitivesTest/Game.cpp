@@ -402,9 +402,12 @@ void Game::CreateDeviceDependentResources()
     m_iso = GeometricPrimitive::CreateIcosahedron(context, 0.5f, rhcoords);
 
     {
-        std::vector<VertexPositionNormalTexture> customVerts;
+        std::vector<GeometricPrimitive::VertexType> customVerts;
         std::vector<uint16_t> customIndices;
         GeometricPrimitive::CreateBox(customVerts, customIndices, XMFLOAT3(1.f / 2.f, 2.f / 2.f, 3.f / 2.f), rhcoords);
+
+        assert(customVerts.size() == 24);
+        assert(customIndices.size() == 36);
 
         for (auto it = customVerts.begin(); it != customVerts.end(); ++it)
         {
@@ -414,6 +417,19 @@ void Game::CreateDeviceDependentResources()
 
         m_customBox = GeometricPrimitive::CreateCustom(context, customVerts, customIndices);
     }
+
+    {
+        // Ensure VertexType alias is consistent with older client usage
+        std::vector<VertexPositionNormalTexture> customVerts;
+        std::vector<uint16_t> customIndices;
+        GeometricPrimitive::CreateBox(customVerts, customIndices, XMFLOAT3(1.f / 2.f, 2.f / 2.f, 3.f / 2.f), rhcoords);
+
+        assert(customVerts.size() == 24);
+        assert(customIndices.size() == 36);
+
+        m_customBox2 = GeometricPrimitive::CreateCustom(context, customVerts, customIndices);
+    }
+
 
     m_customEffect = std::make_unique<BasicEffect>(device);
     m_customEffect->EnableDefaultLighting();
