@@ -23,6 +23,7 @@
 #endif
 #include "StepTimer.h"
 
+#include "RenderTexture.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -130,6 +131,10 @@ private:
             if (inmap)
                 inmap->SetBiasedVertexNormalsAndTangents(showCompressed);
 
+            auto ipbr = dynamic_cast<PBREffect*>(this);
+            if (ipbr)
+                ipbr->SetBiasedVertexNormalsAndTangents(showCompressed);
+
             auto iskin = dynamic_cast<SkinnedEffect*>(this);
             if (iskin)
                 iskin->SetBiasedVertexNormals(showCompressed);
@@ -177,6 +182,7 @@ private:
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::DualTextureEffect>>> m_dual;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::AlphaTestEffect>>> m_alphTest;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::NormalMapEffect>>> m_normalMap;
+    std::vector<std::unique_ptr<EffectWithDecl<DirectX::PBREffect>>> m_pbr;
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::DGSLEffect>>> m_dgsl;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
@@ -190,6 +196,14 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brickDiffuse;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brickNormal;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brickSpecular;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pbrAlbedo;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pbrNormal;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pbrRMA;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pbrEmissive;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_radianceIBL;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_irradianceIBL;
+
+    std::unique_ptr<DX::RenderTexture>      m_velocityBuffer;
 
     DirectX::SimpleMath::Matrix             m_view;
     DirectX::SimpleMath::Matrix             m_projection;
