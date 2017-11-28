@@ -114,6 +114,7 @@ private:
     std::unique_ptr<DirectX::GeometricPrimitive>    m_dodec;
     std::unique_ptr<DirectX::GeometricPrimitive>    m_iso;
     std::unique_ptr<DirectX::GeometricPrimitive>    m_customBox;
+    std::unique_ptr<DirectX::GeometricPrimitive>    m_customBox2;
 
     std::unique_ptr<DirectX::BasicEffect>           m_customEffect;
 
