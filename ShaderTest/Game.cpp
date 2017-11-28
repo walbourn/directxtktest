@@ -272,7 +272,7 @@ namespace
 
     // Helper for creating a D3D vertex or index buffer.
     template<typename T>
-    static void CreateBuffer(
+    void CreateBuffer(
         _In_ ID3D11Device* device,
         T const& data,
         D3D11_BIND_FLAG bindFlags,
@@ -297,7 +297,7 @@ namespace
 
 
     // Helper for creating a D3D input layout.
-    static void CreateInputLayout(
+    void CreateInputLayout(
         _In_ ID3D11Device* device,
         IEffect* effect,
         _Outptr_ ID3D11InputLayout** pInputLayout,

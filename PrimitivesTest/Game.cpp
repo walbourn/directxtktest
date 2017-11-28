@@ -419,7 +419,7 @@ void Game::CreateDeviceDependentResources()
     }
 
     {
-        // Ensure VertexType alias is consistent with older client usage
+        // Ensure VertexType alias is consistent with alternative client usage
         std::vector<VertexPositionNormalTexture> customVerts;
         std::vector<uint16_t> customIndices;
         GeometricPrimitive::CreateBox(customVerts, customIndices, XMFLOAT3(1.f / 2.f, 2.f / 2.f, 3.f / 2.f), rhcoords);
@@ -429,7 +429,6 @@ void Game::CreateDeviceDependentResources()
 
         m_customBox2 = GeometricPrimitive::CreateCustom(context, customVerts, customIndices);
     }
-
 
     m_customEffect = std::make_unique<BasicEffect>(device);
     m_customEffect->EnableDefaultLighting();
@@ -483,6 +482,7 @@ void Game::OnDeviceLost()
     m_dodec.reset();
     m_iso.reset();
     m_customBox.reset();
+    m_customBox2.reset();
 
     m_customEffect.reset();
 

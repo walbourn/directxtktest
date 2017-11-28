@@ -68,7 +68,7 @@ private:
 //--------------------------------------------------------------------------------------
 // Helper for creating a D3D vertex or index buffer.
 template<typename T>
-static void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FLAG bindFlags, _Out_ ID3D11Buffer** pBuffer)
+void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FLAG bindFlags, _Out_ ID3D11Buffer** pBuffer)
 {
     D3D11_BUFFER_DESC bufferDesc = {};
 
@@ -91,7 +91,7 @@ static void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FL
 }
 
 // Helper for creating a D3D input layout.
-static void CreateInputLayout(_In_ ID3D11Device* device, IEffect* effect, _Out_ ID3D11InputLayout** pInputLayout)
+void CreateInputLayout(_In_ ID3D11Device* device, IEffect* effect, _Out_ ID3D11InputLayout** pInputLayout)
 {
     void const* shaderByteCode;
     size_t byteCodeLength;
