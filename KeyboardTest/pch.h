@@ -18,7 +18,9 @@
 
 #include <winapifamily.h>
 
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+#include <xdk.h>
+#elif !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
 #include <WinSDKVer.h>
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
@@ -31,7 +33,6 @@
 #define NOMINMAX
 #define NODRAWTEXT
 #define NOGDI
-#define NOBITMAP
 #define NOMCX
 #define NOSERVICE
 #define NOHELP
@@ -46,11 +47,19 @@
 
 #include <wrl.h>
 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+#include <d3d11_x.h>
+#else
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
 #include <d3d11_3.h>
 #include <dxgi1_6.h>
 #else
 #include <d3d11_1.h>
+#endif
+
+#ifdef _DEBUG
+#include <dxgidebug.h>
+#endif
 #endif
 
 #include <DirectXMath.h>
@@ -63,10 +72,6 @@
 
 #include <stdio.h>
 
-#ifdef _DEBUG
-#include <dxgidebug.h>
-#endif
-
 #include "Keyboard.h"
 #include "Mouse.h"
 
@@ -74,6 +79,7 @@
 #include "DDSTextureLoader.h"
 #include "DirectXHelpers.h"
 #include "GeometricPrimitive.h"
+#include "GraphicsMemory.h"
 #include "ScreenGrab.h"
 #include "SimpleMath.h"
 #include "SpriteBatch.h"
