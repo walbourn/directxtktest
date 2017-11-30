@@ -170,6 +170,7 @@
     <ClInclude Include="..\Common\StepTimer.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="WaveFrontReader.h" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\Common\settings.manifest">

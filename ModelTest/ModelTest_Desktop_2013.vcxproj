@@ -228,6 +228,7 @@
     <ClInclude Include="..\Common\StepTimer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="WaveFrontReader.h" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\Common\settings.manifest" />
