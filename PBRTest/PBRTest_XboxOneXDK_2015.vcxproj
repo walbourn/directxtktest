@@ -192,6 +192,10 @@
     <Image Include="..\Common\WideLogo.scale-100.png" />
     <Image Include="Atrium_diffuseIBL.dds" />
     <Image Include="Atrium_specularIBL.dds" />
+    <Image Include="BrokenCube_baseColor.png" />
+    <Image Include="BrokenCube_emissive.png" />
+    <Image Include="BrokenCube_normal.png" />
+    <Image Include="BrokenCube_occlusionRoughnessMetallic.png" />
     <Image Include="Garage_diffuseIBL.dds" />
     <Image Include="Garage_specularIBL.dds" />
     <Image Include="Sphere2Mat_baseColor.png" />
@@ -206,6 +210,13 @@
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageXDK.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BrokenCube.vbo">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Durango'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'">true</DeploymentContent>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

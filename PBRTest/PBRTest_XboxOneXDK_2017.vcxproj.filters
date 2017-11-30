@@ -90,8 +90,25 @@
     <Image Include="SphereMat_occlusionRoughnessMetallic.png">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="BrokenCube_baseColor.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="BrokenCube_emissive.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="BrokenCube_normal.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="BrokenCube_occlusionRoughnessMetallic.png">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageXDK.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BrokenCube.vbo">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -190,6 +190,10 @@
   <ItemGroup>
     <Image Include="Atrium_diffuseIBL.dds" />
     <Image Include="Atrium_specularIBL.dds" />
+    <Image Include="BrokenCube_baseColor.png" />
+    <Image Include="BrokenCube_emissive.png" />
+    <Image Include="BrokenCube_normal.png" />
+    <Image Include="BrokenCube_occlusionRoughnessMetallic.png" />
     <Image Include="Garage_diffuseIBL.dds" />
     <Image Include="Garage_specularIBL.dds" />
     <Image Include="Sphere2Mat_baseColor.png" />
@@ -206,6 +210,9 @@
     <ProjectReference Include="..\..\DirectXTK_Desktop_2017_Win10.vcxproj">
       <Project>{e0b52ae7-e160-4d32-bf3f-910b785e5a8e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BrokenCube.vbo" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -258,6 +258,10 @@
     <Image Include="..\Common\WideLogo.scale-100.png" />
     <Image Include="Atrium_diffuseIBL.dds" />
     <Image Include="Atrium_specularIBL.dds" />
+    <Image Include="BrokenCube_baseColor.png" />
+    <Image Include="BrokenCube_emissive.png" />
+    <Image Include="BrokenCube_normal.png" />
+    <Image Include="BrokenCube_occlusionRoughnessMetallic.png" />
     <Image Include="Garage_diffuseIBL.dds" />
     <Image Include="Garage_specularIBL.dds" />
     <Image Include="Sphere2Mat_baseColor.png" />
@@ -269,6 +273,16 @@
     <Image Include="SphereMat_occlusionRoughnessMetallic.png" />
     <Image Include="SunSubMixer_diffuseIBL.dds" />
     <Image Include="SunSubMixer_specularIBL.dds" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BrokenCube.vbo">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

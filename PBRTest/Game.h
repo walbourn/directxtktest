@@ -116,17 +116,23 @@ private:
     Microsoft::WRL::ComPtr<ID3D11InputLayout>   m_inputLayoutPBR;
     UINT                                        m_indexCount;
 
+    Microsoft::WRL::ComPtr<ID3D11Buffer>        m_vertexBufferCube;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>        m_indexBufferCube;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>   m_inputLayoutCube;
+    UINT                                        m_indexCountCube;
+
     // Test materials
     std::unique_ptr<DirectX::NormalMapEffect>       m_normalMapEffect;
     std::unique_ptr<DirectX::PBREffect>             m_pbr;
+    std::unique_ptr<DirectX::PBREffect>             m_pbrCube;
 
-    static const size_t s_nMaterials = 2;
+    static const size_t s_nMaterials = 3;
     static const size_t s_nIBL = 3;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_baseColor[s_nMaterials];
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_normalMap[s_nMaterials];
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_rma[s_nMaterials];
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_emissiveMap;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_emissiveMap[s_nMaterials];
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_radianceIBL[s_nIBL];
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_irradianceIBL[s_nIBL];
 
