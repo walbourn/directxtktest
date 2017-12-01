@@ -18,6 +18,9 @@
     <ClCompile Include="..\Common\MainUWP.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\RenderTexture.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -26,6 +29,9 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\RenderTexture.h">
       <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -67,6 +73,24 @@
       <Filter>Assets</Filter>
     </Image>
     <Image Include="..\Common\WideLogo.scale-100.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Atrium_diffuseIBL.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Atrium_specularIBL.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_baseColor.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_emissive.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_normal.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_occlusionRoughnessMetallic.png">
       <Filter>Assets</Filter>
     </Image>
   </ItemGroup>

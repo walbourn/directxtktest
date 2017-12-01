@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\DeviceResourcesPC.h" />
+    <ClInclude Include="..\Common\RenderTexture.h" />
     <ClInclude Include="..\Common\StepTimer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />
@@ -170,6 +171,7 @@
   <ItemGroup>
     <ClCompile Include="..\Common\DeviceResourcesPC.cpp" />
     <ClCompile Include="..\Common\MainPC.cpp" />
+    <ClCompile Include="..\Common\RenderTexture.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -182,10 +184,16 @@
     <Manifest Include="..\Common\settings.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Atrium_diffuseIBL.dds" />
+    <Image Include="Atrium_specularIBL.dds" />
     <Image Include="cat.dds" />
     <Image Include="cubemap.dds" />
     <Image Include="default.dds" />
     <Image Include="overlay.dds" />
+    <Image Include="Sphere2Mat_baseColor.png" />
+    <Image Include="Sphere2Mat_emissive.png" />
+    <Image Include="Sphere2Mat_normal.png" />
+    <Image Include="Sphere2Mat_occlusionRoughnessMetallic.png" />
     <Image Include="spnza_bricks_a.DDS" />
     <Image Include="spnza_bricks_a_normal.DDS" />
     <Image Include="spnza_bricks_a_specular.DDS" />

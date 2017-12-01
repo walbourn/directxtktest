@@ -82,6 +82,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "SimpleMath.h"
+#include "WICTextureLoader.h"
 
 #include "PlatformHelpers.h"
 

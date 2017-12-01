@@ -96,13 +96,48 @@ private:
     std::unique_ptr<DirectX::GamePad>       m_gamePad;
     std::unique_ptr<DirectX::Keyboard>      m_keyboard;
 
+    DirectX::GamePad::ButtonStateTracker    m_gamePadButtons;
+    DirectX::Keyboard::KeyboardStateTracker m_keyboardButtons;
+
     // DirectXTK Test Objects
 #if defined(_XBOX_ONE) && defined(_TITLE)
     std::unique_ptr<DirectX::GraphicsMemory> m_graphicsMemory;
 #endif
+    std::unique_ptr<DirectX::CommonStates>  m_states;
 
     // HDR resources
     std::unique_ptr<DirectX::ToneMapPostProcess>    m_toneMap;
     std::unique_ptr<DX::RenderTexture>              m_hdrScene;
 
+    // Test geometry
+    Microsoft::WRL::ComPtr<ID3D11Buffer>        m_vertexBuffer;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>        m_indexBuffer;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>   m_inputLayoutNM;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>   m_inputLayoutPBR;
+    UINT                                        m_indexCount;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer>        m_vertexBufferCube;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>        m_indexBufferCube;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>   m_inputLayoutCube;
+    UINT                                        m_indexCountCube;
+
+    // Test materials
+    std::unique_ptr<DirectX::NormalMapEffect>       m_normalMapEffect;
+    std::unique_ptr<DirectX::PBREffect>             m_pbr;
+    std::unique_ptr<DirectX::PBREffect>             m_pbrCube;
+
+    static const size_t s_nMaterials = 3;
+    static const size_t s_nIBL = 3;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_baseColor[s_nMaterials];
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_normalMap[s_nMaterials];
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_rma[s_nMaterials];
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_emissiveMap[s_nMaterials];
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_radianceIBL[s_nIBL];
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_irradianceIBL[s_nIBL];
+
+    uint32_t m_ibl;
+    bool m_spinning;
+    float m_pitch;
+    float m_yaw;
 };

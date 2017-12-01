@@ -43,7 +43,10 @@ extern std::unique_ptr<Model> CreateModelFromOBJ(_In_ ID3D11Device* d3dDevice, _
     _In_z_ const wchar_t* szFileName,
     _In_ IEffectFactory& fxFactory, bool ccw = true, bool pmalpha = false);
 
-Game::Game()
+Game::Game() :
+    m_spinning(true),
+    m_pitch(0),
+    m_yaw(0)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
@@ -119,11 +122,75 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const&)
 {
-    auto pad = m_gamePad->GetState(0);
     auto kb = m_keyboard->GetState();
-    if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
+    m_keyboardButtons.Update(kb);
+
+    auto pad = m_gamePad->GetState(0);
+    if (pad.IsConnected())
+    {
+        m_gamePadButtons.Update(pad);
+
+        if (pad.IsViewPressed())
+        {
+            ExitGame();
+        }
+
+        if (m_gamePadButtons.a == GamePad::ButtonStateTracker::PRESSED)
+        {
+            m_spinning = !m_spinning;
+        }
+
+        if (pad.IsLeftStickPressed())
+        {
+            m_spinning = false;
+            m_yaw = m_pitch = 0.f;
+        }
+        else
+        {
+            m_yaw += pad.thumbSticks.leftX * 0.1f;
+            m_pitch -= pad.thumbSticks.leftY * 0.1f;
+        }
+    }
+    else
+    {
+        m_gamePadButtons.Reset();
+
+        if (kb.A || kb.D)
+        {
+            m_spinning = false;
+            m_yaw += (kb.D ? 0.1f : -0.1f);
+        }
+
+        if (kb.W || kb.S)
+        {
+            m_spinning = false;
+            m_pitch += (kb.W ? 0.1f : -0.1f);
+        }
+
+        if (kb.Home)
+        {
+            m_spinning = false;
+            m_yaw = m_pitch = 0.f;
+        }
+    }
+
+    if (m_yaw > XM_PI)
+    {
+        m_yaw -= XM_PI * 2.f;
+    }
+    else if (m_yaw < -XM_PI)
+    {
+        m_yaw += XM_PI * 2.f;
+    }
+
+    if (kb.Escape)
     {
         ExitGame();
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
+    {
+        m_spinning = !m_spinning;
     }
 }
 #pragma endregion
@@ -153,8 +220,19 @@ void Game::Render()
     float pitch = time * 0.7f;
     float roll = time * 1.1f;
 
-    XMMATRIX world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-    XMVECTOR quat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+    XMMATRIX world;
+    XMVECTOR quat;
+
+    if (m_spinning)
+    {
+        world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+        quat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+    }
+    else
+    {
+        world = XMMatrixRotationRollPitchYaw(m_pitch, m_yaw, 0);
+        quat = XMQuaternionRotationRollPitchYaw(m_pitch, m_yaw, roll);
+    }
 
     // Skinning settings
     float s = 1 + sin(time * 1.7f) * 0.5f;
@@ -386,6 +464,8 @@ void Game::OnSuspending()
 void Game::OnResuming()
 {
     m_timer.ResetElapsedTime();
+    m_gamePadButtons.Reset();
+    m_keyboardButtons.Reset();
 }
 
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 

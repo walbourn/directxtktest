@@ -51,7 +51,10 @@ namespace
     const float col10 = 7.5f;
 }
 
-Game::Game()
+Game::Game() :
+    m_spinning(true),
+    m_pitch(0),
+    m_yaw(0)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
@@ -120,11 +123,75 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const&)
 {
-    auto pad = m_gamePad->GetState(0);
     auto kb = m_keyboard->GetState();
-    if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
+    m_keyboardButtons.Update(kb);
+
+    auto pad = m_gamePad->GetState(0);
+    if (pad.IsConnected())
+    {
+        m_gamePadButtons.Update(pad);
+
+        if (pad.IsViewPressed())
+        {
+            ExitGame();
+        }
+
+        if (m_gamePadButtons.a == GamePad::ButtonStateTracker::PRESSED)
+        {
+            m_spinning = !m_spinning;
+        }
+
+        if (pad.IsLeftStickPressed())
+        {
+            m_spinning = false;
+            m_yaw = m_pitch = 0.f;
+        }
+        else
+        {
+            m_yaw += pad.thumbSticks.leftX * 0.1f;
+            m_pitch -= pad.thumbSticks.leftY * 0.1f;
+        }
+    }
+    else
+    {
+        m_gamePadButtons.Reset();
+
+        if (kb.A || kb.D)
+        {
+            m_spinning = false;
+            m_yaw += (kb.D ? 0.1f : -0.1f);
+        }
+
+        if (kb.W || kb.S)
+        {
+            m_spinning = false;
+            m_pitch += (kb.W ? 0.1f : -0.1f);
+        }
+
+        if (kb.Home)
+        {
+            m_spinning = false;
+            m_yaw = m_pitch = 0.f;
+        }
+    }
+
+    if (m_yaw > XM_PI)
+    {
+        m_yaw -= XM_PI * 2.f;
+    }
+    else if (m_yaw < -XM_PI)
+    {
+        m_yaw += XM_PI * 2.f;
+    }
+
+    if (kb.Escape)
     {
         ExitGame();
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
+    {
+        m_spinning = !m_spinning;
     }
 }
 #pragma endregion
@@ -159,8 +226,19 @@ void Game::Render()
     float pitch = time * 0.7f;
     float roll = time * 1.1f;
 
-    XMMATRIX world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-    XMVECTOR quat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+    XMMATRIX world;
+    XMVECTOR quat;
+
+    if (m_spinning)
+    {
+        world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+        quat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+    }
+    else
+    {
+        world = XMMatrixRotationRollPitchYaw(m_pitch, m_yaw, 0);
+        quat = XMQuaternionRotationRollPitchYaw(m_pitch, m_yaw, roll);
+    }
 
     XMVECTORF32 red, green, blue, yellow, cyan, magenta, cornflower, lime, gray;
 #ifdef GAMMA_CORRECT_RENDERING
@@ -310,6 +388,8 @@ void Game::OnSuspending()
 void Game::OnResuming()
 {
     m_timer.ResetElapsedTime();
+    m_gamePadButtons.Reset();
+    m_keyboardButtons.Reset();
 }
 
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
@@ -420,7 +500,7 @@ void Game::CreateDeviceDependentResources()
     }
 
     {
-        // Ensure VertexType alias is consistent with older client usage
+        // Ensure VertexType alias is consistent with alternative client usage
         std::vector<VertexPositionNormalTexture> customVerts;
         std::vector<uint16_t> customIndices;
         GeometricPrimitive::CreateBox(customVerts, customIndices, XMFLOAT3(1.f / 2.f, 2.f / 2.f, 3.f / 2.f), rhcoords);
@@ -430,7 +510,6 @@ void Game::CreateDeviceDependentResources()
 
         m_customBox2 = GeometricPrimitive::CreateCustom(context, customVerts, customIndices);
     }
-
 
     m_customEffect = std::make_unique<BasicEffect>(device);
     m_customEffect->EnableDefaultLighting();
@@ -444,7 +523,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    static const XMVECTORF32 cameraPosition = { 0, 0, 7 };
+    static const XMVECTORF32 cameraPosition = { 0, 0, 9 };
 
     auto size = m_deviceResources->GetOutputSize();
     float aspect = (float)size.right / (float)size.bottom;
@@ -484,6 +563,7 @@ void Game::OnDeviceLost()
     m_dodec.reset();
     m_iso.reset();
     m_customBox.reset();
+    m_customBox2.reset();
 
     m_customEffect.reset();
 

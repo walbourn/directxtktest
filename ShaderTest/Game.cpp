@@ -34,7 +34,7 @@ namespace
     const float SWAP_TIME = 10.f;
 
     const float ortho_width = 6.f;
-    const float ortho_height = 6.f;
+    const float ortho_height = 7.f;
 
     struct TestVertex
     {
@@ -272,7 +272,7 @@ namespace
 
     // Helper for creating a D3D vertex or index buffer.
     template<typename T>
-    static void CreateBuffer(
+    void CreateBuffer(
         _In_ ID3D11Device* device,
         T const& data,
         D3D11_BIND_FLAG bindFlags,
@@ -297,7 +297,7 @@ namespace
 
 
     // Helper for creating a D3D input layout.
-    static void CreateInputLayout(
+    void CreateInputLayout(
         _In_ ID3D11Device* device,
         IEffect* effect,
         _Outptr_ ID3D11InputLayout** pInputLayout,
@@ -482,6 +482,9 @@ Game::Game() :
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     m_deviceResources->RegisterDeviceNotify(this);
 #endif
+
+    // Used for PBREffect velocity buffer
+    m_velocityBuffer = std::make_unique<DX::RenderTexture>(DXGI_FORMAT_R10G10B10A2_UNORM);
 }
 
 // Initialize the Direct3D resources required to run.
@@ -803,6 +806,43 @@ void Game::Render()
         y -= 1.f;
     }
 
+    // PBREffect
+    context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
+
+    ID3D11RenderTargetView* views[] = { m_deviceResources->GetRenderTargetView(), m_velocityBuffer->GetRenderTargetView() };
+    context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
+
+    {
+        auto it = m_pbr.begin();
+        assert(it != m_pbr.end());
+
+        for (; y > -ortho_height; y -= 1.f)
+        {
+            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+            {
+                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
+                context->DrawIndexed(m_indexCount, 0, 0);
+
+                ++it;
+                if (it == m_pbr.cend())
+                    break;
+            }
+
+            if (it == m_pbr.cend())
+                break;
+        }
+
+        // Make sure we drew all the effects
+        assert(it == m_pbr.cend());
+
+        y -= 1.f;
+    }
+
+    views[1] = nullptr;
+    context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
+
+    context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
+
     // DGSLEffect
     if (!m_showCompressed)
     {
@@ -855,6 +895,7 @@ void Game::Clear()
 #endif
     context->ClearRenderTargetView(renderTarget, color);
     context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
     // Set the viewport.
@@ -969,6 +1010,24 @@ void Game::CreateDeviceDependentResources()
 
     DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"spnza_bricks_a_specular.DDS",
         nullptr, m_brickSpecular.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"Sphere2Mat_baseColor.png",
+        nullptr, m_pbrAlbedo.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"Sphere2Mat_normal.png",
+        nullptr, m_pbrNormal.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"Sphere2Mat_occlusionRoughnessMetallic.png",
+        nullptr, m_pbrRMA.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"Sphere2Mat_emissive.png",
+        nullptr, m_pbrEmissive.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"Atrium_diffuseIBL.dds",
+        nullptr, m_radianceIBL.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"Atrium_specularIBL.dds",
+        nullptr, m_irradianceIBL.ReleaseAndGetAddressOf()));
 
     // Create test geometry.
     m_indexCount = CreateCube(device,
@@ -1758,6 +1817,52 @@ void Game::CreateDeviceDependentResources()
         effect->SetFogColor(Colors::Black);
     }));
 
+    //--- PBREffect --------------------------------------------------------------------
+    D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+    m_radianceIBL->GetDesc(&desc);
+
+    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+    }));
+
+    // PBREffect (textured)
+    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+    }));
+
+    // PBREffect (emissive)
+    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+        effect->SetEmissiveTexture(m_pbrEmissive.Get());
+        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+    }));
+
+    // PBREffect (velocity)
+    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        effect->SetVelocityGeneration(true);
+    }));
+
+    // PBREffect (velocity + emissive)
+    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+        effect->SetEmissiveTexture(m_pbrEmissive.Get());
+        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        effect->SetVelocityGeneration(true);
+    }));
+
     //--- DGSLEffect -----------------------------------------------------------------------
 
     // DGSLEffect
@@ -1894,11 +1999,16 @@ void Game::CreateDeviceDependentResources()
         effect->SetVertexColorEnabled(true);
         effect->SetWeightsPerVertex(1);
     }));
+
+    m_velocityBuffer->SetDevice(device);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
+    auto size = m_deviceResources->GetOutputSize();
+    m_velocityBuffer->SetWindow(size);
+
     m_projection = XMMatrixOrthographicRH(ortho_width * 2.f, ortho_height * 2.f, 0.1f, 10.f);
 
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
@@ -1918,6 +2028,7 @@ void Game::OnDeviceLost()
     m_dual.clear();
     m_alphTest.clear();
     m_normalMap.clear();
+    m_pbr.clear();
     m_dgsl.clear();
 
     m_cat.Reset();
@@ -1927,10 +2038,18 @@ void Game::OnDeviceLost()
     m_brickDiffuse.Reset();
     m_brickNormal.Reset();
     m_brickSpecular.Reset();
+    m_pbrAlbedo.Reset();
+    m_pbrNormal.Reset();
+    m_pbrRMA.Reset();
+    m_pbrEmissive.Reset();
+    m_radianceIBL.Reset();
+    m_irradianceIBL.Reset();
 
     m_vertexBuffer.Reset();
     m_compressedVB.Reset();
     m_indexBuffer.Reset();
+
+    m_velocityBuffer->ReleaseDevice();
 }
 
 void Game::OnDeviceRestored()
