@@ -297,6 +297,8 @@ namespace
         if (!hdr->numIndices || !hdr->numIndices)
             throw std::exception("ReadVBO");
 
+        static_assert(sizeof(VertexPositionNormalTexture) == 32, "VBO vertex size mismatch");
+
         size_t vertSize = sizeof(VertexPositionNormalTexture) * hdr->numVertices;
         if (blob.size() < (vertSize + sizeof(VBO::header_t)))
             throw std::exception("End of file");
