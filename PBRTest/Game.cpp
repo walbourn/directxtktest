@@ -319,7 +319,10 @@ namespace
 
 // Constructor.
 Game::Game() :
-    m_ibl(0)
+    m_ibl(0),
+    m_spinning(true),
+    m_pitch(0),
+    m_yaw(0)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
@@ -397,6 +400,9 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const&)
 {
+    auto kb = m_keyboard->GetState();
+    m_keyboardButtons.Update(kb);
+
     auto pad = m_gamePad->GetState(0);
     if (pad.IsConnected())
     {
@@ -407,7 +413,8 @@ void Game::Update(DX::StepTimer const&)
             ExitGame();
         }
 
-        if (m_gamePadButtons.dpadDown == GamePad::ButtonStateTracker::PRESSED)
+        if (m_gamePadButtons.dpadDown == GamePad::ButtonStateTracker::PRESSED
+            || m_gamePadButtons.dpadLeft == GamePad::ButtonStateTracker::PRESSED)
         {
             ++m_ibl;
             if (m_ibl >= s_nIBL)
@@ -415,28 +422,69 @@ void Game::Update(DX::StepTimer const&)
                 m_ibl = 0;
             }
         }
-        else if (m_gamePadButtons.dpadUp == GamePad::ButtonStateTracker::PRESSED)
+        else if (m_gamePadButtons.dpadUp == GamePad::ButtonStateTracker::PRESSED
+                 || m_gamePadButtons.dpadRight == GamePad::ButtonStateTracker::PRESSED)
         {
             if (!m_ibl)
                 m_ibl = s_nIBL - 1;
             else
                 --m_ibl;
         }
+
+        if (m_gamePadButtons.a == GamePad::ButtonStateTracker::PRESSED)
+        {
+            m_spinning = !m_spinning;
+        }
+
+        if (pad.IsLeftStickPressed())
+        {
+            m_spinning = false;
+            m_yaw = m_pitch = 0.f;
+        }
+        else
+        {
+            m_yaw += pad.thumbSticks.leftX * 0.1f;
+            m_pitch -= pad.thumbSticks.leftY * 0.1f;
+        }
     }
     else
     {
         m_gamePadButtons.Reset();
+
+        if (kb.A || kb.D)
+        {
+            m_spinning = false;
+            m_yaw += (kb.D ? 0.1f : -0.1f);
+        }
+
+        if (kb.W || kb.S)
+        {
+            m_spinning = false;
+            m_pitch += (kb.W ? 0.1f : -0.1f);
+        }
+
+        if (kb.Home)
+        {
+            m_spinning = false;
+            m_yaw = m_pitch = 0.f;
+        }
     }
 
-    auto kb = m_keyboard->GetState();
-    m_keyboardButtons.Update(kb);
+    if (m_yaw > XM_PI)
+    {
+        m_yaw -= XM_PI * 2.f;
+    }
+    else if (m_yaw < -XM_PI)
+    {
+        m_yaw += XM_PI * 2.f;
+    }
 
     if (kb.Escape)
     {
         ExitGame();
     }
 
-    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Enter) && !kb.LeftAlt && !kb.RightAlt)
     {
         ++m_ibl;
         if (m_ibl >= s_nIBL)
@@ -450,6 +498,11 @@ void Game::Update(DX::StepTimer const&)
             m_ibl = s_nIBL - 1;
         else
             --m_ibl;
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
+    {
+        m_spinning = !m_spinning;
     }
 }
 #pragma endregion
@@ -484,7 +537,16 @@ void Game::Render()
     float pitch = time * 0.7f;
     float roll = time * 1.1f;
 
-    XMMATRIX world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+    XMMATRIX world;
+    
+    if (m_spinning)
+    {
+        world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+    }
+    else
+    {
+        world = XMMatrixRotationRollPitchYaw(m_pitch, m_yaw, 0);
+    }
 
     // Setup for object drawing.
     UINT vertexStride = sizeof(TestVertex);
@@ -550,7 +612,7 @@ void Game::Render()
     context->IASetVertexBuffers(0, 1, m_vertexBufferCube.GetAddressOf(), &vertexStride, &vertexOffset);
     context->IASetIndexBuffer(m_indexBufferCube.Get(), DXGI_FORMAT_R16_UINT, 0);
     context->IASetInputLayout(m_inputLayoutCube.Get());
-    m_pbrCube->SetWorld(XMMatrixTranslation(col7, row0, 0));
+    m_pbrCube->SetWorld(world * XMMatrixTranslation(col7, row0, 0));
     m_pbrCube->Apply(context);
     context->DrawIndexed(m_indexCountCube, 0, 0);
 

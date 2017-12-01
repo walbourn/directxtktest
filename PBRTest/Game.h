@@ -137,4 +137,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_irradianceIBL[s_nIBL];
 
     uint32_t m_ibl;
+    bool m_spinning;
+    float m_pitch;
+    float m_yaw;
 };
