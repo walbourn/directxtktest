@@ -313,11 +313,11 @@ namespace
 
         auto inmap = dynamic_cast<NormalMapEffect*>(effect);
         if (inmap)
-            inmap->SetBiasedVertexNormalsAndTangents(false);
+            inmap->SetBiasedVertexNormals(false);
 
         auto ipbr = dynamic_cast<PBREffect*>(effect);
         if (ipbr)
-            ipbr->SetBiasedVertexNormalsAndTangents(false);
+            ipbr->SetBiasedVertexNormals(false);
 
         auto iskin = dynamic_cast<SkinnedEffect*>(effect);
         if (iskin)
@@ -351,12 +351,12 @@ namespace
             }
             else if (inmap)
             {
-                inmap->SetBiasedVertexNormalsAndTangents(true);
+                inmap->SetBiasedVertexNormals(true);
                 inmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
             }
             else if (ipbr)
             {
-                ipbr->SetBiasedVertexNormalsAndTangents(true);
+                ipbr->SetBiasedVertexNormals(true);
                 ipbr->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
             }
             else if (iskin)
