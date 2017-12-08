@@ -315,6 +315,10 @@ namespace
         if (inmap)
             inmap->SetBiasedVertexNormalsAndTangents(false);
 
+        auto ipbr = dynamic_cast<PBREffect*>(effect);
+        if (ipbr)
+            ipbr->SetBiasedVertexNormalsAndTangents(false);
+
         auto iskin = dynamic_cast<SkinnedEffect*>(effect);
         if (iskin)
             iskin->SetBiasedVertexNormals(false);
@@ -349,6 +353,11 @@ namespace
             {
                 inmap->SetBiasedVertexNormalsAndTangents(true);
                 inmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+            }
+            else if (ipbr)
+            {
+                ipbr->SetBiasedVertexNormalsAndTangents(true);
+                ipbr->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
             }
             else if (iskin)
             {
