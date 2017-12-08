@@ -50,180 +50,6 @@ namespace
     const float row2 = -1.1f;
     const float row3 = -2.5f;
 
-    struct TestVertex
-    {
-        TestVertex() = default;
-
-        TestVertex(XMFLOAT3 const& position,
-            XMFLOAT3 const& normal,
-            XMFLOAT2 const& textureCoordinate,
-            XMFLOAT3 const& tangent)
-            : position(position),
-            normal(normal),
-            textureCoordinate(textureCoordinate),
-            tangent(tangent)
-        { }
-
-        TestVertex(FXMVECTOR position,
-            FXMVECTOR normal,
-            CXMVECTOR textureCoordinate,
-            FXMVECTOR tangent)
-        {
-            XMStoreFloat3(&this->position, position);
-            XMStoreFloat3(&this->normal, normal);
-            XMStoreFloat2(&this->textureCoordinate, textureCoordinate);
-            XMStoreFloat3(&this->tangent, tangent);
-        }
-
-        XMFLOAT3 position;
-        XMFLOAT3 normal;
-        XMFLOAT2 textureCoordinate;
-        XMFLOAT3 tangent;
-
-        static const int InputElementCount = 4;
-        static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
-    };
-
-    const D3D11_INPUT_ELEMENT_DESC TestVertex::InputElements[] =
-    {
-        { "SV_Position", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "NORMAL",      0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TANGENT",     0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-
-    static_assert(sizeof(TestVertex) == 44, "Vertex struct/layout mismatch");
-
-    struct aligned_deleter { void operator()(void* p) { _aligned_free(p); } };
-
-    // Helper for computing tangents (see DirectXMesh <http://go.microsoft.com/fwlink/?LinkID=324981>)
-    void ComputeTangents(const std::vector<uint16_t>& indices, std::vector<TestVertex>& vertices)
-    {
-        static const float EPSILON = 0.0001f;
-        static const XMVECTORF32 s_flips = { 1.f, -1.f, -1.f, 1.f };
-
-        size_t nFaces = indices.size() / 3;
-        size_t nVerts = vertices.size();
-
-        std::unique_ptr<XMVECTOR[], aligned_deleter> temp(reinterpret_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts * 2, 16)));
-
-        memset(temp.get(), 0, sizeof(XMVECTOR) * nVerts * 2);
-
-        XMVECTOR* tangent1 = temp.get();
-        XMVECTOR* tangent2 = temp.get() + nVerts;
-
-        for (size_t face = 0; face < nFaces; ++face)
-        {
-            uint16_t i0 = indices[face * 3];
-            uint16_t i1 = indices[face * 3 + 1];
-            uint16_t i2 = indices[face * 3 + 2];
-
-            if (i0 >= nVerts
-                || i1 >= nVerts
-                || i2 >= nVerts)
-            {
-                throw std::exception("ComputeTangents");
-            }
-
-            XMVECTOR t0 = XMLoadFloat2(&vertices[i0].textureCoordinate);
-            XMVECTOR t1 = XMLoadFloat2(&vertices[i1].textureCoordinate);
-            XMVECTOR t2 = XMLoadFloat2(&vertices[i2].textureCoordinate);
-
-            XMVECTOR s = XMVectorMergeXY(t1 - t0, t2 - t0);
-
-            XMFLOAT4A tmp;
-            XMStoreFloat4A(&tmp, s);
-
-            float d = tmp.x * tmp.w - tmp.z * tmp.y;
-            d = (fabsf(d) <= EPSILON) ? 1.f : (1.f / d);
-            s *= d;
-            s = XMVectorMultiply(s, s_flips);
-
-            XMMATRIX m0;
-            m0.r[0] = XMVectorPermute<3, 2, 6, 7>(s, g_XMZero);
-            m0.r[1] = XMVectorPermute<1, 0, 4, 5>(s, g_XMZero);
-            m0.r[2] = m0.r[3] = g_XMZero;
-
-            XMVECTOR p0 = XMLoadFloat3(&vertices[i0].position);
-            XMVECTOR p1 = XMLoadFloat3(&vertices[i1].position);
-            XMVECTOR p2 = XMLoadFloat3(&vertices[i2].position);
-
-            XMMATRIX m1;
-            m1.r[0] = p1 - p0;
-            m1.r[1] = p2 - p0;
-            m1.r[2] = m1.r[3] = g_XMZero;
-
-            XMMATRIX uv = XMMatrixMultiply(m0, m1);
-
-            tangent1[i0] = XMVectorAdd(tangent1[i0], uv.r[0]);
-            tangent1[i1] = XMVectorAdd(tangent1[i1], uv.r[0]);
-            tangent1[i2] = XMVectorAdd(tangent1[i2], uv.r[0]);
-
-            tangent2[i0] = XMVectorAdd(tangent2[i0], uv.r[1]);
-            tangent2[i1] = XMVectorAdd(tangent2[i1], uv.r[1]);
-            tangent2[i2] = XMVectorAdd(tangent2[i2], uv.r[1]);
-        }
-
-        for (size_t j = 0; j < nVerts; ++j)
-        {
-            // Gram-Schmidt orthonormalization
-            XMVECTOR b0 = XMLoadFloat3(&vertices[j].normal);
-            b0 = XMVector3Normalize(b0);
-
-            XMVECTOR tan1 = tangent1[j];
-            XMVECTOR b1 = tan1 - XMVector3Dot(b0, tan1) * b0;
-            b1 = XMVector3Normalize(b1);
-
-            XMVECTOR tan2 = tangent2[j];
-            XMVECTOR b2 = tan2 - XMVector3Dot(b0, tan2) * b0 - XMVector3Dot(b1, tan2) * b1;
-            b2 = XMVector3Normalize(b2);
-
-            // handle degenerate vectors
-            float len1 = XMVectorGetX(XMVector3Length(b1));
-            float len2 = XMVectorGetY(XMVector3Length(b2));
-
-            if ((len1 <= EPSILON) || (len2 <= EPSILON))
-            {
-                if (len1 > 0.5f)
-                {
-                    // Reset bi-tangent from tangent and normal
-                    b2 = XMVector3Cross(b0, b1);
-                }
-                else if (len2 > 0.5f)
-                {
-                    // Reset tangent from bi-tangent and normal
-                    b1 = XMVector3Cross(b2, b0);
-                }
-                else
-                {
-                    // Reset both tangent and bi-tangent from normal
-                    XMVECTOR axis;
-
-                    float d0 = fabs(XMVectorGetX(XMVector3Dot(g_XMIdentityR0, b0)));
-                    float d1 = fabs(XMVectorGetX(XMVector3Dot(g_XMIdentityR1, b0)));
-                    float d2 = fabs(XMVectorGetX(XMVector3Dot(g_XMIdentityR2, b0)));
-                    if (d0 < d1)
-                    {
-                        axis = (d0 < d2) ? g_XMIdentityR0 : g_XMIdentityR2;
-                    }
-                    else if (d1 < d2)
-                    {
-                        axis = g_XMIdentityR1;
-                    }
-                    else
-                    {
-                        axis = g_XMIdentityR2;
-                    }
-
-                    b1 = XMVector3Cross(b0, axis);
-                    b2 = XMVector3Cross(b0, b1);
-                }
-            }
-
-            XMStoreFloat3(&vertices[j].tangent, b1);
-        }
-    }
-
     // Helper for creating a D3D vertex or index buffer.
     template<typename T>
     void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FLAG bindFlags, _Out_ ID3D11Buffer** pBuffer)
@@ -253,8 +79,8 @@ namespace
 
         effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
-        HRESULT hr = device->CreateInputLayout(TestVertex::InputElements,
-            TestVertex::InputElementCount,
+        HRESULT hr = device->CreateInputLayout(GeometricPrimitive::VertexType::InputElements,
+            GeometricPrimitive::VertexType::InputElementCount,
             shaderByteCode, byteCodeLength,
             pInputLayout);
         DX::ThrowIfFailed(hr);
@@ -549,7 +375,7 @@ void Game::Render()
     }
 
     // Setup for object drawing.
-    UINT vertexStride = sizeof(TestVertex);
+    UINT vertexStride = sizeof(GeometricPrimitive::VertexType);
     UINT vertexOffset = 0;
 
     context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
@@ -936,28 +762,12 @@ void Game::CreateDeviceDependentResources()
     m_toneMap->SetMRTOutput(true);
 #endif
 
-    // Create test geometry with tangent frame
+    // Create test geometry
     {
-        std::vector<GeometricPrimitive::VertexType> origVerts;
+        std::vector<GeometricPrimitive::VertexType> vertices;
         std::vector<uint16_t> indices;
 
-        GeometricPrimitive::CreateSphere(origVerts, indices);
-
-        std::vector<TestVertex> vertices;
-        vertices.reserve(origVerts.size());
-
-        for (auto it = origVerts.cbegin(); it != origVerts.cend(); ++it)
-        {
-            TestVertex v;
-            v.position = it->position;
-            v.normal = it->normal;
-            v.textureCoordinate = it->textureCoordinate;
-            vertices.emplace_back(v);
-        }
-
-        assert(origVerts.size() == vertices.size());
-
-        ComputeTangents(indices, vertices);
+        GeometricPrimitive::CreateSphere(vertices, indices);
 
         // Create the D3D buffers.
         if (vertices.size() >= USHRT_MAX)
@@ -975,28 +785,12 @@ void Game::CreateDeviceDependentResources()
         m_indexCount = static_cast<UINT>(indices.size());
     }
 
-    // Create cube geometry with tangent frame
+    // Create cube geometry
     {
-        std::vector<GeometricPrimitive::VertexType> origVerts;
+        std::vector<GeometricPrimitive::VertexType> vertices;
         std::vector<uint16_t> indices;
 
-        ReadVBO(L"BrokenCube.vbo", origVerts, indices);
-
-        std::vector<TestVertex> vertices;
-        vertices.reserve(origVerts.size());
-
-        for (auto it = origVerts.cbegin(); it != origVerts.cend(); ++it)
-        {
-            TestVertex v;
-            v.position = it->position;
-            v.normal = it->normal;
-            v.textureCoordinate = it->textureCoordinate;
-            vertices.emplace_back(v);
-        }
-
-        assert(origVerts.size() == vertices.size());
-
-        ComputeTangents(indices, vertices);
+        ReadVBO(L"BrokenCube.vbo", vertices, indices);
 
         // Create the D3D buffers.
         if (vertices.size() >= USHRT_MAX)
