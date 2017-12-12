@@ -441,7 +441,7 @@ void Game::Update(DX::StepTimer const&)
         if (m_gamePadButtons.y == GamePad::ButtonStateTracker::PRESSED)
         {
             CycleDebug();
-         }
+        }
 
         if (pad.IsLeftStickPressed())
         {
@@ -588,6 +588,7 @@ void Game::Render()
 
     if (m_showDebug)
     {
+        //--- DebugEffect ------------------------------------------------------------------
         context->IASetInputLayout(m_inputLayoutDBG.Get());
 
         m_debug->SetMode(m_debugMode);
@@ -617,7 +618,6 @@ void Game::Render()
         m_debug->Apply(context);
         context->DrawIndexed(m_indexCountCube, 0, 0);
 
-        //--- PBREffect (emissive) ---------------------------------------------------------
         context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
         context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
         context->IASetInputLayout(m_inputLayoutPBR.Get());
