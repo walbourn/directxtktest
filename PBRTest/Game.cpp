@@ -321,6 +321,8 @@ namespace
 Game::Game() :
     m_ibl(0),
     m_spinning(true),
+    m_showDebug(false),
+    m_debugMode(DebugEffect::Mode_Default),
     m_pitch(0),
     m_yaw(0)
 {
@@ -436,6 +438,11 @@ void Game::Update(DX::StepTimer const&)
             m_spinning = !m_spinning;
         }
 
+        if (m_gamePadButtons.y == GamePad::ButtonStateTracker::PRESSED)
+        {
+            CycleDebug();
+         }
+
         if (pad.IsLeftStickPressed())
         {
             m_spinning = false;
@@ -504,6 +511,11 @@ void Game::Update(DX::StepTimer const&)
     {
         m_spinning = !m_spinning;
     }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Tab))
+    {
+        CycleDebug();
+    }
 }
 #pragma endregion
 
@@ -538,7 +550,7 @@ void Game::Render()
     float roll = time * 1.1f;
 
     XMMATRIX world;
-    
+
     if (m_spinning)
     {
         world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
@@ -574,67 +586,117 @@ void Game::Render()
 
     context->PSSetSamplers(0, 2, samplers);
 
-    //--- NormalMap ------------------------------------------------------------------------
-    context->IASetInputLayout(m_inputLayoutNM.Get());
+    if (m_showDebug)
+    {
+        context->IASetInputLayout(m_inputLayoutDBG.Get());
 
-    m_normalMapEffect->SetWorld(world * XMMatrixTranslation(col0, row0, 0));
-    m_normalMapEffect->SetTexture(m_baseColor[0].Get());
-    m_normalMapEffect->SetNormalTexture(m_normalMap[0].Get());
-    m_normalMapEffect->Apply(context);
-    context->DrawIndexed(m_indexCount, 0, 0);
+        m_debug->SetMode(m_debugMode);
+        m_debug->SetAlpha(1.f);
+        m_debug->SetWorld(world * XMMatrixTranslation(col0, row0, 0));
+        m_debug->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
 
-    m_normalMapEffect->SetWorld(world * XMMatrixTranslation(col3, row0, 0));
-    m_normalMapEffect->SetTexture(m_baseColor[1].Get());
-    m_normalMapEffect->SetNormalTexture(m_normalMap[1].Get());
-    m_normalMapEffect->Apply(context);
-    context->DrawIndexed(m_indexCount, 0, 0);
+        m_debug->SetWorld(world * XMMatrixTranslation(col3, row0, 0));
+        m_debug->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
 
-    //--- PBREffect (basic) ----------------------------------------------------------------
-    context->IASetInputLayout(m_inputLayoutPBR.Get());
+        m_debug->SetWorld(world * XMMatrixTranslation(col1, row0, 0));
+        m_debug->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
 
-    D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-    m_radianceIBL[m_ibl]->GetDesc(&desc);
+        m_debug->SetAlpha(alphaFade);
+        m_debug->SetWorld(world * XMMatrixTranslation(col2, row0, 0));
+        m_debug->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
 
-    m_pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
-    m_pbrCube->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+        context->IASetVertexBuffers(0, 1, m_vertexBufferCube.GetAddressOf(), &vertexStride, &vertexOffset);
+        context->IASetIndexBuffer(m_indexBufferCube.Get(), DXGI_FORMAT_R16_UINT, 0);
+        context->IASetInputLayout(m_inputLayoutCube.Get());
+        m_debug->SetAlpha(1.f);
+        m_debug->SetWorld(world * XMMatrixTranslation(col7, row0, 0));
+        m_debug->Apply(context);
+        context->DrawIndexed(m_indexCountCube, 0, 0);
 
-    m_pbr->SetAlpha(1.f);
-    m_pbr->SetWorld(world * XMMatrixTranslation(col1, row0, 0));
-    m_pbr->SetSurfaceTextures(m_baseColor[0].Get(), m_normalMap[0].Get(), m_rma[0].Get());
-    m_pbr->Apply(context);
-    context->DrawIndexed(m_indexCount, 0, 0);
+        //--- PBREffect (emissive) ---------------------------------------------------------
+        context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
+        context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+        context->IASetInputLayout(m_inputLayoutPBR.Get());
 
-    m_pbr->SetAlpha(alphaFade);
-    m_pbr->SetWorld(world * XMMatrixTranslation(col2, row0, 0));
-    m_pbr->Apply(context);
-    context->DrawIndexed(m_indexCount, 0, 0);
+        m_debug->SetAlpha(1.f);
+        m_debug->SetWorld(world * XMMatrixTranslation(col4, row0, 0));
+        m_debug->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
 
-    context->IASetVertexBuffers(0, 1, m_vertexBufferCube.GetAddressOf(), &vertexStride, &vertexOffset);
-    context->IASetIndexBuffer(m_indexBufferCube.Get(), DXGI_FORMAT_R16_UINT, 0);
-    context->IASetInputLayout(m_inputLayoutCube.Get());
-    m_pbrCube->SetWorld(world * XMMatrixTranslation(col7, row0, 0));
-    m_pbrCube->Apply(context);
-    context->DrawIndexed(m_indexCountCube, 0, 0);
+        m_debug->SetAlpha(alphaFade);
+        m_debug->SetWorld(world * XMMatrixTranslation(col5, row0, 0));
+        m_debug->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
+    }
+    else
+    {
+        //--- NormalMap --------------------------------------------------------------------
+        context->IASetInputLayout(m_inputLayoutNM.Get());
 
-    //--- PBREffect (emissive) -------------------------------------------------------------
-    context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
-    context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
-    context->IASetInputLayout(m_inputLayoutPBR.Get());
+        m_normalMapEffect->SetWorld(world * XMMatrixTranslation(col0, row0, 0));
+        m_normalMapEffect->SetTexture(m_baseColor[0].Get());
+        m_normalMapEffect->SetNormalTexture(m_normalMap[0].Get());
+        m_normalMapEffect->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
 
-    m_pbr->SetEmissiveTexture(m_emissiveMap[1].Get());
+        m_normalMapEffect->SetWorld(world * XMMatrixTranslation(col3, row0, 0));
+        m_normalMapEffect->SetTexture(m_baseColor[1].Get());
+        m_normalMapEffect->SetNormalTexture(m_normalMap[1].Get());
+        m_normalMapEffect->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
 
-    m_pbr->SetAlpha(1.f);
-    m_pbr->SetWorld(world * XMMatrixTranslation(col4, row0, 0));
-    m_pbr->SetSurfaceTextures(m_baseColor[1].Get(), m_normalMap[1].Get(), m_rma[1].Get());
-    m_pbr->Apply(context);
-    context->DrawIndexed(m_indexCount, 0, 0);
+        //--- PBREffect (basic) ------------------------------------------------------------
+        context->IASetInputLayout(m_inputLayoutPBR.Get());
 
-    m_pbr->SetAlpha(alphaFade);
-    m_pbr->SetWorld(world * XMMatrixTranslation(col5, row0, 0));
-    m_pbr->Apply(context);
-    context->DrawIndexed(m_indexCount, 0, 0);
+        D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+        m_radianceIBL[m_ibl]->GetDesc(&desc);
+
+        m_pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+        m_pbrCube->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+
+        m_pbr->SetAlpha(1.f);
+        m_pbr->SetWorld(world * XMMatrixTranslation(col1, row0, 0));
+        m_pbr->SetSurfaceTextures(m_baseColor[0].Get(), m_normalMap[0].Get(), m_rma[0].Get());
+        m_pbr->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
+
+        m_pbr->SetAlpha(alphaFade);
+        m_pbr->SetWorld(world * XMMatrixTranslation(col2, row0, 0));
+        m_pbr->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
+
+        context->IASetVertexBuffers(0, 1, m_vertexBufferCube.GetAddressOf(), &vertexStride, &vertexOffset);
+        context->IASetIndexBuffer(m_indexBufferCube.Get(), DXGI_FORMAT_R16_UINT, 0);
+        context->IASetInputLayout(m_inputLayoutCube.Get());
+        m_pbrCube->SetWorld(world * XMMatrixTranslation(col7, row0, 0));
+        m_pbrCube->Apply(context);
+        context->DrawIndexed(m_indexCountCube, 0, 0);
+
+        //--- PBREffect (emissive) ---------------------------------------------------------
+        context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
+        context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+        context->IASetInputLayout(m_inputLayoutPBR.Get());
+
+        m_pbr->SetEmissiveTexture(m_emissiveMap[1].Get());
+
+        m_pbr->SetAlpha(1.f);
+        m_pbr->SetWorld(world * XMMatrixTranslation(col4, row0, 0));
+        m_pbr->SetSurfaceTextures(m_baseColor[1].Get(), m_normalMap[1].Get(), m_rma[1].Get());
+        m_pbr->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
+
+        m_pbr->SetAlpha(alphaFade);
+        m_pbr->SetWorld(world * XMMatrixTranslation(col5, row0, 0));
+        m_pbr->Apply(context);
+        context->DrawIndexed(m_indexCount, 0, 0);
+    }
 
     //--- PBREffect (constant) -------------------------------------------------------------   
+    context->IASetInputLayout(m_inputLayoutPBR.Get());
 
     m_pbr->SetAlpha(1.f);
     m_pbr->SetSurfaceTextures(nullptr, nullptr, nullptr);
@@ -928,6 +990,9 @@ void Game::CreateDeviceDependentResources()
     m_pbrCube = std::make_unique<PBREffect>(device);
     m_pbrCube->EnableDefaultLighting();
 
+    m_debug = std::make_unique<DebugEffect>(device);
+    m_debug->SetHemisphericalAmbientColor(Colors::White, Colors::Black);
+
     m_toneMap = std::make_unique<ToneMapPostProcess>(device);
     m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
     m_toneMap->SetTransferFunction(ToneMapPostProcess::SRGB);
@@ -966,6 +1031,8 @@ void Game::CreateDeviceDependentResources()
         CreateInputLayout(device, m_normalMapEffect.get(), m_inputLayoutNM.ReleaseAndGetAddressOf());
 
         CreateInputLayout(device, m_pbr.get(), m_inputLayoutPBR.ReleaseAndGetAddressOf());
+
+        CreateInputLayout(device, m_debug.get(), m_inputLayoutDBG.ReleaseAndGetAddressOf());
         
         CreateBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.ReleaseAndGetAddressOf());
 
@@ -1118,10 +1185,12 @@ void Game::CreateWindowSizeDependentResources()
     m_normalMapEffect->SetView(view);
     m_pbr->SetView(view);
     m_pbrCube->SetView(view);
+    m_debug->SetView(view);
 
     m_normalMapEffect->SetProjection(projection);
     m_pbr->SetProjection(projection);
     m_pbrCube->SetProjection(projection);
+    m_debug->SetProjection(projection);
 
     // Set windows size for HDR.
     m_hdrScene->SetWindow(size);
@@ -1151,11 +1220,13 @@ void Game::OnDeviceLost()
     m_normalMapEffect.reset();
     m_pbr.reset();
     m_pbrCube.reset();
+    m_debug.reset();
 
     m_vertexBuffer.Reset();
     m_indexBuffer.Reset();
     m_inputLayoutNM.Reset();
     m_inputLayoutPBR.Reset();
+    m_inputLayoutDBG.Reset();
 
     m_vertexBufferCube.Reset();
     m_indexBufferCube.Reset();
@@ -1174,3 +1245,27 @@ void Game::OnDeviceRestored()
 }
 #endif
 #pragma endregion
+
+void Game::CycleDebug()
+{
+    if (!m_showDebug)
+    {
+        m_showDebug = true;
+        m_debugMode = DebugEffect::Mode_Default;
+    }
+    else if (m_debugMode == DebugEffect::Mode_BiTangents)
+    {
+        m_showDebug = false;
+    }
+    else
+    {
+        m_debugMode = static_cast<DebugEffect::Mode>(m_debugMode + 1);
+
+        switch (m_debugMode)
+        {
+        case DebugEffect::Mode_Normals: OutputDebugStringA("INFO: Showing normals\n"); break;
+        case DebugEffect::Mode_Tangents: OutputDebugStringA("INFO: Showing tangents\n"); break;
+        case DebugEffect::Mode_BiTangents: OutputDebugStringA("INFO: Showing bi-tangents\n"); break;
+        }
+    }
+}
