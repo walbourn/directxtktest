@@ -323,6 +323,10 @@ namespace
         if (iskin)
             iskin->SetBiasedVertexNormals(false);
 
+        auto idbg = dynamic_cast<DebugEffect*>(effect);
+        if (idbg)
+            idbg->SetBiasedVertexNormalsAndTangents(false);
+
         void const* shaderByteCode;
         size_t byteCodeLength;
 
@@ -363,6 +367,11 @@ namespace
             {
                 iskin->SetBiasedVertexNormals(true);
                 iskin->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+            }
+            else if (idbg)
+            {
+                idbg->SetBiasedVertexNormalsAndTangents(true);
+                idbg->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
             }
 
             hr = device->CreateInputLayout(TestCompressedVertex::InputElements,
@@ -851,6 +860,33 @@ void Game::Render()
     context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
 
     context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
+
+    // DebugEffect
+    {
+        auto it = m_debug.begin();
+        assert(it != m_debug.end());
+
+        for (; y > -ortho_height; y -= 1.f)
+        {
+            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+            {
+                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
+                context->DrawIndexed(m_indexCount, 0, 0);
+
+                ++it;
+                if (it == m_debug.cend())
+                    break;
+            }
+
+            if (it == m_debug.cend())
+                break;
+        }
+
+        // Make sure we drew all the effects
+        assert(it == m_debug.cend());
+
+        y -= 1.f;
+    }
 
     // DGSLEffect
     if (!m_showCompressed)
@@ -1826,7 +1862,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetFogColor(Colors::Black);
     }));
 
-    //--- PBREffect --------------------------------------------------------------------
+    //--- PBREffect ------------------------------------------------------------------------
     D3D11_SHADER_RESOURCE_VIEW_DESC desc;
     m_radianceIBL->GetDesc(&desc);
 
@@ -1870,6 +1906,50 @@ void Game::CreateDeviceDependentResources()
         effect->SetEmissiveTexture(m_pbrEmissive.Get());
         effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
         effect->SetVelocityGeneration(true);
+    }));
+
+    //--- DebugEffect ----------------------------------------------------------------------
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect;
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetMode(DebugEffect::Mode_Normals);
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetMode(DebugEffect::Mode_Tangents);
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetMode(DebugEffect::Mode_BiTangents);
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetMode(DebugEffect::Mode_Normals);
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetMode(DebugEffect::Mode_Tangents);
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetMode(DebugEffect::Mode_BiTangents);
+        effect->SetVertexColorEnabled(true);
     }));
 
     //--- DGSLEffect -----------------------------------------------------------------------
@@ -2038,6 +2118,7 @@ void Game::OnDeviceLost()
     m_alphTest.clear();
     m_normalMap.clear();
     m_pbr.clear();
+    m_debug.clear();
     m_dgsl.clear();
 
     m_cat.Reset();
