@@ -991,7 +991,6 @@ void Game::CreateDeviceDependentResources()
     m_pbrCube->EnableDefaultLighting();
 
     m_debug = std::make_unique<DebugEffect>(device);
-    m_debug->SetHemisphericalAmbientColor(Colors::White, Colors::Black);
 
     m_toneMap = std::make_unique<ToneMapPostProcess>(device);
     m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
