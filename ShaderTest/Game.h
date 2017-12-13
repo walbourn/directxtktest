@@ -139,6 +139,10 @@ private:
             if (iskin)
                 iskin->SetBiasedVertexNormals(showCompressed);
 
+            auto idbg = dynamic_cast<DebugEffect*>(this);
+            if (idbg)
+                idbg->SetBiasedVertexNormalsAndTangents(true);
+
             T::Apply(context);
 
             context->IASetInputLayout((showCompressed) ? compressedInputLayout.Get() : inputLayout.Get());
@@ -183,6 +187,7 @@ private:
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::AlphaTestEffect>>> m_alphTest;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::NormalMapEffect>>> m_normalMap;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::PBREffect>>> m_pbr;
+    std::vector<std::unique_ptr<EffectWithDecl<DirectX::DebugEffect>>> m_debug;
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::DGSLEffect>>> m_dgsl;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
