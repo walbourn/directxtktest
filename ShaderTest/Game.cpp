@@ -323,6 +323,10 @@ namespace
         if (iskin)
             iskin->SetBiasedVertexNormals(false);
 
+        auto idbg = dynamic_cast<DebugEffect*>(effect);
+        if (idbg)
+            idbg->SetBiasedVertexNormalsAndTangents(false);
+
         void const* shaderByteCode;
         size_t byteCodeLength;
 
@@ -363,6 +367,11 @@ namespace
             {
                 iskin->SetBiasedVertexNormals(true);
                 iskin->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+            }
+            else if (idbg)
+            {
+                idbg->SetBiasedVertexNormalsAndTangents(true);
+                idbg->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
             }
 
             hr = device->CreateInputLayout(TestCompressedVertex::InputElements,
@@ -493,7 +502,7 @@ Game::Game() :
 #endif
 
     // Used for PBREffect velocity buffer
-    m_velocityBuffer = std::make_unique<DX::RenderTexture>(DXGI_FORMAT_R10G10B10A2_UNORM);
+    m_velocityBuffer = std::make_unique<DX::RenderTexture>(DXGI_FORMAT_R32_UINT);
 }
 
 // Initialize the Direct3D resources required to run.
@@ -816,14 +825,49 @@ void Game::Render()
     }
 
     // PBREffect
-    context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
-
-    ID3D11RenderTargetView* views[] = { m_deviceResources->GetRenderTargetView(), m_velocityBuffer->GetRenderTargetView() };
-    context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
-
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
     {
-        auto it = m_pbr.begin();
-        assert(it != m_pbr.end());
+        context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
+
+        ID3D11RenderTargetView* views[] = { m_deviceResources->GetRenderTargetView(), m_velocityBuffer->GetRenderTargetView() };
+        context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
+
+        {
+            auto it = m_pbr.begin();
+            assert(it != m_pbr.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_pbr.cend())
+                        break;
+                }
+
+                if (it == m_pbr.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_pbr.cend());
+
+            y -= 1.f;
+        }
+
+        views[1] = nullptr;
+        context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
+
+        context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
+    }
+
+    // DebugEffect
+    {
+        auto it = m_debug.begin();
+        assert(it != m_debug.end());
 
         for (; y > -ortho_height; y -= 1.f)
         {
@@ -833,24 +877,19 @@ void Game::Render()
                 context->DrawIndexed(m_indexCount, 0, 0);
 
                 ++it;
-                if (it == m_pbr.cend())
+                if (it == m_debug.cend())
                     break;
             }
 
-            if (it == m_pbr.cend())
+            if (it == m_debug.cend())
                 break;
         }
 
         // Make sure we drew all the effects
-        assert(it == m_pbr.cend());
+        assert(it == m_debug.cend());
 
         y -= 1.f;
     }
-
-    views[1] = nullptr;
-    context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
-
-    context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
 
     // DGSLEffect
     if (!m_showCompressed)
@@ -1826,50 +1865,97 @@ void Game::CreateDeviceDependentResources()
         effect->SetFogColor(Colors::Black);
     }));
 
-    //--- PBREffect --------------------------------------------------------------------
-    D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-    m_radianceIBL->GetDesc(&desc);
-
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    //--- PBREffect ------------------------------------------------------------------------
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
     {
-        effect->EnableDefaultLighting();
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+        m_radianceIBL->GetDesc(&desc);
+
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        }));
+
+        // PBREffect (textured)
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        }));
+
+        // PBREffect (emissive)
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetEmissiveTexture(m_pbrEmissive.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        }));
+
+        // PBREffect (velocity)
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+            effect->SetVelocityGeneration(true);
+        }));
+
+        // PBREffect (velocity + emissive)
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetEmissiveTexture(m_pbrEmissive.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+            effect->SetVelocityGeneration(true);
+        }));
+    }
+
+    //--- DebugEffect ----------------------------------------------------------------------
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect;
     }));
 
-    // PBREffect (textured)
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
     {
-        effect->EnableDefaultLighting();
-        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        effect->SetMode(DebugEffect::Mode_Normals);
     }));
 
-    // PBREffect (emissive)
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
     {
-        effect->EnableDefaultLighting();
-        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-        effect->SetEmissiveTexture(m_pbrEmissive.Get());
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        effect->SetMode(DebugEffect::Mode_Tangents);
     }));
 
-    // PBREffect (velocity)
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
     {
-        effect->EnableDefaultLighting();
-        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
-        effect->SetVelocityGeneration(true);
+        effect->SetMode(DebugEffect::Mode_BiTangents);
     }));
 
-    // PBREffect (velocity + emissive)
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
     {
-        effect->EnableDefaultLighting();
-        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-        effect->SetEmissiveTexture(m_pbrEmissive.Get());
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
-        effect->SetVelocityGeneration(true);
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetMode(DebugEffect::Mode_Normals);
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetMode(DebugEffect::Mode_Tangents);
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetMode(DebugEffect::Mode_BiTangents);
+        effect->SetVertexColorEnabled(true);
     }));
 
     //--- DGSLEffect -----------------------------------------------------------------------
@@ -2009,14 +2095,20 @@ void Game::CreateDeviceDependentResources()
         effect->SetWeightsPerVertex(1);
     }));
 
-    m_velocityBuffer->SetDevice(device);
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+    {
+        m_velocityBuffer->SetDevice(device);
+    }
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    auto size = m_deviceResources->GetOutputSize();
-    m_velocityBuffer->SetWindow(size);
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+    {
+        auto size = m_deviceResources->GetOutputSize();
+        m_velocityBuffer->SetWindow(size);
+    }
 
     m_projection = XMMatrixOrthographicRH(ortho_width * 2.f, ortho_height * 2.f, 0.1f, 10.f);
 
@@ -2038,6 +2130,7 @@ void Game::OnDeviceLost()
     m_alphTest.clear();
     m_normalMap.clear();
     m_pbr.clear();
+    m_debug.clear();
     m_dgsl.clear();
 
     m_cat.Reset();

@@ -114,6 +114,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Buffer>        m_indexBuffer;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>   m_inputLayoutNM;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>   m_inputLayoutPBR;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>   m_inputLayoutDBG;
     UINT                                        m_indexCount;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>        m_vertexBufferCube;
@@ -125,6 +126,7 @@ private:
     std::unique_ptr<DirectX::NormalMapEffect>       m_normalMapEffect;
     std::unique_ptr<DirectX::PBREffect>             m_pbr;
     std::unique_ptr<DirectX::PBREffect>             m_pbrCube;
+    std::unique_ptr<DirectX::DebugEffect>           m_debug;
 
     static const size_t s_nMaterials = 3;
     static const size_t s_nIBL = 3;
@@ -138,6 +140,10 @@ private:
 
     uint32_t m_ibl;
     bool m_spinning;
+    bool m_showDebug;
+    DirectX::DebugEffect::Mode m_debugMode;
     float m_pitch;
     float m_yaw;
+
+    void CycleDebug();
 };
