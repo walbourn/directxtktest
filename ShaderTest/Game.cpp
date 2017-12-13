@@ -325,7 +325,7 @@ namespace
 
         auto idbg = dynamic_cast<DebugEffect*>(effect);
         if (idbg)
-            idbg->SetBiasedVertexNormalsAndTangents(false);
+            idbg->SetBiasedVertexNormals(false);
 
         void const* shaderByteCode;
         size_t byteCodeLength;
@@ -370,7 +370,7 @@ namespace
             }
             else if (idbg)
             {
-                idbg->SetBiasedVertexNormalsAndTangents(true);
+                idbg->SetBiasedVertexNormals(true);
                 idbg->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
             }
 

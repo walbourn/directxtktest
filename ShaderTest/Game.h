@@ -141,7 +141,7 @@ private:
 
             auto idbg = dynamic_cast<DebugEffect*>(this);
             if (idbg)
-                idbg->SetBiasedVertexNormalsAndTangents(true);
+                idbg->SetBiasedVertexNormals(true);
 
             T::Apply(context);
 
