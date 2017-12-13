@@ -502,7 +502,7 @@ Game::Game() :
 #endif
 
     // Used for PBREffect velocity buffer
-    m_velocityBuffer = std::make_unique<DX::RenderTexture>(DXGI_FORMAT_R10G10B10A2_UNORM);
+    m_velocityBuffer = std::make_unique<DX::RenderTexture>(DXGI_FORMAT_R32_UINT);
 }
 
 // Initialize the Direct3D resources required to run.
@@ -825,41 +825,44 @@ void Game::Render()
     }
 
     // PBREffect
-    context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
-
-    ID3D11RenderTargetView* views[] = { m_deviceResources->GetRenderTargetView(), m_velocityBuffer->GetRenderTargetView() };
-    context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
-
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
     {
-        auto it = m_pbr.begin();
-        assert(it != m_pbr.end());
+        context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
 
-        for (; y > -ortho_height; y -= 1.f)
+        ID3D11RenderTargetView* views[] = { m_deviceResources->GetRenderTargetView(), m_velocityBuffer->GetRenderTargetView() };
+        context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
+
         {
-            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
-            {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
-                context->DrawIndexed(m_indexCount, 0, 0);
+            auto it = m_pbr.begin();
+            assert(it != m_pbr.end());
 
-                ++it;
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_pbr.cend())
+                        break;
+                }
+
                 if (it == m_pbr.cend())
                     break;
             }
 
-            if (it == m_pbr.cend())
-                break;
+            // Make sure we drew all the effects
+            assert(it == m_pbr.cend());
+
+            y -= 1.f;
         }
 
-        // Make sure we drew all the effects
-        assert(it == m_pbr.cend());
+        views[1] = nullptr;
+        context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
 
-        y -= 1.f;
+        context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
     }
-
-    views[1] = nullptr;
-    context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
-
-    context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
 
     // DebugEffect
     {
@@ -1863,50 +1866,53 @@ void Game::CreateDeviceDependentResources()
     }));
 
     //--- PBREffect ------------------------------------------------------------------------
-    D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-    m_radianceIBL->GetDesc(&desc);
-
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
     {
-        effect->EnableDefaultLighting();
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
-    }));
+        D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+        m_radianceIBL->GetDesc(&desc);
 
-    // PBREffect (textured)
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
-    {
-        effect->EnableDefaultLighting();
-        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
-    }));
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        }));
 
-    // PBREffect (emissive)
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
-    {
-        effect->EnableDefaultLighting();
-        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-        effect->SetEmissiveTexture(m_pbrEmissive.Get());
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
-    }));
+        // PBREffect (textured)
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        }));
 
-    // PBREffect (velocity)
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
-    {
-        effect->EnableDefaultLighting();
-        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
-        effect->SetVelocityGeneration(true);
-    }));
+        // PBREffect (emissive)
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetEmissiveTexture(m_pbrEmissive.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+        }));
 
-    // PBREffect (velocity + emissive)
-    m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
-    {
-        effect->EnableDefaultLighting();
-        effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-        effect->SetEmissiveTexture(m_pbrEmissive.Get());
-        effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
-        effect->SetVelocityGeneration(true);
-    }));
+        // PBREffect (velocity)
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+            effect->SetVelocityGeneration(true);
+        }));
+
+        // PBREffect (velocity + emissive)
+        m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetEmissiveTexture(m_pbrEmissive.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+            effect->SetVelocityGeneration(true);
+        }));
+    }
 
     //--- DebugEffect ----------------------------------------------------------------------
     m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
@@ -2089,14 +2095,20 @@ void Game::CreateDeviceDependentResources()
         effect->SetWeightsPerVertex(1);
     }));
 
-    m_velocityBuffer->SetDevice(device);
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+    {
+        m_velocityBuffer->SetDevice(device);
+    }
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    auto size = m_deviceResources->GetOutputSize();
-    m_velocityBuffer->SetWindow(size);
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+    {
+        auto size = m_deviceResources->GetOutputSize();
+        m_velocityBuffer->SetWindow(size);
+    }
 
     m_projection = XMMatrixOrthographicRH(ortho_width * 2.f, ortho_height * 2.f, 0.1f, 10.f);
 
