@@ -313,11 +313,11 @@ namespace
 
         auto inmap = dynamic_cast<NormalMapEffect*>(effect);
         if (inmap)
-            inmap->SetBiasedVertexNormalsAndTangents(false);
+            inmap->SetBiasedVertexNormals(false);
 
         auto ipbr = dynamic_cast<PBREffect*>(effect);
         if (ipbr)
-            ipbr->SetBiasedVertexNormalsAndTangents(false);
+            ipbr->SetBiasedVertexNormals(false);
 
         auto iskin = dynamic_cast<SkinnedEffect*>(effect);
         if (iskin)
@@ -325,7 +325,7 @@ namespace
 
         auto idbg = dynamic_cast<DebugEffect*>(effect);
         if (idbg)
-            idbg->SetBiasedVertexNormalsAndTangents(false);
+            idbg->SetBiasedVertexNormals(false);
 
         void const* shaderByteCode;
         size_t byteCodeLength;
@@ -355,12 +355,12 @@ namespace
             }
             else if (inmap)
             {
-                inmap->SetBiasedVertexNormalsAndTangents(true);
+                inmap->SetBiasedVertexNormals(true);
                 inmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
             }
             else if (ipbr)
             {
-                ipbr->SetBiasedVertexNormalsAndTangents(true);
+                ipbr->SetBiasedVertexNormals(true);
                 ipbr->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
             }
             else if (iskin)
@@ -370,7 +370,7 @@ namespace
             }
             else if (idbg)
             {
-                idbg->SetBiasedVertexNormalsAndTangents(true);
+                idbg->SetBiasedVertexNormals(true);
                 idbg->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
             }
 

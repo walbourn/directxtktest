@@ -129,11 +129,11 @@ private:
 
             auto inmap = dynamic_cast<NormalMapEffect*>(this);
             if (inmap)
-                inmap->SetBiasedVertexNormalsAndTangents(showCompressed);
+                inmap->SetBiasedVertexNormals(showCompressed);
 
             auto ipbr = dynamic_cast<PBREffect*>(this);
             if (ipbr)
-                ipbr->SetBiasedVertexNormalsAndTangents(showCompressed);
+                ipbr->SetBiasedVertexNormals(showCompressed);
 
             auto iskin = dynamic_cast<SkinnedEffect*>(this);
             if (iskin)
@@ -141,7 +141,7 @@ private:
 
             auto idbg = dynamic_cast<DebugEffect*>(this);
             if (idbg)
-                idbg->SetBiasedVertexNormalsAndTangents(true);
+                idbg->SetBiasedVertexNormals(true);
 
             T::Apply(context);
 
