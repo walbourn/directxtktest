@@ -80,20 +80,7 @@ void Game::Initialize(
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
 
-#if defined(__cplusplus_winrt)
-    // SimpleMath interop tests for Windows Runtime types
-    Rectangle test1(10, 20, 50, 100);
-
-    Windows::Foundation::Rect test2 = test1;
-    if (test1.x != long(test2.X)
-        && test1.y != long(test2.Y)
-        && test1.width != long(test2.Width)
-        && test1.height != long(test2.Height))
-    {
-        OutputDebugStringA("SimpleMath::Rectangle operator test A failed!");
-        throw ref new Platform::Exception(E_FAIL);
-    }
-#endif
+    UnitTests();
 }
 
 #pragma region Frame Update
@@ -372,3 +359,108 @@ void Game::OnDeviceRestored()
 }
 #endif
 #pragma endregion
+
+void Game::UnitTests()
+{
+    bool success = true;
+    OutputDebugStringA("*********** UINT TESTS BEGIN ***************\n");
+
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    {
+        std::uniform_int_distribution<uint32_t> dist(1, UINT16_MAX);
+        for (size_t j = 1; j < 0x20000; j <<= 1)
+        {
+            for (size_t k = 0; k < 20000; k++)
+            {
+                uint32_t value = dist(generator);
+                uint32_t up = AlignUp(value, j);
+                uint32_t down = AlignDown(value, j);
+
+                if (!up)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignUp(32) tests\n");
+                    success = false;
+                }
+                else if (!down && value > j)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignDown(32) tests\n");
+                    success = false;
+                }
+                else if (up < down)
+                {
+                    OutputDebugStringA("ERROR: Failed Align(32) tests\n");
+                    success = false;
+                }
+                else if (value > up)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignUp(32) tests\n");
+                    success = false;
+                }
+                else if (value < down)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignDown(32) tests\n");
+                    success = false;
+                }
+            }
+        }
+    }
+
+    {
+        std::uniform_int_distribution<uint64_t> dist(1, UINT32_MAX);
+        for (size_t j = 1; j < 0x20000; j <<= 1)
+        {
+            for (size_t k = 0; k < 20000; k++)
+            {
+                uint64_t value = dist(generator);
+                uint64_t up = AlignUp(value, j);
+                uint64_t down = AlignDown(value, j);
+
+                if (!up)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignUp(64) tests\n");
+                    success = false;
+                }
+                else if (!down && value > j)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignDown(64) tests\n");
+                    success = false;
+                }
+                else if (up < down)
+                {
+                    OutputDebugStringA("ERROR: Failed Align(64) tests\n");
+                    success = false;
+                }
+                else if (value > up)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignUp(64) tests\n");
+                    success = false;
+                }
+                else if (value < down)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignDown(64) tests\n");
+                    success = false;
+                }
+            }
+        }
+    }
+
+
+#if defined(__cplusplus_winrt)
+    // SimpleMath interop tests for Windows Runtime types
+    Rectangle test1(10, 20, 50, 100);
+
+    Windows::Foundation::Rect test2 = test1;
+    if (test1.x != long(test2.X)
+        && test1.y != long(test2.Y)
+        && test1.width != long(test2.Width)
+        && test1.height != long(test2.Height))
+    {
+        OutputDebugStringA("SimpleMath::Rectangle operator test A failed!");
+        success = false;
+    }
+#endif
+
+    OutputDebugStringA(success ? "Passed\n" : "Failed\n");
+    OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
+}
