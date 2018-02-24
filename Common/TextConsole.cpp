@@ -1,14 +1,8 @@
 //--------------------------------------------------------------------------------------
 // File: TextConsole.cpp
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
-// Copyright(c) Microsoft Corporation. All rights reserved.
-//
-// http://go.microsoft.com/fwlink/?LinkId=248929
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //--------------------------------------------------------------------------------------
 
 #include "pch.h"
@@ -29,6 +23,7 @@ TextConsole::TextConsole()
 }
 
 
+_Use_decl_annotations_
 TextConsole::TextConsole(ID3D11DeviceContext* context, const wchar_t* fontName)
     : m_textColor(1.f, 1.f, 1.f, 1.f),
     m_debugOutput(false)
@@ -200,7 +195,7 @@ void TextConsole::ReleaseDevice()
     m_context.Reset();
 }
 
-
+_Use_decl_annotations_
 void TextConsole::RestoreDevice(ID3D11DeviceContext* context, const wchar_t* fontName)
 {
     m_context = context;
@@ -234,7 +229,7 @@ void TextConsole::SetRotation(DXGI_MODE_ROTATION rotation)
 }
 
 
-void TextConsole::ProcessString(const wchar_t* str)
+void TextConsole::ProcessString(_In_z_ const wchar_t* str)
 {
     if (!m_lines)
         return;

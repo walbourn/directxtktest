@@ -6,14 +6,8 @@
 //
 // Note: This is best used with monospace rather than proportional fonts
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
-// Copyright(c) Microsoft Corporation. All rights reserved.
-//
-// http://go.microsoft.com/fwlink/?LinkId=248929
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //--------------------------------------------------------------------------------------
 
 #pragma once
@@ -24,6 +18,8 @@
 #include <mutex>
 #include <vector>
 
+#include <wrl/client.h>
+
 
 namespace DX
 {
@@ -31,7 +27,7 @@ namespace DX
     {
     public:
         TextConsole();
-        TextConsole(ID3D11DeviceContext* context, const wchar_t* fontName);
+        TextConsole(_In_ ID3D11DeviceContext* context, _In_z_ const wchar_t* fontName);
 
         void Render();
 
@@ -48,14 +44,14 @@ namespace DX
         void SetDebugOutput(bool debug) { m_debugOutput = debug; }
 
         void ReleaseDevice();
-        void RestoreDevice(ID3D11DeviceContext* context, const wchar_t* fontName);
+        void RestoreDevice(_In_ ID3D11DeviceContext* context, _In_z_ const wchar_t* fontName);
 
         void SetViewport(const D3D11_VIEWPORT& viewPort);
 
         void SetRotation(DXGI_MODE_ROTATION rotation);
 
     private:
-        void ProcessString(const wchar_t* str);
+        void ProcessString(_In_z_ const wchar_t* str);
         void IncrementLine();
 
         RECT                                            m_layout;
