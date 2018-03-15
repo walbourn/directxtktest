@@ -73,23 +73,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>Bin\Desktop_2017_Win10\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Desktop_2017_Win10\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Desktop_2017\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Desktop_2017\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>Bin\Desktop_2017_Win10\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Desktop_2017_Win10\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Desktop_2017\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Desktop_2017\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>Bin\Desktop_2017_Win10\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Desktop_2017_Win10\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Desktop_2017\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Desktop_2017\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>Bin\Desktop_2017_Win10\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Desktop_2017_Win10\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Desktop_2017\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Desktop_2017\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -207,7 +207,7 @@
     <Image Include="SunSubMixer_specularIBL.dds" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DirectXTK_Desktop_2017_Win10.vcxproj">
+    <ProjectReference Include="..\..\DirectXTK_Desktop_2017.vcxproj">
       <Project>{e0b52ae7-e160-4d32-bf3f-910b785e5a8e}</Project>
     </ProjectReference>
   </ItemGroup>

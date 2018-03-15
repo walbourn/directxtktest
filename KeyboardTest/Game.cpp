@@ -120,12 +120,10 @@ void Game::Update(DX::StepTimer const&)
 {
     auto kb = m_keyboard->GetState();
 
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
     if (kb.Escape)
     {
-        PostQuitMessage(0);
+        ExitGame();
     }
-#endif
 
     if (kb.Home)
         m_keyboard->Reset();
