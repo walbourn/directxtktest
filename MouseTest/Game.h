@@ -15,7 +15,9 @@
 
 #pragma once
 
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#if defined(_XBOX_ONE) && defined(_TITLE)
+#include "DeviceResourcesXDK.h"
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
 #include "DeviceResourcesUWP.h"
 #else
 #include "DeviceResourcesPC.h"
@@ -25,25 +27,30 @@
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
-class Game : public DX::IDeviceNotify
+class Game
+#if !defined(_XBOX_ONE) || !defined(_TITLE)
+    : public DX::IDeviceNotify
+#endif
 {
 public:
 
     Game();
 
     // Initialization and management
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-    void Initialize(IUnknown* window, int width, int height, DXGI_MODE_ROTATION rotation);
-#else
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
     void Initialize(HWND window, int width, int height, DXGI_MODE_ROTATION rotation);
+#else
+    void Initialize(IUnknown* window, int width, int height, DXGI_MODE_ROTATION rotation);
 #endif
 
     // Basic game loop
     void Tick();
 
+#if !defined(_XBOX_ONE) || !defined(_TITLE)
     // IDeviceNotify
     virtual void OnDeviceLost() override;
     virtual void OnDeviceRestored() override;
+#endif
 
     // Messages
     void OnActivated();
@@ -53,7 +60,9 @@ public:
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
     void OnWindowMoved();
 #endif
+#if !defined(_XBOX_ONE) || !defined(_TITLE)
     void OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation);
+#endif
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
     void ValidateDevice();
 #endif
@@ -87,6 +96,10 @@ private:
     DirectX::Mouse::ButtonStateTracker                  m_tracker;
 
     // DirectXTK Test Objects
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    std::unique_ptr<DirectX::GraphicsMemory>            m_graphicsMemory;
+#endif
+
     std::unique_ptr<DirectX::SpriteBatch>               m_spriteBatch;
     std::unique_ptr<DirectX::SpriteFont>                m_comicFont;
     DirectX::Mouse::State                               m_ms;

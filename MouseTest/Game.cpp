@@ -38,15 +38,18 @@ Game::Game() :
     *m_lastStrBuff = 0;
 
     m_deviceResources = std::make_unique<DX::DeviceResources>();
+
+#if !defined(_XBOX_ONE) || !defined(_TITLE)
     m_deviceResources->RegisterDeviceNotify(this);
+#endif
 }
 
 // Initialize the Direct3D resources required to run.
 void Game::Initialize(
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-    IUnknown* window,
-#else
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
     HWND window,
+#else
+    IUnknown* window,
 #endif
     int width, int height, DXGI_MODE_ROTATION rotation)
 {
@@ -54,7 +57,16 @@ void Game::Initialize(
 
     m_mouse = std::make_unique<Mouse>();
 
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    UNREFERENCED_PARAMETER(rotation);
+    UNREFERENCED_PARAMETER(width);
+    UNREFERENCED_PARAMETER(height);
+    m_deviceResources->SetWindow(window);
+#if _XDK_VER >= 0x42D907D1
+    m_mouse->SetWindow(reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(window));
+#endif
+    m_keyboard->SetWindow(reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(window));
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
     m_deviceResources->SetWindow(window, width, height, rotation);
     m_mouse->SetWindow(reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(window));
     m_keyboard->SetWindow(reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(window));
@@ -79,10 +91,10 @@ void Game::Initialize(
 
         if (!thrown)
         {
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-            throw std::exception("Mouse not acting like a singleton");
-#else
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
             MessageBox(window, L"Mouse not acting like a singleton", L"MouseTest", MB_ICONERROR);
+#else
+            throw std::exception("Mouse not acting like a singleton");
 #endif
         }
 
@@ -91,6 +103,7 @@ void Game::Initialize(
     }
 
     OutputDebugStringA(m_mouse->IsConnected() ? "INFO: Mouse is connected\n" : "INFO: No mouse found\n");
+    OutputDebugStringA(m_mouse->IsVisible() ? "INFO: Mouse cursor is visible on startup\n" : "INFO: Mouse cursor NOT visible on startup\n");
 
     m_deviceResources->CreateDeviceResources();
     CreateDeviceDependentResources();
@@ -120,6 +133,14 @@ void Game::Update(DX::StepTimer const&)
     if (kb.Escape)
     {
         ExitGame();
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
+    {
+        bool isvisible = m_mouse->IsVisible();
+        m_mouse->SetVisible(!isvisible);
+
+        OutputDebugStringA(m_mouse->IsVisible() ? "INFO: Mouse cursor is visible\n" : "INFO: Mouse cursor NOT visible\n");
     }
 
     if (m_keyboardButtons.IsKeyPressed(Keyboard::Home))
@@ -213,6 +234,10 @@ void Game::Render()
         return;
     }
 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    m_deviceResources->Prepare();
+#endif
+
     Clear();
 
     float y = sinf(m_pitch);        // vertical
@@ -274,6 +299,10 @@ void Game::Render()
 
     // Show the new frame.
     m_deviceResources->Present();
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    m_graphicsMemory->Commit();
+#endif
 }
 
 // Helper method to clear the back buffers.
@@ -323,6 +352,7 @@ void Game::OnWindowMoved()
 }
 #endif
 
+#if !defined(_XBOX_ONE) || !defined(_TITLE)
 void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation)
 {
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
@@ -336,6 +366,7 @@ void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotatio
 
     CreateWindowSizeDependentResources();
 }
+#endif
 
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
 void Game::ValidateDevice()
@@ -357,6 +388,11 @@ void Game::GetDefaultSize(int& width, int& height) const
 void Game::CreateDeviceDependentResources()
 {
     auto device = m_deviceResources->GetD3DDevice();
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    m_graphicsMemory = std::make_unique<GraphicsMemory>(device, m_deviceResources->GetBackBufferCount());
+#endif
+
     auto context = m_deviceResources->GetD3DDeviceContext();
 
     m_spriteBatch = std::make_unique<SpriteBatch>(context);
@@ -383,6 +419,7 @@ void Game::CreateWindowSizeDependentResources()
 #endif
 }
 
+#if !defined(_XBOX_ONE) || !defined(_TITLE)
 void Game::OnDeviceLost()
 {
     m_room.reset();
@@ -399,4 +436,5 @@ void Game::OnDeviceRestored()
 
     CreateWindowSizeDependentResources();
 }
+#endif
 #pragma endregion
