@@ -61,7 +61,7 @@ void dump_stats( _In_ AudioEngine* engine )
 {
     auto stats = engine->GetStatistics();
 
-    printf( "\nPlaying: %Iu / %Iu; Instances %Iu; Voices %Iu / %Iu / %Iu / %Iu; %Iu audio bytes\n",
+    printf( "\nPlaying: %zu / %zu; Instances %zu; Voices %zu / %zu / %zu / %zu; %zu audio bytes\n",
             stats.playingOneShots, stats.playingInstances,
             stats.allocatedInstances, stats.allocatedVoices, stats.allocatedVoices3d,
             stats.allocatedVoicesOneShot, stats.allocatedVoicesIdle,
@@ -181,7 +181,7 @@ int __cdecl main()
     }
     else
     {
-        printf("INFO: Found %Iu audio devices:\n", enumList.size() );
+        printf("INFO: Found %zu audio devices:\n", enumList.size() );
         for( auto it = enumList.cbegin(); it != enumList.cend(); ++it )
         {
             printf( "\t\"%ls\"\n", it->description.c_str() );
@@ -304,7 +304,7 @@ int __cdecl main()
 
         std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), wavData, wfx, audioStart, audioSize ) );
 
-        printf( "\n\nINFO: PCM-A440 sine wave (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\n\nINFO: PCM-A440 sine wave (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
 
         auto wfxRef = soundEffect->GetFormat();
@@ -443,7 +443,7 @@ int __cdecl main()
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
-        printf( "\n\nINFO: Loaded MusicMono.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\n\nINFO: Loaded MusicMono.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur );
 
         dump_wfx( soundEffect->GetFormat() );
@@ -475,12 +475,12 @@ int __cdecl main()
 
         if ( dur < effectDur )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
             return 1;
         }
         else if ( dur > ( effectDur + 2000 ) )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
             return 1;
         }
 
@@ -528,12 +528,12 @@ int __cdecl main()
 
         if ( dur < effectDur )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
             return 1;
         }
         else if ( dur > ( effectDur + 2000 ) )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
             return 1;
         }
 
@@ -764,7 +764,7 @@ int __cdecl main()
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
-        printf( "\n\nINFO: Loaded Alarm01.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\n\nINFO: Loaded Alarm01.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur );
 
         dump_wfx( soundEffect->GetFormat() );
@@ -796,12 +796,12 @@ int __cdecl main()
 
         if ( dur < effectDur )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
             return 1;
         }
         else if ( dur > ( effectDur + 2000 ) )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
             return 1;
         }
 
@@ -849,12 +849,12 @@ int __cdecl main()
 
         if ( dur < effectDur )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
             return 1;
         }
         else if ( dur > ( effectDur + 2000 ) )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
             return 1;
         }
 
@@ -1085,7 +1085,7 @@ int __cdecl main()
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
-        printf( "\n\nINFO: Loaded MusicSurround.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\n\nINFO: Loaded MusicSurround.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur );
 
         dump_wfx( soundEffect->GetFormat() );
@@ -1117,12 +1117,12 @@ int __cdecl main()
 
         if ( dur < effectDur )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
             return 1;
         }
         else if ( dur > ( effectDur + 2000 ) )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
             return 1;
         }
 
@@ -1170,12 +1170,12 @@ int __cdecl main()
 
         if ( dur < effectDur )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
             return 1;
         }
         else if ( dur > ( effectDur + 2000 ) )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
             return 1;
         }
 
@@ -1388,7 +1388,7 @@ int __cdecl main()
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
-        printf( "\nINFO: Loaded HipHoppy_float.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\nINFO: Loaded HipHoppy_float.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur);
 
         dump_wfx( soundEffect->GetFormat() );
@@ -1414,12 +1414,12 @@ int __cdecl main()
 
         if ( dur < effectDur )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
             return 1;
         }
         else if ( dur > ( effectDur + 1000 ) )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
             return 1;
         }
 
@@ -1431,7 +1431,7 @@ int __cdecl main()
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
-        printf( "\nINFO: Loaded electro_adpcm.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\nINFO: Loaded electro_adpcm.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur);
 
         dump_wfx( soundEffect->GetFormat() );
@@ -1457,12 +1457,12 @@ int __cdecl main()
 
         if ( dur < effectDur )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
             return 1;
         }
         else if ( dur > ( effectDur + 1000 ) )
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
             return 1;
         }
 
@@ -1476,7 +1476,7 @@ int __cdecl main()
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
-        printf( "\nINFO: Loaded musicmono_xwma.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\nINFO: Loaded musicmono_xwma.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur );
     
         dump_wfx( soundEffect->GetFormat() );
@@ -1502,12 +1502,12 @@ int __cdecl main()
 
         if (dur < effectDur)
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
             return 1;
         }
         else if (dur >(effectDur + 1000))
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
             return 1;
         }
 
@@ -1519,7 +1519,7 @@ int __cdecl main()
     // SoundEffect One-shots
     { // PCM .WAV one-shots
         std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01.wav" ) );
-        printf( "\n\nINFO: Loaded Alarm01.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\n\nINFO: Loaded Alarm01.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
 
         dump_wfx( soundEffect->GetFormat() );
@@ -1734,7 +1734,7 @@ int __cdecl main()
 
     { // PCM float .WAV one-shots
         std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01_float.wav" ) );
-        printf( "\n\nINFO: Loaded Alarm01_float.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\n\nINFO: Loaded Alarm01_float.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
 
         dump_wfx( soundEffect->GetFormat() );
@@ -1780,7 +1780,7 @@ int __cdecl main()
 
     { // ADPCM .WAV one-shots
         std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01_adpcm.wav" ) );
-        printf( "\n\nINFO: Loaded Alarm01_adpcm.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\n\nINFO: Loaded Alarm01_adpcm.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
 
         dump_wfx( soundEffect->GetFormat() );
@@ -1828,7 +1828,7 @@ int __cdecl main()
 
     { // xWMA .WAV one-shots
         std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01_xwma.wav" ) );
-        printf( "\n\nINFO: Loaded Alarm01_xwma.wav (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\n\nINFO: Loaded Alarm01_xwma.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
 
         dump_wfx( soundEffect->GetFormat() );
@@ -1907,7 +1907,7 @@ int __cdecl main()
         for (unsigned int j = 0; j < 4; ++j)
         {
             size_t effectDur = wb->GetSampleDurationMS(j);
-            printf("\n\tIndex #%u (%Iu bytes, %Iu samples, %Iu ms)\n", j,
+            printf("\n\tIndex #%u (%zu bytes, %zu samples, %zu ms)\n", j,
                 wb->GetSampleSizeInBytes(j), wb->GetSampleDuration(j), effectDur);
             dump_wfx(wb->GetFormat(j, wfx, 64));
 
@@ -1936,12 +1936,12 @@ int __cdecl main()
 
             if (dur < effectDur)
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
                 return 1;
             }
             else if (dur >(effectDur + 1000))
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
                 return 1;
             }
         }
@@ -1975,7 +1975,7 @@ int __cdecl main()
         for (unsigned int j = 0; j < 4; ++j)
         {
             size_t effectDur = wb->GetSampleDurationMS(j);
-            printf("\n\tIndex #%u (%Iu bytes, %Iu samples, %Iu ms)\n", j,
+            printf("\n\tIndex #%u (%zu bytes, %zu samples, %zu ms)\n", j,
                 wb->GetSampleSizeInBytes(j), wb->GetSampleDuration(j), effectDur);
             dump_wfx(wb->GetFormat(j, wfx, 64));
 
@@ -2004,12 +2004,12 @@ int __cdecl main()
 
             if (dur < effectDur)
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
                 return 1;
             }
             else if (dur >(effectDur + 1000))
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
                 return 1;
             }
         }
@@ -2041,15 +2041,15 @@ int __cdecl main()
 
         size_t effectDur = wb->GetSampleDurationMS(10);
 
-        printf( "\tIndex #10 (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\tIndex #10 (%zu bytes, %zu samples, %zu ms)\n",
                 wb->GetSampleSizeInBytes( 10 ), wb->GetSampleDuration( 10 ), effectDur );
         dump_wfx( wb->GetFormat( 10, wfx, 64) );
 
-        printf( "\tIndex #11 (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\tIndex #11 (%zu bytes, %zu samples, %zu ms)\n",
                 wb->GetSampleSizeInBytes( 11 ), wb->GetSampleDuration( 11 ), wb->GetSampleDurationMS( 11 ) );
         dump_wfx( wb->GetFormat( 11, wfx, 64) );
 
-        printf( "\tIndex #8 (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\tIndex #8 (%zu bytes, %zu samples, %zu ms)\n",
                 wb->GetSampleSizeInBytes( 8 ), wb->GetSampleDuration( 8 ), wb->GetSampleDurationMS( 8 ) );
         dump_wfx( wb->GetFormat( 8, wfx, 64) );
 
@@ -2079,12 +2079,12 @@ int __cdecl main()
 
             if (dur < effectDur)
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
                 return 1;
             }
             else if (dur >(effectDur + 1000))
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
                 return 1;
             }
 
@@ -2250,15 +2250,15 @@ int __cdecl main()
 
         size_t effectDur = wb->GetSampleDurationMS(10);
 
-        printf( "\tIndex #10 (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\tIndex #10 (%zu bytes, %zu samples, %zu ms)\n",
                 wb->GetSampleSizeInBytes( 10 ), wb->GetSampleDuration( 10 ), effectDur );
         dump_wfx( wb->GetFormat( 10, wfx, 64) );
 
-        printf( "\tIndex #11 (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\tIndex #11 (%zu bytes, %zu samples, %zu ms)\n",
                 wb->GetSampleSizeInBytes( 11 ), wb->GetSampleDuration( 11 ), wb->GetSampleDurationMS( 11 ) );
         dump_wfx( wb->GetFormat( 11, wfx, 64) );
 
-        printf( "\tIndex #8 (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\tIndex #8 (%zu bytes, %zu samples, %zu ms)\n",
                 wb->GetSampleSizeInBytes( 8 ), wb->GetSampleDuration( 8 ), wb->GetSampleDurationMS( 8 ) );
         dump_wfx( wb->GetFormat( 8, wfx, 64) );
 
@@ -2288,12 +2288,12 @@ int __cdecl main()
 
             if (dur < effectDur)
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
                 return 1;
             }
             else if (dur >(effectDur + 1000))
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
                 return 1;
             }
 
@@ -2347,15 +2347,15 @@ int __cdecl main()
 
         size_t effectDur = wb->GetSampleDurationMS(10);
 
-        printf( "\tIndex #10 (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\tIndex #10 (%zu bytes, %zu samples, %zu ms)\n",
                 wb->GetSampleSizeInBytes( 10 ), wb->GetSampleDuration( 10 ), effectDur );
         dump_wfx( wb->GetFormat( 10, wfx, 64) );
 
-        printf( "\tIndex #11 (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\tIndex #11 (%zu bytes, %zu samples, %zu ms)\n",
                 wb->GetSampleSizeInBytes( 11 ), wb->GetSampleDuration( 11 ), wb->GetSampleDurationMS( 11 ) );
         dump_wfx( wb->GetFormat( 11, wfx, 64) );
 
-        printf( "\tIndex #8 (%Iu bytes, %Iu samples, %Iu ms)\n",
+        printf( "\tIndex #8 (%zu bytes, %zu samples, %zu ms)\n",
                 wb->GetSampleSizeInBytes( 8 ), wb->GetSampleDuration( 8 ), wb->GetSampleDurationMS( 8 ) );
         dump_wfx( wb->GetFormat( 8, wfx, 64) );
 
@@ -2385,12 +2385,12 @@ int __cdecl main()
 
             if ( dur < effectDur )
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly short (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, effectDur);
                 return 1;
             }
             else if ( dur > ( effectDur + 1000 ) )
             {
-                printf("\nERROR: Play() time (%I64u) was unexpectedly long (%Iu)\n", dur, effectDur);
+                printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, effectDur);
                 return 1;
             }
 

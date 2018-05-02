@@ -641,7 +641,7 @@ int __cdecl main()
             PropVariantClear(&var);
         }
 
-        printf("\n\nINFO: becky.wma (%I64u ms)\n", effectDur );
+        printf("\n\nINFO: becky.wma (%llu ms)\n", effectDur );
         dump_wfx( &wfx );
 
         if ( wfx.wFormatTag != WAVE_FORMAT_PCM )
@@ -727,12 +727,12 @@ int __cdecl main()
 
         if (dur < effectDur)
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly short (%I64u)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%llu)\n", dur, effectDur);
             return 1;
         }
         else if (dur >(effectDur + 5000))
         {
-            printf("\nERROR: Play() time (%I64u) was unexpectedly long (%I64u)\n", dur, effectDur);
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%llu)\n", dur, effectDur);
             return 1;
         }
 

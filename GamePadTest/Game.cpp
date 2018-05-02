@@ -210,7 +210,7 @@ void Game::Update(DX::StepTimer const&)
                     }
 #else
                     char buff[64] = {};
-                    sprintf_s(buff, "Player %d -> connected (type %u, id %I64u)\n", j, caps.gamepadType, caps.id);
+                    sprintf_s(buff, "Player %d -> connected (type %u, id %llu)\n", j, caps.gamepadType, caps.id);
                     OutputDebugStringA(buff);
 #endif
                 }

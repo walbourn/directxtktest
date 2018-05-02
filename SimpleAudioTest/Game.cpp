@@ -199,7 +199,7 @@ void Game::Initialize(
         else
         {
             char buff[1024] = {};
-            sprintf_s(buff,"\nINFO: Found %Iu audio devices:\n", enumList.size());
+            sprintf_s(buff,"\nINFO: Found %zu audio devices:\n", enumList.size());
             OutputDebugStringA(buff);
             for (auto it = enumList.cbegin(); it != enumList.cend(); ++it)
             {
@@ -256,7 +256,7 @@ void Game::Initialize(
     //--- XWB Wave Banks ---
     m_wbPCM = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"droid.xwb");
     m_console->WriteLine(L"Loaded droid.xwb");
-    m_console->Format(L"    Index #8 (%Iu bytes, %Iu samples, %Iu ms)\n",
+    m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
         m_wbPCM->GetSampleSizeInBytes(8),
         m_wbPCM->GetSampleDuration(8),
         m_wbPCM->GetSampleDurationMS(8));
@@ -268,7 +268,7 @@ void Game::Initialize(
 
     m_wbADPCM = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"ADPCMdroid.xwb");
     m_console->WriteLine(L"Loaded ADPCMdroid.xwb");
-    m_console->Format(L"    Index #8 (%Iu bytes, %Iu samples, %Iu ms)\n",
+    m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
         m_wbADPCM->GetSampleSizeInBytes(8),
         m_wbADPCM->GetSampleDuration(8),
         m_wbADPCM->GetSampleDurationMS(8));
@@ -281,7 +281,7 @@ void Game::Initialize(
 #if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
     m_wbXWMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xwmadroid.xwb");
     m_console->WriteLine(L"Loaded xwmadroid.xwb");
-    m_console->Format(L"    Index #8 (%Iu bytes, %Iu samples, %Iu ms)\n",
+    m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
         m_wbXWMA->GetSampleSizeInBytes(8),
         m_wbXWMA->GetSampleDuration(8),
         m_wbXWMA->GetSampleDurationMS(8));
@@ -295,7 +295,7 @@ void Game::Initialize(
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_wbXMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xmadroid.xwb");
     m_console->WriteLine(L"Loaded xmadroid.xwb");
-    m_console->Format(L"    Index #8 (%Iu bytes, %Iu samples, %Iu ms)\n",
+    m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
         m_wbXMA->GetSampleSizeInBytes(8),
         m_wbXMA->GetSampleDuration(8),
         m_wbXMA->GetSampleDurationMS(8));
@@ -485,7 +485,7 @@ void Game::Render()
     auto stats = m_audEngine->GetStatistics();
 
     wchar_t statsStr[256] = {};
-    swprintf_s(statsStr, L"Playing: %Iu / %Iu; Instances %Iu; Voices %Iu / %Iu / %Iu / %Iu; %Iu audio bytes",
+    swprintf_s(statsStr, L"Playing: %zu / %zu; Instances %zu; Voices %zu / %zu / %zu / %zu; %zu audio bytes",
         stats.playingOneShots, stats.playingInstances,
         stats.allocatedInstances, stats.allocatedVoices, stats.allocatedVoices3d,
         stats.allocatedVoicesOneShot, stats.allocatedVoicesIdle,

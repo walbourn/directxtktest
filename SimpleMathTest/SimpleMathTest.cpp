@@ -1843,7 +1843,7 @@ int TestV2()
             v = buff[j];
             if (!XMVector2NearEqual(v, result, VEPSILON))
             {
-                printf("ERROR: transarr %Iu - %f %f ... %f %f \n", j, v.x, v.y, result.x, result.y);
+                printf("ERROR: transarr %zu - %f %f ... %f %f \n", j, v.x, v.y, result.x, result.y);
                 success = false;
             }
         }
@@ -1859,7 +1859,7 @@ int TestV2()
             Vector4 vec4 = buff4[j];
             if (!XMVector4NearEqual(vec4, result, VEPSILON2))
             {
-                printf("ERROR: transarr(2) %Iu - %f %f %f %f ... %f %f %f %f\n", j, vec4.x, vec4.y, vec4.z, vec4.w, result.x, result.y, result.z, result.w);
+                printf("ERROR: transarr(2) %zu - %f %f %f %f ... %f %f %f %f\n", j, vec4.x, vec4.y, vec4.z, vec4.w, result.x, result.y, result.z, result.w);
                 success = false;
             }
         }
@@ -1888,7 +1888,7 @@ int TestV2()
             v = buff[j];
             if (!XMVector2NearEqual(v, result, VEPSILON))
             {
-                printf("ERROR: transnormarr %Iu - %f %f ... %f %f \n", j, v.x, v.y, result.x, result.y);
+                printf("ERROR: transnormarr %zu - %f %f ... %f %f \n", j, v.x, v.y, result.x, result.y);
                 success = false;
             }
         }
@@ -2784,7 +2784,7 @@ int TestV3()
             v = buff[j];
             if (!XMVector3NearEqual(v, result, VEPSILON))
             {
-                printf("ERROR: transarr %Iu - %f %f %f ... %f %f %f\n", j, v.x, v.y, v.z, result.x, result.y, result.z);
+                printf("ERROR: transarr %zu - %f %f %f ... %f %f %f\n", j, v.x, v.y, v.z, result.x, result.y, result.z);
                 success = false;
             }
         }
@@ -2800,7 +2800,7 @@ int TestV3()
             Vector4 vec4 = buff4[j];
             if (!XMVector4NearEqual(vec4, result, VEPSILON2))
             {
-                printf("ERROR: transarr(2) %Iu - %f %f %f %f ... %f %f %f %f\n", j, vec4.x, vec4.y, vec4.z, vec4.w, result.x, result.y, result.z, result.w);
+                printf("ERROR: transarr(2) %zu - %f %f %f %f ... %f %f %f %f\n", j, vec4.x, vec4.y, vec4.z, vec4.w, result.x, result.y, result.z, result.w);
                 success = false;
             }
         }
@@ -2829,7 +2829,7 @@ int TestV3()
             v = buff[j];
             if (!XMVector3NearEqual(v, result, VEPSILON))
             {
-                printf("ERROR: transnormarr %Iu - %f %f %f ... %f %f %f\n", j, v.x, v.y, v.z, result.x, result.y, result.z);
+                printf("ERROR: transnormarr %zu - %f %f %f ... %f %f %f\n", j, v.x, v.y, v.z, result.x, result.y, result.z);
                 success = false;
             }
         }
@@ -3753,7 +3753,7 @@ int TestV4()
             v = buff[j];
             if (!XMVector4NearEqual(v, result, VEPSILON2))
             {
-                printf("ERROR: transarr %Iu - %f %f %f %f ... %f %f %f %f\n", j, v.x, v.y, v.z, v.w, result.x, result.y, result.z, result.w);
+                printf("ERROR: transarr %zu - %f %f %f %f ... %f %f %f %f\n", j, v.x, v.y, v.z, v.w, result.x, result.y, result.z, result.w);
                 success = false;
             }
         }
@@ -5688,7 +5688,7 @@ int __cdecl main()
     }
     else
     {
-        printf("FAILED, passed %Iu tests\n", npass );
+        printf("FAILED, passed %zu tests\n", npass );
         return 1;
     }
 }

@@ -286,7 +286,7 @@ void Game::Render()
     auto stats = m_audEngine->GetStatistics();
 
     wchar_t statsStr[256] = {};
-    swprintf_s(statsStr, L"Playing: %Iu / %Iu; Instances %Iu; Voices %Iu / %Iu / %Iu / %Iu; %Iu audio bytes",
+    swprintf_s(statsStr, L"Playing: %zu / %zu; Instances %zu; Voices %zu / %zu / %zu / %zu; %zu audio bytes",
         stats.playingOneShots, stats.playingInstances,
         stats.allocatedInstances, stats.allocatedVoices, stats.allocatedVoices3d,
         stats.allocatedVoicesOneShot, stats.allocatedVoicesIdle,
