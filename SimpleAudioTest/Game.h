@@ -34,7 +34,7 @@ class Game
 {
 public:
 
-    Game();
+    Game() noexcept(false);
     ~Game();
 
     // Initialization and management

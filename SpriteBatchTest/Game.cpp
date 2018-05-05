@@ -34,7 +34,7 @@ namespace
     }
 }
 
-Game::Game()
+Game::Game() noexcept(false)
 {
     // 2D only rendering
 #if defined(_XBOX_ONE) && defined(_TITLE)

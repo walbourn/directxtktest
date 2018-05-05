@@ -29,7 +29,7 @@ static const XMVECTORF32 ROOM_BOUNDS = { 8.f, 6.f, 12.f, 0.f };
 #define MOVEMENT_GAIN 0.07f
 
 // Constructor.
-Game::Game() :
+Game::Game() noexcept(false) :
     m_lastStr(nullptr)
 {
     m_cameraPos = START_POSITION.v;

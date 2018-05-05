@@ -165,7 +165,7 @@ namespace
     }
 };
 
-Game::Game() :
+Game::Game() noexcept(false) :
     m_frame(0)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)

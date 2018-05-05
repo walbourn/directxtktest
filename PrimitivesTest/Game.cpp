@@ -51,7 +51,7 @@ namespace
     const float col10 = 7.5f;
 }
 
-Game::Game() :
+Game::Game() noexcept(false) :
     m_spinning(true),
     m_pitch(0),
     m_yaw(0)

@@ -43,7 +43,7 @@ extern std::unique_ptr<Model> CreateModelFromOBJ(_In_ ID3D11Device* d3dDevice, _
     _In_z_ const wchar_t* szFileName,
     _In_ IEffectFactory& fxFactory, bool ccw = true, bool pmalpha = false);
 
-Game::Game() :
+Game::Game() noexcept(false) :
     m_spinning(true),
     m_pitch(0),
     m_yaw(0)
@@ -519,6 +519,8 @@ void Game::CreateDeviceDependentResources()
 
     m_states = std::make_unique<CommonStates>(device);
 
+    m_abstractFXFactory = std::make_unique<EffectFactory>(device);
+
     m_fxFactory = std::make_unique<EffectFactory>(device);
 
 #ifdef GAMMA_CORRECT_RENDERING
@@ -624,6 +626,7 @@ void Game::OnDeviceLost()
     m_lmap.reset();
     m_nmap.reset();
 
+    m_abstractFXFactory.reset();
     m_fxFactory.reset();
 
     m_defaultTex.Reset();

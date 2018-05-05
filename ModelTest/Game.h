@@ -35,7 +35,7 @@ class Game
 {
 public:
 
-    Game();
+    Game() noexcept(false);
 
     // Initialization and management
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
@@ -121,6 +121,7 @@ private:
     std::unique_ptr<DirectX::Model>         m_lmap;
     std::unique_ptr<DirectX::Model>         m_nmap;
 
+    std::unique_ptr<DirectX::EffectFactory> m_abstractFXFactory;
     std::unique_ptr<DirectX::EffectFactory> m_fxFactory;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_defaultTex;

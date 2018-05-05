@@ -33,7 +33,7 @@ class Game
 {
 public:
 
-    Game();
+    Game() noexcept(false);
 
     // Initialization and management
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 

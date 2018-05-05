@@ -208,7 +208,7 @@ namespace
     }
 } // anonymous namespace
 
-Game::Game() :
+Game::Game() noexcept(false) :
     m_indexCount(0)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)
@@ -365,6 +365,9 @@ void Game::Render()
     blue.v = Colors::Blue;
     gray.v = Colors::Gray;
 #endif
+
+    // Abstract effect
+    m_abstractEffect->Apply(context);
 
     //--- BasicEFfect ----------------------------------------------------------------------
 
@@ -1013,6 +1016,8 @@ void Game::CreateDeviceDependentResources()
         effect->SetNormalTexture(m_brickNormal.Get());
     });
 
+    // Abstract
+    m_abstractEffect = std::make_unique<BasicEffect>(device);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -1041,6 +1046,8 @@ void Game::CreateWindowSizeDependentResources()
 void Game::OnDeviceLost()
 {
     m_states.reset();
+
+    m_abstractEffect.reset();
 
     m_basicEffectUnlit.reset();
     m_basicEffectUnlitVc.reset();

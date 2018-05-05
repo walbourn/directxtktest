@@ -479,7 +479,7 @@ namespace
     }
 }
 
-Game::Game() :
+Game::Game() noexcept(false) :
     m_showCompressed(false),
     m_delay(0)
 {

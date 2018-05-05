@@ -33,7 +33,7 @@ class Game
 {
 public:
 
-    Game();
+    Game() noexcept(false);
 
     // Initialization and management
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
@@ -108,6 +108,7 @@ private:
     DirectX::SimpleMath::Matrix                         m_view;
     DirectX::SimpleMath::Matrix                         m_proj;
 
+    std::unique_ptr<DirectX::IPostProcess>              m_abstractPostProcess;
     std::unique_ptr<DirectX::BasicPostProcess>          m_basicPostProcess;
     std::unique_ptr<DirectX::DualPostProcess>           m_dualPostProcess;
     std::unique_ptr<DirectX::ToneMapPostProcess>        m_toneMapPostProcess;

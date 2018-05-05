@@ -39,7 +39,7 @@ namespace
     const float row2 = -2.f;
 }
 
-Game::Game()
+Game::Game() noexcept(false)
 {
     m_deviceResources = std::make_unique<DX::DeviceResources>(
 #ifdef GAMMA_CORRECT_RENDERING
