@@ -54,7 +54,7 @@ extern bool g_HDRMode;
 #endif
 
 // Constructor.
-Game::Game()
+Game::Game() noexcept(false)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_deviceResources = std::make_unique<DX::DeviceResources>(

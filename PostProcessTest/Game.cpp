@@ -31,7 +31,7 @@ namespace
 }
 
 // Constructor.
-Game::Game() :
+Game::Game() noexcept(false) :
     m_scene(0)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)
@@ -713,6 +713,8 @@ void Game::CreateDeviceDependentResources()
     );
 
     // Setup post processing
+    m_abstractPostProcess = std::make_unique<BasicPostProcess>(device);
+
     m_basicPostProcess = std::make_unique<BasicPostProcess>(device);
 
     m_dualPostProcess = std::make_unique<DualPostProcess>(device);
@@ -769,6 +771,7 @@ void Game::CreateWindowSizeDependentResources()
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
 void Game::OnDeviceLost()
 {
+    m_abstractPostProcess.reset();
     m_basicPostProcess.reset();
     m_dualPostProcess.reset();
     m_toneMapPostProcess.reset();

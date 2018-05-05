@@ -27,7 +27,7 @@ using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
 // Constructor.
-Game::Game() :
+Game::Game() noexcept(false) :
     m_lastStr(nullptr)
 {
     *m_lastStrBuff = 0;

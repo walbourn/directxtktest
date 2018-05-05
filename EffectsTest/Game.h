@@ -33,7 +33,7 @@ class Game
 {
 public:
 
-    Game();
+    Game() noexcept(false);
 
     // Initialization and management
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
@@ -125,6 +125,8 @@ private:
     };
 
     std::unique_ptr<DirectX::CommonStates>                      m_states;
+
+    std::unique_ptr<DirectX::IEffect>                           m_abstractEffect;
 
     std::unique_ptr<EffectWithDecl<DirectX::BasicEffect>>       m_basicEffectUnlit;
     std::unique_ptr<EffectWithDecl<DirectX::BasicEffect>>       m_basicEffectUnlitVc;

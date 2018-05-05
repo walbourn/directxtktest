@@ -118,7 +118,7 @@ namespace
 }
     
 // Constructor.
-Game::Game() :
+Game::Game() noexcept(false) :
     m_critError(false),
     m_retrydefault(false),
     m_newAudio(false),
