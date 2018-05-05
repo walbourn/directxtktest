@@ -38,10 +38,10 @@ namespace
     {
         switch (fmt)
         {
-            case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:   return DXGI_FORMAT_R8G8B8A8_UNORM;
-            case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:   return DXGI_FORMAT_B8G8R8A8_UNORM;
-            case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:   return DXGI_FORMAT_B8G8R8X8_UNORM;
-            default:                                return fmt;
+        case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:   return DXGI_FORMAT_R8G8B8A8_UNORM;
+        case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:   return DXGI_FORMAT_B8G8R8A8_UNORM;
+        case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:   return DXGI_FORMAT_B8G8R8X8_UNORM;
+        default:                                return fmt;
         }
     }
 };
@@ -63,11 +63,11 @@ DeviceResources::DeviceResources(
         m_d3dMinFeatureLevel(minFeatureLevel),
         m_window(nullptr),
         m_d3dFeatureLevel(D3D_FEATURE_LEVEL_9_1),
-        m_outputSize{ 0, 0, 1, 1 },
+        m_outputSize{0, 0, 1, 1},
     #ifdef __dxgi1_4_h__
         m_colorSpace(DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709),
     #endif
-        m_options(flags  | c_FlipPresent),
+        m_options(flags | c_FlipPresent),
         m_deviceNotify(nullptr)
 {
 }
@@ -556,7 +556,47 @@ void DeviceResources::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
     *ppAdapter = nullptr;
 
     ComPtr<IDXGIAdapter1> adapter;
-    for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != m_dxgiFactory->EnumAdapters1(adapterIndex, adapter.ReleaseAndGetAddressOf()); adapterIndex++)
+
+#if defined(__dxgi1_6_h__) && defined(NTDDI_WIN10_RS4)
+    ComPtr<IDXGIFactory6> factory6;
+    HRESULT hr = m_dxgiFactory.As(&factory6);
+    if (SUCCEEDED(hr))
+    {
+        for (UINT adapterIndex = 0;
+            DXGI_ERROR_NOT_FOUND != factory6->EnumAdapterByGpuPreference(
+                adapterIndex,
+                DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
+                IID_PPV_ARGS(adapter.ReleaseAndGetAddressOf()));
+            adapterIndex++)
+        {
+            DXGI_ADAPTER_DESC1 desc;
+            adapter->GetDesc1(&desc);
+
+            if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+            {
+                // Don't select the Basic Render Driver adapter.
+                continue;
+            }
+
+            if (s_debugAdapterOrdinal == -1 || (s_debugAdapterOrdinal == int(adapterIndex)))
+            {
+#ifdef _DEBUG
+                wchar_t buff[256] = {};
+                swprintf_s(buff, L"Direct3D Adapter (%u): VID:%04X, PID:%04X - %ls\n", adapterIndex, desc.VendorId, desc.DeviceId, desc.Description);
+                OutputDebugStringW(buff);
+#endif
+            }
+
+            break;
+        }
+    }
+    else
+#endif
+    for (UINT adapterIndex = 0;
+        DXGI_ERROR_NOT_FOUND != m_dxgiFactory->EnumAdapters1(
+            adapterIndex,
+            adapter.ReleaseAndGetAddressOf());
+        adapterIndex++)
     {
         DXGI_ADAPTER_DESC1 desc;
         adapter->GetDesc1(&desc);
