@@ -35,6 +35,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 using namespace DirectX;
@@ -186,6 +187,12 @@ namespace
 int TestRect()
 {
     // Rectangle
+    static_assert(std::is_nothrow_default_constructible<SimpleMath::Rectangle>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<SimpleMath::Rectangle>::value, "Copy Ctor.");
+    static_assert(std::is_nothrow_copy_assignable<SimpleMath::Rectangle>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<SimpleMath::Rectangle>::value, "Move Ctor.");
+    static_assert(std::is_nothrow_move_assignable<SimpleMath::Rectangle>::value, "Move Assign.");
+
     bool success = true;
 
     using Rectangle = SimpleMath::Rectangle;
@@ -999,7 +1006,14 @@ int TestRect()
 //-------------------------------------------------------------------------------------
 int TestV2()
 {
-	// Vector2 
+    // Vector2
+    static_assert(std::is_nothrow_default_constructible<Vector2>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<Vector2>::value, "Copy Ctor.");
+    static_assert(std::is_copy_assignable<Vector2>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<Vector2>::value, "Move Ctor.");
+    static_assert(std::is_move_assignable<Vector2>::value, "Move Assign.");
+        // As of DirectXMath 3.13, this type is_nothrow_copy/move_assignable
+
     bool success = true;
 
     Vector2 upVector( 0, 1.f );
@@ -1916,14 +1930,21 @@ int TestV2()
         success = false;
     }
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 
 //-------------------------------------------------------------------------------------
 int TestV3()
 {
-	// Vector3
+    // Vector3
+    static_assert(std::is_nothrow_default_constructible<Vector3>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<Vector3>::value, "Copy Ctor.");
+    static_assert(std::is_copy_assignable<Vector3>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<Vector3>::value, "Move Ctor.");
+    static_assert(std::is_move_assignable<Vector3>::value, "Move Assign.");
+        // As of DirectXMath 3.13, this type is_nothrow_copy/move_assignable
+
     bool success = true;
 
     Vector3 upVector( 0, 1.f, 0 );
@@ -2858,14 +2879,21 @@ int TestV3()
     }
 
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 
 //-------------------------------------------------------------------------------------
 int TestV4()
 {
-	// Vector4
+    // Vector4
+    static_assert(std::is_nothrow_default_constructible<Vector4>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<Vector4>::value, "Copy Ctor.");
+    static_assert(std::is_copy_assignable<Vector4>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<Vector4>::value, "Move Ctor.");
+    static_assert(std::is_move_assignable<Vector4>::value, "Move Assign.");
+        // As of DirectXMath 3.13, this type is_nothrow_copy/move_assignable
+
     bool success = true;
 
     Vector4 upVector( 0, 1.f, 0, 0 );
@@ -3782,7 +3810,7 @@ int TestV4()
     }
 
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 
@@ -3790,7 +3818,14 @@ int TestV4()
 //-------------------------------------------------------------------------------------
 int TestM()
 {
-	// Matrix
+    // Matrix
+    static_assert(std::is_nothrow_default_constructible<Matrix>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<Matrix>::value, "Copy Ctor.");
+    static_assert(std::is_copy_assignable<Matrix>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<Matrix>::value, "Move Ctor.");
+    static_assert(std::is_move_assignable<Matrix>::value, "Move Assign.");
+        // As of DirectXMath 3.13, this type is_nothrow_copy/move_assignable
+
     bool success = 1;
 
     Matrix a(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
@@ -4406,14 +4441,21 @@ int TestM()
                         Matrix::CreateRotationX(XMConvertToRadians(-90.f)) * Matrix::CreateRotationZ(XMConvertToRadians(-90.f)) * Matrix::CreateTranslation(objectPosition.x, objectPosition.y, objectPosition.z));
     }
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 
 //-------------------------------------------------------------------------------------
 int TestP()
 {
-	// Plane
+    // Plane
+    static_assert(std::is_nothrow_default_constructible<Plane>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<Plane>::value, "Copy Ctor.");
+    static_assert(std::is_copy_assignable<Plane>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<Plane>::value, "Move Ctor.");
+    static_assert(std::is_move_assignable<Plane>::value, "Move Assign.");
+        // As of DirectXMath 3.13, this type is_nothrow_copy/move_assignable
+
     bool success = true;
 
     Plane a(1, 2, 3, 4);
@@ -4542,14 +4584,21 @@ int TestP()
     Plane::Transform(Plane(1, 5, 10, 23), quat, c);
     VerifyNearEqual(c, Plane(10, 5, -1, 23));
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 
 //-------------------------------------------------------------------------------------
 int TestQ()
 {
-	// Quaternion
+    // Quaternion
+    static_assert(std::is_nothrow_default_constructible<Quaternion>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<Quaternion>::value, "Copy Ctor.");
+    static_assert(std::is_copy_assignable<Quaternion>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<Quaternion>::value, "Move Ctor.");
+    static_assert(std::is_move_assignable<Quaternion>::value, "Move Assign.");
+        // As of DirectXMath 3.13, this type is_nothrow_copy/move_assignable
+
     bool success = true;
 
     Quaternion a(1, 2, 3, 4);
@@ -4713,14 +4762,21 @@ int TestQ()
     VerifyNearEqual(Quaternion(0, 0.707107f, 0, 0.707107f) * Quaternion(0.707107f, 0, 0, 0.707107f), Quaternion(0.5f, 0.5f, 0.5f, 0.5f));
     VerifyNearEqual(Quaternion(0.5f, 0.5f, 0.5f, 0.5f) / Quaternion(0.707107f, 0, 0, 0.707107f), Quaternion(0, 0.707107f, 0, 0.707107f));
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 
 //-------------------------------------------------------------------------------------
 int TestC()
 {
-	// Color
+    // Color
+    static_assert(std::is_nothrow_default_constructible<Color>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<Color>::value, "Copy Ctor.");
+    static_assert(std::is_copy_assignable<Color>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<Color>::value, "Move Ctor.");
+    static_assert(std::is_move_assignable<Color>::value, "Move Assign.");
+        // As of DirectXMath 3.13, this type is_nothrow_copy/move_assignable
+
     bool success = true;
 
     Color a(1, 2, 3);
@@ -4910,14 +4966,21 @@ int TestC()
     VerifyNearEqual(a / b, Color(0.25f, 0.4f, 0.5f, 0.142857f));
     VerifyEqual(3 * a, Color(3, 6, 9, 3));
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 
 //-------------------------------------------------------------------------------------
 int TestRay()
 {
-	// Ray
+    // Ray
+    static_assert(std::is_nothrow_default_constructible<Ray>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<Ray>::value, "Copy Ctor.");
+    static_assert(std::is_copy_assignable<Ray>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<Ray>::value, "Move Ctor.");
+    static_assert(std::is_move_assignable<Ray>::value, "Move Assign.");
+        // As of DirectXMath 3.13, this type is_nothrow_copy/move_assignable
+
     bool success = true;
 
     Ray a;
@@ -4958,7 +5021,7 @@ int TestRay()
     VerifyEqual(b.Intersects(Plane(Vector3(10, 100, 666), Vector3(50, 100, 300), Vector3(50, 100, 800)), dist), true);
     VerifyEqual(dist, 58.f);
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 
@@ -4966,6 +5029,12 @@ int TestRay()
 int TestVP()
 {
     // Viewport
+    static_assert(std::is_nothrow_default_constructible<Viewport>::value, "Default Ctor.");
+    static_assert(std::is_nothrow_copy_constructible<Viewport>::value, "Copy Ctor.");
+    static_assert(std::is_nothrow_copy_assignable<Viewport>::value, "Copy Assign.");
+    static_assert(std::is_nothrow_move_constructible<Viewport>::value, "Move Ctor.");
+    static_assert(std::is_nothrow_move_assignable<Viewport>::value, "Move Assign.");
+
     bool success = true;
 
     Viewport vp1;
@@ -5500,7 +5569,7 @@ int TestVP()
         }
     }
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 template<typename T>
@@ -5521,7 +5590,7 @@ int EnsureSorted(std::map<T, int>& map)
         ++expected;
     }
 
-	return (success) ? 0 : 1;
+    return (success) ? 0 : 1;
 }
 
 
@@ -5642,8 +5711,8 @@ typedef int (*TestFN)();
 
 static struct Test
 {
-	const char *    name;
-	TestFN          func;
+    const char *    name;
+    TestFN          func;
 } g_Tests[] = 
 { 
     { "Rectangle", TestRect },
