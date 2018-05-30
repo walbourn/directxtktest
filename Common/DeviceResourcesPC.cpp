@@ -1,4 +1,4 @@
-﻿//
+//
 // DeviceResources.cpp - A wrapper for the Direct3D 11 device and swapchain
 //                       (requires DirectX 11.1 Runtime)
 //
@@ -47,6 +47,7 @@ namespace
 };
 
 bool DeviceResources::s_debugForceWarp = false;
+bool DeviceResources::s_debugPreferMinPower = false;
 int DeviceResources::s_debugAdapterOrdinal = -1;
 
 // Constructor for DeviceResources.
@@ -565,7 +566,7 @@ void DeviceResources::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
         for (UINT adapterIndex = 0;
             DXGI_ERROR_NOT_FOUND != factory6->EnumAdapterByGpuPreference(
                 adapterIndex,
-                DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
+                s_debugPreferMinPower ? DXGI_GPU_PREFERENCE_MINIMUM_POWER : DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
                 IID_PPV_ARGS(adapter.ReleaseAndGetAddressOf()));
             adapterIndex++)
         {

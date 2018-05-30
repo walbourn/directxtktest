@@ -1,4 +1,4 @@
-﻿//
+//
 // DeviceResources.h - A wrapper for the Direct3D 11 device and swapchain
 //
 
@@ -79,6 +79,11 @@ namespace DX
             s_debugForceWarp = enable;
         }
 
+        static void DebugPreferMinimumPower(bool enable)
+        {
+            s_debugPreferMinPower = enable;
+        }
+
         static void DebugSetAdapter(int adapter)
         {
             s_debugAdapterOrdinal = adapter;
@@ -127,6 +132,7 @@ namespace DX
 
         // Debugging options
         static bool s_debugForceWarp;
+        static bool s_debugPreferMinPower;
         static int s_debugAdapterOrdinal;
     };
 }
