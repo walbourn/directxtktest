@@ -78,6 +78,7 @@
 #include <memory>
 #include <random>
 #include <stdexcept>
+#include <type_traits>
 
 #include <stdio.h>
 
