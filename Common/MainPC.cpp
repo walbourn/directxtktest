@@ -377,6 +377,11 @@ void ParseCommandLine(_In_ LPWSTR lpCmdLine)
                 DX::DeviceResources::DebugForceWarp(true);
             }
 
+            if (!_wcsicmp(pArg, L"minpower"))
+            {
+                DX::DeviceResources::DebugPreferMinimumPower(true);
+            }
+
             if (!_wcsicmp(pArg, L"adapter"))
             {
                 if (pValue && *pValue != 0)
