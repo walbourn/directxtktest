@@ -1,4 +1,4 @@
-﻿//
+//
 // DeviceResources.cpp - A wrapper for the Direct3D 11 device and swapchain
 //                       (requires DirectX 11.3 Runtime)
 //
@@ -11,6 +11,13 @@ using namespace DirectX;
 using namespace DX;
 
 using Microsoft::WRL::ComPtr;
+
+#if defined(NTDDI_WIN10_RS3)
+#include "Gamingdeviceinformation.h"
+
+#include <libloaderapi2.h>
+extern "C" IMAGE_DOS_HEADER __ImageBase;
+#endif
 
 namespace
 {
@@ -105,6 +112,62 @@ DeviceResources::DeviceResources(
         m_options(flags),
         m_deviceNotify(nullptr)
 {
+#if defined(NTDDI_WIN10_RS3)
+    if (QueryOptionalDelayLoadedAPI(reinterpret_cast<HMODULE>(&__ImageBase),
+        "api-ms-win-gaming-deviceinformation-l1-1-0.dll",
+        "GetGamingDeviceModelInformation",
+        0))
+    {
+        GAMING_DEVICE_MODEL_INFORMATION info = {};
+        GetGamingDeviceModelInformation(&info);
+
+        if (info.vendorId == GAMING_DEVICE_VENDOR_ID_MICROSOFT)
+        {
+#ifdef _DEBUG
+            switch (info.deviceId)
+            {
+            case GAMING_DEVICE_DEVICE_ID_XBOX_ONE: OutputDebugStringA("INFO: Running on Xbox One\n"); break;
+            case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_S: OutputDebugStringA("INFO: Running on Xbox One S\n"); break;
+            case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_X: OutputDebugStringA("INFO: Running on Xbox One X\n"); break;
+            case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_X_DEVKIT: OutputDebugStringA("INFO: Running on Xbox One X (DevKit)\n"); break;
+            }
+#endif
+
+            switch (info.deviceId)
+            {
+            case GAMING_DEVICE_DEVICE_ID_XBOX_ONE:
+            case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_S:
+                m_options &= ~c_Enable4K_Xbox;
+#ifdef _DEBUG
+                OutputDebugStringA("INFO: Swapchain using 1080p (1920 x 1080) on Xbox One or Xbox One S\n");
+#endif
+                break;
+
+            case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_X:
+            case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_X_DEVKIT:
+#ifdef _DEBUG
+                if (m_options & c_Enable4K_Xbox)
+                {
+                    OutputDebugStringA("INFO: Swapchain using 4k (3840 x 2160) on Xbox One X\n");
+                }
+#endif
+                break;
+
+            default:
+                m_options &= ~c_Enable4K_Xbox;
+                break;
+            }
+        }
+        else
+        {
+            m_options &= ~c_Enable4K_Xbox;
+        }
+    }
+    else
+#endif
+    {
+        m_options &= ~c_Enable4K_Xbox;
+    }
 }
 
 // Configures the Direct3D device, and stores handles to it and the device context.
@@ -433,6 +496,13 @@ void DeviceResources::SetWindow(IUnknown* window, int width, int height, DXGI_MO
 {
     m_window = window;
 
+    if (m_options & c_Enable4K_Xbox)
+    {
+        // If we are using a 4k swapchain, we hardcode the value
+        width = 3840;
+        height = 2160;
+    }
+
     m_outputSize.left = m_outputSize.top = 0;
     m_outputSize.right = width;
     m_outputSize.bottom = height;
@@ -629,11 +699,11 @@ void DeviceResources::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
                 continue;
             }
 
-#ifdef _DEBUG
+        #ifdef _DEBUG
             wchar_t buff[256] = {};
             swprintf_s(buff, L"Direct3D Adapter (%u): VID:%04X, PID:%04X - %ls\n", adapterIndex, desc.VendorId, desc.DeviceId, desc.Description);
             OutputDebugStringW(buff);
-#endif
+        #endif
 
             break;
         }

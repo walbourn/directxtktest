@@ -16,6 +16,9 @@
 #include "pch.h"
 #include "Game.h"
 
+#define GAMMA_CORRECT_RENDERING
+#define USE_FAST_SEMANTICS
+
 extern void ExitGame();
 
 using namespace DirectX;
@@ -37,7 +40,28 @@ Game::Game() noexcept(false) :
 
     *m_lastStrBuff = 0;
 
-    m_deviceResources = std::make_unique<DX::DeviceResources>();
+#ifdef GAMMA_CORRECT_RENDERING
+    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+#else
+    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+#endif
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2,
+        DX::DeviceResources::c_Enable4K_UHD
+#ifdef USE_FAST_SEMANTICS
+        | DX::DeviceResources::c_FastSemantics
+#endif
+        );
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3,
+        DX::DeviceResources::c_Enable4K_Xbox
+        );
+#else
+    m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat);
+#endif
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     m_deviceResources->RegisterDeviceNotify(this);
