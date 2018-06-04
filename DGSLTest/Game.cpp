@@ -49,41 +49,30 @@ Game::Game() noexcept(false)
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2,
+        DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
-        , DX::DeviceResources::c_FastSemantics
+        | DX::DeviceResources::c_FastSemantics
 #endif
         );
-#else
-    m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat,
-
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
-        DXGI_FORMAT_D32_FLOAT, 2, DX::DeviceResources::c_FastSemantics
-#elif defined(FEATURE_LEVEL_9_X)
-        DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_1
-#else
-        DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0
-#endif
-        );
-
-#endif
-
-
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-#ifdef GAMMA_CORRECT_RENDERING
-        DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
+#ifdef FEATURE_LEVEL_9_X
+        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3,
 #else
-        DXGI_FORMAT_B8G8R8A8_UNORM,
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
 #endif
-
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
-        DXGI_FORMAT_D32_FLOAT, 2, DX::DeviceResources::c_FastSemantics
-#elif defined(FEATURE_LEVEL_9_X)
-        DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_1
-#else
-        DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0
-#endif
+        DX::DeviceResources::c_Enable4K_Xbox
         );
+#elif defined(FEATURE_LEVEL_9_X)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3
+        );
+#else
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0
+        );
+#endif
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     m_deviceResources->RegisterDeviceNotify(this);
