@@ -825,7 +825,7 @@ void Game::Render()
     }
 
     // PBREffect
-    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
     {
         context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
 
@@ -1071,11 +1071,15 @@ void Game::CreateDeviceDependentResources()
     DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"Sphere2Mat_emissive.png",
         nullptr, m_pbrEmissive.ReleaseAndGetAddressOf()));
 
-    DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"Atrium_diffuseIBL.dds",
-        nullptr, m_radianceIBL.ReleaseAndGetAddressOf()));
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
+    {
+        // These are BC6H, so they need to be FL 11 +
+        DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"Atrium_diffuseIBL.dds",
+            nullptr, m_radianceIBL.ReleaseAndGetAddressOf()));
 
-    DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"Atrium_specularIBL.dds",
-        nullptr, m_irradianceIBL.ReleaseAndGetAddressOf()));
+        DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"Atrium_specularIBL.dds",
+            nullptr, m_irradianceIBL.ReleaseAndGetAddressOf()));
+    }
 
     // Create test geometry.
     m_indexCount = CreateCube(device,
@@ -1866,7 +1870,7 @@ void Game::CreateDeviceDependentResources()
     }));
 
     //--- PBREffect ------------------------------------------------------------------------
-    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
     {
         D3D11_SHADER_RESOURCE_VIEW_DESC desc;
         m_radianceIBL->GetDesc(&desc);
@@ -2095,7 +2099,7 @@ void Game::CreateDeviceDependentResources()
         effect->SetWeightsPerVertex(1);
     }));
 
-    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
     {
         m_velocityBuffer->SetDevice(device);
     }
@@ -2104,7 +2108,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
     {
         auto size = m_deviceResources->GetOutputSize();
         m_velocityBuffer->SetWindow(size);
