@@ -264,6 +264,19 @@ void Game::Render()
 
     Clear();
 
+    XMVECTORF32 red, blue, lightGray, yellow;
+#ifdef GAMMA_CORRECT_RENDERING
+    red.v = XMColorSRGBToRGB(Colors::Red);
+    blue.v = XMColorSRGBToRGB(Colors::Blue);
+    lightGray.v = XMColorSRGBToRGB(Colors::LightGray);
+    yellow.v = XMColorSRGBToRGB(Colors::Yellow);
+#else
+    red.v = Colors::Red;
+    blue.v = Colors::Blue;
+    lightGray.v = Colors::LightGray;
+    yellow.v = Colors::Yellow;
+#endif
+
     float y = sinf(m_pitch);        // vertical
     float r = cosf(m_pitch);        // in the plane
     float z = r*cosf(m_yaw);        // fwd-back
@@ -284,19 +297,19 @@ void Game::Render()
     XMFLOAT2 pos(50, 50);
 
     // Buttons
-    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftButton", pos, m_ms.leftButton ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftButton", pos, m_ms.leftButton ? red : lightGray);
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"RightButton", pos, m_ms.rightButton ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"RightButton", pos, m_ms.rightButton ? red : lightGray);
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"MiddleButton", pos, m_ms.middleButton ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"MiddleButton", pos, m_ms.middleButton ? red : lightGray);
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"XButton1", pos, m_ms.xButton1 ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"XButton1", pos, m_ms.xButton1 ? red : lightGray);
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"XButton2", pos, m_ms.xButton2 ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"XButton2", pos, m_ms.xButton2 ? red : lightGray);
 
     // Scroll Wheel
     pos.y += height * 2;
@@ -307,11 +320,11 @@ void Game::Render()
     }
 
     m_comicFont->DrawString(m_spriteBatch.get(), (m_ms.positionMode == Mouse::MODE_RELATIVE) ? L"Relative" : L"Absolute",
-        XMFLOAT2(50, 550), Colors::Blue);
+        XMFLOAT2(50, 550), blue);
 
     if (m_lastStr)
     {
-        m_comicFont->DrawString(m_spriteBatch.get(), m_lastStr, XMFLOAT2(50, 600), Colors::Yellow);
+        m_comicFont->DrawString(m_spriteBatch.get(), m_lastStr, XMFLOAT2(50, 600), yellow);
     }
 
     if (m_ms.positionMode == Mouse::MODE_ABSOLUTE)
@@ -337,7 +350,13 @@ void Game::Clear()
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     auto depthStencil = m_deviceResources->GetDepthStencilView();
 
-    context->ClearRenderTargetView(renderTarget, Colors::CornflowerBlue);
+    XMVECTORF32 color;
+#ifdef GAMMA_CORRECT_RENDERING
+    color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
+#else
+    color.v = Colors::CornflowerBlue;
+#endif
+    context->ClearRenderTargetView(renderTarget, color);
     context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
@@ -425,7 +444,16 @@ void Game::CreateDeviceDependentResources()
 
     m_room = GeometricPrimitive::CreateBox(context, XMFLOAT3(ROOM_BOUNDS[0], ROOM_BOUNDS[1], ROOM_BOUNDS[2]), false, true);
 
-    DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"texture.dds", nullptr, m_roomTex.GetAddressOf()));
+#ifdef GAMMA_CORRECT_RENDERING
+    bool forceSRGB = true;
+#else
+    bool forceSRGB = false;
+#endif
+
+    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"texture.dds", 0,
+        D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+        forceSRGB, nullptr, m_roomTex.GetAddressOf()));
+
     DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"arrow.png", nullptr, m_cursor.GetAddressOf()));
 }
 

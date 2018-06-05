@@ -316,6 +316,17 @@ void Game::Render()
 
     Clear();
 
+    XMVECTORF32 red, lightGray, yellow;
+#ifdef GAMMA_CORRECT_RENDERING
+    red.v = XMColorSRGBToRGB(Colors::Red);
+    lightGray.v = XMColorSRGBToRGB(Colors::LightGray);
+    yellow.v = XMColorSRGBToRGB(Colors::Yellow);
+#else
+    red.v = Colors::Red;
+    lightGray.v = Colors::LightGray;
+    yellow.v = Colors::Yellow;
+#endif
+
     XMVECTOR lookAt = XMVectorAdd(m_cameraPos, Vector3::Backward);
 
     XMMATRIX view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
@@ -336,7 +347,7 @@ void Game::Render()
     {
         wchar_t buff[5] = {};
         swprintf_s(buff, L"F%d", vk - VK_F1 + 1);
-        m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, m_kb.IsKeyDown(static_cast<DirectX::Keyboard::Keys>(vk)) ? Colors::Red : Colors::LightGray);
+        m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, m_kb.IsKeyDown(static_cast<DirectX::Keyboard::Keys>(vk)) ? red : lightGray);
 
         pos.x += width * 3;
     }
@@ -349,7 +360,7 @@ void Game::Render()
     {
         wchar_t buff[3] = {};
         swprintf_s(buff, L"%d", vk - 0x30);
-        m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, m_kb.IsKeyDown(static_cast<DirectX::Keyboard::Keys>(vk)) ? Colors::Red : Colors::LightGray);
+        m_comicFont->DrawString(m_spriteBatch.get(), buff, pos, m_kb.IsKeyDown(static_cast<DirectX::Keyboard::Keys>(vk)) ? red : lightGray);
 
         pos.x += width * 2;
     }
@@ -358,67 +369,67 @@ void Game::Render()
     pos.x = 50;
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"Q", pos, m_kb.Q ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"Q", pos, m_kb.Q ? red : lightGray);
 
     pos.x += width * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"W", pos, m_kb.W ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"W", pos, m_kb.W ? red : lightGray);
 
     pos.x += width * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"E", pos, m_kb.E ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"E", pos, m_kb.E ? red : lightGray);
 
     pos.x += width * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"R", pos, m_kb.R ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"R", pos, m_kb.R ? red : lightGray);
 
     pos.x += width * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"T", pos, m_kb.T ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"T", pos, m_kb.T ? red : lightGray);
 
     pos.x += width * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"Y", pos, m_kb.Y ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"Y", pos, m_kb.Y ? red : lightGray);
 
     // Row 3
     pos.x = 50;
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftShift", pos, m_kb.LeftShift ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftShift", pos, m_kb.LeftShift ? red : lightGray);
 
     pos.x += width * 10;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"RightShift", pos, m_kb.RightShift ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"RightShift", pos, m_kb.RightShift ? red : lightGray);
 
     // Row 4
     pos.x = 50;
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftCtrl", pos, m_kb.LeftControl ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftCtrl", pos, m_kb.LeftControl ? red : lightGray);
 
     pos.x += width * 10;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"RightCtrl", pos, m_kb.RightControl ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"RightCtrl", pos, m_kb.RightControl ? red : lightGray);
 
     // Row 5
     pos.x = 50;
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftAlt", pos, m_kb.LeftAlt ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftAlt", pos, m_kb.LeftAlt ? red : lightGray);
 
     pos.x += width * 10;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"RightAlt", pos, m_kb.RightAlt ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"RightAlt", pos, m_kb.RightAlt ? red : lightGray);
 
     // Row 6
     pos.x = 50;
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"Space", pos, m_kb.Space ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"Space", pos, m_kb.Space ? red : lightGray);
 
     if (m_lastStr)
     {
-        m_comicFont->DrawString(m_spriteBatch.get(), m_lastStr, XMFLOAT2(50, 650), Colors::Yellow);
+        m_comicFont->DrawString(m_spriteBatch.get(), m_lastStr, XMFLOAT2(50, 650), yellow);
     }
 
     m_spriteBatch->End();
@@ -439,7 +450,13 @@ void Game::Clear()
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     auto depthStencil = m_deviceResources->GetDepthStencilView();
 
-    context->ClearRenderTargetView(renderTarget, Colors::CornflowerBlue);
+    XMVECTORF32 color;
+#ifdef GAMMA_CORRECT_RENDERING
+    color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
+#else
+    color.v = Colors::CornflowerBlue;
+#endif
+    context->ClearRenderTargetView(renderTarget, color);
     context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
@@ -526,7 +543,15 @@ void Game::CreateDeviceDependentResources()
 
     m_room = GeometricPrimitive::CreateBox(context, XMFLOAT3(ROOM_BOUNDS[0], ROOM_BOUNDS[1], ROOM_BOUNDS[2]), false, true);
 
-    DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"texture.dds", nullptr, m_roomTex.GetAddressOf()));
+#ifdef GAMMA_CORRECT_RENDERING
+    bool forceSRGB = true;
+#else
+    bool forceSRGB = false;
+#endif
+
+    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"texture.dds", 0,
+        D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+        forceSRGB, nullptr, m_roomTex.GetAddressOf()));
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
