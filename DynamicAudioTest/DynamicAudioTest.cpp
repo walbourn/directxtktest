@@ -301,9 +301,9 @@ int __cdecl main()
 
     for( size_t j = 0; j < FMT_CASES; ++j )
     {
-        const static uint32_t s_rate[FMT_CASES] = { 44100, 22050, 22050, 48000, XAUDIO2_MIN_SAMPLE_RATE, XAUDIO2_MAX_SAMPLE_RATE };
-        const static uint32_t s_channels[FMT_CASES] = { 1, 2, 6, 4, 1, 8 };
-        const static uint32_t s_bits[FMT_CASES] = { 16, 8, 16, 8, 8, 16 };
+        static const uint32_t s_rate[FMT_CASES] = { 44100, 22050, 22050, 48000, XAUDIO2_MIN_SAMPLE_RATE, XAUDIO2_MAX_SAMPLE_RATE };
+        static const uint32_t s_channels[FMT_CASES] = { 1, 2, 6, 4, 1, 8 };
+        static const uint32_t s_bits[FMT_CASES] = { 16, 8, 16, 8, 8, 16 };
 
         std::unique_ptr<DynamicSoundEffectInstance> effect( new DynamicSoundEffectInstance( audEngine.get(),
                     nullptr, s_rate[j], s_channels[j], s_bits[j] ) );
