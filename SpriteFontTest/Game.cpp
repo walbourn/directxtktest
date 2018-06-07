@@ -252,6 +252,7 @@ void Game::Render()
 
     m_ctrlOneFont->DrawString(m_spriteBatch.get(), L" !\"\n#$%\n&'()\n*+,-", XMFLOAT2(950, 130), Colors::White, 0.f, XMFLOAT2(0.f, 0.f), 0.5f);
 
+#if !defined(_XBOX_ONE) || !defined(_TITLE)
     {
         UINT w, h;
 
@@ -283,6 +284,7 @@ void Game::Render()
             m_nonproportionalFont->DrawString(m_spriteBatch.get(), tmp, XMFLOAT2(float(w - 100), float(y)), red);
         }
     }
+#endif
 
     m_spriteBatch->End();
 
