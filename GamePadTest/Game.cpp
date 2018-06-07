@@ -84,6 +84,7 @@ void Game::Initialize(
 
     m_gamePad = std::make_unique<GamePad>();
 
+#if !defined(_XBOX_ONE) || !defined(_TITLE)
     // Singleton test
     {
         bool thrown = false;
@@ -109,6 +110,7 @@ void Game::Initialize(
         auto state = GamePad::Get().GetState(0);
         state;
     }
+#endif
 
 #if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
 
@@ -624,7 +626,21 @@ void Game::CreateWindowSizeDependentResources()
     auto viewPort = m_deviceResources->GetScreenViewport();
     m_spriteBatch->SetViewport(viewPort);
 
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_UHD)
+    {
+        // Scale sprite batch rendering when running 4k
+        static const D3D11_VIEWPORT s_vp1080 = { 0.f, 0.f, 1920.f, 1080.f, D3D11_MIN_DEPTH, D3D11_MAX_DEPTH };
+        m_spriteBatch->SetViewport(s_vp1080);
+    }
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_Xbox)
+    {
+        // Scale sprite batch rendering when running 4k
+        static const D3D11_VIEWPORT s_vp1080 = { 0.f, 0.f, 1920.f, 1080.f, D3D11_MIN_DEPTH, D3D11_MAX_DEPTH };
+        m_spriteBatch->SetViewport(s_vp1080);
+    }
+
     m_spriteBatch->SetRotation(m_deviceResources->GetRotation());
 #endif
 }

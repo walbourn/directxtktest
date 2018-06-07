@@ -234,7 +234,15 @@ void Game::Render()
         }
 
         wchar_t unicode[256] = {};
-        if (!MultiByteToWideChar(437, MB_PRECOMPOSED, ascii, i, unicode, 256))
+
+        int cp = 437;
+    #if defined(_XBOX_ONE) && defined(_TITLE)
+        cp = 1252;
+
+        m_consolasFont->SetDefaultCharacter('-');
+    #endif
+
+        if (!MultiByteToWideChar(cp, MB_PRECOMPOSED, ascii, i, unicode, 256))
             wcscpy_s(unicode, L"<ERROR!>\n");
 
         m_consolasFont->DrawString(m_spriteBatch.get(), unicode, XMFLOAT2(10, 600), cyan);
@@ -416,7 +424,21 @@ void Game::CreateWindowSizeDependentResources()
     auto viewport = m_deviceResources->GetScreenViewport();
     m_spriteBatch->SetViewport(viewport);
 
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_UHD)
+    {
+        // Scale sprite batch rendering when running 4k
+        static const D3D11_VIEWPORT s_vp1080 = { 0.f, 0.f, 1920.f, 1080.f, D3D11_MIN_DEPTH, D3D11_MAX_DEPTH };
+        m_spriteBatch->SetViewport(s_vp1080);
+    }
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_Xbox)
+    {
+        // Scale sprite batch rendering when running 4k
+        static const D3D11_VIEWPORT s_vp1080 = { 0.f, 0.f, 1920.f, 1080.f, D3D11_MIN_DEPTH, D3D11_MAX_DEPTH };
+        m_spriteBatch->SetViewport(s_vp1080);
+    }
+
     auto rotation = m_deviceResources->GetRotation();
     m_spriteBatch->SetRotation(rotation);
 #endif
