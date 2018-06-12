@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="KeyboardTest.App">
-      <uap:VisualElements DisplayName="KeyboardTest (DirectX 11)" Square150x150Logo="Logo.png" Square44x44Logo="SmallLogo.png" Description="KeyboardTest" BackgroundColor="transparent">
+      <uap:VisualElements DisplayName="KeyboardTest (DirectX 11)" Square150x150Logo="Logo.png" Square44x44Logo="SmallLogo.png" Description="KeyboardTest for DirectX Tool Kit for DirectX 11 (UWP)" BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="WideLogo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="SplashScreen.png" />

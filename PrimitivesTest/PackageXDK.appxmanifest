@@ -8,7 +8,7 @@
             Version="1.0.0.0" />
   
   <Properties>
-    <DisplayName>PrimitivesTest (DirectX 11)</DisplayName>
+    <DisplayName>PrimitivesTest (DirectX 11, Xbox)</DisplayName>
     <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
     <Logo>StoreLogo.png</Logo>
     <Description>PrimitivesTest</Description>
@@ -28,10 +28,10 @@
         Executable="$targetnametoken$.exe" 
         EntryPoint="PrimitivesTest.App">
         <VisualElements 
-            DisplayName="PrimitivesTest (DirectX 11)"
+            DisplayName="PrimitivesTest (DirectX 11, Xbox)"
             Logo="Logo.png"
             SmallLogo="SmallLogo.png"
-            Description="PrimitivesTest"
+            Description="PrimitivesTest for DirectX Tool Kit for DirectX 11 (Xbox)"
             ForegroundText="light"
             BackgroundColor="#464646">
             <SplashScreen Image="SplashScreen.png" />

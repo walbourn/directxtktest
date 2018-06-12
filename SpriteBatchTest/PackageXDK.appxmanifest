@@ -8,7 +8,7 @@
             Version="1.0.0.0" />
   
   <Properties>
-    <DisplayName>SpriteBatchTest (DirectX 11)</DisplayName>
+    <DisplayName>SpriteBatchTest (DirectX 11, Xbox)</DisplayName>
     <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
     <Logo>StoreLogo.png</Logo>
     <Description>SpriteBatchTest</Description>
@@ -28,10 +28,10 @@
         Executable="$targetnametoken$.exe" 
         EntryPoint="SpriteBatchTest.App">
         <VisualElements 
-            DisplayName="SpriteBatchTest (DirectX 11)"
+            DisplayName="SpriteBatchTest (DirectX 11, Xbox)"
             Logo="Logo.png"
             SmallLogo="SmallLogo.png"
-            Description="SpriteBatchTest"
+            Description="SpriteBatchTest for DirectX Tool Kit for DirectX 11 (Xbox)"
             ForegroundText="light"
             BackgroundColor="#464646">
             <SplashScreen Image="SplashScreen.png" />

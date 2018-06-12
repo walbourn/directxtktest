@@ -35,7 +35,7 @@
         DisplayName="Audio3DTest (DirectX 11)"
         Square150x150Logo="Logo.png"
         Square44x44Logo="SmallLogo.png"
-        Description="Audio3DTest"
+        Description="Audio3DTest for DirectX Tool Kit for DirectX 11 (UWP)"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="WideLogo.png"/>
         <uap:SplashScreen Image="SplashScreen.png" />
