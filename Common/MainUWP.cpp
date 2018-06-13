@@ -47,12 +47,24 @@ public:
             ref new EventHandler<Platform::Object^>(this, &ViewProvider::OnResuming);
 
         m_game = std::make_unique<Game>();
-        if (m_game->RequestHDRMode())
-        {
-            using namespace Windows::Graphics::Display::Core;
 
-            auto displayInfo = HdmiDisplayInformation::GetForCurrentView();
-            if (displayInfo)
+        using namespace Windows::Graphics::Display::Core;
+
+        auto displayInfo = HdmiDisplayInformation::GetForCurrentView();
+        if (displayInfo)
+        {
+#ifdef _DEBUG
+            auto current = displayInfo->GetCurrentDisplayMode();
+
+            if (current)
+            {
+                char buff[256] = {};
+                sprintf_s(buff, "INFO: Current display mode %u x %u (%f Hz)\n", current->ResolutionWidthInRawPixels, current->ResolutionHeightInRawPixels, current->RefreshRate);
+                OutputDebugStringA(buff);
+            }
+#endif
+
+            if (m_game->RequestHDRMode())
             {
                 auto modes = displayInfo->GetSupportedDisplayModes();
 

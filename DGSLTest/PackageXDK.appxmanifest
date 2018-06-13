@@ -8,7 +8,7 @@
             Version="1.0.0.0" />
   
   <Properties>
-    <DisplayName>DGSLTest (DirectX 11)</DisplayName>
+    <DisplayName>DGSLTest (DirectX 11, Xbox)</DisplayName>
     <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
     <Logo>StoreLogo.png</Logo>
     <Description>DGSLTest</Description>
@@ -28,10 +28,10 @@
         Executable="$targetnametoken$.exe" 
         EntryPoint="DGSLTest.App">
         <VisualElements 
-            DisplayName="DGSLTest (DirectX 11)"
+            DisplayName="DGSLTest (DirectX 11, Xbox)"
             Logo="Logo.png"
             SmallLogo="SmallLogo.png"
-            Description="DGSLTest"
+            Description="DGSLTest for DirectX Tool Kit for DirectX 11 (Xbox)"
             ForegroundText="light"
             BackgroundColor="#464646">
             <SplashScreen Image="SplashScreen.png" />

@@ -35,7 +35,7 @@
         DisplayName="AnimTest (DirectX 11)"
         Square150x150Logo="Logo.png"
         Square44x44Logo="SmallLogo.png"
-        Description="AnimTest"
+        Description="AnimTest for DirectX Tool Kit for DirectX 11 (UWP)"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="WideLogo.png"/>
         <uap:SplashScreen Image="SplashScreen.png" />

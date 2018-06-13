@@ -28,6 +28,9 @@ using Microsoft::WRL::ComPtr;
 namespace
 {
     const int MaxScene = 27;
+
+    const DXGI_FORMAT c_sdrFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
+    const DXGI_FORMAT c_hdrFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 }
 
 // Constructor.
@@ -36,14 +39,20 @@ Game::Game() noexcept(false) :
 {
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2,
+        c_sdrFormat, DXGI_FORMAT_D32_FLOAT, 2,
         DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
         | DX::DeviceResources::c_FastSemantics
 #endif
-        );
+        | DX::DeviceResources::c_EnableHDR);
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_sdrFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
+        DX::DeviceResources::c_EnableHDR | DX::DeviceResources::c_Enable4K_Xbox);
 #else
-    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0);
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_sdrFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
+        DX::DeviceResources::c_EnableHDR);
 #endif
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
@@ -185,7 +194,7 @@ void Game::Render()
 #if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
     context->DecompressResource(m_sceneTex.Get(), 0, nullptr,
         m_sceneTex.Get(), 0, nullptr,
-        DXGI_FORMAT_R16G16B16A16_FLOAT, D3D11X_DECOMPRESS_PROPAGATE_COLOR_CLEAR);
+        c_hdrFormat, D3D11X_DECOMPRESS_PROPAGATE_COLOR_CLEAR);
 #endif
 
     auto renderTarget = m_deviceResources->GetRenderTargetView();
@@ -734,7 +743,7 @@ void Game::CreateWindowSizeDependentResources()
     auto device = m_deviceResources->GetD3DDevice();
 
     CD3D11_TEXTURE2D_DESC sceneDesc(
-        DXGI_FORMAT_R16G16B16A16_FLOAT, width, height,
+        c_hdrFormat, width, height,
         1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 
     DX::ThrowIfFailed(device->CreateTexture2D(&sceneDesc, nullptr, m_sceneTex.GetAddressOf()));

@@ -8,7 +8,7 @@
             Version="1.0.0.0" />
   
   <Properties>
-    <DisplayName>HDRTest (DirectX 11)</DisplayName>
+    <DisplayName>HDRTest (DirectX 11, Xbox)</DisplayName>
     <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
     <Logo>StoreLogo.png</Logo>
     <Description>HDRTest</Description>
@@ -28,10 +28,10 @@
         Executable="$targetnametoken$.exe" 
         EntryPoint="HDRTest.App">
         <VisualElements 
-            DisplayName="HDRTest"
+            DisplayName="HDRTest (DirectX 11, Xbox)"
             Logo="Logo.png"
             SmallLogo="SmallLogo.png"
-            Description="HDRTest (DirectX 11)"
+            Description="HDRTest for DirectX Tool Kit for DirectX 11 (Xbox)"
             ForegroundText="light"
             BackgroundColor="#464646">
             <SplashScreen Image="SplashScreen.png" />

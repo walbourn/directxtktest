@@ -41,21 +41,38 @@ namespace
 
 Game::Game() noexcept(false)
 {
-    m_deviceResources = std::make_unique<DX::DeviceResources>(
 #ifdef GAMMA_CORRECT_RENDERING
-        DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
+    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 #else
-        DXGI_FORMAT_B8G8R8A8_UNORM,
+    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 #endif
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
-        DXGI_FORMAT_D32_FLOAT, 2, DX::DeviceResources::c_FastSemantics
-#elif defined(FEATURE_LEVEL_9_X)
-        DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_1
-#else
-        DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2,
+        DX::DeviceResources::c_Enable4K_UHD
+#ifdef USE_FAST_SEMANTICS
+        | DX::DeviceResources::c_FastSemantics
 #endif
         );
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+#ifdef FEATURE_LEVEL_9_X
+        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3,
+#else
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
+#endif
+        DX::DeviceResources::c_Enable4K_Xbox
+        );
+#elif defined(FEATURE_LEVEL_9_X)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3
+        );
+#else
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0
+        );
+#endif
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     m_deviceResources->RegisterDeviceNotify(this);

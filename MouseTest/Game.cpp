@@ -16,6 +16,9 @@
 #include "pch.h"
 #include "Game.h"
 
+#define GAMMA_CORRECT_RENDERING
+#define USE_FAST_SEMANTICS
+
 extern void ExitGame();
 
 using namespace DirectX;
@@ -37,7 +40,28 @@ Game::Game() noexcept(false) :
 
     *m_lastStrBuff = 0;
 
-    m_deviceResources = std::make_unique<DX::DeviceResources>();
+#ifdef GAMMA_CORRECT_RENDERING
+    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+#else
+    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+#endif
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2,
+        DX::DeviceResources::c_Enable4K_UHD
+#ifdef USE_FAST_SEMANTICS
+        | DX::DeviceResources::c_FastSemantics
+#endif
+        );
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3,
+        DX::DeviceResources::c_Enable4K_Xbox
+        );
+#else
+    m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat);
+#endif
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
     m_deviceResources->RegisterDeviceNotify(this);
@@ -240,6 +264,19 @@ void Game::Render()
 
     Clear();
 
+    XMVECTORF32 red, blue, lightGray, yellow;
+#ifdef GAMMA_CORRECT_RENDERING
+    red.v = XMColorSRGBToRGB(Colors::Red);
+    blue.v = XMColorSRGBToRGB(Colors::Blue);
+    lightGray.v = XMColorSRGBToRGB(Colors::LightGray);
+    yellow.v = XMColorSRGBToRGB(Colors::Yellow);
+#else
+    red.v = Colors::Red;
+    blue.v = Colors::Blue;
+    lightGray.v = Colors::LightGray;
+    yellow.v = Colors::Yellow;
+#endif
+
     float y = sinf(m_pitch);        // vertical
     float r = cosf(m_pitch);        // in the plane
     float z = r*cosf(m_yaw);        // fwd-back
@@ -260,19 +297,19 @@ void Game::Render()
     XMFLOAT2 pos(50, 50);
 
     // Buttons
-    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftButton", pos, m_ms.leftButton ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"LeftButton", pos, m_ms.leftButton ? red : lightGray);
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"RightButton", pos, m_ms.rightButton ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"RightButton", pos, m_ms.rightButton ? red : lightGray);
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"MiddleButton", pos, m_ms.middleButton ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"MiddleButton", pos, m_ms.middleButton ? red : lightGray);
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"XButton1", pos, m_ms.xButton1 ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"XButton1", pos, m_ms.xButton1 ? red : lightGray);
     pos.y += height * 2;
 
-    m_comicFont->DrawString(m_spriteBatch.get(), L"XButton2", pos, m_ms.xButton2 ? Colors::Red : Colors::LightGray);
+    m_comicFont->DrawString(m_spriteBatch.get(), L"XButton2", pos, m_ms.xButton2 ? red : lightGray);
 
     // Scroll Wheel
     pos.y += height * 2;
@@ -283,11 +320,11 @@ void Game::Render()
     }
 
     m_comicFont->DrawString(m_spriteBatch.get(), (m_ms.positionMode == Mouse::MODE_RELATIVE) ? L"Relative" : L"Absolute",
-        XMFLOAT2(50, 550), Colors::Blue);
+        XMFLOAT2(50, 550), blue);
 
     if (m_lastStr)
     {
-        m_comicFont->DrawString(m_spriteBatch.get(), m_lastStr, XMFLOAT2(50, 600), Colors::Yellow);
+        m_comicFont->DrawString(m_spriteBatch.get(), m_lastStr, XMFLOAT2(50, 600), yellow);
     }
 
     if (m_ms.positionMode == Mouse::MODE_ABSOLUTE)
@@ -313,7 +350,13 @@ void Game::Clear()
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     auto depthStencil = m_deviceResources->GetDepthStencilView();
 
-    context->ClearRenderTargetView(renderTarget, Colors::CornflowerBlue);
+    XMVECTORF32 color;
+#ifdef GAMMA_CORRECT_RENDERING
+    color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
+#else
+    color.v = Colors::CornflowerBlue;
+#endif
+    context->ClearRenderTargetView(renderTarget, color);
     context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
@@ -401,13 +444,34 @@ void Game::CreateDeviceDependentResources()
 
     m_room = GeometricPrimitive::CreateBox(context, XMFLOAT3(ROOM_BOUNDS[0], ROOM_BOUNDS[1], ROOM_BOUNDS[2]), false, true);
 
-    DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"texture.dds", nullptr, m_roomTex.GetAddressOf()));
+#ifdef GAMMA_CORRECT_RENDERING
+    bool forceSRGB = true;
+#else
+    bool forceSRGB = false;
+#endif
+
+    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"texture.dds", 0,
+        D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+        forceSRGB, nullptr, m_roomTex.GetAddressOf()));
+
     DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"arrow.png", nullptr, m_cursor.GetAddressOf()));
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_UHD)
+    {
+        Mouse::SetDpi(192.);
+    }
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_Xbox)
+    {
+        Mouse::SetDpi(192.);
+    }
+#endif
+
     auto size = m_deviceResources->GetOutputSize();
     m_proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(70.f), float(size.right) / float(size.bottom), 0.01f, 100.f);
 

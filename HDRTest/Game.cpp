@@ -56,6 +56,12 @@ extern bool g_HDRMode;
 // Constructor.
 Game::Game() noexcept(false)
 {
+#ifdef TEST_HDR_LINEAR
+    const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+#else
+    const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
+#endif
+
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
         DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_D32_FLOAT, 2,
@@ -64,15 +70,13 @@ Game::Game() noexcept(false)
         | DX::DeviceResources::c_FastSemantics
 #endif
         | DX::DeviceResources::c_EnableHDR);
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_DisplayFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
+        DX::DeviceResources::c_EnableHDR | DX::DeviceResources::c_Enable4K_Xbox);
 #else
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-#if defined(TEST_HDR_LINEAR)
-        DXGI_FORMAT_R16G16B16A16_FLOAT,
-#else
-        DXGI_FORMAT_R10G10B10A2_UNORM,
-#endif
-        DXGI_FORMAT_D32_FLOAT, 2,
-        D3D_FEATURE_LEVEL_10_0,
+        c_DisplayFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
         DX::DeviceResources::c_EnableHDR);
 #endif
 

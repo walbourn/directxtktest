@@ -8,7 +8,7 @@
             Version="1.0.0.0" />
   
   <Properties>
-    <DisplayName>Audio3DTest (DirectX 11)</DisplayName>
+    <DisplayName>Audio3DTest (DirectX 11, Xbox)</DisplayName>
     <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
     <Logo>StoreLogo.png</Logo>
     <Description>Audio3DTest</Description>
@@ -28,10 +28,10 @@
         Executable="$targetnametoken$.exe" 
         EntryPoint="Audio3DTest.App">
         <VisualElements 
-            DisplayName="Audio3DTest (DirectX 11)"
+            DisplayName="Audio3DTest (DirectX 11, Xbox)"
             Logo="Logo.png"
             SmallLogo="SmallLogo.png"
-            Description="Audio3DTest"
+            Description="Audio3DTest for DirectX Tool Kit for DirectX 11 (Xbox)"
             ForegroundText="light"
             BackgroundColor="#464646">
             <SplashScreen Image="SplashScreen.png" />

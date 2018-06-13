@@ -32,19 +32,28 @@ Game::Game() noexcept(false) :
 {
     *m_lastStrBuff = 0;
 
+#ifdef GAMMA_CORRECT_RENDERING
+    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+#else
+    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+#endif
+
     // 2D only rendering
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2,
+        c_RenderFormat, DXGI_FORMAT_UNKNOWN, 2,
         DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
         | DX::DeviceResources::c_FastSemantics
 #endif
         );
-#elif defined(GAMMA_CORRECT_RENDERING)
-    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_UNKNOWN);
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    m_deviceResources = std::make_unique<DX::DeviceResources>(
+        c_RenderFormat, DXGI_FORMAT_UNKNOWN, 2, D3D_FEATURE_LEVEL_9_3,
+        DX::DeviceResources::c_Enable4K_Xbox
+        );
 #else
-    m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_UNKNOWN);
+    m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat, DXGI_FORMAT_UNKNOWN);
 #endif
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
@@ -75,6 +84,7 @@ void Game::Initialize(
 
     m_gamePad = std::make_unique<GamePad>();
 
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
     // Singleton test
     {
         bool thrown = false;
@@ -90,16 +100,14 @@ void Game::Initialize(
 
         if (!thrown)
         {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
             MessageBox(window, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
-#else
             throw std::exception("GamePad not acting like a singleton");
-#endif
         }
 
         auto state = GamePad::Get().GetState(0);
         state;
     }
+#endif
 
 #if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
 
@@ -376,7 +384,7 @@ void Game::Render()
 
     for (int j = 0; j < std::min(GamePad::MAX_PLAYER_COUNT, 4); ++j)
     {
-        XMVECTOR color = m_found[j] ? Colors::White : Colors::Black;
+        XMVECTOR color = m_found[j] ? Colors::White : Colors::DimGray;
         m_ctrlFont->DrawString(m_spriteBatch.get(), L"$", XMFLOAT2(800.f, float(50 + j * 150)), color);
     }
 
@@ -386,10 +394,10 @@ void Game::Render()
     }
 
     // X Y A B
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"&", XMFLOAT2(325, 150), m_state.IsXPressed() ? Colors::White : Colors::Black);
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"(", XMFLOAT2(400, 110), m_state.IsYPressed() ? Colors::White : Colors::Black);
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"'", XMFLOAT2(400, 200), m_state.IsAPressed() ? Colors::White : Colors::Black);
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L")", XMFLOAT2(475, 150), m_state.IsBPressed() ? Colors::White : Colors::Black);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"&", XMFLOAT2(325, 150), m_state.IsXPressed() ? Colors::White : Colors::DimGray);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"(", XMFLOAT2(400, 110), m_state.IsYPressed() ? Colors::White : Colors::DimGray);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"'", XMFLOAT2(400, 200), m_state.IsAPressed() ? Colors::White : Colors::DimGray);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L")", XMFLOAT2(475, 150), m_state.IsBPressed() ? Colors::White : Colors::DimGray);
 
     // Left/Right sticks
     auto loc = XMFLOAT2(10, 110);
@@ -398,7 +406,7 @@ void Game::Render()
     loc.y -= m_state.IsLeftThumbStickUp() ? 20.f : 0.f;
     loc.y += m_state.IsLeftThumbStickDown() ? 20.f : 0.f;
 
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L" ", loc, m_state.IsLeftStickPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0));
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L" ", loc, m_state.IsLeftStickPressed() ? Colors::White : Colors::DimGray, 0, XMFLOAT2(0, 0));
 
     loc = XMFLOAT2(450, 300);
     loc.x -= m_state.IsRightThumbStickLeft() ? 20.f : 0.f;
@@ -406,10 +414,10 @@ void Game::Render()
     loc.y -= m_state.IsRightThumbStickUp() ? 20.f : 0.f;
     loc.y += m_state.IsRightThumbStickDown() ? 20.f : 0.f;
 
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"\"", loc, m_state.IsRightStickPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0));
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"\"", loc, m_state.IsRightStickPressed() ? Colors::White : Colors::DimGray, 0, XMFLOAT2(0, 0));
 
     // DPad
-    XMVECTOR color = Colors::Black;
+    XMVECTOR color = Colors::DimGray;
     if (m_state.dpad.up || m_state.dpad.down || m_state.dpad.right || m_state.dpad.left)
         color = Colors::White;
 
@@ -422,28 +430,28 @@ void Game::Render()
     m_ctrlFont->DrawString(m_spriteBatch.get(), L"!", loc, color);
 
     // Back/Start (aka View/Menu)
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"#", XMFLOAT2(175, 75), m_state.IsViewPressed() ? Colors::White : Colors::Black);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"#", XMFLOAT2(175, 75), m_state.IsViewPressed() ? Colors::White : Colors::DimGray);
     assert(m_state.IsViewPressed() == m_state.IsBackPressed());
     assert(m_state.buttons.back == m_state.buttons.view);
 
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"%", XMFLOAT2(300, 75), m_state.IsMenuPressed() ? Colors::White : Colors::Black);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"%", XMFLOAT2(300, 75), m_state.IsMenuPressed() ? Colors::White : Colors::DimGray);
     assert(m_state.IsMenuPressed() == m_state.IsStartPressed());
     assert(m_state.buttons.start == m_state.buttons.menu);
 
     // Triggers/Shoulders
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"*", XMFLOAT2(500, 10), m_state.IsRightShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"*", XMFLOAT2(500, 10), m_state.IsRightShoulderPressed() ? Colors::White : Colors::DimGray, 0, XMFLOAT2(0, 0), 0.5f);
 
     loc = XMFLOAT2(450, 10);
     loc.x += m_state.IsRightTriggerPressed() ? 5.f : 0.f;
-    color = XMVectorSet(m_state.triggers.right, m_state.triggers.right, m_state.triggers.right, 1.f);
+    color = XMVectorLerp(Colors::DimGray, Colors::White, m_state.triggers.right);
     m_ctrlFont->DrawString(m_spriteBatch.get(), L"+", loc, color, 0, XMFLOAT2(0, 0), 0.5f);
 
     loc = XMFLOAT2(130, 10);
     loc.x -= m_state.IsLeftTriggerPressed() ? 5.f : 0.f;
-    color = XMVectorSet(m_state.triggers.left, m_state.triggers.left, m_state.triggers.left, 1.f);
+    color = XMVectorLerp(Colors::DimGray, Colors::White, m_state.triggers.left);
     m_ctrlFont->DrawString(m_spriteBatch.get(), L",", loc, color, 0, XMFLOAT2(0, 0), 0.5f);
 
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"-", XMFLOAT2(10, 10), m_state.IsLeftShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"-", XMFLOAT2(10, 10), m_state.IsLeftShoulderPressed() ? Colors::White : Colors::DimGray, 0, XMFLOAT2(0, 0), 0.5f);
 
     // Sticks
     RECT src = { 0, 0, 1, 1 };
@@ -615,7 +623,21 @@ void Game::CreateWindowSizeDependentResources()
     auto viewPort = m_deviceResources->GetScreenViewport();
     m_spriteBatch->SetViewport(viewPort);
 
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_UHD)
+    {
+        // Scale sprite batch rendering when running 4k
+        static const D3D11_VIEWPORT s_vp1080 = { 0.f, 0.f, 1920.f, 1080.f, D3D11_MIN_DEPTH, D3D11_MAX_DEPTH };
+        m_spriteBatch->SetViewport(s_vp1080);
+    }
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_Xbox)
+    {
+        // Scale sprite batch rendering when running 4k
+        static const D3D11_VIEWPORT s_vp1080 = { 0.f, 0.f, 1920.f, 1080.f, D3D11_MIN_DEPTH, D3D11_MAX_DEPTH };
+        m_spriteBatch->SetViewport(s_vp1080);
+    }
+
     m_spriteBatch->SetRotation(m_deviceResources->GetRotation());
 #endif
 }

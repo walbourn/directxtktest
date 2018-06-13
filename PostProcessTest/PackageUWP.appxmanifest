@@ -32,10 +32,10 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="PostProcessTest.App">
       <uap:VisualElements
-        DisplayName="PostProcessTest"
+        DisplayName="PostProcessTest (DirectX 11)"
         Square150x150Logo="Logo.png"
         Square44x44Logo="SmallLogo.png"
-        Description="PostProcessTest"
+        Description="PostProcessTest for DirectX Tool Kit for DirectX 11 (UWP)"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="WideLogo.png"/>
         <uap:SplashScreen Image="SplashScreen.png" />
