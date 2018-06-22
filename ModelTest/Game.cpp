@@ -255,6 +255,7 @@ void Game::Render()
 
     Clear();
 
+    auto device = m_deviceResources->GetD3DDevice();
     auto context = m_deviceResources->GetD3DDeviceContext();
 
 #ifdef LH_COORDS
@@ -349,6 +350,34 @@ void Game::Render()
         if (fog)
             fog->SetFogEnabled(false);
     });
+
+        // Custom drawing
+    local = XMMatrixRotationX(cos(time)) * XMMatrixTranslation(-5.f, row0, cos(time) * 2.f);
+    for (auto mit = m_cup->meshes.cbegin(); mit != m_cup->meshes.cend(); ++mit)
+    {
+        auto mesh = mit->get();
+        assert(mesh != 0);
+
+        mesh->PrepareForRendering(context, *m_states.get());
+
+        for (auto it = mesh->meshParts.cbegin(); it != mesh->meshParts.cend(); ++it)
+        {
+            auto part = it->get();
+            assert(part != 0);
+
+            auto imatrices = dynamic_cast<IEffectMatrices*>(part->effect.get());
+            if (imatrices) imatrices->SetWorld(local);
+
+            if (device->GetFeatureLevel() >= D3D_FEATURE_LEVEL_9_3)
+            {
+                part->DrawInstanced(context, part->effect.get(), part->inputLayout.Get(), 1);
+            }
+            else
+            {
+                part->Draw(context, part->effect.get(), part->inputLayout.Get());
+            }
+        }
+    }
 
     //--- Draw VBO models ------------------------------------------------------------------
     local = XMMatrixMultiply(XMMatrixScaling(0.25f, 0.25f, 0.25f), XMMatrixTranslation(4.5f, row0, 0.f));
