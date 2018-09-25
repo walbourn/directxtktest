@@ -217,12 +217,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_ACTIVATEAPP:
+        Keyboard::ProcessMessage(message, wParam, lParam);
         Mouse::ProcessMessage(message, wParam, lParam);
 
         if (game)
         {
-            Keyboard::ProcessMessage(message, wParam, lParam);
-
             if (wParam)
             {
                 game->OnActivated();
