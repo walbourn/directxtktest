@@ -30,7 +30,7 @@ using namespace DirectX::SimpleMath;
 using Microsoft::WRL::ComPtr;
 
 // Constructor.
-Game::Game()
+Game::Game() noexcept(false)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2, true);

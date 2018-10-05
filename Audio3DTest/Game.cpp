@@ -83,10 +83,9 @@ namespace
 Game::Game() noexcept(false) :
     m_critError(false),
     m_retrydefault(false),
-    m_newAudio(false)
+    m_newAudio(false),
+    m_deviceStr{}
 {
-    *m_deviceStr = 0;
-
 #ifdef GAMMA_CORRECT_RENDERING
     const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 #else
