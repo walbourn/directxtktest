@@ -30,7 +30,7 @@ using namespace DirectX::SimpleMath;
 using Microsoft::WRL::ComPtr;
 
 // Constructor.
-Game::Game()
+Game::Game() noexcept(false)
 {
 #if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
     m_deviceResources = std::make_unique<DX::DeviceResources>(DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_D32_FLOAT, 2, true);
@@ -167,10 +167,19 @@ void Game::OnDeactivated()
 
 void Game::OnSuspending()
 {
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    auto context = m_deviceResources->GetD3DDeviceContext();
+    context->Suspend(0);
+#endif
 }
 
 void Game::OnResuming()
 {
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    auto context = m_deviceResources->GetD3DDeviceContext();
+    context->Resume();
+#endif
+
     m_timer.ResetElapsedTime();
 }
 

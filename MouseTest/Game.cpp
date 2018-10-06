@@ -26,19 +26,23 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
-static const XMVECTORF32 START_POSITION = { 0.f, -1.5f, 0.f, 0.f };
-static const XMVECTORF32 ROOM_BOUNDS = { 8.f, 6.f, 12.f, 0.f };
+namespace
+{
+    const XMVECTORF32 START_POSITION = { 0.f, -1.5f, 0.f, 0.f };
+    const XMVECTORF32 ROOM_BOUNDS = { 8.f, 6.f, 12.f, 0.f };
+
+    const float MOVEMENT_GAIN = 0.07f;
+}
 
 // Constructor.
 Game::Game() noexcept(false) :
     m_pitch(0),
     m_yaw(0),
     m_lastStr(nullptr),
-    m_lastMode(Mouse::MODE_ABSOLUTE)
+    m_lastMode(Mouse::MODE_ABSOLUTE),
+    m_lastStrBuff{}
 {
     m_cameraPos = START_POSITION.v;
-
-    *m_lastStrBuff = 0;
 
 #ifdef GAMMA_CORRECT_RENDERING
     const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
@@ -378,10 +382,19 @@ void Game::OnDeactivated()
 
 void Game::OnSuspending()
 {
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    auto context = m_deviceResources->GetD3DDeviceContext();
+    context->Suspend(0);
+#endif
 }
 
 void Game::OnResuming()
 {
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    auto context = m_deviceResources->GetD3DDeviceContext();
+    context->Resume();
+#endif
+
     m_tracker.Reset();
     m_keyboardButtons.Reset();
     m_timer.ResetElapsedTime();

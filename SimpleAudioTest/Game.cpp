@@ -122,10 +122,9 @@ Game::Game() noexcept(false) :
     m_critError(false),
     m_retrydefault(false),
     m_newAudio(false),
+    m_deviceStr{},
     m_gamepadPresent(false)
 {
-    *m_deviceStr = 0;
-
 #ifdef GAMMA_CORRECT_RENDERING
     const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 #else
@@ -639,11 +638,21 @@ void Game::OnDeactivated()
 
 void Game::OnSuspending()
 {
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    auto context = m_deviceResources->GetD3DDeviceContext();
+    context->Suspend(0);
+#endif
+
     m_audEngine->Suspend();
 }
 
 void Game::OnResuming()
 {
+#if defined(_XBOX_ONE) && defined(_TITLE)
+    auto context = m_deviceResources->GetD3DDeviceContext();
+    context->Resume();
+#endif
+
     m_timer.ResetElapsedTime();
     m_gamepadButtons.Reset();
     m_keyboardButtons.Reset();
