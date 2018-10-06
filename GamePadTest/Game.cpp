@@ -84,7 +84,7 @@ void Game::Initialize(
 
     m_gamePad = std::make_unique<GamePad>();
 
-#if !defined(_XBOX_ONE) || !defined(_TITLE)
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
     // Singleton test
     {
         bool thrown = false;
@@ -100,11 +100,8 @@ void Game::Initialize(
 
         if (!thrown)
         {
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
             MessageBox(window, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
-#else
             throw std::exception("GamePad not acting like a singleton");
-#endif
         }
 
         auto state = GamePad::Get().GetState(0);
@@ -387,7 +384,7 @@ void Game::Render()
 
     for (int j = 0; j < std::min(GamePad::MAX_PLAYER_COUNT, 4); ++j)
     {
-        XMVECTOR color = m_found[j] ? Colors::White : Colors::Black;
+        XMVECTOR color = m_found[j] ? Colors::White : Colors::DimGray;
         m_ctrlFont->DrawString(m_spriteBatch.get(), L"$", XMFLOAT2(800.f, float(50 + j * 150)), color);
     }
 
@@ -397,10 +394,10 @@ void Game::Render()
     }
 
     // X Y A B
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"&", XMFLOAT2(325, 150), m_state.IsXPressed() ? Colors::White : Colors::Black);
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"(", XMFLOAT2(400, 110), m_state.IsYPressed() ? Colors::White : Colors::Black);
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"'", XMFLOAT2(400, 200), m_state.IsAPressed() ? Colors::White : Colors::Black);
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L")", XMFLOAT2(475, 150), m_state.IsBPressed() ? Colors::White : Colors::Black);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"&", XMFLOAT2(325, 150), m_state.IsXPressed() ? Colors::White : Colors::DimGray);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"(", XMFLOAT2(400, 110), m_state.IsYPressed() ? Colors::White : Colors::DimGray);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"'", XMFLOAT2(400, 200), m_state.IsAPressed() ? Colors::White : Colors::DimGray);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L")", XMFLOAT2(475, 150), m_state.IsBPressed() ? Colors::White : Colors::DimGray);
 
     // Left/Right sticks
     auto loc = XMFLOAT2(10, 110);
@@ -409,7 +406,7 @@ void Game::Render()
     loc.y -= m_state.IsLeftThumbStickUp() ? 20.f : 0.f;
     loc.y += m_state.IsLeftThumbStickDown() ? 20.f : 0.f;
 
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L" ", loc, m_state.IsLeftStickPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0));
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L" ", loc, m_state.IsLeftStickPressed() ? Colors::White : Colors::DimGray, 0, XMFLOAT2(0, 0));
 
     loc = XMFLOAT2(450, 300);
     loc.x -= m_state.IsRightThumbStickLeft() ? 20.f : 0.f;
@@ -417,10 +414,10 @@ void Game::Render()
     loc.y -= m_state.IsRightThumbStickUp() ? 20.f : 0.f;
     loc.y += m_state.IsRightThumbStickDown() ? 20.f : 0.f;
 
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"\"", loc, m_state.IsRightStickPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0));
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"\"", loc, m_state.IsRightStickPressed() ? Colors::White : Colors::DimGray, 0, XMFLOAT2(0, 0));
 
     // DPad
-    XMVECTOR color = Colors::Black;
+    XMVECTOR color = Colors::DimGray;
     if (m_state.dpad.up || m_state.dpad.down || m_state.dpad.right || m_state.dpad.left)
         color = Colors::White;
 
@@ -433,28 +430,28 @@ void Game::Render()
     m_ctrlFont->DrawString(m_spriteBatch.get(), L"!", loc, color);
 
     // Back/Start (aka View/Menu)
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"#", XMFLOAT2(175, 75), m_state.IsViewPressed() ? Colors::White : Colors::Black);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"#", XMFLOAT2(175, 75), m_state.IsViewPressed() ? Colors::White : Colors::DimGray);
     assert(m_state.IsViewPressed() == m_state.IsBackPressed());
     assert(m_state.buttons.back == m_state.buttons.view);
 
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"%", XMFLOAT2(300, 75), m_state.IsMenuPressed() ? Colors::White : Colors::Black);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"%", XMFLOAT2(300, 75), m_state.IsMenuPressed() ? Colors::White : Colors::DimGray);
     assert(m_state.IsMenuPressed() == m_state.IsStartPressed());
     assert(m_state.buttons.start == m_state.buttons.menu);
 
     // Triggers/Shoulders
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"*", XMFLOAT2(500, 10), m_state.IsRightShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"*", XMFLOAT2(500, 10), m_state.IsRightShoulderPressed() ? Colors::White : Colors::DimGray, 0, XMFLOAT2(0, 0), 0.5f);
 
     loc = XMFLOAT2(450, 10);
     loc.x += m_state.IsRightTriggerPressed() ? 5.f : 0.f;
-    color = XMVectorSet(m_state.triggers.right, m_state.triggers.right, m_state.triggers.right, 1.f);
+    color = XMVectorLerp(Colors::DimGray, Colors::White, m_state.triggers.right);
     m_ctrlFont->DrawString(m_spriteBatch.get(), L"+", loc, color, 0, XMFLOAT2(0, 0), 0.5f);
 
     loc = XMFLOAT2(130, 10);
     loc.x -= m_state.IsLeftTriggerPressed() ? 5.f : 0.f;
-    color = XMVectorSet(m_state.triggers.left, m_state.triggers.left, m_state.triggers.left, 1.f);
+    color = XMVectorLerp(Colors::DimGray, Colors::White, m_state.triggers.left);
     m_ctrlFont->DrawString(m_spriteBatch.get(), L",", loc, color, 0, XMFLOAT2(0, 0), 0.5f);
 
-    m_ctrlFont->DrawString(m_spriteBatch.get(), L"-", XMFLOAT2(10, 10), m_state.IsLeftShoulderPressed() ? Colors::White : Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
+    m_ctrlFont->DrawString(m_spriteBatch.get(), L"-", XMFLOAT2(10, 10), m_state.IsLeftShoulderPressed() ? Colors::White : Colors::DimGray, 0, XMFLOAT2(0, 0), 0.5f);
 
     // Sticks
     RECT src = { 0, 0, 1, 1 };
