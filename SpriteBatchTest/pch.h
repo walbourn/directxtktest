@@ -81,8 +81,6 @@
 #include "SimpleMath.h"
 #include "SpriteBatch.h"
 
-#include "PlatformHelpers.h"
-
 namespace DX
 {
     // Helper class for COM exceptions

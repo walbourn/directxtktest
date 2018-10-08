@@ -84,7 +84,6 @@
 #include "SimpleMath.h"
 
 #include "Bezier.h"
-#include "PlatformHelpers.h"
 
 namespace DX
 {
