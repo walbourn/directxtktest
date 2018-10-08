@@ -85,8 +85,6 @@
 #include "SpriteBatch.h"
 #include "SpriteFont.h"
 
-#include "PlatformHelpers.h"
-
 namespace DX
 {
     // Helper class for COM exceptions

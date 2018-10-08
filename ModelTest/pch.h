@@ -86,8 +86,6 @@
 #include "SimpleMath.h"
 #include "VertexTypes.h"
 
-#include "PlatformHelpers.h"
-
 namespace DX
 {
     // Helper class for COM exceptions

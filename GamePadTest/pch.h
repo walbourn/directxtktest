@@ -1,4 +1,4 @@
-﻿//
+//
 // pch.h
 // Header for standard system include files.
 //
@@ -81,8 +81,6 @@
 #include "DirectXHelpers.h"
 #include "SpriteBatch.h"
 #include "SpriteFont.h"
-
-#include "PlatformHelpers.h"
 
 namespace DX
 {

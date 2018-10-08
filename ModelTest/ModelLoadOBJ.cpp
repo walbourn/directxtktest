@@ -40,7 +40,7 @@ namespace
 
         dataDesc.pSysMem = data.data();
 
-        ThrowIfFailed(
+        DX::ThrowIfFailed(
             device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer)
         );
 
@@ -58,7 +58,7 @@ namespace
 
         effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
-        ThrowIfFailed(
+        DX::ThrowIfFailed(
             device->CreateInputLayout(VertexPositionNormalTexture::InputElements,
                 VertexPositionNormalTexture::InputElementCount,
                 shaderByteCode, byteCodeLength,

@@ -88,8 +88,6 @@
 #include "VertexTypes.h"
 #include "WICTextureLoader.h"
 
-#include "PlatformHelpers.h"
-
 namespace DX
 {
     // Helper class for COM exceptions

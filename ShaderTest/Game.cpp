@@ -16,6 +16,8 @@
 #include "pch.h"
 #include "Game.h"
 
+#include "PlatformHelpers.h"
+
 #pragma warning(disable : 4238)
 
 #define GAMMA_CORRECT_RENDERING
