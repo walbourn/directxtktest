@@ -21,8 +21,6 @@
 #include <Windows.Storage.h>
 #endif
 
-#pragma warning(disable : 4238)
-
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
@@ -807,8 +805,11 @@ void Game::CreateWindowSizeDependentResources()
 #endif
 
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-    XMMATRIX orient = XMLoadFloat4x4(&m_deviceResources->GetOrientationTransform3D());
-    projection *= orient;
+    {
+        auto orient3d = m_deviceResources->GetOrientationTransform3D();
+        XMMATRIX orient = XMLoadFloat4x4(&orient3d);
+        projection *= orient;
+    }
 #endif
 
     m_effect->SetView(view);
