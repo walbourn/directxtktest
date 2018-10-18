@@ -243,7 +243,7 @@ void Game::Render()
     #endif
 
         if (!MultiByteToWideChar(cp, MB_PRECOMPOSED, ascii, i, unicode, 256))
-            wcscpy_s(unicode, L"<ERROR!>\n");
+            swprintf_s(unicode, L"<ERROR: %u>\n", GetLastError());
 
         m_consolasFont->DrawString(m_spriteBatch.get(), unicode, XMFLOAT2(10, 600), cyan);
     }
