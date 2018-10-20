@@ -21,8 +21,6 @@
 #include <Windows.Storage.h>
 #endif
 
-#pragma warning(disable : 4238)
-
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
@@ -392,9 +390,16 @@ void Game::Render()
         DeleteFileW(sstif);
         DeleteFileW(ssdds);
 
-        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatPng, sspng));
+        HRESULT hr = SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatPng, sspng, &GUID_WICPixelFormat32bppBGRA);
 
-        if (GetFileAttributesW(sspng) != INVALID_FILE_ATTRIBUTES)
+        if (FAILED(hr))
+        {
+            char buff[128] = {};
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (PNG) failed %08X\n", hr);
+            OutputDebugStringA(buff);
+            success = false;
+        }
+        else if (GetFileAttributesW(sspng) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.PNG\n");
         }
@@ -404,9 +409,16 @@ void Game::Render()
             success = false;
         }
 
-        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatJpeg, ssjpg));
+        hr = SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatJpeg, ssjpg);
 
-        if (GetFileAttributesW(ssjpg) != INVALID_FILE_ATTRIBUTES)
+        if (FAILED(hr))
+        {
+            char buff[128] = {};
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (JPG) failed %08X\n", hr);
+            OutputDebugStringA(buff);
+            success = false;
+        }
+        else if (GetFileAttributesW(ssjpg) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.JPG\n");
         }
@@ -416,10 +428,17 @@ void Game::Render()
             success = false;
         }
 
-        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatBmp, ssbmp,
-            &GUID_WICPixelFormat16bppBGR565));
+        hr = SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatBmp, ssbmp,
+            &GUID_WICPixelFormat16bppBGR565);
 
-        if (GetFileAttributesW(ssbmp) != INVALID_FILE_ATTRIBUTES)
+        if (FAILED(hr))
+        {
+            char buff[128] = {};
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (BMP) failed %08X\n", hr);
+            OutputDebugStringA(buff);
+            success = false;
+        }
+        else if (GetFileAttributesW(ssbmp) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.BMP\n");
         }
@@ -429,12 +448,12 @@ void Game::Render()
             success = false;
         }
 
-        DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatTiff, sstif, nullptr,
+        hr = SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatTiff, sstif, nullptr,
             [&](IPropertyBag2* props)
         {
             PROPBAG2 options[2] = { 0, 0 };
-            options[0].pstrName = L"CompressionQuality";
-            options[1].pstrName = L"TiffCompressionMethod";
+            options[0].pstrName = const_cast<wchar_t*>(L"CompressionQuality");
+            options[1].pstrName = const_cast<wchar_t*>(L"TiffCompressionMethod");
 
             VARIANT varValues[2];
             varValues[0].vt = VT_R4;
@@ -444,9 +463,16 @@ void Game::Render()
             varValues[1].bVal = WICTiffCompressionNone;
 
             (void)props->Write(2, options, varValues);
-        }));
+        });
 
-        if (GetFileAttributesW(sstif) != INVALID_FILE_ATTRIBUTES)
+        if (FAILED(hr))
+        {
+            char buff[128] = {};
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (TIFF) failed %08X\n", hr);
+            OutputDebugStringA(buff);
+            success = false;
+        }
+        else if (GetFileAttributesW(sstif) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.TIF\n");
         }
@@ -456,9 +482,16 @@ void Game::Render()
             success = false;
         }
 
-        DX::ThrowIfFailed(SaveDDSTextureToFile(context, backBufferTex, ssdds));
+        hr = SaveDDSTextureToFile(context, backBufferTex, ssdds);
 
-        if (GetFileAttributesW(ssdds) != INVALID_FILE_ATTRIBUTES)
+        if (FAILED(hr))
+        {
+            char buff[128] = {};
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (DDS) failed %08X\n", hr);
+            OutputDebugStringA(buff);
+            success = false;
+        }
+        else if (GetFileAttributesW(ssdds) != INVALID_FILE_ATTRIBUTES)
         {
             OutputDebugStringA("Wrote SCREENSHOT.DDS\n");
         }
@@ -772,8 +805,11 @@ void Game::CreateWindowSizeDependentResources()
 #endif
 
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-    XMMATRIX orient = XMLoadFloat4x4(&m_deviceResources->GetOrientationTransform3D());
-    projection *= orient;
+    {
+        auto orient3d = m_deviceResources->GetOrientationTransform3D();
+        XMMATRIX orient = XMLoadFloat4x4(&orient3d);
+        projection *= orient;
+    }
 #endif
 
     m_effect->SetView(view);
@@ -1103,6 +1139,7 @@ void Game::UnitTests(bool success)
         }
     }
 
+    // Video textures
     {
         ComPtr<ID3D11Resource> res;
 
@@ -1111,6 +1148,45 @@ void Game::UnitTests(bool success)
         if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_NV12, 1, 200, 200))
         {
             OutputDebugStringA("FAILED: lenaNV12.dds res desc unexpected\n");
+            success = false;
+        }
+    }
+
+    // WIC load without format conversion or resize
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"testpattern.png", res.GetAddressOf(), nullptr));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, 1, 1280, 1024))
+        {
+            OutputDebugStringA("FAILED: testpattern.png res desc unexpected\n");
+            success = false;
+        }
+    }
+
+    // WIC load with resize
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"testpattern.png", res.GetAddressOf(), nullptr, 1024));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, 1, 1024, 819))
+        {
+            OutputDebugStringA("FAILED: testpattern.png resize res desc unexpected\n");
+            success = false;
+        }
+    }
+
+    // WIC load with resize and format conversion
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"cup_small.jpg", res.GetAddressOf(), nullptr, 256));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, 191, 256))
+        {
+            OutputDebugStringA("FAILED: cup_small.jpg resize res desc unexpected\n");
             success = false;
         }
     }
