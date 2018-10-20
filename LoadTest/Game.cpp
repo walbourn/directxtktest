@@ -390,7 +390,7 @@ void Game::Render()
         DeleteFileW(sstif);
         DeleteFileW(ssdds);
 
-        HRESULT hr = SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatPng, sspng);
+        HRESULT hr = SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatPng, sspng, &GUID_WICPixelFormat32bppBGRA);
 
         if (FAILED(hr))
         {
@@ -1139,6 +1139,7 @@ void Game::UnitTests(bool success)
         }
     }
 
+    // Video textures
     {
         ComPtr<ID3D11Resource> res;
 
@@ -1147,6 +1148,45 @@ void Game::UnitTests(bool success)
         if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_NV12, 1, 200, 200))
         {
             OutputDebugStringA("FAILED: lenaNV12.dds res desc unexpected\n");
+            success = false;
+        }
+    }
+
+    // WIC load without format conversion or resize
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"testpattern.png", res.GetAddressOf(), nullptr));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, 1, 1280, 1024))
+        {
+            OutputDebugStringA("FAILED: testpattern.png res desc unexpected\n");
+            success = false;
+        }
+    }
+
+    // WIC load with resize
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"testpattern.png", res.GetAddressOf(), nullptr, 1024));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, 1, 1024, 819))
+        {
+            OutputDebugStringA("FAILED: testpattern.png resize res desc unexpected\n");
+            success = false;
+        }
+    }
+
+    // WIC load with resize and format conversion
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFile(device, L"cup_small.jpg", res.GetAddressOf(), nullptr, 256));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, 191, 256))
+        {
+            OutputDebugStringA("FAILED: cup_small.jpg resize res desc unexpected\n");
             success = false;
         }
     }
