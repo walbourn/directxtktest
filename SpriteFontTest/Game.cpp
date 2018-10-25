@@ -237,12 +237,12 @@ void Game::Render()
 
         int cp = 437;
     #if defined(_XBOX_ONE) && defined(_TITLE)
-        cp = 1252;
+        cp = CP_UTF8;
 
         m_consolasFont->SetDefaultCharacter('-');
     #endif
 
-        if (!MultiByteToWideChar(cp, MB_PRECOMPOSED, ascii, i, unicode, 256))
+        if (!MultiByteToWideChar(cp, 0, ascii, i, unicode, 256))
             swprintf_s(unicode, L"<ERROR: %u>\n", GetLastError());
 
         m_consolasFont->DrawString(m_spriteBatch.get(), unicode, XMFLOAT2(10, 600), cyan);

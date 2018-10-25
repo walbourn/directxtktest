@@ -439,6 +439,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
+    SetDebugObjectName(m_deviceResources->GetRenderTargetView(), L"RenderTarget");
     SetDebugObjectName(m_deviceResources->GetDepthStencilView(), "DepthStencil");
 }
 
