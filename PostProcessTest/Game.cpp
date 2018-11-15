@@ -42,9 +42,8 @@ Game::Game() noexcept(false) :
         c_sdrFormat, DXGI_FORMAT_D32_FLOAT, 2,
         DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
-        | DX::DeviceResources::c_FastSemantics
+        | DX::DeviceResources::c_FastSemantics);
 #endif
-        );
 #elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
         c_sdrFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
