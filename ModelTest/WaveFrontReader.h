@@ -352,7 +352,7 @@ public:
 #endif
             }
 
-            InFile.ignore(1000, '\n');
+            InFile.ignore(1000, L'\n');
         }
 
         if (positions.empty())
@@ -375,7 +375,6 @@ public:
 
             wchar_t szPath[MAX_PATH] = {};
             _wmakepath_s(szPath, MAX_PATH, drive, dir, fname, ext);
-
             HRESULT hr = LoadMTL(szPath);
             if (FAILED(hr))
                 return hr;
@@ -448,6 +447,17 @@ public:
                 InFile >> r >> g >> b;
                 curMaterial->vSpecular = XMFLOAT3(r, g, b);
             }
+            else if (0 == wcscmp(strCommand.c_str(), L"Ke"))
+            {
+                // Emissive color
+                float r, g, b;
+                InFile >> r >> g >> b;
+                curMaterial->vEmissive = XMFLOAT3(r, g, b);
+                if (r > 0.f || g > 0.f || b > 0.f)
+                {
+                    curMaterial->bEmissive = true;
+                }
+            }
             else if (0 == wcscmp(strCommand.c_str(), L"d"))
             {
                 // Alpha
@@ -478,8 +488,26 @@ public:
             }
             else if (0 == wcscmp(strCommand.c_str(), L"map_Kd"))
             {
-                // Texture
-                InFile >> curMaterial->strTexture;
+                // Diffuse texture
+                LoadTexturePath(InFile, curMaterial->strTexture, MAX_PATH);
+            }
+            else if (0 == wcscmp(strCommand.c_str(), L"map_Ks"))
+            {
+                // Specular texture
+                LoadTexturePath(InFile, curMaterial->strSpecularTexture, MAX_PATH);
+            }
+            else if (0 == wcscmp(strCommand.c_str(), L"map_Kn")
+                     || 0 == wcscmp(strCommand.c_str(), L"norm"))
+            {
+                // Normal texture
+                LoadTexturePath(InFile, curMaterial->strNormalTexture, MAX_PATH);
+            }
+            else if (0 == wcscmp(strCommand.c_str(), L"map_Ke")
+                     || 0 == wcscmp(strCommand.c_str(), L"map_emissive"))
+            {
+                // Emissive texture
+                LoadTexturePath(InFile, curMaterial->strEmissiveTexture, MAX_PATH);
+                curMaterial->bEmissive = true;
             }
             else
             {
@@ -574,23 +602,33 @@ public:
         DirectX::XMFLOAT3 vAmbient;
         DirectX::XMFLOAT3 vDiffuse;
         DirectX::XMFLOAT3 vSpecular;
+        DirectX::XMFLOAT3 vEmissive;
         uint32_t nShininess;
         float fAlpha;
 
         bool bSpecular;
+        bool bEmissive;
 
         wchar_t strName[MAX_PATH];
         wchar_t strTexture[MAX_PATH];
+        wchar_t strNormalTexture[MAX_PATH];
+        wchar_t strSpecularTexture[MAX_PATH];
+        wchar_t strEmissiveTexture[MAX_PATH];
 
         Material() noexcept :
         vAmbient(0.2f, 0.2f, 0.2f),
             vDiffuse(0.8f, 0.8f, 0.8f),
             vSpecular(1.0f, 1.0f, 1.0f),
+            vEmissive(0.f, 0.f, 0.f),
             nShininess(0),
             fAlpha(1.f),
             bSpecular(false),
+            bEmissive(false),
             strName{},
-            strTexture{}
+            strTexture{},
+            strNormalTexture{},
+            strSpecularTexture{},
+            strEmissiveTexture{}
         {
         }
     };
@@ -629,5 +667,40 @@ private:
         VertexCache::value_type entry(hash, index);
         cache.insert(entry);
         return index;
+    }
+
+    void LoadTexturePath(std::wifstream& InFile, _Out_writes_(maxChar) wchar_t* texture, size_t maxChar)
+    {
+        wchar_t buff[1024] = {};
+        InFile.getline(buff, 1024, L'\n');
+        InFile.putback(L'\n');
+
+        std::wstring path = buff;
+
+        // Ignore any end-of-line comment
+        size_t pos = path.find_first_of(L'#');
+        if (pos != std::wstring::npos)
+        {
+            path = path.substr(0, pos);
+        }
+
+        // Trim any trailing whitespace
+        pos = path.find_last_not_of(L" \t");
+        if (pos != std::wstring::npos)
+        {
+            path = path.substr(0, pos + 1);
+        }
+
+        // Texture path should be last element in line
+        pos = path.find_last_of(' ');
+        if (pos != std::wstring::npos)
+        {
+            path = path.substr(pos + 1);
+        }
+
+        if (!path.empty())
+        {
+            wcscpy_s(texture, maxChar, path.c_str());
+        }
     }
 };
