@@ -294,9 +294,31 @@
     <Image Include="..\Common\SplashScreen.scale-100.png" />
     <Image Include="..\Common\StoreLogo.scale-100.png" />
     <Image Include="..\Common\WideLogo.scale-100.png" />
+    <Image Include="..\PBRTest\Atrium_diffuseIBL.dds" />
+    <Image Include="..\PBRTest\Atrium_specularIBL.dds" />
+    <Image Include="..\PBRTest\Garage_diffuseIBL.dds" />
+    <Image Include="..\PBRTest\Garage_specularIBL.dds" />
+    <Image Include="..\PBRTest\SunSubMixer_diffuseIBL.dds" />
+    <Image Include="..\PBRTest\SunSubMixer_specularIBL.dds" />
+    <Image Include="BrokenCube_baseColor.DDS" />
+    <Image Include="BrokenCube_emissive.DDS" />
+    <Image Include="BrokenCube_normal.DDS" />
+    <Image Include="BrokenCube_occlusionRoughnessMetallic.DDS" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageUWP.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BrokenCube.sdkmesh">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

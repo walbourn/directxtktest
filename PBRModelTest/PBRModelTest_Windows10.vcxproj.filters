@@ -51,8 +51,43 @@
     <Image Include="..\Common\WideLogo.scale-100.png">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="BrokenCube_baseColor.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="BrokenCube_emissive.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="BrokenCube_normal.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="BrokenCube_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\PBRTest\Atrium_diffuseIBL.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\PBRTest\Atrium_specularIBL.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\PBRTest\Garage_diffuseIBL.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\PBRTest\Garage_specularIBL.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\PBRTest\SunSubMixer_diffuseIBL.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="..\PBRTest\SunSubMixer_specularIBL.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageUWP.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BrokenCube.sdkmesh">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -73,9 +73,13 @@
 
 #include <stdio.h>
 
+#include "CommonStates.h"
+#include "DDSTextureLoader.h"
+#include "Effects.h"
 #include "GamePad.h"
 #include "GraphicsMemory.h"
 #include "Keyboard.h"
+#include "Model.h"
 #include "Mouse.h"
 #include "PostProcess.h"
 #include "SimpleMath.h"

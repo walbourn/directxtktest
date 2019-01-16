@@ -24,6 +24,13 @@
 // For UWP/PC, this tests using a linear F16 swapchain intead of HDR10
 //#define TEST_HDR_LINEAR
 
+namespace
+{
+    const float row0 = 2.f;
+    const float row1 = 0.f;
+    const float row2 = -2.f;
+}
+
 extern void ExitGame();
 
 using namespace DirectX;
@@ -32,7 +39,11 @@ using namespace DirectX::SimpleMath;
 using Microsoft::WRL::ComPtr;
 
 // Constructor.
-Game::Game() noexcept(false)
+Game::Game() noexcept(false) :
+    m_ibl(0),
+    m_spinning(true),
+    m_pitch(0),
+    m_yaw(0)
 {
 #ifdef TEST_HDR_LINEAR
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
@@ -114,11 +125,109 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const&)
 {
-    auto pad = m_gamePad->GetState(0);
     auto kb = m_keyboard->GetState();
-    if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
+    m_keyboardButtons.Update(kb);
+
+    auto pad = m_gamePad->GetState(0);
+    if (pad.IsConnected())
+    {
+        m_gamePadButtons.Update(pad);
+
+        if (pad.IsViewPressed())
+        {
+            ExitGame();
+        }
+
+        if (m_gamePadButtons.dpadDown == GamePad::ButtonStateTracker::PRESSED
+            || m_gamePadButtons.dpadLeft == GamePad::ButtonStateTracker::PRESSED)
+        {
+            ++m_ibl;
+            if (m_ibl >= s_nIBL)
+            {
+                m_ibl = 0;
+            }
+        }
+        else if (m_gamePadButtons.dpadUp == GamePad::ButtonStateTracker::PRESSED
+            || m_gamePadButtons.dpadRight == GamePad::ButtonStateTracker::PRESSED)
+        {
+            if (!m_ibl)
+                m_ibl = s_nIBL - 1;
+            else
+                --m_ibl;
+        }
+
+        if (m_gamePadButtons.a == GamePad::ButtonStateTracker::PRESSED)
+        {
+            m_spinning = !m_spinning;
+        }
+
+        if (pad.IsLeftStickPressed())
+        {
+            m_spinning = false;
+            m_yaw = m_pitch = 0.f;
+        }
+        else
+        {
+            m_yaw += pad.thumbSticks.leftX * 0.1f;
+            m_pitch -= pad.thumbSticks.leftY * 0.1f;
+        }
+    }
+    else
+    {
+        m_gamePadButtons.Reset();
+
+        if (kb.A || kb.D)
+        {
+            m_spinning = false;
+            m_yaw += (kb.D ? 0.1f : -0.1f);
+        }
+
+        if (kb.W || kb.S)
+        {
+            m_spinning = false;
+            m_pitch += (kb.W ? 0.1f : -0.1f);
+        }
+
+        if (kb.Home)
+        {
+            m_spinning = false;
+            m_yaw = m_pitch = 0.f;
+        }
+    }
+
+    if (m_yaw > XM_PI)
+    {
+        m_yaw -= XM_PI * 2.f;
+    }
+    else if (m_yaw < -XM_PI)
+    {
+        m_yaw += XM_PI * 2.f;
+    }
+
+    if (kb.Escape)
     {
         ExitGame();
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Enter) && !kb.LeftAlt && !kb.RightAlt)
+    {
+        ++m_ibl;
+        if (m_ibl >= s_nIBL)
+        {
+            m_ibl = 0;
+        }
+    }
+    else if (m_keyboardButtons.IsKeyPressed(Keyboard::Back))
+    {
+        if (!m_ibl)
+            m_ibl = s_nIBL - 1;
+        else
+            --m_ibl;
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
+    {
+        m_spinning = !m_spinning;
     }
 }
 #pragma endregion
@@ -137,11 +246,53 @@ void Game::Render()
     m_deviceResources->Prepare();
 #endif
 
+    auto time = static_cast<float>(m_timer.GetTotalSeconds());
+
+    float alphaFade = (sin(time * 2) + 1) / 2;
+
+    if (alphaFade >= 1)
+        alphaFade = 1 - FLT_EPSILON;
+
+    float yaw = time * 0.4f;
+    float pitch = time * 0.7f;
+    float roll = time * 1.1f;
+
+    XMMATRIX world;
+    XMVECTOR quat;
+
+    if (m_spinning)
+    {
+        world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+        quat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+    }
+    else
+    {
+        world = XMMatrixRotationRollPitchYaw(m_pitch, m_yaw, 0);
+        quat = XMQuaternionRotationRollPitchYaw(m_pitch, m_yaw, roll);
+    }
+
     Clear();
 
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Add your rendering code here.
+    //--- Set PBR lighting sources ---
+    D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+    m_radianceIBL[m_ibl]->GetDesc(&desc);
+
+    m_cube->UpdateEffects([&](IEffect* effect)
+    {
+        auto fx = dynamic_cast<PBREffect*>(effect);
+        if (fx)
+        {
+            fx->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            fx->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+        }
+    });
+
+    //--- Draw SDKMESH models ---
+    XMMATRIX local = XMMatrixTranslation(1.5f, row0, 0.f);
+    local = XMMatrixMultiply(world, local);
+    m_cube->Draw(context, *m_states, local, m_view, m_projection);
 
     // Tonemap the frame.
 #if defined(_XBOX_ONE) && defined(_TITLE)
@@ -232,6 +383,8 @@ void Game::OnResuming()
 #endif
 
     m_timer.ResetElapsedTime();
+    m_gamePadButtons.Reset();
+    m_keyboardButtons.Reset();
 }
 
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
@@ -293,26 +446,96 @@ void Game::CreateDeviceDependentResources()
     m_toneMap->SetMRTOutput(true);
 #endif
 
-    // TODO: Initialize device dependent objects here (independent of window size).
+    m_states = std::make_unique<CommonStates>(device);
+
+    m_fxFactory = std::make_unique<PBREffectFactory>(device);
+
+#ifdef LH_COORDS
+    bool ccw = false;
+#else
+    bool ccw = true;
+#endif
+
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
+#define IBL_PATH L"..\\PBRTest\\"
+#else
+#define IBL_PATH
+#endif
+
+    static const wchar_t* s_radianceIBL[s_nIBL] =
+    {
+        IBL_PATH L"Atrium_diffuseIBL.dds",
+        IBL_PATH L"Garage_diffuseIBL.dds",
+        IBL_PATH L"SunSubMixer_diffuseIBL.dds",
+    };
+    static const wchar_t* s_irradianceIBL[s_nIBL] =
+    {
+        IBL_PATH L"Atrium_specularIBL.dds",
+        IBL_PATH L"Garage_specularIBL.dds",
+        IBL_PATH L"SunSubMixer_specularIBL.dds",
+    };
+
+    static_assert(_countof(s_radianceIBL) == _countof(s_irradianceIBL), "IBL array mismatch");
+
+    for (size_t j = 0; j < s_nIBL; ++j)
+    {
+        DX::ThrowIfFailed(
+            CreateDDSTextureFromFile(device, s_radianceIBL[j], nullptr, m_radianceIBL[j].ReleaseAndGetAddressOf())
+        );
+
+        DX::ThrowIfFailed(
+            CreateDDSTextureFromFile(device, s_irradianceIBL[j], nullptr, m_irradianceIBL[j].ReleaseAndGetAddressOf())
+        );
+    }
+
+    // DirectX SDK Mesh
+    m_cube = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, !ccw);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
+    static const XMVECTORF32 cameraPosition = { 0, 0, 6 };
+
     auto size = m_deviceResources->GetOutputSize();
+    float aspect = (float)size.right / (float)size.bottom;
+
+#ifdef LH_COORDS
+    m_view = XMMatrixLookAtLH(cameraPosition, g_XMZero, XMVectorSet(0, 1, 0, 0));
+    m_projection = XMMatrixPerspectiveFovLH(1, aspect, 1, 15);
+#else
+    m_view = XMMatrixLookAtRH(cameraPosition, g_XMZero, XMVectorSet(0, 1, 0, 0));
+    m_projection = XMMatrixPerspectiveFovRH(1, aspect, 1, 15);
+#endif
+
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+    {
+        auto orient3d = m_deviceResources->GetOrientationTransform3D();
+        XMMATRIX orient = XMLoadFloat4x4(&orient3d);
+        m_projection *= orient;
+    }
+#endif
 
     // Set windows size for HDR.
     m_hdrScene->SetWindow(size);
 
     m_toneMap->SetHDRSourceTexture(m_hdrScene->GetShaderResourceView());
-
-    // TODO: Initialize windows-size dependent objects here.
 }
 
 #if !defined(_XBOX_ONE) || !defined(_TITLE)
 void Game::OnDeviceLost()
 {
-    // TODO: Add Direct3D resource cleanup here.
+    m_states.reset();
+
+    for (size_t j = 0; j < s_nIBL; ++j)
+    {
+        m_radianceIBL[j].Reset();
+        m_irradianceIBL[j].Reset();
+    }
+
+    m_cube.reset();
+
+    m_fxFactory.reset();
 
     m_toneMap.reset();
 
