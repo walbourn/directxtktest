@@ -281,11 +281,11 @@ void Game::Render()
 
     m_cube->UpdateEffects([&](IEffect* effect)
     {
-        auto fx = dynamic_cast<PBREffect*>(effect);
-        if (fx)
+        auto pbr = dynamic_cast<PBREffect*>(effect);
+        if (pbr)
         {
-            fx->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
-            fx->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
         }
     });
 
