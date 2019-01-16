@@ -289,10 +289,38 @@ void Game::Render()
         }
     });
 
+    m_sphere->UpdateEffects([&](IEffect* effect)
+    {
+        auto pbr = dynamic_cast<PBREffect*>(effect);
+        if (pbr)
+        {
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+        }
+    });
+
+    m_sphere2->UpdateEffects([&](IEffect* effect)
+    {
+        auto pbr = dynamic_cast<PBREffect*>(effect);
+        if (pbr)
+        {
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+        }
+    });
+
     //--- Draw SDKMESH models ---
     XMMATRIX local = XMMatrixTranslation(1.5f, row0, 0.f);
     local = XMMatrixMultiply(world, local);
     m_cube->Draw(context, *m_states, local, m_view, m_projection);
+
+    local = XMMatrixTranslation(-1.5f, row1, 0.f);
+    local = XMMatrixMultiply(world, local);
+    m_sphere->Draw(context, *m_states, local, m_view, m_projection);
+
+    local = XMMatrixTranslation(1.5f, row1, 0.f);
+    local = XMMatrixMultiply(world, local);
+    m_sphere2->Draw(context, *m_states, local, m_view, m_projection);
 
     // Tonemap the frame.
 #if defined(_XBOX_ONE) && defined(_TITLE)
@@ -490,6 +518,8 @@ void Game::CreateDeviceDependentResources()
 
     // DirectX SDK Mesh
     m_cube = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, !ccw);
+    m_sphere = Model::CreateFromSDKMESH(device, L"Sphere.sdkmesh", *m_fxFactory, !ccw);
+    m_sphere2 = Model::CreateFromSDKMESH(device, L"Sphere2.sdkmesh", *m_fxFactory, !ccw);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -534,6 +564,8 @@ void Game::OnDeviceLost()
     }
 
     m_cube.reset();
+    m_sphere.reset();
+    m_sphere2.reset();
 
     m_fxFactory.reset();
 

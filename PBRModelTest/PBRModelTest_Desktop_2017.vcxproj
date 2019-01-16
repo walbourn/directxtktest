@@ -193,6 +193,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BrokenCube.sdkmesh" />
+    <None Include="Sphere.sdkmesh" />
+    <None Include="Sphere2.sdkmesh" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\PBRTest\Atrium_diffuseIBL.dds" />
@@ -205,6 +207,13 @@
     <Image Include="BrokenCube_emissive.DDS" />
     <Image Include="BrokenCube_normal.DDS" />
     <Image Include="BrokenCube_occlusionRoughnessMetallic.DDS" />
+    <Image Include="Sphere2Mat_baseColor.DDS" />
+    <Image Include="Sphere2Mat_emissive.DDS" />
+    <Image Include="Sphere2Mat_normal.DDS" />
+    <Image Include="Sphere2Mat_occlusionRoughnessMetallic.DDS" />
+    <Image Include="SphereMat_baseColor.DDS" />
+    <Image Include="SphereMat_normal.DDS" />
+    <Image Include="SphereMat_occlusionRoughnessMetallic.DDS" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

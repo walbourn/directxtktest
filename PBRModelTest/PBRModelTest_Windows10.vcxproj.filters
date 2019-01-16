@@ -81,12 +81,39 @@
     <Image Include="..\PBRTest\SunSubMixer_specularIBL.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="Sphere2Mat_baseColor.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_emissive.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_normal.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="SphereMat_baseColor.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="SphereMat_normal.DDS">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="SphereMat_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageUWP.appxmanifest" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BrokenCube.sdkmesh">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="Sphere.sdkmesh">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="Sphere2.sdkmesh">
       <Filter>Assets</Filter>
     </None>
   </ItemGroup>

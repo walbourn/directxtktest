@@ -106,6 +106,8 @@ private:
 
     std::unique_ptr<DirectX::CommonStates>      m_states;
     std::unique_ptr<DirectX::Model>             m_cube;
+    std::unique_ptr<DirectX::Model>             m_sphere;
+    std::unique_ptr<DirectX::Model>             m_sphere2;
     std::unique_ptr<DirectX::PBREffectFactory>  m_fxFactory;
 
     static const size_t s_nIBL = 3;
