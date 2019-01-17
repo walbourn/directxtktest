@@ -304,6 +304,15 @@
     <Image Include="BrokenCube_emissive.DDS" />
     <Image Include="BrokenCube_normal.DDS" />
     <Image Include="BrokenCube_occlusionRoughnessMetallic.DDS" />
+    <Image Include="matFloor_baseColor.dds" />
+    <Image Include="matFloor_normal.DDS" />
+    <Image Include="matFloor_occlusionRoughnessMetallic.DDS" />
+    <Image Include="matToyRobot_baseColor.dds" />
+    <Image Include="matToyRobot_normal.DDS" />
+    <Image Include="matToyRobot_occlusionRoughnessMetallic.DDS" />
+    <Image Include="matWoodBlocks_baseColor.dds" />
+    <Image Include="matWoodBlocks_normal.DDS" />
+    <Image Include="matWoodBlocks_occlusionRoughnessMetallic.DDS" />
     <Image Include="Sphere2Mat_baseColor.DDS" />
     <Image Include="Sphere2Mat_emissive.DDS" />
     <Image Include="Sphere2Mat_normal.DDS" />
@@ -337,6 +346,16 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </None>
     <None Include="Sphere2.sdkmesh">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="ToyRobot.sdkmesh">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</DeploymentContent>

@@ -26,9 +26,9 @@
 
 namespace
 {
-    const float row0 = 2.f;
+    const float row0 = 1.5f;
     const float row1 = 0.f;
-    const float row2 = -2.f;
+    const float row2 = -1.5f;
 }
 
 extern void ExitGame();
@@ -253,22 +253,20 @@ void Game::Render()
     if (alphaFade >= 1)
         alphaFade = 1 - FLT_EPSILON;
 
-    float yaw = time * 0.4f;
-    float pitch = time * 0.7f;
-    float roll = time * 1.1f;
+    float yaw = time * 1.4f;
 
     XMMATRIX world;
     XMVECTOR quat;
 
     if (m_spinning)
     {
-        world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-        quat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+        world = XMMatrixRotationRollPitchYaw(0, yaw, 0);
+        quat = XMQuaternionRotationRollPitchYaw(0, yaw, 0);
     }
     else
     {
         world = XMMatrixRotationRollPitchYaw(m_pitch, m_yaw, 0);
-        quat = XMQuaternionRotationRollPitchYaw(m_pitch, m_yaw, roll);
+        quat = XMQuaternionRotationRollPitchYaw(m_pitch, m_yaw, 0);
     }
 
     Clear();
@@ -309,18 +307,44 @@ void Game::Render()
         }
     });
 
+    m_robot->UpdateEffects([&](IEffect* effect)
+    {
+        auto pbr = dynamic_cast<PBREffect*>(effect);
+        if (pbr)
+        {
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+        }
+    });
+
     //--- Draw SDKMESH models ---
     XMMATRIX local = XMMatrixTranslation(1.5f, row0, 0.f);
     local = XMMatrixMultiply(world, local);
     m_cube->Draw(context, *m_states, local, m_view, m_projection);
 
-    local = XMMatrixTranslation(-1.5f, row1, 0.f);
-    local = XMMatrixMultiply(world, local);
+    {
+        XMMATRIX scale = XMMatrixScaling(0.75f, 0.75f, 0.75f);
+        XMMATRIX trans = XMMatrixTranslation(-2.5f, row0, 0.f);
+        local = XMMatrixMultiply(scale, trans);
+        local = XMMatrixMultiply(world, local);
+    }
     m_sphere->Draw(context, *m_states, local, m_view, m_projection);
 
-    local = XMMatrixTranslation(1.5f, row1, 0.f);
-    local = XMMatrixMultiply(world, local);
+    {
+        XMMATRIX scale = XMMatrixScaling(0.75f, 0.75f, 0.75f);
+        XMMATRIX trans = XMMatrixTranslation(-2.5f, row2, 0.f);
+        local = XMMatrixMultiply(scale, trans);
+        local = XMMatrixMultiply(world, local);
+    }
     m_sphere2->Draw(context, *m_states, local, m_view, m_projection);
+
+    {
+        XMMATRIX scale = XMMatrixScaling(0.1f, 0.1f, 0.1f);
+        XMMATRIX trans = XMMatrixTranslation(1.5f, row2, 0.f);
+        local = XMMatrixMultiply(scale, trans);
+        local = XMMatrixMultiply(world, local);
+    }
+    m_robot->Draw(context, *m_states, local, m_view, m_projection);
 
     // Tonemap the frame.
 #if defined(_XBOX_ONE) && defined(_TITLE)
@@ -520,6 +544,7 @@ void Game::CreateDeviceDependentResources()
     m_cube = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, !ccw);
     m_sphere = Model::CreateFromSDKMESH(device, L"Sphere.sdkmesh", *m_fxFactory, !ccw);
     m_sphere2 = Model::CreateFromSDKMESH(device, L"Sphere2.sdkmesh", *m_fxFactory, !ccw);
+    m_robot = Model::CreateFromSDKMESH(device, L"ToyRobot.sdkmesh", *m_fxFactory, !ccw);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -566,6 +591,7 @@ void Game::OnDeviceLost()
     m_cube.reset();
     m_sphere.reset();
     m_sphere2.reset();
+    m_robot.reset();
 
     m_fxFactory.reset();
 
