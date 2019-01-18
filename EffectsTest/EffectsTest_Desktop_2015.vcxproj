@@ -18,7 +18,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <PropertyGroup Label="Globals" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>{73D86084-E42E-48AE-A7AD-609784B13304}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

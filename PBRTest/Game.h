@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: Game.h
 //
-// Developer unit test for DirectXTK ?
+// Developer unit test for DirectXTK PBR Effect Test
 //
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO

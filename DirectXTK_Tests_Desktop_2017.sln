@@ -59,6 +59,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HDRTest_Desktop_2017", "HDR
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PBRTest_Desktop_2017", "PBRTest\PBRTest_Desktop_2017.vcxproj", "{569DE05D-CEF7-4372-AA77-6E331F86CC88}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PBRModelTest_Desktop_2017", "PBRModelTest\PBRModelTest_Desktop_2017.vcxproj", "{79DE43CC-2EA4-495F-8376-53A08F282801}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -373,6 +375,18 @@ Global
 		{569DE05D-CEF7-4372-AA77-6E331F86CC88}.Release|Win32.Build.0 = Release|Win32
 		{569DE05D-CEF7-4372-AA77-6E331F86CC88}.Release|x64.ActiveCfg = Release|x64
 		{569DE05D-CEF7-4372-AA77-6E331F86CC88}.Release|x64.Build.0 = Release|x64
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Debug|Win32.ActiveCfg = Debug|Win32
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Debug|Win32.Build.0 = Debug|Win32
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Debug|x64.ActiveCfg = Debug|x64
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Debug|x64.Build.0 = Debug|x64
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Release|Win32.ActiveCfg = Release|Win32
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Release|Win32.Build.0 = Release|Win32
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Release|x64.ActiveCfg = Release|x64
+		{79DE43CC-2EA4-495F-8376-53A08F282801}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -399,6 +413,7 @@ Global
 		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{C56638CF-151A-41CB-BFBE-70002B98061D} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 		{569DE05D-CEF7-4372-AA77-6E331F86CC88} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
+		{79DE43CC-2EA4-495F-8376-53A08F282801} = {4D16B144-34CC-42E7-8078-A5504ECF2C9E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E16BF50A-0E28-4F84-BF05-1C5D0DB3422A}
