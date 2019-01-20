@@ -132,6 +132,38 @@
   <PropertyGroup Label="UserMacros">
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <OutDir>Bin\Windows10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <OutDir>Bin\Windows10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <OutDir>Bin\Windows10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <OutDir>Bin\Windows10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>Bin\Windows10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>Bin\Windows10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>Bin\Windows10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>Bin\Windows10\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
       <AdditionalDependencies>d2d1.lib; d3d11.lib; dxgi.lib; dxguid.lib; windowscodecs.lib; dwrite.lib; %(AdditionalDependencies)</AdditionalDependencies>
