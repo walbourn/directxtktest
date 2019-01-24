@@ -96,6 +96,9 @@ private:
     std::unique_ptr<DirectX::GamePad>       m_gamePad;
     std::unique_ptr<DirectX::Keyboard>      m_keyboard;
 
+    DirectX::GamePad::ButtonStateTracker    m_gamePadButtons;
+    DirectX::Keyboard::KeyboardStateTracker m_keyboardButtons;
+
     // DirectXTK Test Objects
 #if defined(_XBOX_ONE) && defined(_TITLE)
     std::unique_ptr<DirectX::GraphicsMemory>    m_graphicsMemory;
@@ -116,4 +119,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_scissorState;
 
     uint64_t m_frame;
+
+    bool                                    m_showUTF8;
+    float                                   m_delay;
 };
