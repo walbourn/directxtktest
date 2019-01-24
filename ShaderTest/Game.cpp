@@ -291,8 +291,8 @@ namespace
         HRESULT hr = device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer);
         DX::ThrowIfFailed(hr);
 
-        assert(pBuffer != 0);
-        _Analysis_assume_(pBuffer != 0);
+        assert(pBuffer != 0 && *pBuffer != 0);
+        _Analysis_assume_(pBuffer != 0 && *pBuffer != 0);
     }
 
 
@@ -338,8 +338,8 @@ namespace
             pInputLayout);
         DX::ThrowIfFailed(hr);
 
-        assert(pInputLayout != 0);
-        _Analysis_assume_(pInputLayout != 0);
+        assert(pInputLayout != 0 && *pInputLayout != 0);
+        _Analysis_assume_(pInputLayout != 0 && *pInputLayout != 0);
 
         if (pCompresedInputLayout)
         {
@@ -380,8 +380,8 @@ namespace
                 pCompresedInputLayout);
             DX::ThrowIfFailed(hr);
 
-            assert(pCompresedInputLayout != 0);
-            _Analysis_assume_(pCompresedInputLayout != 0);
+            assert(pCompresedInputLayout != 0 && *pCompresedInputLayout != 0);
+            _Analysis_assume_(pCompresedInputLayout != 0 && *pCompresedInputLayout != 0);
         }
     }
 
@@ -480,6 +480,7 @@ namespace
 }
 
 Game::Game() noexcept(false) :
+    m_indexCount(0),
     m_showCompressed(false),
     m_delay(0)
 {

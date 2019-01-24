@@ -36,10 +36,11 @@ namespace
 
 // Constructor.
 Game::Game() noexcept(false) :
+    m_ms{},
+    m_lastMode(Mouse::MODE_ABSOLUTE),
     m_pitch(0),
     m_yaw(0),
     m_lastStr(nullptr),
-    m_lastMode(Mouse::MODE_ABSOLUTE),
     m_lastStrBuff{}
 {
     m_cameraPos = START_POSITION.v;

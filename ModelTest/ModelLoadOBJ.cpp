@@ -44,8 +44,8 @@ namespace
             device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer)
         );
 
-        assert(pBuffer != 0);
-        _Analysis_assume_(pBuffer != 0);
+        assert(pBuffer != 0 && *pBuffer != 0);
+        _Analysis_assume_(pBuffer != 0 && *pBuffer != 0);
 
         SetDebugObjectName(*pBuffer, "ModelOBJ");
     }
@@ -65,8 +65,8 @@ namespace
                 pInputLayout)
         );
 
-        assert(pInputLayout != 0);
-        _Analysis_assume_(pInputLayout != 0);
+        assert(pInputLayout != 0 && *pInputLayout != 0);
+        _Analysis_assume_(pInputLayout != 0 && *pInputLayout != 0);
 
         SetDebugObjectName(*pInputLayout, "ModelOBJ");
     }

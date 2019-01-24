@@ -28,6 +28,7 @@ using Microsoft::WRL::ComPtr;
 
 // Constructor.
 Game::Game() noexcept(false) :
+    m_state{},
     m_lastStr(nullptr),
     m_lastStrBuff{}
 {

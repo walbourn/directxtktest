@@ -118,7 +118,7 @@ namespace
 
         auto hdr = reinterpret_cast<const VBO::header_t*>(blob.data());
 
-        if (!hdr->numIndices || !hdr->numIndices)
+        if (!hdr->numIndices || !hdr->numVertices)
             throw std::exception("ReadVBO");
 
         static_assert(sizeof(VertexPositionNormalTexture) == 32, "VBO vertex size mismatch");
@@ -143,6 +143,8 @@ namespace
 
 // Constructor.
 Game::Game() noexcept(false) :
+    m_indexCount(0),
+    m_indexCountCube(0),
     m_ibl(0),
     m_spinning(true),
     m_showDebug(false),
