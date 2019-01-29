@@ -213,6 +213,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BrokenCube.vbo" />
+    <None Include="comic.spritefont" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

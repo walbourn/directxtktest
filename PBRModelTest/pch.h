@@ -83,6 +83,8 @@
 #include "Mouse.h"
 #include "PostProcess.h"
 #include "SimpleMath.h"
+#include "SpriteBatch.h"
+#include "SpriteFont.h"
 
 namespace DX
 {

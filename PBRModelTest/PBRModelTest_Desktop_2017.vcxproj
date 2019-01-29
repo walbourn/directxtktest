@@ -193,6 +193,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BrokenCube.sdkmesh" />
+    <None Include="comic.spritefont" />
     <None Include="Sphere.sdkmesh" />
     <None Include="Sphere2.sdkmesh" />
     <None Include="ToyRobot.sdkmesh" />

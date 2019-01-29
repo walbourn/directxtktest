@@ -86,6 +86,9 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 
+    void CycleDebug();
+    void CycleToneMapOperator();
+
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
@@ -103,7 +106,9 @@ private:
 #if defined(_XBOX_ONE) && defined(_TITLE)
     std::unique_ptr<DirectX::GraphicsMemory> m_graphicsMemory;
 #endif
-    std::unique_ptr<DirectX::CommonStates>  m_states;
+    std::unique_ptr<DirectX::SpriteBatch>       m_batch;
+    std::unique_ptr<DirectX::SpriteFont>        m_font;
+    std::unique_ptr<DirectX::CommonStates>      m_states;
 
     // HDR resources
     std::unique_ptr<DirectX::ToneMapPostProcess>    m_toneMap;
@@ -138,12 +143,11 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_radianceIBL[s_nIBL];
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_irradianceIBL[s_nIBL];
 
+    int m_toneMapMode;
     uint32_t m_ibl;
     bool m_spinning;
     bool m_showDebug;
     DirectX::DebugEffect::Mode m_debugMode;
     float m_pitch;
     float m_yaw;
-
-    void CycleDebug();
 };

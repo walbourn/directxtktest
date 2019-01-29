@@ -54,7 +54,8 @@ extern bool g_HDRMode;
 #endif
 
 // Constructor.
-Game::Game() noexcept(false)
+Game::Game() noexcept(false) :
+    m_toneMapMode(ToneMapPostProcess::Reinhard)
 {
 #ifdef TEST_HDR_LINEAR
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
@@ -141,6 +142,27 @@ void Game::Update(DX::StepTimer const&)
     if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
     {
         ExitGame();
+    }
+
+    if (pad.IsConnected())
+    {
+        m_gamePadButtons.Update(pad);
+
+        if (m_gamePadButtons.y == GamePad::ButtonStateTracker::PRESSED)
+        {
+            CycleToneMapOperator();
+        }
+    }
+    else
+    {
+        m_gamePadButtons.Reset();
+    }
+
+    m_keyboardButtons.Update(kb);
+
+    if (m_keyboardButtons.pressed.T)
+    {
+        CycleToneMapOperator();
     }
 }
 #pragma endregion
@@ -239,12 +261,22 @@ void Game::Render()
     const wchar_t* info = nullptr;
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
-    info = (g_HDRMode) ? L"TV in HDR Mode" : L"TV in SDR Mode";
+    switch (m_toneMapMode)
+    {
+    case ToneMapPostProcess::Saturate: info = (g_HDRMode) ? L"HDR10 (GameDVR: None)" : L"None"; break;
+    case ToneMapPostProcess::Reinhard: info = (g_HDRMode) ? L"HDR10 (GameDVR: Reinhard)" : L"Reinhard"; break;
+    case ToneMapPostProcess::ACESFilmic: info = (g_HDRMode) ? L"HDR10 (GameDVR: ACES Filmic)" : L"ACES Filmic"; break;
+    }
 #else
     switch (m_deviceResources->GetColorSpace())
     {
     default:
-        info = L"SRGB";
+        switch (m_toneMapMode)
+        {
+        case ToneMapPostProcess::Saturate: info = L"None"; break;
+        case ToneMapPostProcess::Reinhard: info = L"Reinhard"; break;
+        case ToneMapPostProcess::ACESFilmic: info = L"ACES Filmic"; break;
+        }
         break;
 
     case DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020:
@@ -269,6 +301,8 @@ void Game::Render()
 #if defined(_XBOX_ONE) && defined(_TITLE)
     ID3D11RenderTargetView* renderTargets[2] = { m_deviceResources->GetRenderTargetView(), m_deviceResources->GetGameDVRRenderTargetView() };
     context->OMSetRenderTargets(2, renderTargets, nullptr);
+
+    m_toneMap->SetOperator(static_cast<ToneMapPostProcess::Operator>(m_toneMapMode));
 #else
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     context->OMSetRenderTargets(1, &renderTarget, nullptr);
@@ -276,7 +310,7 @@ void Game::Render()
     switch (m_deviceResources->GetColorSpace())
     {
     default:
-        m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
+        m_toneMap->SetOperator(static_cast<ToneMapPostProcess::Operator>(m_toneMapMode));
         m_toneMap->SetTransferFunction((m_deviceResources->GetBackBufferFormat() == DXGI_FORMAT_R16G16B16A16_FLOAT) ? ToneMapPostProcess::Linear : ToneMapPostProcess::SRGB);
         break;
 
@@ -329,6 +363,8 @@ void Game::Clear()
 // Message handlers
 void Game::OnActivated()
 {
+    m_keyboardButtons.Reset();
+    m_gamePadButtons.Reset();
 }
 
 void Game::OnDeactivated()
@@ -351,6 +387,8 @@ void Game::OnResuming()
 #endif
 
     m_timer.ResetElapsedTime();
+    m_gamePadButtons.Reset();
+    m_keyboardButtons.Reset();
 }
 
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
@@ -440,7 +478,7 @@ void Game::CreateDeviceDependentResources()
     m_hdrScene->SetDevice(device);
 
     m_toneMap = std::make_unique<ToneMapPostProcess>(device);
-    m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
+    m_toneMap->SetOperator(static_cast<ToneMapPostProcess::Operator>(m_toneMapMode));
     m_toneMap->SetTransferFunction(ToneMapPostProcess::SRGB);
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
@@ -506,3 +544,18 @@ void Game::OnDeviceRestored()
 }
 #endif
 #pragma endregion
+
+void Game::CycleToneMapOperator()
+{
+#if !defined(_XBOX_ONE) || !defined(_TITLE)
+    if (m_deviceResources->GetColorSpace() != DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709)
+        return;
+#endif
+
+    m_toneMapMode += 1;
+
+    if (m_toneMapMode >= ToneMapPostProcess::Operator_Max)
+    {
+        m_toneMapMode = ToneMapPostProcess::Saturate;
+    }
+}

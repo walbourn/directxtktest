@@ -86,6 +86,8 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 
+    void CycleToneMapOperator();
+
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
@@ -104,6 +106,8 @@ private:
     std::unique_ptr<DirectX::GraphicsMemory>    m_graphicsMemory;
 #endif
 
+    std::unique_ptr<DirectX::SpriteBatch>       m_batch;
+    std::unique_ptr<DirectX::SpriteFont>        m_font;
     std::unique_ptr<DirectX::CommonStates>      m_states;
     std::unique_ptr<DirectX::Model>             m_cube;
     std::unique_ptr<DirectX::Model>             m_sphere;
@@ -123,6 +127,7 @@ private:
     DirectX::SimpleMath::Matrix             m_view;
     DirectX::SimpleMath::Matrix             m_projection;
 
+    int m_toneMapMode;
     uint32_t m_ibl;
     bool m_spinning;
     float m_pitch;

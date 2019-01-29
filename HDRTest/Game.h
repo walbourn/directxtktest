@@ -86,6 +86,8 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 
+    void CycleToneMapOperator();
+
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
@@ -95,6 +97,9 @@ private:
     // Input devices.
     std::unique_ptr<DirectX::GamePad>       m_gamePad;
     std::unique_ptr<DirectX::Keyboard>      m_keyboard;
+
+    DirectX::GamePad::ButtonStateTracker    m_gamePadButtons;
+    DirectX::Keyboard::KeyboardStateTracker m_keyboardButtons;
 
     // DirectXTK Test Objects
 #if defined(_XBOX_ONE) && defined(_TITLE)
@@ -122,4 +127,6 @@ private:
 
     DirectX::SimpleMath::Matrix                         m_view;
     DirectX::SimpleMath::Matrix                         m_projection;
+
+    int                                                 m_toneMapMode;
 };

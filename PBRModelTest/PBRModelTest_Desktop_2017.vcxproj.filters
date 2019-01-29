@@ -53,6 +53,9 @@
     <None Include="ToyRobot.sdkmesh">
       <Filter>Assets</Filter>
     </None>
+    <None Include="comic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="BrokenCube_baseColor.DDS">

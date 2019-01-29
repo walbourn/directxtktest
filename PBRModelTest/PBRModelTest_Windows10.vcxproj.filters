@@ -146,5 +146,8 @@
     <None Include="ToyRobot.sdkmesh">
       <Filter>Assets</Filter>
     </None>
+    <None Include="comic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
 </Project>
