@@ -100,7 +100,7 @@ void Game::Initialize(
 
         if (!thrown)
         {
-            MessageBox(window, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
+            MessageBoxW(window, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
             throw std::exception("GamePad not acting like a singleton");
         }
 

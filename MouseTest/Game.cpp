@@ -121,7 +121,7 @@ void Game::Initialize(
         if (!thrown)
         {
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-            MessageBox(window, L"Mouse not acting like a singleton", L"MouseTest", MB_ICONERROR);
+            MessageBoxW(window, L"Mouse not acting like a singleton", L"MouseTest", MB_ICONERROR);
 #else
             throw std::exception("Mouse not acting like a singleton");
 #endif

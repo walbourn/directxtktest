@@ -111,7 +111,7 @@ void Game::Initialize(
         if (!thrown)
         {
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-            MessageBox(window, L"Keyboard not acting like a singleton", L"KeyboardTest", MB_ICONERROR);
+            MessageBoxW(window, L"Keyboard not acting like a singleton", L"KeyboardTest", MB_ICONERROR);
 #else
             throw std::exception("Keyboard not acting like a singleton");
 #endif

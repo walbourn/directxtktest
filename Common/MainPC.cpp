@@ -56,17 +56,17 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     // Register class and create window
     {
         // Register class
-        WNDCLASSEX wcex = {};
-        wcex.cbSize = sizeof(WNDCLASSEX);
+        WNDCLASSEXW wcex = {};
+        wcex.cbSize = sizeof(WNDCLASSEXW);
         wcex.style = CS_HREDRAW | CS_VREDRAW;
         wcex.lpfnWndProc = WndProc;
         wcex.hInstance = hInstance;
-        wcex.hIcon = LoadIcon(hInstance, L"IDI_ICON");
-        wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+        wcex.hIcon = LoadIconW(hInstance, L"IDI_ICON");
+        wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
         wcex.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
         wcex.lpszClassName = L"D3D11TestWindowClass";
-        wcex.hIconSm = LoadIcon(wcex.hInstance, L"IDI_ICON");
-        if (!RegisterClassEx(&wcex))
+        wcex.hIconSm = LoadIconW(wcex.hInstance, L"IDI_ICON");
+        if (!RegisterClassExW(&wcex))
             return 1;
 
         // Create window
@@ -77,7 +77,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
-        HWND hwnd = CreateWindowEx(0, L"D3D11TestWindowClass", g_game->GetAppName(), WS_OVERLAPPEDWINDOW,
+        HWND hwnd = CreateWindowExW(0, L"D3D11TestWindowClass", g_game->GetAppName(), WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
             nullptr);
 
