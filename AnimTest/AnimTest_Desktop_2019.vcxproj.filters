@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{8b3a42a6-46eb-4c40-994f-492f1159845d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{9cd2cb99-9822-43da-99ad-b8b1539a372f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Tank">
+      <UniqueIdentifier>{ce581c73-a35c-4d2c-9aad-1a41f6452bb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Soldier">
+      <UniqueIdentifier>{72227b57-cbd2-47f5-91f7-ccc931cfa4f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\VSStarter">
+      <UniqueIdentifier>{ddc83cd7-28f5-42a0-90dd-cb1d2d4b40d3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TankScene.sdkmesh">
+      <Filter>Assets\Tank</Filter>
+    </None>
+    <None Include="head_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="jacket_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="pants_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="soldier.sdkmesh">
+      <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="soldier.sdkmesh_anim">
+      <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="upBody_diff.dds">
+      <Filter>Assets\Soldier</Filter>
+    </None>
+    <None Include="teapot.cmo">
+      <Filter>Assets\VSStarter</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="default.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="ground_diff.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="ground_norm.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="left_engine_diff.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="left_engine_norm.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="turret_diff.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+    <Image Include="turret_norm.dds">
+      <Filter>Assets\Tank</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\MainPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="..\Common\DeviceResourcesPC.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Common\settings.manifest">
+      <Filter>Common</Filter>
+    </Manifest>
+  </ItemGroup>
+</Project>
