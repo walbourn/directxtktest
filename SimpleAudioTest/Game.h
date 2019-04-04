@@ -111,6 +111,7 @@ private:
     std::unique_ptr<DirectX::SpriteFont>    m_comicFont;
 
     std::unique_ptr<DirectX::SoundEffect>   m_alarmPCM;
+    std::unique_ptr<DirectX::SoundEffect>   m_tadaPCM;
     std::unique_ptr<DirectX::SoundEffect>   m_alarmADPCM;
     std::unique_ptr<DirectX::SoundEffect>   m_alarmFLOAT;
 

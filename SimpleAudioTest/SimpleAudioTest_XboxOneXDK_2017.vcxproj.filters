@@ -90,5 +90,8 @@
     <Media Include="Alarm01_xma.wav">
       <Filter>Assets</Filter>
     </Media>
+    <Media Include="tada.wav">
+      <Filter>Assets</Filter>
+    </Media>
   </ItemGroup>
 </Project>

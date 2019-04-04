@@ -65,6 +65,9 @@
     <Media Include="..\BasicAudioTest\Alarm01_xwma.wav">
       <Filter>Assets</Filter>
     </Media>
+    <Media Include="tada.wav">
+      <Filter>Assets</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\Common\settings.manifest">

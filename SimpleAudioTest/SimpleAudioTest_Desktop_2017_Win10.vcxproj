@@ -192,6 +192,7 @@
     <Media Include="..\BasicAudioTest\Alarm01_adpcm.wav" />
     <Media Include="..\BasicAudioTest\Alarm01_float.wav" />
     <Media Include="..\BasicAudioTest\Alarm01_xwma.wav" />
+    <Media Include="tada.wav" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\Common\settings.manifest" />

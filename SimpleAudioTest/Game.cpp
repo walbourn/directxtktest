@@ -238,32 +238,36 @@ void Game::Initialize(
 
     //--- WAV files ---
     m_alarmPCM = std::make_unique<SoundEffect>(m_audEngine.get(), MEDIA_PATH L"Alarm01.wav");
-    m_console->WriteLine(L"Loaded Alarm01.wav");
+    m_console->Write(L"Alarm01.wav:       ");
     dump_wfx(m_console.get(), m_alarmPCM->GetFormat());
 
+    m_tadaPCM = std::make_unique<SoundEffect>(m_audEngine.get(), L"tada.wav");
+    m_console->Write(L"Tada.wav:          ");
+    dump_wfx(m_console.get(), m_tadaPCM->GetFormat());
+
     m_alarmADPCM = std::make_unique<SoundEffect>(m_audEngine.get(), MEDIA_PATH L"Alarm01_adpcm.wav");
-    m_console->WriteLine(L"Loaded Alarm01_adpcm.wav");
+    m_console->Write(L"Alarm01_adpcm.wav: ");
     dump_wfx(m_console.get(), m_alarmADPCM->GetFormat());
 
     m_alarmFLOAT = std::make_unique<SoundEffect>(m_audEngine.get(), MEDIA_PATH L"Alarm01_float.wav");
-    m_console->WriteLine(L"Loaded Alarm01_float.wav");
+    m_console->Write(L"Alarm01_float.wav: ");
     dump_wfx(m_console.get(), m_alarmFLOAT->GetFormat());
 
 #if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
     m_alarmXWMA = std::make_unique<SoundEffect>(m_audEngine.get(), MEDIA_PATH L"Alarm01_xwma.wav");
-    m_console->WriteLine(L"Loaded Alarm01_xwma.wav");
+    m_console->Write(L"Alarm01_xwma.wav: ");
     dump_wfx(m_console.get(), m_alarmXWMA->GetFormat());
 #endif
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
-    m_alarmXMA = std::make_unique<SoundEffect>(m_audEngine.get(), MEDIA_PATH L"Alarm01_xma.wav");
-    m_console->WriteLine(L"Loaded Alarm01_xma.wav");
+    m_alarmXMA = std::make_unique<SoundEffect>(m_audEngine.get(), L"Alarm01_xma.wav");
+    m_console->Write(L"Alarm01_xma.wav: ");
     dump_wfx(m_console.get(), m_alarmXMA->GetFormat());
 #endif
 
     //--- XWB Wave Banks ---
     m_wbPCM = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"droid.xwb");
-    m_console->WriteLine(L"Loaded droid.xwb");
+    m_console->WriteLine(L"droid.xwb");
     m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
         m_wbPCM->GetSampleSizeInBytes(8),
         m_wbPCM->GetSampleDuration(8),
@@ -275,7 +279,7 @@ void Game::Initialize(
     }
 
     m_wbADPCM = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"ADPCMdroid.xwb");
-    m_console->WriteLine(L"Loaded ADPCMdroid.xwb");
+    m_console->WriteLine(L"ADPCMdroid.xwb");
     m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
         m_wbADPCM->GetSampleSizeInBytes(8),
         m_wbADPCM->GetSampleDuration(8),
@@ -288,7 +292,7 @@ void Game::Initialize(
 
 #if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
     m_wbXWMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xwmadroid.xwb");
-    m_console->WriteLine(L"Loaded xwmadroid.xwb");
+    m_console->WriteLine(L"xwmadroid.xwb");
     m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
         m_wbXWMA->GetSampleSizeInBytes(8),
         m_wbXWMA->GetSampleDuration(8),
@@ -302,7 +306,7 @@ void Game::Initialize(
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_wbXMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xmadroid.xwb");
-    m_console->WriteLine(L"Loaded xmadroid.xwb");
+    m_console->WriteLine(L"xmadroid.xwb");
     m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
         m_wbXMA->GetSampleSizeInBytes(8),
         m_wbXMA->GetSampleDuration(8),
@@ -350,8 +354,16 @@ void Game::Update(DX::StepTimer const&)
 
         if (m_gamepadButtons.a == ButtonState::PRESSED)
         {
-            m_console->WriteLine(L"PCM alarm started");
-            m_alarmPCM->Play();
+            if (pad.IsLeftTriggerPressed())
+            {
+                m_console->WriteLine(L"PCM tada started");
+                m_tadaPCM->Play();
+            }
+            else
+            {
+                m_console->WriteLine(L"PCM alarm started");
+                m_alarmPCM->Play();
+            }
         }
         if (m_gamepadButtons.x == ButtonState::PRESSED)
         {
@@ -423,6 +435,11 @@ void Game::Update(DX::StepTimer const&)
         {
             m_console->WriteLine(L"FLOAT32 alarm started");
             m_alarmFLOAT->Play();
+        }
+        if (m_keyboardButtons.IsKeyPressed(Keyboard::D5))
+        {
+            m_console->WriteLine(L"PCM tada started");
+            m_tadaPCM->Play();
         }
 
         if (m_keyboardButtons.IsKeyPressed(Keyboard::Q))
@@ -531,9 +548,9 @@ void Game::Render()
     if (m_gamepadPresent)
     {
 #if defined(_XBOX_ONE) && defined(_TITLE)
-        help1 = L"Press A, B, X, Y, or RThumb to trigger Alarm.wav";
+        help1 = L"Press A, B, X, Y, or RThumb to trigger Alarm.wav; LTrigger+A for Tada.wav";
 #else
-        help1 = L"Press A, B, X, or Y to trigger Alarm.wav";
+        help1 = L"Press A, B, X, or Y to trigger Alarm.wav; LTrigger+A for Tada.wav";
 #endif
         help2 = L"Press DPAD to trigger Wavebank entry #8";
         help3 = L"Press MENU/START to trim voices";
@@ -541,7 +558,7 @@ void Game::Render()
     }
     else
     {
-        help1 = L"Press 1, 2, 3, or 4 to trigger Alarm.wav";
+        help1 = L"Press 1, 2, 3, or 4 to trigger Alarm.wav; 5 for Tada.wav";
         help2 = L"Press Q, W, or E to trigger Wavebank entry #8";
         help3 = L"Press Space to trim voices";
         help4 = L"Press Esc to exit";
