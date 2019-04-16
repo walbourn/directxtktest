@@ -696,7 +696,7 @@ void Game::Render()
     // Render HUD
     m_batch->Begin();
 
-    const wchar_t* info = nullptr;
+    const wchar_t* info = L"";
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
     switch (m_toneMapMode)
