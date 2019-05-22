@@ -1598,14 +1598,14 @@ int TestV2()
         // 0.5
         Vector2 result(-1.0f, 1.583105f);
         v = Vector2::Hermite(p1, t1, p2, t2, 0.5f);
-        if (v != result)
+        if (!XMVector2NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite 0.5 %f %f\n", v.x, v.y);
             success = false;
         }
 
         Vector2::Hermite(p1, t1, p2, t2, 0.5f, v);
-        if (v != result)
+        if (!XMVector2NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite(2) 0.5 %f %f\n", v.x, v.y);
             success = false;
@@ -1613,14 +1613,14 @@ int TestV2()
 
         // 0
         v = Vector2::Hermite(p1, t1, p2, t2, 0.f);
-        if (v != p1)
+        if (!XMVector2NearEqual(v, p1, VEPSILON))
         {
             printf("ERROR: hermite 0 %f %f\n", v.x, v.y);
             success = false;
         }
 
         Vector2::Hermite(p1, t1, p2, t2, 0.f, v);
-        if (v != p1)
+        if (!XMVector2NearEqual(v, p1, VEPSILON))
         {
             printf("ERROR: hermite(2) 0 %f %f\n", v.x, v.y);
             success = false;
@@ -1628,14 +1628,14 @@ int TestV2()
 
         // 1
         v = Vector2::Hermite(p1, t1, p2, t2, 1.f);
-        if (v != p2)
+        if (!XMVector2NearEqual(v, p2, VEPSILON))
         {
             printf("ERROR: hermite 1 %f %f\n", v.x, v.y);
             success = false;
         }
 
         Vector2::Hermite(p1, t1, p2, t2, 1.f, v);
-        if (v != p2)
+        if (!XMVector2NearEqual(v, p2, VEPSILON))
         {
             printf("ERROR: hermite(2) 1 %f %f\n", v.x, v.y);
             success = false;
@@ -1644,14 +1644,14 @@ int TestV2()
         // <0
         result = Vector2(-10.0f, 3.86557627f);
         v = Vector2::Hermite(p1, t1, p2, t2, -1.f);
-        if (v != result)
+        if (!XMVector2NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite <0 %f %f\n", v.x, v.y);
             success = false;
         }
 
         Vector2::Hermite(p1, t1, p2, t2, -1.f, v);
-        if (v != result)
+        if (!XMVector2NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite(2) <0 %f %f\n", v.x, v.y);
             success = false;
@@ -1660,14 +1660,14 @@ int TestV2()
         // >1
         result = Vector2(8.0f, -2.19525433f);
         v = Vector2::Hermite(p1, t1, p2, t2, 2.f);
-        if (v != result)
+        if (!XMVector2NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite >1 %f %f\n", v.x, v.y);
             success = false;
         }
 
         Vector2::Hermite(p1, t1, p2, t2, 2.f, v);
-        if (v != result)
+        if (!XMVector2NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite(2) >1 %f %f\n", v.x, v.y);
             success = false;
@@ -2546,14 +2546,14 @@ int TestV3()
         // 0.5
         Vector3 result(-1.0f, 1.583105f, 3.55423713f);
         v = Vector3::Hermite(p1, t1, p2, t2, 0.5f);
-        if (v != result)
+        if (!XMVector3NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite 0.5 %f %f %f\n", v.x, v.y, v.z);
             success = false;
         }
 
         Vector3::Hermite(p1, t1, p2, t2, 0.5f, v);
-        if (v != result)
+        if (!XMVector3NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite(2) 0.5 %f %f %f\n", v.x, v.y, v.z);
             success = false;
@@ -2561,14 +2561,14 @@ int TestV3()
 
         // 0
         v = Vector3::Hermite(p1, t1, p2, t2, 0.f);
-        if (v != p1)
+        if (!XMVector3NearEqual(v, p1, VEPSILON))
         {
             printf("ERROR: hermite 0 %f %f %f\n", v.x, v.y, v.z);
             success = false;
         }
 
         Vector3::Hermite(p1, t1, p2, t2, 0.f, v);
-        if (v != p1)
+        if (!XMVector3NearEqual(v, p1, VEPSILON))
         {
             printf("ERROR: hermite(2) 0 %f %f %f\n", v.x, v.y, v.z);
             success = false;
@@ -2576,14 +2576,14 @@ int TestV3()
 
         // 1
         v = Vector3::Hermite(p1, t1, p2, t2, 1.f);
-        if (v != p2)
+        if (!XMVector3NearEqual(v, p2, VEPSILON))
         {
             printf("ERROR: hermite 1 %f %f %f\n", v.x, v.y, v.z);
             success = false;
         }
 
         Vector3::Hermite(p1, t1, p2, t2, 1.f, v);
-        if (v != p2)
+        if (!XMVector3NearEqual(v, p2, VEPSILON))
         {
             printf("ERROR: hermite(2) 1 %f %f %f\n", v.x, v.y, v.z);
             success = false;
@@ -2592,14 +2592,14 @@ int TestV3()
         // <0
         result = Vector3(-10.0f, 3.86557627f, 15.6839724f);
         v = Vector3::Hermite(p1, t1, p2, t2, -1.f);
-        if (v != result)
+        if (!XMVector3NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite <0 %f %f %f\n", v.x, v.y, v.z);
             success = false;
         }
 
         Vector3::Hermite(p1, t1, p2, t2, -1.f, v);
-        if (v != result)
+        if (!XMVector3NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite(2) <0 %f %f %f\n", v.x, v.y, v.z);
             success = false;
@@ -2608,14 +2608,14 @@ int TestV3()
         // >1
         result = Vector3(8.0f, -2.19525433f, -9.551766f);
         v = Vector3::Hermite(p1, t1, p2, t2, 2.f);
-        if (v != result)
+        if (!XMVector3NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite >1 %f %f %f\n", v.x, v.y, v.z);
             success = false;
         }
 
         Vector3::Hermite(p1, t1, p2, t2, 2.f, v);
-        if (v != result)
+        if (!XMVector3NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite(2) >1 %f %f %f\n", v.x, v.y, v.z);
             success = false;
@@ -3491,14 +3491,14 @@ int TestV4()
         // 0.5
         Vector4 result(-1.0f, 1.583105f, 3.55423713f, 2.27859187f);
         v = Vector4::Hermite(p1, t1, p2, t2, 0.5f);
-        if (v != result)
+        if (!XMVector4NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite 0.5 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
         }
 
         Vector4::Hermite(p1, t1, p2, t2, 0.5f, v);
-        if (v != result)
+        if (!XMVector4NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite(2) 0.5 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
@@ -3506,14 +3506,14 @@ int TestV4()
 
         // 0
         v = Vector4::Hermite(p1, t1, p2, t2, 0.f);
-        if (v != p1)
+        if (!XMVector4NearEqual(v, p1, VEPSILON))
         {
             printf("ERROR: hermite 0 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
         }
 
         Vector4::Hermite(p1, t1, p2, t2, 0.f, v);
-        if (v != p1)
+        if (!XMVector4NearEqual(v, p1, VEPSILON))
         {
             printf("ERROR: hermite(2) 0 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
@@ -3521,14 +3521,14 @@ int TestV4()
 
         // 1
         v = Vector4::Hermite(p1, t1, p2, t2, 1.f);
-        if (v != p2)
+        if (!XMVector4NearEqual(v, p2, VEPSILON))
         {
             printf("ERROR: hermite 1 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
         }
 
         Vector4::Hermite(p1, t1, p2, t2, 1.f, v);
-        if (v != p2)
+        if (!XMVector4NearEqual(v, p2, VEPSILON))
         {
             printf("ERROR: hermite(2) 1 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
@@ -3537,14 +3537,14 @@ int TestV4()
         // <0
         result = Vector4(-10.0f, 3.86557627f, 15.6839724f, -5.10049248f);
         v = Vector4::Hermite(p1, t1, p2, t2, -1.f);
-        if (v != result)
+        if (!XMVector4NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite <0 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
         }
 
         Vector4::Hermite(p1, t1, p2, t2, -1.f, v);
-        if (v != result)
+        if (!XMVector4NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite(2) <0 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
@@ -3553,14 +3553,14 @@ int TestV4()
         // >1
         result = Vector4(8.0f, -2.19525433f, -9.551766f, 9.143023f);
         v = Vector4::Hermite(p1, t1, p2, t2, 2.f);
-        if (v != result)
+        if (!XMVector4NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite >1 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
         }
 
         Vector4::Hermite(p1, t1, p2, t2, 2.f, v);
-        if (v != result)
+        if (!XMVector4NearEqual(v, result, VEPSILON))
         {
             printf("ERROR: hermite(2) >1 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
