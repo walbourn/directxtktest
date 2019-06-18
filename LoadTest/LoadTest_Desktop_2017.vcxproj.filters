@@ -65,6 +65,9 @@
     <ClInclude Include="..\Common\StepTimer.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\ReadData.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\Common\settings.manifest">

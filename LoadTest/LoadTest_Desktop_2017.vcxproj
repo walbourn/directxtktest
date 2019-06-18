@@ -190,6 +190,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\DeviceResourcesPC.h" />
+    <ClInclude Include="..\Common\ReadData.h" />
     <ClInclude Include="..\Common\StepTimer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />

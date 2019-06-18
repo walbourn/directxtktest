@@ -16,6 +16,8 @@
 #include "pch.h"
 #include "Game.h"
 
+#include "ReadData.h"
+
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
 #include <Windows.ApplicationModel.h>
 #include <Windows.Storage.h>
@@ -692,6 +694,67 @@ void Game::CreateDeviceDependentResources()
         }
     }
 
+    {
+        auto blob = DX::ReadData(L"earth_A2B10G10R10.dds");
+
+        {
+            DDS_ALPHA_MODE alphaMode = DDS_ALPHA_MODE_UNKNOWN;
+
+            ComPtr<ID3D11Resource> res;
+            ComPtr<ID3D11ShaderResourceView> srv;
+            DX::ThrowIfFailed(CreateDDSTextureFromMemory(device, blob.data(), blob.size(),
+                res.GetAddressOf(), srv.GetAddressOf(), 0, &alphaMode));
+
+            if (alphaMode != DDS_ALPHA_MODE_UNKNOWN)
+            {
+                OutputDebugStringA("FAILED: earth_A2B10G10R10.dds (mem) alpha mode unexpected\n");
+                success = false;
+            }
+
+            if (!ValidateDesc(srv.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R10G10B10A2_UNORM, 10))
+            {
+                OutputDebugStringA("FAILED: earth_A2B10G10R10.dds (mem) srv desc unexpected\n");
+                success = false;
+            }
+
+            if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R10G10B10A2_UNORM, 10, 512, 256))
+            {
+                OutputDebugStringA("FAILED: earth_A2B10G10R10.dds (mem) res desc unexpected\n");
+                success = false;
+            }
+        }
+
+        {
+            DDS_ALPHA_MODE alphaMode = DDS_ALPHA_MODE_UNKNOWN;
+
+            ComPtr<ID3D11Resource> res;
+            ComPtr<ID3D11ShaderResourceView> srv;
+            DX::ThrowIfFailed(CreateDDSTextureFromMemoryEx(device, blob.data(), blob.size(),
+                0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, true,
+                res.GetAddressOf(), srv.ReleaseAndGetAddressOf(), &alphaMode));
+
+            if (alphaMode != DDS_ALPHA_MODE_UNKNOWN)
+            {
+                OutputDebugStringA("FAILED: earth_A2B10G10R10.dds (mem 2) alpha mode unexpected\n");
+                success = false;
+            }
+
+            // forceSRGB has no effect for 10:10:10:2
+
+            if (!ValidateDesc(srv.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R10G10B10A2_UNORM, 10))
+            {
+                OutputDebugStringA("FAILED: earth_A2B10G10R10.dds (mem 2) srv desc unexpected\n");
+                success = false;
+            }
+
+            if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R10G10B10A2_UNORM, 10, 512, 256))
+            {
+                OutputDebugStringA("FAILED: earth_A2B10G10R10.dds (mem 2) res desc unexpected\n");
+                success = false;
+            }
+        }
+    }
+
     // DirectX Logo
     {
         DDS_ALPHA_MODE alphaMode = DDS_ALPHA_MODE_UNKNOWN;
@@ -780,6 +843,48 @@ void Game::CreateDeviceDependentResources()
         {
             OutputDebugStringA("FAILED: win95.bmp (sRGB) res desc unexpected\n");
             success = false;
+        }
+    }
+
+    {
+        auto blob = DX::ReadData(L"win95.bmp");
+
+        {
+            ComPtr<ID3D11Resource> res;
+            ComPtr<ID3D11ShaderResourceView> srv;
+            DX::ThrowIfFailed(CreateWICTextureFromMemory(device, context, blob.data(), blob.size(),
+                res.GetAddressOf(), srv.ReleaseAndGetAddressOf()));
+
+            if (!ValidateDesc(srv.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM, 9))
+            {
+                OutputDebugStringA("FAILED: win95.bmp (mem autogen) srv desc unexpected\n");
+                success = false;
+            }
+
+            if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM, 9, 256, 256))
+            {
+                OutputDebugStringA("FAILED: win95.bmp (mem autogen) res desc unexpected\n");
+                success = false;
+            }
+        }
+
+        {
+            ComPtr<ID3D11Resource> res;
+            ComPtr<ID3D11ShaderResourceView> srv;
+            DX::ThrowIfFailed(CreateWICTextureFromMemoryEx(device, context, blob.data(), blob.size(),
+                0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, true, res.GetAddressOf(), srv.ReleaseAndGetAddressOf()));
+
+            if (!ValidateDesc(srv.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 9))
+            {
+                OutputDebugStringA("FAILED: win95.bmp (mem sRGB) srv desc unexpected\n");
+                success = false;
+            }
+
+            if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 9, 256, 256))
+            {
+                OutputDebugStringA("FAILED: win95.bmp (mem sRGB) res desc unexpected\n");
+                success = false;
+            }
         }
     }
 
