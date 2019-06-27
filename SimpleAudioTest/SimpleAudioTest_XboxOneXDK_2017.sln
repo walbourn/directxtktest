@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 15
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleAudioTest_XboxOneXDK_2017", "SimpleAudioTest_XboxOneXDK_2017.vcxproj", "{1BAD9750-62E9-4D9E-A59D-2B09C5AE74A1}"
