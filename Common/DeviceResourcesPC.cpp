@@ -20,7 +20,7 @@ namespace
         HRESULT hr = D3D11CreateDevice(
             nullptr,
             D3D_DRIVER_TYPE_NULL,       // There is no need to create a real hardware device.
-            0,
+            nullptr,
             D3D11_CREATE_DEVICE_DEBUG,  // Check for the SDK layers.
             nullptr,                    // Any feature level will do.
             0,
@@ -195,7 +195,7 @@ void DeviceResources::CreateDeviceResources()
         hr = D3D11CreateDevice(
             adapter.Get(),
             D3D_DRIVER_TYPE_UNKNOWN,
-            0,
+            nullptr,
             creationFlags,
             s_featureLevels,
             featLevelCount,
@@ -219,7 +219,7 @@ void DeviceResources::CreateDeviceResources()
         hr = D3D11CreateDevice(
             nullptr,
             D3D_DRIVER_TYPE_WARP, // Create a WARP device instead of a hardware device.
-            0,
+            nullptr,
             creationFlags,
             s_featureLevels,
             featLevelCount,
@@ -297,7 +297,7 @@ void DeviceResources::CreateWindowSizeDependentResources()
             backBufferHeight,
             backBufferFormat,
 #ifdef __dxgi1_5_h__
-            (m_options & c_AllowTearing) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0
+            (m_options & c_AllowTearing) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0u
 #else
             0
 #endif
@@ -336,7 +336,7 @@ void DeviceResources::CreateWindowSizeDependentResources()
         swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 #ifdef __dxgi1_5_h__
         swapChainDesc.SwapEffect = (m_options & (c_FlipPresent | c_AllowTearing | c_EnableHDR)) ? DXGI_SWAP_EFFECT_FLIP_DISCARD : DXGI_SWAP_EFFECT_DISCARD;
-        swapChainDesc.Flags = (m_options & c_AllowTearing) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+        swapChainDesc.Flags = (m_options & c_AllowTearing) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0u;
 #elif defined(__dxgi1_4_h__)
         swapChainDesc.SwapEffect = (m_options & c_FlipPresent) ? DXGI_SWAP_EFFECT_FLIP_DISCARD : DXGI_SWAP_EFFECT_DISCARD;
 #endif
