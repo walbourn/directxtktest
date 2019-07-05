@@ -196,7 +196,7 @@ void Game::Render()
     m_spriteBatch->Draw(m_cat.Get(), XMFLOAT2(0, 0), nullptr, Colors::White, 0, XMFLOAT2(0, 0), 0.5);
 
     RECT dest1 = { 0, 0, 256, 64 };
-    RECT dest2 = { 0, 0, 64, 256 };
+    Rectangle dest2 = { 0, 0, 64, 256 };
 
     m_spriteBatch->Draw(m_cat.Get(), dest1);
     m_spriteBatch->Draw(m_cat.Get(), dest2);
