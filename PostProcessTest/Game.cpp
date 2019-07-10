@@ -578,7 +578,7 @@ void Game::Render()
     // Draw UI.
     auto size = m_deviceResources->GetOutputSize();
 
-    auto safeRect = Viewport::ComputeTitleSafeArea(size.right, size.bottom);
+    auto safeRect = Viewport::ComputeTitleSafeArea(UINT(size.right), UINT(size.bottom));
 
     m_spriteBatch->Begin();
     m_font->DrawString(m_spriteBatch.get(), descstr, XMFLOAT2(float(safeRect.left), float(safeRect.bottom - m_font->GetLineSpacing())));
@@ -743,8 +743,8 @@ void Game::CreateWindowSizeDependentResources()
 {
     auto size = m_deviceResources->GetOutputSize();
 
-    UINT width = size.right - size.left;
-    UINT height = size.bottom - size.top;
+    auto width = UINT(size.right - size.left);
+    auto height = UINT(size.bottom - size.top);
 
     // Create scene render target
     auto device = m_deviceResources->GetD3DDevice();

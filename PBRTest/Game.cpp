@@ -1145,6 +1145,7 @@ void Game::CycleDebug()
         case DebugEffect::Mode_Normals: OutputDebugStringA("INFO: Showing normals\n"); break;
         case DebugEffect::Mode_Tangents: OutputDebugStringA("INFO: Showing tangents\n"); break;
         case DebugEffect::Mode_BiTangents: OutputDebugStringA("INFO: Showing bi-tangents\n"); break;
+        case DebugEffect::Mode_Default: break;
         }
     }
 }

@@ -173,9 +173,9 @@ void Game::Update(DX::StepTimer const&)
 
         if (state2.IsConnected())
         {
-            if (!m_found[j])
+            if (!m_found[size_t(j)])
             {
-                m_found[j] = true;
+                m_found[size_t(j)] = true;
 
                 if (caps.IsConnected())
                 {
@@ -226,9 +226,9 @@ void Game::Update(DX::StepTimer const&)
         }
         else
         {
-            if (m_found[j])
+            if (m_found[size_t(j)])
             {
-                m_found[j] = false;
+                m_found[size_t(j)] = false;
 
                 char buff[32];
                 sprintf_s(buff, "Player %d <- disconnected\n", j);
@@ -384,7 +384,7 @@ void Game::Render()
 
     for (int j = 0; j < std::min(GamePad::MAX_PLAYER_COUNT, 4); ++j)
     {
-        XMVECTOR color = m_found[j] ? Colors::White : Colors::DimGray;
+        XMVECTOR color = m_found[size_t(j)] ? Colors::White : Colors::DimGray;
         m_ctrlFont->DrawString(m_spriteBatch.get(), L"$", XMFLOAT2(800.f, float(50 + j * 150)), color);
     }
 
