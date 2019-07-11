@@ -303,7 +303,7 @@ void Game::Render()
 
         wchar_t unicode[256] = {};
 
-        int cp = 437;
+        UINT cp = 437;
     #if defined(_XBOX_ONE) && defined(_TITLE)
         cp = CP_UTF8;
 

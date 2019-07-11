@@ -518,7 +518,7 @@ void Game::Render()
 
     auto size = m_deviceResources->GetOutputSize();
 
-    auto safeRect = Viewport::ComputeTitleSafeArea(size.right, size.bottom);
+    auto safeRect = Viewport::ComputeTitleSafeArea(UINT(size.right), UINT(size.bottom));
 
     m_spriteBatch->Begin();
 
@@ -746,7 +746,7 @@ void Game::CreateWindowSizeDependentResources()
     
     RECT size = m_deviceResources->GetOutputSize();
 
-    RECT safeRect = Viewport::ComputeTitleSafeArea(size.right, size.bottom);
+    RECT safeRect = Viewport::ComputeTitleSafeArea(UINT(size.right), UINT(size.bottom));
 
     float dy = m_comicFont->GetLineSpacing();
 
