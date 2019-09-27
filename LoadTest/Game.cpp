@@ -392,7 +392,11 @@ void Game::Render()
         DeleteFileW(sstif);
         DeleteFileW(ssdds);
 
+#ifdef GAMMA_CORRECT_RENDERING
         HRESULT hr = SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatPng, sspng, &GUID_WICPixelFormat32bppBGRA);
+#else
+        HRESULT hr = SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatPng, sspng, &GUID_WICPixelFormat32bppBGRA, nullptr, true);
+#endif
 
         if (FAILED(hr))
         {
