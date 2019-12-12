@@ -65,3 +65,8 @@ if ( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
     set(WarningsEXE "/wd4061" "/wd4365" "/wd4514" "/wd4571" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045")
     target_compile_options(headertest PRIVATE ${WarningsEXE})
 endif()
+
+if(WIN32)
+    # Windows 8 is used here to use XAudio 2.8 rather than require the legacy DirectX SDK or NuGet (https://aka.ms/XAudio2Redist)
+    target_compile_definitions(headertest PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0602)
+endif()
