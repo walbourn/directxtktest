@@ -1,4 +1,4 @@
-﻿# DirectX Tool Kit for DirectX 11 Header Inclusion Test
+﻿# DirectX Tool Kit for DirectX 11 Simple Math Test
 #
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
@@ -7,7 +7,7 @@
 
 cmake_minimum_required (VERSION 3.11)
 
-project (headertest LANGUAGES CXX)
+project (simplemathtest LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,37 +25,22 @@ if(MSVC)
 endif()
 
 add_executable(${PROJECT_NAME}
-    main.cpp
-    audiotest.cpp
-    commonstatestest.cpp
-    ddstextureloadertest.cpp
-    directxhelperstest.cpp
-    effectstest.cpp
-    gamepadtest.cpp
-    geometricprimitivetest.cpp
-    graphicsmemorytest.cpp
-    keyboardtest.cpp
-    modeltest.cpp
-    mousetest.cpp
-    postprocesstest.cpp
-    primitivebatchtest.cpp
-    screengrabtest.cpp
-    simplemathtest.cpp
-    spritebatchtest.cpp
-    spritefonttest.cpp
-    vertextypestest.cpp
-    wictextureloadertest.cpp)
+    SimpleMathTest.cpp
+    ../../Src/SimpleMath.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../../inc)
 
 if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /fp:fast)
+
     if (${CMAKE_SIZEOF_VOID_P} EQUAL "4")
         target_compile_options(${PROJECT_NAME} PRIVATE /arch:SSE2)
     endif()
 endif()
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-    set(WarningsEXE "-Wpedantic" "-Wextra" "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-language-extension-token")
+    set(WarningsEXE "-Wpedantic" "-Wextra" "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-language-extension-token" "-Wno-reserved-id-macro"
+                    "-Wno-missing-prototypes" "-Wno-double-promotion" "-Wno-unused-variable" "-Wno-float-equal")
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsEXE})
 endif()
 if ( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
@@ -66,6 +51,5 @@ if ( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
 endif()
 
 if(WIN32)
-    # Windows 8 is used here to use XAudio 2.8 rather than require the legacy DirectX SDK or NuGet (https://aka.ms/XAudio2Redist)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0602)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE)
 endif()

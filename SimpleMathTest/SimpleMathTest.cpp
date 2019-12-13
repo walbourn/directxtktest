@@ -15,7 +15,6 @@
 #define NOMINMAX
 #define NODRAWTEXT
 #define NOGDI
-#define NOBITMAP
 #define NOMCX
 #define NOSERVICE
 #define NOHELP
@@ -45,9 +44,9 @@ static const float EPSILON = 0.000001f;
 static const float EPSILON2 = 0.00001f;
 static const float EPSILON3 = 0.001f;
 
-static const XMVECTORF32 VEPSILON = { EPSILON, EPSILON, EPSILON, EPSILON };
-static const XMVECTORF32 VEPSILON2 = { EPSILON2, EPSILON2, EPSILON2, EPSILON2 };
-static const XMVECTORF32 VEPSILON3 = { EPSILON3, EPSILON3, EPSILON3, EPSILON3 };
+static const XMVECTORF32 VEPSILON = { { { EPSILON, EPSILON, EPSILON, EPSILON } } };
+static const XMVECTORF32 VEPSILON2 = { { { EPSILON2, EPSILON2, EPSILON2, EPSILON2 } } };
+static const XMVECTORF32 VEPSILON3 = { { { EPSILON3, EPSILON3, EPSILON3, EPSILON3 } } };
 
 
 void FormatValue(bool value, char* output, size_t outputSize) { strcpy_s(output, outputSize, value ? "true" : "false"); }
@@ -1065,7 +1064,7 @@ int TestV2()
     }
 
     {
-        Vector2 vc = Colors::CornflowerBlue;
+        auto vc = Vector2(Colors::CornflowerBlue);
 
         if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
             || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON))
@@ -1923,7 +1922,7 @@ int TestV2()
         success = false;
     }
 
-    v = v1 / 2;
+    v = v1 / 2.f;
     if ( v != Vector2( 0.5f, 1.f ) )
     {
         printf("ERROR: / %f %f ... 0.5 1\n", v.x, v.y );
@@ -2022,7 +2021,7 @@ int TestV3()
     }
 
     {
-        Vector3 vc = Colors::CornflowerBlue;
+        auto vc = Vector3(Colors::CornflowerBlue);
 
         if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
             || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
@@ -2871,7 +2870,7 @@ int TestV3()
         success = false;
     }
 
-    v = v1 / 2;
+    v = v1 / 2.f;
     if ( v != Vector3( 0.5f, 1.f, 1.5f) )
     {
         printf("ERROR: / %f %f %f ... 0.5 1 1.5\n", v.x, v.y, v.z );
@@ -2966,7 +2965,7 @@ int TestV4()
     }
 
     {
-        Vector4 vc = Colors::CornflowerBlue;
+        auto vc = Vector4(Colors::CornflowerBlue);
 
         if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
             || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
@@ -3802,7 +3801,7 @@ int TestV4()
         success = false;
     }
 
-    v = v1 / 2;
+    v = v1 / 2.f;
     if ( v != Vector4( 0.5f, 1.f, 1.5f, 2) )
     {
         printf("ERROR: / %f %f %f %f ... 0.5 1 1.5 x\n", v.x, v.y, v.z, v.w );
@@ -4525,7 +4524,7 @@ int TestP()
     }
 
     {
-        Plane vc = Colors::CornflowerBlue;
+        auto vc = Plane(Colors::CornflowerBlue);
 
         if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
             || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
@@ -4667,7 +4666,7 @@ int TestQ()
     }
 
     {
-        Quaternion vc = Colors::CornflowerBlue;
+        auto vc = Quaternion(Colors::CornflowerBlue);
 
         if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
             || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
@@ -4861,7 +4860,7 @@ int TestC()
     }
 
     {
-        Color vc = Colors::CornflowerBlue;
+        auto vc = Color(Colors::CornflowerBlue);
 
         if (!XMScalarNearEqual(vc.x, Colors::CornflowerBlue.f[0], EPSILON)
             || !XMScalarNearEqual(vc.y, Colors::CornflowerBlue.f[1], EPSILON)
@@ -5347,7 +5346,7 @@ int TestVP()
         Matrix proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, 640.f / 480.f, 0.1f, 100.f);
 
         Vector3 p = vp2.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world);
-        if (!XMVector3NearEqual(p, Vector3(231.296143f, 265.606598, 0.993776858f), VEPSILON3))
+        if (!XMVector3NearEqual(p, Vector3(231.296143f, 265.606598f, 0.993776858f), VEPSILON3))
         {
             printf("ERROR: Project %f %f %f ... 231.296143 265.606598 0.993776858\n", p.x, p.y, p.z);
             success = false;
@@ -5355,7 +5354,7 @@ int TestVP()
 
         Vector3 r;
         vp2.Project(Vector3(0.5f, 0.75f, 0.25f), proj, view, world, r);
-        if (!XMVector3NearEqual(r, Vector3(231.296143f, 265.606598, 0.993776858f), VEPSILON3))
+        if (!XMVector3NearEqual(r, Vector3(231.296143f, 265.606598f, 0.993776858f), VEPSILON3))
         {
             printf("ERROR: Project(2) %f %f %f ... 231.296143 265.606598 0.993776858\n", p.x, p.y, p.z);
             success = false;
@@ -5375,14 +5374,14 @@ int TestVP()
             success = false;
         }
 
-        p = vp2.Unproject(Vector3(231.f,265.f,0.993776858), proj, view, world);
+        p = vp2.Unproject(Vector3(231.f,265.f,0.993776858f), proj, view, world);
         if (!XMVector3NearEqual(p, Vector3(0.488145798f, 0.748996973f, 0.260956854f), VEPSILON3))
         {
             printf("ERROR: Unproject %f %f %f ... 0.488145798 0.748996973 0.260956854\n", p.x, p.y, p.z);
             success = false;
         }
 
-        vp2.Unproject(Vector3(231.f, 265.f, 0.993776858), proj, view, world, r);
+        vp2.Unproject(Vector3(231.f, 265.f, 0.993776858f), proj, view, world, r);
         if (!XMVector3NearEqual(r, Vector3(0.488145798f, 0.748996973f, 0.260956854f), VEPSILON3))
         {
             printf("ERROR: Unproject(2) %f %f %f ... 0.488145798 0.748996973 0.260956854\n", p.x, p.y, p.z);
