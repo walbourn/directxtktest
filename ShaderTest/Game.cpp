@@ -16,8 +16,6 @@
 #include "pch.h"
 #include "Game.h"
 
-#include "PlatformHelpers.h"
-
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
@@ -67,7 +65,6 @@ namespace
         static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
     };
 
-
     const D3D11_INPUT_ELEMENT_DESC TestVertex::InputElements[] =
     {
         { "SV_Position",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -80,10 +77,10 @@ namespace
         { "COLOR",        0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
+    using VertexCollection = std::vector<TestVertex>;
+    using IndexCollection = std::vector<uint16_t>;
 
-    typedef std::vector<TestVertex> VertexCollection;
-    typedef std::vector<uint16_t> IndexCollection;
-
+    struct aligned_deleter { void operator()(void* p) noexcept { _aligned_free(p); } };
 
     // Helper for computing tangents (see DirectXMesh <http://go.microsoft.com/fwlink/?LinkID=324981>)
     void ComputeTangents(const IndexCollection& indices, VertexCollection& vertices)
