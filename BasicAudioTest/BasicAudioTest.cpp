@@ -39,6 +39,7 @@
 
 using namespace DirectX;
 
+#define TEST_SINE_WAVE
 #define TEST_LIMITER
 #define TEST_SOUNDEFFECT
 #define TEST_WAVEBANK
@@ -59,94 +60,96 @@ using namespace DirectX;
         return 1; \
     }
 
-
-//--------------------------------------------------------------------------------------
-void dump_stats( _In_ AudioEngine* engine )
+namespace
 {
-    auto stats = engine->GetStatistics();
+    //----------------------------------------------------------------------------------
+    void dump_stats(_In_ AudioEngine* engine)
+    {
+        auto stats = engine->GetStatistics();
 
-    printf( "\nPlaying: %zu / %zu; Instances %zu; Voices %zu / %zu / %zu / %zu; %zu audio bytes\n",
+        printf("\nPlaying: %zu / %zu; Instances %zu; Voices %zu / %zu / %zu / %zu; %zu audio bytes\n",
             stats.playingOneShots, stats.playingInstances,
             stats.allocatedInstances, stats.allocatedVoices, stats.allocatedVoices3d,
             stats.allocatedVoicesOneShot, stats.allocatedVoicesIdle,
-            stats.audioBytes );
-}
-
-
-//--------------------------------------------------------------------------------------
-const char* GetFormatTagName( DWORD tag )
-{
-    switch( tag )
-    {
-    case WAVE_FORMAT_PCM: return "PCMi"; 
-    case WAVE_FORMAT_IEEE_FLOAT: return "PCMf";
-    case WAVE_FORMAT_ADPCM: return "ADPCM";
-    case WAVE_FORMAT_WMAUDIO2: return "WMAUDIO2";
-    case WAVE_FORMAT_WMAUDIO3: return "WMAUDIO3";
-    case 0x166 /* WAVE_FORMAT_XMA2 */: return "XMA2";
-    default: return "*Unknown*"; break;
+            stats.audioBytes);
     }
-}
 
-void dump_wfx( const WAVEFORMATEX *wfx )
-{
-    if ( wfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE )
+
+    //----------------------------------------------------------------------------------
+    const char* GetFormatTagName(DWORD tag)
     {
-        if ( wfx->cbSize < ( sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX) ) )
+        switch (tag)
         {
-            printf( "\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
-                    wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec );
-            printf( "\tERROR: Invalid WAVE_FORMAT_EXTENSIBLE\n" );
+        case WAVE_FORMAT_PCM: return "PCMi";
+        case WAVE_FORMAT_IEEE_FLOAT: return "PCMf";
+        case WAVE_FORMAT_ADPCM: return "ADPCM";
+        case WAVE_FORMAT_WMAUDIO2: return "WMAUDIO2";
+        case WAVE_FORMAT_WMAUDIO3: return "WMAUDIO3";
+        case 0x166 /* WAVE_FORMAT_XMA2 */: return "XMA2";
+        default: return "*Unknown*"; break;
         }
-        else
+    }
+
+    void dump_wfx(const WAVEFORMATEX* wfx)
+    {
+        if (wfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
         {
-            static const GUID s_wfexBase = {0x00000000, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71};
-
-            auto wfex = reinterpret_cast<const WAVEFORMATEXTENSIBLE*>( wfx );
-
-            if ( memcmp( reinterpret_cast<const BYTE*>(&wfex->SubFormat) + sizeof(DWORD),
-                         reinterpret_cast<const BYTE*>(&s_wfexBase) + sizeof(DWORD), sizeof(GUID) - sizeof(DWORD) ) != 0 )
+            if (wfx->cbSize < (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))
             {
-                printf( "\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
-                        wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec );
-                printf( "\tERROR: Unknown EXTENSIBLE SubFormat {%8.8lX-%4.4X-%4.4X-%2.2X%2.2X-%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X}\n",
-                        wfex->SubFormat.Data1, wfex->SubFormat.Data2, wfex->SubFormat.Data3,
-                        wfex->SubFormat.Data4[0], wfex->SubFormat.Data4[1], wfex->SubFormat.Data4[2], wfex->SubFormat.Data4[3], 
-                        wfex->SubFormat.Data4[4], wfex->SubFormat.Data4[5], wfex->SubFormat.Data4[6], wfex->SubFormat.Data4[7] );
+                printf("\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                    wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
+                printf("\tERROR: Invalid WAVE_FORMAT_EXTENSIBLE\n");
             }
             else
             {
-                printf( "\tEXTENSIBLE %s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
-                        GetFormatTagName( wfex->SubFormat.Data1 ), wfex->SubFormat.Data1, 
-                        wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec );
-                printf( "\t\t%u samples per block, %u valid bps, %u channel mask",
-                        wfex->Samples.wSamplesPerBlock, wfex->Samples.wValidBitsPerSample, wfex->dwChannelMask );
+                static const GUID s_wfexBase = { 0x00000000, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71 };
+
+                auto wfex = reinterpret_cast<const WAVEFORMATEXTENSIBLE*>(wfx);
+
+                if (memcmp(reinterpret_cast<const BYTE*>(&wfex->SubFormat) + sizeof(DWORD),
+                    reinterpret_cast<const BYTE*>(&s_wfexBase) + sizeof(DWORD), sizeof(GUID) - sizeof(DWORD)) != 0)
+                {
+                    printf("\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                        wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
+                    printf("\tERROR: Unknown EXTENSIBLE SubFormat {%8.8lX-%4.4X-%4.4X-%2.2X%2.2X-%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X}\n",
+                        wfex->SubFormat.Data1, wfex->SubFormat.Data2, wfex->SubFormat.Data3,
+                        wfex->SubFormat.Data4[0], wfex->SubFormat.Data4[1], wfex->SubFormat.Data4[2], wfex->SubFormat.Data4[3],
+                        wfex->SubFormat.Data4[4], wfex->SubFormat.Data4[5], wfex->SubFormat.Data4[6], wfex->SubFormat.Data4[7]);
+                }
+                else
+                {
+                    printf("\tEXTENSIBLE %s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                        GetFormatTagName(wfex->SubFormat.Data1), wfex->SubFormat.Data1,
+                        wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
+                    printf("\t\t%u samples per block, %u valid bps, %u channel mask",
+                        wfex->Samples.wSamplesPerBlock, wfex->Samples.wValidBitsPerSample, wfex->dwChannelMask);
+                }
             }
         }
+        else
+        {
+            printf("\t%s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                GetFormatTagName(wfx->wFormatTag), wfx->wFormatTag,
+                wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
+        }
     }
-    else
+
+
+    //----------------------------------------------------------------------------------
+    void GenerateSineWave(_Out_writes_(sampleRate) int16_t* data, int sampleRate, int frequency)
     {
-        printf( "\t%s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
-                GetFormatTagName( wfx->wFormatTag ), wfx->wFormatTag,
-                wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec );
-    }
-}
+        const double timeStep = 1.0 / double(sampleRate);
+        const double freq = double(frequency);
 
-
-//--------------------------------------------------------------------------------------
-void GenerateSineWave( _Out_writes_(sampleRate) int16_t* data, int sampleRate, int frequency )
-{
-    const double timeStep = 1.0 / double(sampleRate);
-    const double freq = double(frequency);
-
-    int16_t* ptr = data;
-    double time = 0.0;
-    for( int j = 0; j < sampleRate; ++j, ++ptr )
-    {
-        double angle = ( 2.0 * XM_PI * freq ) * time;
-        double factor = 0.5 * ( sin(angle) + 1.0 );
-        *ptr = int16_t( 32768 * factor );
-        time += timeStep;
+        int16_t* ptr = data;
+        double time = 0.0;
+        for (int j = 0; j < sampleRate; ++j, ++ptr)
+        {
+            double angle = (2.0 * XM_PI * freq) * time;
+            double factor = 0.5 * (sin(angle) + 1.0);
+            *ptr = int16_t(32768 * factor);
+            time += timeStep;
+        }
     }
 }
 
@@ -283,6 +286,7 @@ int __cdecl main()
 
     printf("\tPASS\n");
 
+#ifdef TEST_SINE_WAVE
 
     //
     // SoundEffect/SoundEffectInstance
@@ -440,6 +444,8 @@ int __cdecl main()
 
         audEngine->SetMasterVolume( 1.f  );
     };
+
+#endif // TEST_SINE_WAVE
 
 #ifdef TEST_SOUNDEFFECT
     { // PCM .WAV
@@ -2499,7 +2505,8 @@ int __cdecl main()
    
         audEngine.reset();
     }
-#endif
+
+#endif // TEST_SHUTDOWN
 
     //
     // Cleanup Audio

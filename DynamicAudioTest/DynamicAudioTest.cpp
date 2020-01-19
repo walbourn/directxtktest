@@ -33,11 +33,13 @@
 
 using namespace DirectX;
 
-#define TEST_DYNAMICSOUNDEFFECT
-
+#define TEST_SINE_WAVE
+#define TEST_MF_STREAMING
 
 //--------------------------------------------------------------------------------------
-#include <wrl.h>
+#include <wrl/client.h>
+
+using Microsoft::WRL::ComPtr;
 
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
 #pragma comment(lib,"mfplat.lib")
@@ -74,151 +76,151 @@ using namespace DirectX;
         return 1; \
     }
 
-
-//--------------------------------------------------------------------------------------
-const char* GetFormatTagName( DWORD tag )
+namespace
 {
-    switch( tag )
+    //----------------------------------------------------------------------------------
+    const char* GetFormatTagName(DWORD tag)
     {
-    case WAVE_FORMAT_PCM: return "PCMi"; 
-    case WAVE_FORMAT_IEEE_FLOAT: return "PCMf";
-    case WAVE_FORMAT_ADPCM: return "ADPCM";
-    case WAVE_FORMAT_WMAUDIO2: return "WMAUDIO2";
-    case WAVE_FORMAT_WMAUDIO3: return "WMAUDIO3";
-    case 0x166 /* WAVE_FORMAT_XMA2 */: return "XMA2";
-    default: return "*Unknown*"; break;
-    }
-}
-
-void dump_wfx( const WAVEFORMATEX *wfx )
-{
-    if ( wfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE )
-    {
-        if ( wfx->cbSize < ( sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX) ) )
+        switch (tag)
         {
-            printf( "\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
-                    wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec );
-            printf( "\tERROR: Invalid WAVE_FORMAT_EXTENSIBLE\n" );
+        case WAVE_FORMAT_PCM: return "PCMi";
+        case WAVE_FORMAT_IEEE_FLOAT: return "PCMf";
+        case WAVE_FORMAT_ADPCM: return "ADPCM";
+        case WAVE_FORMAT_WMAUDIO2: return "WMAUDIO2";
+        case WAVE_FORMAT_WMAUDIO3: return "WMAUDIO3";
+        case 0x166 /* WAVE_FORMAT_XMA2 */: return "XMA2";
+        default: return "*Unknown*"; break;
         }
-        else
+    }
+
+    void dump_wfx(const WAVEFORMATEX* wfx)
+    {
+        if (wfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
         {
-            static const GUID s_wfexBase = {0x00000000, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71};
-
-            auto wfex = reinterpret_cast<const WAVEFORMATEXTENSIBLE*>( wfx );
-
-            if ( memcmp( reinterpret_cast<const BYTE*>(&wfex->SubFormat) + sizeof(DWORD),
-                         reinterpret_cast<const BYTE*>(&s_wfexBase) + sizeof(DWORD), sizeof(GUID) - sizeof(DWORD) ) != 0 )
+            if (wfx->cbSize < (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))
             {
-                printf( "\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
-                        wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec );
-                printf( "\tERROR: Unknown EXTENSIBLE SubFormat {%8.8lX-%4.4X-%4.4X-%2.2X%2.2X-%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X}\n",
-                        wfex->SubFormat.Data1, wfex->SubFormat.Data2, wfex->SubFormat.Data3,
-                        wfex->SubFormat.Data4[0], wfex->SubFormat.Data4[1], wfex->SubFormat.Data4[2], wfex->SubFormat.Data4[3], 
-                        wfex->SubFormat.Data4[4], wfex->SubFormat.Data4[5], wfex->SubFormat.Data4[6], wfex->SubFormat.Data4[7] );
+                printf("\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                    wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
+                printf("\tERROR: Invalid WAVE_FORMAT_EXTENSIBLE\n");
             }
             else
             {
-                printf( "\tEXTENSIBLE %s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
-                        GetFormatTagName( wfex->SubFormat.Data1 ), wfex->SubFormat.Data1, 
-                        wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec );
-                printf( "\t\t%u samples per block, %u valid bps, %u channel mask",
-                        wfex->Samples.wSamplesPerBlock, wfex->Samples.wValidBitsPerSample, wfex->dwChannelMask );
+                static const GUID s_wfexBase = { 0x00000000, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71 };
+
+                auto wfex = reinterpret_cast<const WAVEFORMATEXTENSIBLE*>(wfx);
+
+                if (memcmp(reinterpret_cast<const BYTE*>(&wfex->SubFormat) + sizeof(DWORD),
+                    reinterpret_cast<const BYTE*>(&s_wfexBase) + sizeof(DWORD), sizeof(GUID) - sizeof(DWORD)) != 0)
+                {
+                    printf("\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                        wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
+                    printf("\tERROR: Unknown EXTENSIBLE SubFormat {%8.8lX-%4.4X-%4.4X-%2.2X%2.2X-%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X}\n",
+                        wfex->SubFormat.Data1, wfex->SubFormat.Data2, wfex->SubFormat.Data3,
+                        wfex->SubFormat.Data4[0], wfex->SubFormat.Data4[1], wfex->SubFormat.Data4[2], wfex->SubFormat.Data4[3],
+                        wfex->SubFormat.Data4[4], wfex->SubFormat.Data4[5], wfex->SubFormat.Data4[6], wfex->SubFormat.Data4[7]);
+                }
+                else
+                {
+                    printf("\tEXTENSIBLE %s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                        GetFormatTagName(wfex->SubFormat.Data1), wfex->SubFormat.Data1,
+                        wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
+                    printf("\t\t%u samples per block, %u valid bps, %u channel mask",
+                        wfex->Samples.wSamplesPerBlock, wfex->Samples.wValidBitsPerSample, wfex->dwChannelMask);
+                }
             }
         }
+        else
+        {
+            printf("\t%s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                GetFormatTagName(wfx->wFormatTag), wfx->wFormatTag,
+                wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
+        }
     }
-    else
+
+
+    //----------------------------------------------------------------------------------
+    void GenerateSineWave(_Out_writes_(sampleRate) int16_t* data, int sampleRate, int frequency)
     {
-        printf( "\t%s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
-                GetFormatTagName( wfx->wFormatTag ), wfx->wFormatTag,
-                wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec );
+        const double timeStep = 1.0 / double(sampleRate);
+        const double freq = double(frequency);
+
+        int16_t* ptr = data;
+        double time = 0.0;
+        for (int j = 0; j < sampleRate; ++j, ++ptr)
+        {
+            double angle = (2.0 * XM_PI * freq) * time;
+            double factor = 0.5 * (sin(angle) + 1.0);
+            *ptr = int16_t(32768 * factor);
+            time += timeStep;
+        }
     }
-}
 
 
-//--------------------------------------------------------------------------------------
-void GenerateSineWave( _Out_writes_(sampleRate) int16_t* data, int sampleRate, int frequency )
-{
-    const double timeStep = 1.0 / double(sampleRate);
-    const double freq = double(frequency);
-
-    int16_t* ptr = data;
-    double time = 0.0;
-    for( int j = 0; j < sampleRate; ++j, ++ptr )
+    //----------------------------------------------------------------------------------
+    HRESULT CreateMFReader(_In_z_ const wchar_t* mediaFile, _Outptr_ IMFSourceReader** reader, _Out_ WAVEFORMATEX* wfx, _In_ size_t maxwfx)
     {
-        double angle = ( 2.0 * XM_PI * freq ) * time;
-        double factor = 0.5 * ( sin(angle) + 1.0 );
-        *ptr = int16_t( 32768 * factor );
-        time += timeStep;
-    }
-}
+        if (!mediaFile || !reader || !wfx)
+            return E_INVALIDARG;
 
-
-//--------------------------------------------------------------------------------------
-HRESULT CreateMFReader(_In_z_ const wchar_t* mediaFile, _Outptr_ IMFSourceReader ** reader, _Out_ WAVEFORMATEX* wfx, _In_ size_t maxwfx)
-{
-    using namespace Microsoft::WRL;
-
-    if (!mediaFile || !reader || !wfx)
-        return E_INVALIDARG;
-
-    HRESULT hr;
-    ComPtr<IMFAttributes> attr;
+        HRESULT hr;
+        ComPtr<IMFAttributes> attr;
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
-    hr = MFCreateAttributes(attr.GetAddressOf(), 2);
-    if (FAILED(hr))
-        return hr;
+        hr = MFCreateAttributes(attr.GetAddressOf(), 2);
+        if (FAILED(hr))
+            return hr;
 
-    hr = attr->SetUINT32(MF_LOW_LATENCY, TRUE);
+        hr = attr->SetUINT32(MF_LOW_LATENCY, TRUE);
 #else
-    hr = MFCreateAttributes(attr.GetAddressOf(), 1);
+        hr = MFCreateAttributes(attr.GetAddressOf(), 1);
 #endif
-    if (FAILED(hr))
-        return hr;
+        if (FAILED(hr))
+            return hr;
 
-    hr = MFCreateSourceReaderFromURL(mediaFile, attr.Get(), reader);
-    if (FAILED(hr))
-        return hr;
+        hr = MFCreateSourceReaderFromURL(mediaFile, attr.Get(), reader);
+        if (FAILED(hr))
+            return hr;
 
-    //
-    // Make the output from Media Foundation PCM so XAudio2 can consume it
-    //
+        //
+        // Make the output from Media Foundation PCM so XAudio2 can consume it
+        //
 
-    ComPtr<IMFMediaType> mediaType;
-    hr = MFCreateMediaType(mediaType.GetAddressOf());
-    if (FAILED(hr))
-        return hr;
+        ComPtr<IMFMediaType> mediaType;
+        hr = MFCreateMediaType(mediaType.GetAddressOf());
+        if (FAILED(hr))
+            return hr;
 
-    hr = mediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
-    if (FAILED(hr))
-        return hr;
+        hr = mediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
+        if (FAILED(hr))
+            return hr;
 
-    hr = mediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
-    if (FAILED(hr))
-        return hr;
+        hr = mediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
+        if (FAILED(hr))
+            return hr;
 
-    hr = (*reader)->SetCurrentMediaType( DWORD(MF_SOURCE_READER_FIRST_AUDIO_STREAM), 0, mediaType.Get());
-    if (FAILED(hr))
-        return hr;
+        hr = (*reader)->SetCurrentMediaType(DWORD(MF_SOURCE_READER_FIRST_AUDIO_STREAM), nullptr, mediaType.Get());
+        if (FAILED(hr))
+            return hr;
 
-    //
-    // Get the wave format
-    //
+        //
+        // Get the wave format
+        //
 
-    ComPtr<IMFMediaType> outputMediaType;
-    hr = (*reader)->GetCurrentMediaType( DWORD(MF_SOURCE_READER_FIRST_AUDIO_STREAM), outputMediaType.GetAddressOf());
-    if (FAILED(hr))
-        return hr;
+        ComPtr<IMFMediaType> outputMediaType;
+        hr = (*reader)->GetCurrentMediaType(DWORD(MF_SOURCE_READER_FIRST_AUDIO_STREAM), outputMediaType.GetAddressOf());
+        if (FAILED(hr))
+            return hr;
 
-    UINT32 waveFormatSize = 0;
-    WAVEFORMATEX* waveFormat = nullptr;
-    hr = MFCreateWaveFormatExFromMFMediaType(outputMediaType.Get(), &waveFormat, &waveFormatSize);
-    if (FAILED(hr))
-        return hr;
+        UINT32 waveFormatSize = 0;
+        WAVEFORMATEX* waveFormat = nullptr;
+        hr = MFCreateWaveFormatExFromMFMediaType(outputMediaType.Get(), &waveFormat, &waveFormatSize);
+        if (FAILED(hr))
+            return hr;
 
-    memcpy_s(wfx, maxwfx, waveFormat, waveFormatSize);
-    CoTaskMemFree(waveFormat);
+        memcpy_s(wfx, maxwfx, waveFormat, waveFormatSize);
+        CoTaskMemFree(waveFormat);
 
-    return S_OK;
+        return S_OK;
+    }
 }
 
 
@@ -289,11 +291,11 @@ int __cdecl main()
 
     printf("\tPASS\n");
 
+#ifdef TEST_SINE_WAVE
+
     //
     // DynamicSoundEffectInstance constructor
     //
-
-#ifdef TEST_DYNAMICSOUNDEFFECT
 
     printf("\nCreating dynamic sound effect instance in various formats\n");
 
@@ -601,7 +603,9 @@ int __cdecl main()
 
     printf("\n\tPASS\n");
 
-#endif // TEST_DYNAMICSOUNDEFFECT
+#endif // TEST_SINE_WAVE
+
+#ifdef TEST_MF_STREAMING
 
     //
     // Streaming implementation test
@@ -609,8 +613,9 @@ int __cdecl main()
 
     printf("\n\nStreaming test\n");
 
+    bool abort = false;
+
     {
-        using namespace Microsoft::WRL;
         #define MAX_BUFFER_COUNT 12
 
         if ( FAILED( MFStartup(MF_VERSION) ) )
@@ -659,8 +664,6 @@ int __cdecl main()
         std::unique_ptr<DynamicSoundEffectInstance> effect( new DynamicSoundEffectInstance( audEngine.get(),
             [&reader, &currentStreamBuffer, &bufferSize, &buffers, &endofstream](DynamicSoundEffectInstance* effect)
             {
-                using namespace Microsoft::WRL;
-
                 if (endofstream)
                     return;
 
@@ -719,27 +722,46 @@ int __cdecl main()
             if ( endofstream && !effect->GetPendingBufferCount() )
                 break;
 
+            if (GetAsyncKeyState(VK_ESCAPE))
+            {
+                while (GetAsyncKeyState(VK_ESCAPE))
+                    Sleep(10);
+                abort = true;
+                break;
+            }
+
             printf(".");
             Sleep(1000);
         }
 
-        ULONGLONG dur = GetTickCount64() - startTick;
-
-        if (dur < effectDur)
+        if (!abort)
         {
-            printf("\nERROR: Play() time (%llu) was unexpectedly short (%llu)\n", dur, effectDur);
-            return 1;
+            ULONGLONG dur = GetTickCount64() - startTick;
+
+            if (dur < effectDur)
+            {
+                printf("\nERROR: Play() time (%llu) was unexpectedly short (%llu)\n", dur, effectDur);
+                return 1;
+            }
+            else if (dur > (effectDur + 5000))
+            {
+                printf("\nERROR: Play() time (%llu) was unexpectedly long (%llu)\n", dur, effectDur);
+                return 1;
+            }
+
+            printf("\n\tPASS\n");
         }
-        else if (dur >(effectDur + 5000))
+        else
         {
-            printf("\nERROR: Play() time (%llu) was unexpectedly long (%llu)\n", dur, effectDur);
-            return 1;
+            printf("\n\tAborted...\n");
         }
 
-        printf("\n\tPASS\n");
     }
 
-    printf( "\nDONE\n");
+    if (!abort)
+        printf( "\nDONE\n");
+
+#endif // TEST_MF_STREAMING
 
     //
     // Cleanup Audio
