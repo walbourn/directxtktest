@@ -130,7 +130,7 @@ private:
     DirectX::SimpleMath::Matrix             m_view;
     DirectX::SimpleMath::Matrix             m_projection;
 
-    std::unique_ptr<DirectX::XMMATRIX[], DirectX::aligned_deleter> m_bones;
+    DirectX::ModelBone::TransformArray      m_bones;
 
     bool m_spinning;
     float m_pitch;
