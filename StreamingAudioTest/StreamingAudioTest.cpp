@@ -183,13 +183,15 @@ int __cdecl main()
         char buff[64] = {};
         auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
 
-        for (size_t j = 0; j < 3; ++j)
+        for (uint32_t j = 0; j < 3; ++j)
         {
             printf("\tIndex #%zu (%zu bytes, %zu samples, %zu ms)\n",
                 j, wb->GetSampleSizeInBytes(j), wb->GetSampleDuration(j), wb->GetSampleDurationMS(j));
             dump_wfx(wb->GetFormat(j, wfx, 64));
         }
 
+
+        auto stream1 = wb->CreateStreamInstance(0u);
 
         // TODO -
     }
