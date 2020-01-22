@@ -101,7 +101,7 @@ void Game::Initialize(
 
         try
         {
-            std::unique_ptr<Keyboard> kb2(new Keyboard);
+            auto kb2 = std::make_unique<Keyboard>();
         }
         catch (...)
         {

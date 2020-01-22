@@ -91,7 +91,7 @@ void Game::Initialize(
 
         try
         {
-            std::unique_ptr<GamePad> gamePad2(new GamePad);
+            auto gamePad2 = std::make_unique<GamePad>();
         }
         catch (...)
         {

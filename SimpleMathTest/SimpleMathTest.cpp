@@ -1846,7 +1846,7 @@ int TestV2()
             Vector2(10, 20),
         };
 
-        std::unique_ptr<Vector2[]> buff(new Vector2[_countof(points)]);
+        auto buff = std::make_unique<Vector2[]>(_countof(points));
 
         Vector2::Transform(&points[0], _countof(points), m, buff.get());
 
@@ -1861,7 +1861,7 @@ int TestV2()
             }
         }
 
-        std::unique_ptr<Vector4[]> buff4(new Vector4[_countof(points)]);
+        auto buff4 = std::make_unique<Vector4[]>(_countof(points));
 
         Vector2::Transform(&points[0], _countof(points), m, buff4.get());
 
@@ -1891,7 +1891,7 @@ int TestV2()
             Vector2(10, 20),
         };
 
-        std::unique_ptr<Vector2[]> buff(new Vector2[_countof(points)]);
+        auto buff = std::make_unique<Vector2[]>(_countof(points));
 
         Vector2::TransformNormal(&points[0], _countof(points), m, buff.get());
 
@@ -2794,7 +2794,7 @@ int TestV3()
             Vector3(10, 20, 30),
         };
 
-        std::unique_ptr<Vector3[]> buff(new Vector3[_countof(points)]);
+        auto buff = std::make_unique<Vector3[]>(_countof(points));
 
         Vector3::Transform(&points[0], _countof(points), m, buff.get());
 
@@ -2809,7 +2809,7 @@ int TestV3()
             }
         }
 
-        std::unique_ptr<Vector4[]> buff4(new Vector4[_countof(points)]);
+        auto buff4 = std::make_unique<Vector4[]>(_countof(points));
 
         Vector3::Transform(&points[0], _countof(points), m, buff4.get());
 
@@ -2839,7 +2839,7 @@ int TestV3()
             Vector3(10, 20, 30),
         };
 
-        std::unique_ptr<Vector3[]> buff(new Vector3[_countof(points)]);
+        auto buff = std::make_unique<Vector3[]>(_countof(points));
 
         Vector3::TransformNormal(&points[0], _countof(points), m, buff.get());
 
@@ -3770,7 +3770,7 @@ int TestV4()
             Vector4(10, 20, 30, 1.f),
         };
 
-        std::unique_ptr<Vector4[]> buff(new Vector4[_countof(points)]);
+        auto buff = std::make_unique<Vector4[]>(_countof(points));
         
         Vector4::Transform( &points[0], _countof(points), m, buff.get() );
 

@@ -212,7 +212,7 @@ int __cdecl main()
         testwfx.nChannels = 1;
         testwfx.nSamplesPerSec = 22100;
 
-        std::unique_ptr<AudioEngine> audEngine( new AudioEngine( eflags, &testwfx, enumList[0].deviceId.c_str() ) ); 
+        auto audEngine = std::make_unique<AudioEngine>(eflags, &testwfx, enumList[0].deviceId.c_str());
 
         {
             auto output = audEngine->GetOutputFormat();
@@ -246,7 +246,7 @@ int __cdecl main()
     // Use default for rest of tests
     printf("\nTrying default device\n");
 
-    std::unique_ptr<AudioEngine> audEngine( new AudioEngine( eflags ) );
+    auto audEngine = std::make_unique<AudioEngine>(eflags);
 
     {
         auto output = audEngine->GetOutputFormat();
@@ -294,7 +294,7 @@ int __cdecl main()
 
     { // PCM Sine Wave
         size_t audioSize = 44100 * 2;
-        std::unique_ptr<uint8_t[]> wavData( new uint8_t[ audioSize + sizeof(WAVEFORMATEX) ] );
+        auto wavData = std::make_unique<uint8_t[]>(audioSize + sizeof(WAVEFORMATEX));
 
         auto audioStart = wavData.get() + sizeof(WAVEFORMATEX);
 
@@ -310,7 +310,7 @@ int __cdecl main()
         wfx->cbSize = 0;
         dump_wfx( wfx );
 
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), wavData, wfx, audioStart, audioSize ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), wavData, wfx, audioStart, audioSize);
 
         printf( "\n\nINFO: PCM-A440 sine wave (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
@@ -449,7 +449,7 @@ int __cdecl main()
 
 #ifdef TEST_SOUNDEFFECT
     { // PCM .WAV
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"MusicMono.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"MusicMono.wav");
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
@@ -770,7 +770,7 @@ int __cdecl main()
     }
 
     { // PCM .WAV (Stereo)
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"Alarm01.wav");
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
@@ -1091,7 +1091,7 @@ int __cdecl main()
     }
 
     { // PCM .WAV (Multichannel)
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"MusicSurround.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"MusicSurround.wav");
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
@@ -1394,7 +1394,7 @@ int __cdecl main()
     }
 
     { // PCM float .WAV
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"HipHoppy_float.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"HipHoppy_float.wav");
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
@@ -1437,7 +1437,7 @@ int __cdecl main()
     }
 
     { // ADPCM .WAV
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"electro_adpcm.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"electro_adpcm.wav");
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
@@ -1482,7 +1482,7 @@ int __cdecl main()
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
 
     { // xWMA .WAV
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"musicmono_xwma.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"musicmono_xwma.wav");
 
         size_t effectDur = soundEffect->GetSampleDurationMS();
 
@@ -1528,7 +1528,7 @@ int __cdecl main()
 
     // SoundEffect One-shots
     { // PCM .WAV one-shots
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"Alarm01.wav");
         printf( "\n\nINFO: Loaded Alarm01.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
 
@@ -1743,7 +1743,7 @@ int __cdecl main()
     }
 
     { // PCM float .WAV one-shots
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01_float.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"Alarm01_float.wav");
         printf( "\n\nINFO: Loaded Alarm01_float.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
 
@@ -1789,7 +1789,7 @@ int __cdecl main()
     }
 
     { // ADPCM .WAV one-shots
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01_adpcm.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"Alarm01_adpcm.wav");
         printf( "\n\nINFO: Loaded Alarm01_adpcm.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
 
@@ -1837,7 +1837,7 @@ int __cdecl main()
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
 
     { // xWMA .WAV one-shots
-        std::unique_ptr<SoundEffect> soundEffect( new SoundEffect( audEngine.get(), L"Alarm01_xwma.wav" ) );
+        auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"Alarm01_xwma.wav");
         printf( "\n\nINFO: Loaded Alarm01_xwma.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), soundEffect->GetSampleDurationMS() );
 
@@ -1892,7 +1892,7 @@ int __cdecl main()
     //
 
     { // Compact WaveBank validation
-        std::unique_ptr<WaveBank> wb( new WaveBank( audEngine.get(), L"compact.xwb" ) );
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"compact.xwb");
         printf( "\n\nINFO: Loaded compact.xwb\n" );
 
         if ( wb->Find( "Test" ) != -1 )
@@ -1960,7 +1960,7 @@ int __cdecl main()
     }
 
     { // WaveBank validation
-        std::unique_ptr<WaveBank> wb( new WaveBank( audEngine.get(), L"wavebank.xwb" ) );
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"wavebank.xwb");
         printf( "\n\nINFO: Loaded wavebank.xwb\n" );
 
         if ( wb->Find( "Test" ) != -1 )
@@ -2028,7 +2028,7 @@ int __cdecl main()
     }
 
     { // PCM WaveBank
-        std::unique_ptr<WaveBank> wb( new WaveBank( audEngine.get(), L"droid.xwb" ) );
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"droid.xwb");
         printf( "\n\nINFO: Loaded droid.xwb\n" );
 
         if ( wb->Find( "Test" ) != -1 )
@@ -2243,7 +2243,7 @@ int __cdecl main()
     }
 
     { // ADPCM WaveBank
-        std::unique_ptr<WaveBank> wb( new WaveBank( audEngine.get(), L"adpcmdroid.xwb" ) );
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"adpcmdroid.xwb");
         printf( "\n\nINFO: Loaded adpcmdroid.xwb\n" );
 
         if ( ( wb->Find( "Rumble2" ) != -1 )
@@ -2349,7 +2349,7 @@ int __cdecl main()
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/ )
 
     { // xWMV WaveBank
-        std::unique_ptr<WaveBank> wb( new WaveBank( audEngine.get(), L"xwmadroid.xwb" ) );
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"xwmadroid.xwb");
         printf( "\n\nINFO: Loaded xwmadroid.xwb\n" );
 
         char buff[64];
@@ -2476,9 +2476,9 @@ int __cdecl main()
 #ifdef TEST_SHUTDOWN
 
     {
-        std::unique_ptr<SoundEffect> music( new SoundEffect( audEngine.get(), L"MusicMono.wav" ) );
-        std::unique_ptr<SoundEffect> alarm( new SoundEffect( audEngine.get(), L"Alarm01.wav" ) );
-        std::unique_ptr<WaveBank> wb( new WaveBank( audEngine.get(), L"droid.xwb" ) );
+        auto music = std::make_unique<SoundEffect>(audEngine.get(), L"MusicMono.wav");
+        auto alarm = std::make_unique<SoundEffect>(audEngine.get(), L"Alarm01.wav");
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"droid.xwb");
 
         printf("Force shutdown test...\n");
         auto loop = music->CreateInstance();

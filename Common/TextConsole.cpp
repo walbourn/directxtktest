@@ -42,6 +42,9 @@ TextConsole::TextConsole(ID3D11DeviceContext* context, const wchar_t* fontName)
 
 void TextConsole::Render()
 {
+    if (!m_lines)
+        return;
+
     std::lock_guard<std::mutex> lock(m_mutex);
 
     float lineSpacing = m_font->GetLineSpacing();
@@ -162,10 +165,10 @@ void TextConsole::SetWindow(const RECT& layout)
     RECT fontLayout = m_font->MeasureDrawBounds(L"X", XMFLOAT2(0,0));
     unsigned int columns = std::max<unsigned int>(1, static_cast<unsigned int>(float(layout.right - layout.left) / float(fontLayout.right - fontLayout.left)));
 
-    std::unique_ptr<wchar_t[]> buffer(new wchar_t[(columns + 1) * rows]);
+    auto buffer = std::make_unique<wchar_t[]>((columns + 1) * rows);
     memset(buffer.get(), 0, sizeof(wchar_t) * (columns + 1) * rows);
 
-    std::unique_ptr<wchar_t*[]> lines(new wchar_t*[rows]);
+    auto lines = std::make_unique<wchar_t* []>(rows);
     for (unsigned int line = 0; line < rows; ++line)
     {
         lines[line] = buffer.get() + (columns + 1) * line;
