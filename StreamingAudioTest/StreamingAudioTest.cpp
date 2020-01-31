@@ -185,7 +185,7 @@ int __cdecl main()
 
         for (uint32_t j = 0; j < 3; ++j)
         {
-            printf("\tIndex #%zu (%zu bytes, %zu samples, %zu ms)\n",
+            printf("\tIndex #%u (%zu bytes, %zu samples, %zu ms)\n",
                 j, wb->GetSampleSizeInBytes(j), wb->GetSampleDuration(j), wb->GetSampleDurationMS(j));
             dump_wfx(wb->GetFormat(j, wfx, 64));
         }
