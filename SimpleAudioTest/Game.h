@@ -115,7 +115,7 @@ private:
     std::unique_ptr<DirectX::SoundEffect>   m_alarmADPCM;
     std::unique_ptr<DirectX::SoundEffect>   m_alarmFLOAT;
 
-#if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
     std::unique_ptr<DirectX::SoundEffect>   m_alarmXWMA;
     std::unique_ptr<DirectX::WaveBank>      m_wbXWMA;
 #endif

@@ -22,7 +22,7 @@
     <ProjectGuid>{F7273BDA-F567-4172-9B5A-C8A9BAD5E968}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>DynamicAudioTestDX</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
