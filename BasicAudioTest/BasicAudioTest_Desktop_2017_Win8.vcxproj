@@ -164,9 +164,6 @@
     <ProjectReference Include="..\..\Audio\DirectXTKAudio_Desktop_2017_Win8.vcxproj">
       <Project>{4f150a30-cecb-49d1-8283-6a3f57438cf5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\DirectXTK_Desktop_2017.vcxproj">
-      <Project>{e0b52ae7-e160-4d32-bf3f-910b785e5a8e}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

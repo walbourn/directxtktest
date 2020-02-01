@@ -253,7 +253,7 @@ void Game::Initialize(
     m_console->Write(L"Alarm01_float.wav: ");
     dump_wfx(m_console.get(), m_alarmFLOAT->GetFormat());
 
-#if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
     m_alarmXWMA = std::make_unique<SoundEffect>(m_audEngine.get(), MEDIA_PATH L"Alarm01_xwma.wav");
     m_console->Write(L"Alarm01_xwma.wav: ");
     dump_wfx(m_console.get(), m_alarmXWMA->GetFormat());
@@ -290,7 +290,7 @@ void Game::Initialize(
         dump_wfx(m_console.get(), m_wbADPCM->GetFormat(8, wfx, 64));
     }
 
-#if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
     m_wbXWMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xwmadroid.xwb");
     m_console->WriteLine(L"xwmadroid.xwb");
     m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
@@ -387,7 +387,7 @@ void Game::Update(DX::StepTimer const&)
             m_wbADPCM->Play(8);
         }
 
-#if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
         if (m_gamepadButtons.b == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"xWMA alarm started");
@@ -453,7 +453,7 @@ void Game::Update(DX::StepTimer const&)
             m_wbADPCM->Play(8);
         }
 
-#if defined(_XBOX_ONE) || (_WIN32_WINNT < _WIN32_WINNT_WIN8) || (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
         if (m_keyboardButtons.IsKeyPressed(Keyboard::D2))
         {
             m_console->WriteLine(L"xWMA alarm started");
