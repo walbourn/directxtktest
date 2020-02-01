@@ -41,25 +41,13 @@ using namespace DirectX;
 
 using Microsoft::WRL::ComPtr;
 
-#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
-#pragma comment(lib,"mfplat.lib")
-#elif (_WIN32_WINNT < _WIN32_WINNT_WIN7 )
-#error This code needs _WIN32_WINNT set to 0x0601 or higher. It is compatible with Windows Vista with KB 2117917 installed
-#else
-// The magic incantation needed to get down-level MF Source Reader support...
-#define MF_SDK_VERSION 0x0001  
-#define MF_API_VERSION 0x0070 
-#define MF_VERSION (MF_SDK_VERSION << 16 | MF_API_VERSION)  
-#pragma comment(lib,"mfplat_vista.lib")
-#endif
-
 #include <initguid.h>
 #include <mfidl.h>
 #include <mfapi.h>
 #include <mfreadwrite.h>
 
 #pragma comment(lib,"mfreadwrite.lib")
-
+#pragma comment(lib,"mfplat.lib")
 
 //--------------------------------------------------------------------------------------
 #define UPDATE \
