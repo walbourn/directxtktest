@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.28307.1000
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicAudioTest_Desktop_2017_Win7", "BasicAudioTest\BasicAudioTest_Desktop_2017_Win7.vcxproj", "{C81EFCF2-0DD3-4BF6-BB74-B2CC876CFA4B}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DynamicAudioTest_Desktop_2017_Win7", "DynamicAudioTest\DynamicAudioTest_Desktop_2017_Win7.vcxproj", "{C0702EBA-C4C6-4530-9AE3-8D74BF7D7644}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleAudioTest_Desktop_2017_Win7", "SimpleAudioTest\SimpleAudioTest_Desktop_2017_Win7.vcxproj", "{C3281769-B603-4C38-A765-29F9EA00C84E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StreamingAudioTest_Desktop_2017_Win7", "StreamingAudioTest\StreamingAudioTest_Desktop_2017_Win7.vcxproj", "{49A006E0-354D-45B5-AE7B-2C2F92DF7928}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Audio", "Audio", "{FD69444F-455C-4728-BA27-13037801F259}"
 EndProject
@@ -73,6 +75,14 @@ Global
 		{C3281769-B603-4C38-A765-29F9EA00C84E}.Release|x64.Build.0 = Release|x64
 		{C3281769-B603-4C38-A765-29F9EA00C84E}.Release|x86.ActiveCfg = Release|Win32
 		{C3281769-B603-4C38-A765-29F9EA00C84E}.Release|x86.Build.0 = Release|Win32
+		{49A006E0-354D-45B5-AE7B-2C2F92DF7928}.Debug|x64.ActiveCfg = Debug|x64
+		{49A006E0-354D-45B5-AE7B-2C2F92DF7928}.Debug|x64.Build.0 = Debug|x64
+		{49A006E0-354D-45B5-AE7B-2C2F92DF7928}.Debug|x86.ActiveCfg = Debug|Win32
+		{49A006E0-354D-45B5-AE7B-2C2F92DF7928}.Debug|x86.Build.0 = Debug|Win32
+		{49A006E0-354D-45B5-AE7B-2C2F92DF7928}.Release|x64.ActiveCfg = Release|x64
+		{49A006E0-354D-45B5-AE7B-2C2F92DF7928}.Release|x64.Build.0 = Release|x64
+		{49A006E0-354D-45B5-AE7B-2C2F92DF7928}.Release|x86.ActiveCfg = Release|Win32
+		{49A006E0-354D-45B5-AE7B-2C2F92DF7928}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +92,7 @@ Global
 		{28E0E100-6368-4BAD-AF65-832248DD0B73} = {FD69444F-455C-4728-BA27-13037801F259}
 		{C0702EBA-C4C6-4530-9AE3-8D74BF7D7644} = {FD69444F-455C-4728-BA27-13037801F259}
 		{C3281769-B603-4C38-A765-29F9EA00C84E} = {FD69444F-455C-4728-BA27-13037801F259}
+		{49A006E0-354D-45B5-AE7B-2C2F92DF7928} = {FD69444F-455C-4728-BA27-13037801F259}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {38713E8B-DF86-4BBC-B50C-708F16685871}
