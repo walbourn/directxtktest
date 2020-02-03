@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DynamicAudioTest_Desktop_20
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleAudioTest_Desktop_2017_Win7", "SimpleAudioTest\SimpleAudioTest_Desktop_2017_Win7.vcxproj", "{C3281769-B603-4C38-A765-29F9EA00C84E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Audio", "Audio", "{FD69444F-455C-4728-BA27-13037801F259}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -74,6 +76,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C81EFCF2-0DD3-4BF6-BB74-B2CC876CFA4B} = {FD69444F-455C-4728-BA27-13037801F259}
+		{28E0E100-6368-4BAD-AF65-832248DD0B73} = {FD69444F-455C-4728-BA27-13037801F259}
+		{C0702EBA-C4C6-4530-9AE3-8D74BF7D7644} = {FD69444F-455C-4728-BA27-13037801F259}
+		{C3281769-B603-4C38-A765-29F9EA00C84E} = {FD69444F-455C-4728-BA27-13037801F259}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {38713E8B-DF86-4BBC-B50C-708F16685871}
