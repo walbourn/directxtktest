@@ -190,8 +190,24 @@ int __cdecl main()
             dump_wfx(wb->GetFormat(j, wfx, 64));
         }
 
-
         auto stream1 = wb->CreateStreamInstance(0u);
+
+        stream1->Play();
+
+        ULONGLONG startTick = GetTickCount64();
+
+        while (stream1->GetState() == PLAYING)
+        {
+            UPDATE
+
+            printf(".");
+            Sleep(1000);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 30000)
+                break;
+        }
 
         // TODO -
     }
