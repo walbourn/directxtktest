@@ -192,6 +192,7 @@ int __cdecl main()
 
         auto stream1 = wb->CreateStreamInstance(0u);
 
+        printf("Playing #0: ");
         stream1->Play();
 
         ULONGLONG startTick = GetTickCount64();
@@ -200,16 +201,55 @@ int __cdecl main()
         {
             UPDATE
 
+            if (GetAsyncKeyState(VK_ESCAPE))
+            {
+                while (GetAsyncKeyState(VK_ESCAPE))
+                    Sleep(10);
+                break;
+            }
+
             printf(".");
-            Sleep(1000);
+            Sleep(200);
 
             ULONGLONG tick = GetTickCount64();
 
-            if (tick > startTick + 30000)
+            if (tick > startTick + 43000)
                 break;
         }
 
-        // TODO -
+        stream1->Stop();
+
+        auto stream2 = wb->CreateStreamInstance(2u);
+
+        printf("\n\nPlaying #2 (looped): ");
+        stream2->Play(true);
+
+        startTick = GetTickCount64();
+
+        while (stream2->GetState() == PLAYING)
+        {
+            UPDATE
+
+            if (GetAsyncKeyState(VK_ESCAPE))
+            {
+                while (GetAsyncKeyState(VK_ESCAPE))
+                    Sleep(10);
+                break;
+            }
+
+            printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 45000)
+                break;
+        }
+
+        stream2->Stop();
+        printf("\n");
+
+        // TODO - Pause, Resume, Volume, Pan
     }
 
     printf("\tPASS\n");
