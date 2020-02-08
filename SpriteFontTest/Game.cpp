@@ -646,6 +646,48 @@ void Game::UnitTests()
             OutputDebugStringA("FAILED: MeasureDrawBounds\n");
             success = false;
         }
+
+        auto text2 = L"  Spinning like a cat ";
+
+        drawSize = m_comicFont->MeasureString(text2);
+
+        if (fabs(XMVectorGetX(drawSize) - 284.f) > EPSILON
+            || fabs(XMVectorGetY(drawSize) - 44.f) > EPSILON)
+        {
+            OutputDebugStringA("FAILED: MeasureString (2)\n");
+            success = false;
+        }
+
+        rect = m_comicFont->MeasureDrawBounds(text2, XMFLOAT2(150, 350));
+
+        if (rect.top != 359
+            || rect.bottom != 394
+            || rect.left != 175
+            || rect.right != 434)
+        {
+            OutputDebugStringA("FAILED: MeasureDrawBounds (2)\n");
+            success = false;
+        }
+
+        drawSize = m_comicFont->MeasureString(text2, false);
+
+        if (fabs(XMVectorGetX(drawSize) - 302.f) > EPSILON
+            || fabs(XMVectorGetY(drawSize) - 70.f) > EPSILON)
+        {
+            OutputDebugStringA("FAILED: MeasureString (3)\n");
+            success = false;
+        }
+
+        rect = m_comicFont->MeasureDrawBounds(text2, XMFLOAT2(150, 350), false);
+
+        if (rect.top != 359
+            || rect.bottom != 420
+            || rect.left != 171
+            || rect.right != 452)
+        {
+            OutputDebugStringA("FAILED: MeasureDrawBounds (3)\n");
+            success = false;
+        }
     }
 
     OutputDebugStringA(success ? "Passed\n" : "Failed\n");
