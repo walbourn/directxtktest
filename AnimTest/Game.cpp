@@ -330,12 +330,12 @@ void Game::CreateDeviceDependentResources()
 #endif
 
     // Visual Studio CMO
-    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, ccw, false);
+    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
 
     // DirectX SDK Mesh
-    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, !ccw);
+    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
 
-    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, !ccw, false);
+    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
