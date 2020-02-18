@@ -37,9 +37,12 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
-extern std::unique_ptr<Model> CreateModelFromOBJ(_In_ ID3D11Device* d3dDevice, _In_ ID3D11DeviceContext* context,
+extern std::unique_ptr<Model> CreateModelFromOBJ(
+    _In_ ID3D11Device* d3dDevice,
+    _In_ ID3D11DeviceContext* context,
     _In_z_ const wchar_t* szFileName,
-    _In_ IEffectFactory& fxFactory, bool ccw = true, bool pmalpha = false);
+    _In_ IEffectFactory& fxFactory,
+    ModelLoaderFlags flags);
 
 Game::Game() noexcept(false) :
     m_spinning(true),
@@ -588,7 +591,11 @@ void Game::CreateDeviceDependentResources()
 #endif
 
     // Wavefront OBJ
+#ifdef GAMMA_CORRECT_RENDERING
+    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, (ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise) | ModelLoader_MaterialColorsSRGB);
+#else
     m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+#endif
 
     // VBO
     m_vbo = Model::CreateFromVBO(device, L"player_ship_a.vbo", nullptr, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);

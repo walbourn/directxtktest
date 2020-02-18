@@ -25,6 +25,23 @@ using namespace DirectX;
 
 namespace
 {
+    inline XMFLOAT3 GetMaterialColor(float r, float g, float b, bool srgb)
+    {
+        if (srgb)
+        {
+            XMVECTOR v = XMVectorSet(r, g, b, 1.f);
+            v = XMColorSRGBToRGB(v);
+
+            XMFLOAT3 result;
+            XMStoreFloat3(&result, v);
+            return result;
+        }
+        else
+        {
+            return XMFLOAT3(r, g, b);
+        }
+    }
+
     //----------------------------------------------------------------------------------
     // Helper for creating a D3D vertex or index buffer.
     template<typename T>
@@ -90,7 +107,12 @@ namespace
 
 
 //--------------------------------------------------------------------------------------
-std::unique_ptr<Model> CreateModelFromOBJ( _In_ ID3D11Device* d3dDevice, _In_ ID3D11DeviceContext* deviceContext, _In_z_ const wchar_t* szFileName, _In_ IEffectFactory& fxFactory, bool ccw, bool pmalpha )
+std::unique_ptr<Model> CreateModelFromOBJ(
+    _In_ ID3D11Device* d3dDevice,
+    _In_ ID3D11DeviceContext* deviceContext,
+    _In_z_ const wchar_t* szFileName,
+    _In_ IEffectFactory& fxFactory,
+    ModelLoaderFlags flags )
 {
     if ( !InitOnceExecuteOnce( &g_InitOnce, InitializeDecl, nullptr, nullptr ) )
         throw std::exception("One-time initialization failed");
@@ -161,8 +183,8 @@ std::unique_ptr<Model> CreateModelFromOBJ( _In_ ID3D11Device* d3dDevice, _In_ ID
     // Create mesh
     auto mesh = std::make_shared<ModelMesh>();
     mesh->name = szFileName;
-    mesh->ccw = ccw;
-    mesh->pmalpha = pmalpha;
+    mesh->ccw = (flags & ModelLoader_CounterClockwise) != 0;
+    mesh->pmalpha = (flags & ModelLoader_PremultipledAlpha) != 0;
 
     BoundingSphere::CreateFromPoints( mesh->boundingSphere, obj->vertices.size(), &obj->vertices[0].position, sizeof( VertexPositionNormalTexture ) );
     BoundingBox::CreateFromPoints( mesh->boundingBox, obj->vertices.size(), &obj->vertices[0].position, sizeof( VertexPositionNormalTexture ) );
@@ -187,8 +209,8 @@ std::unique_ptr<Model> CreateModelFromOBJ( _In_ ID3D11Device* d3dDevice, _In_ ID
             EffectFactory::EffectInfo info;
             info.name = mat.strName;
             info.alpha = mat.fAlpha;
-            info.ambientColor = mat.vAmbient;
-            info.diffuseColor = mat.vDiffuse;
+            info.ambientColor = GetMaterialColor(mat.vAmbient.x, mat.vAmbient.y, mat.vAmbient.z, (flags & ModelLoader_MaterialColorsSRGB) != 0);
+            info.diffuseColor = GetMaterialColor(mat.vDiffuse.x, mat.vDiffuse.y, mat.vDiffuse.z, (flags & ModelLoader_MaterialColorsSRGB) != 0);
 
             if ( mat.bSpecular )
             {
