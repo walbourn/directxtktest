@@ -608,10 +608,10 @@ void Game::CreateDeviceDependentResources()
     }
 
     // DirectX SDK Mesh
-    m_cube = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, !ccw);
-    m_sphere = Model::CreateFromSDKMESH(device, L"Sphere.sdkmesh", *m_fxFactory, !ccw);
-    m_sphere2 = Model::CreateFromSDKMESH(device, L"Sphere2.sdkmesh", *m_fxFactory, !ccw);
-    m_robot = Model::CreateFromSDKMESH(device, L"ToyRobot.sdkmesh", *m_fxFactory, !ccw);
+    m_cube = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_sphere = Model::CreateFromSDKMESH(device, L"Sphere.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_sphere2 = Model::CreateFromSDKMESH(device, L"Sphere2.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_robot = Model::CreateFromSDKMESH(device, L"ToyRobot.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

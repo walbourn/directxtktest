@@ -37,9 +37,12 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
-extern std::unique_ptr<Model> CreateModelFromOBJ(_In_ ID3D11Device* d3dDevice, _In_ ID3D11DeviceContext* context,
+extern std::unique_ptr<Model> CreateModelFromOBJ(
+    _In_ ID3D11Device* d3dDevice,
+    _In_ ID3D11DeviceContext* context,
     _In_z_ const wchar_t* szFileName,
-    _In_ IEffectFactory& fxFactory, bool ccw = true, bool pmalpha = false);
+    _In_ IEffectFactory& fxFactory,
+    ModelLoaderFlags flags);
 
 Game::Game() noexcept(false) :
     m_spinning(true),
@@ -588,10 +591,14 @@ void Game::CreateDeviceDependentResources()
 #endif
 
     // Wavefront OBJ
-    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, !ccw);
+#ifdef GAMMA_CORRECT_RENDERING
+    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, (ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise) | ModelLoader_MaterialColorsSRGB);
+#else
+    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+#endif
 
     // VBO
-    m_vbo = Model::CreateFromVBO(device, L"player_ship_a.vbo", nullptr, !ccw);
+    m_vbo = Model::CreateFromVBO(device, L"player_ship_a.vbo", nullptr, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
 
     m_effect = std::make_shared<EnvironmentMapEffect>(device);
     m_effect->EnableDefaultLighting();
@@ -609,25 +616,25 @@ void Game::CreateDeviceDependentResources()
 
     m_effect->SetEnvironmentMap(m_cubemap.Get());
 
-    m_vbo2 = Model::CreateFromVBO(device, L"player_ship_a.vbo", m_effect, !ccw);
+    m_vbo2 = Model::CreateFromVBO(device, L"player_ship_a.vbo", m_effect, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
 
     // Visual Studio CMO
 
     // TODO - forceSRGB behavior for material colors
 
-    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, ccw);
+    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
 
-    m_gamelevel = Model::CreateFromCMO(device, L"gamelevel.cmo", *m_fxFactory, ccw);
+    m_gamelevel = Model::CreateFromCMO(device, L"gamelevel.cmo", *m_fxFactory, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
 
-    m_ship = Model::CreateFromCMO(device, L"25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo", *m_fxFactory, ccw);
+    m_ship = Model::CreateFromCMO(device, L"25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo", *m_fxFactory, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
 
     // DirectX SDK Mesh
-    m_cupMesh = Model::CreateFromSDKMESH(device, L"cup.sdkmesh", *m_fxFactory, !ccw);
-    m_tiny = Model::CreateFromSDKMESH(device, L"tiny.sdkmesh", *m_fxFactory, !ccw);
-    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, !ccw);
-    m_dwarf = Model::CreateFromSDKMESH(device, L"dwarf.sdkmesh", *m_fxFactory, !ccw);
-    m_lmap = Model::CreateFromSDKMESH(device, L"SimpleLightMap.sdkmesh", *m_fxFactory, !ccw);
-    m_nmap = Model::CreateFromSDKMESH(device, L"Helmet.sdkmesh", *m_fxFactory, !ccw);
+    m_cupMesh = Model::CreateFromSDKMESH(device, L"cup.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_tiny = Model::CreateFromSDKMESH(device, L"tiny.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_dwarf = Model::CreateFromSDKMESH(device, L"dwarf.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_lmap = Model::CreateFromSDKMESH(device, L"SimpleLightMap.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_nmap = Model::CreateFromSDKMESH(device, L"Helmet.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
