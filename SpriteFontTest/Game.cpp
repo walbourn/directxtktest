@@ -592,7 +592,7 @@ void Game::UnitTests()
 
         ComPtr<ID3D11ShaderResourceView> sheet;
         m_comicFont->GetSpriteSheet(sheet.GetAddressOf());
-        if (!sheet )
+        if (!sheet)
         {
             OutputDebugStringA("FAILED: GetSpriteSheet\n");
             success = false;
@@ -669,23 +669,157 @@ void Game::UnitTests()
             success = false;
         }
 
-        drawSize = m_comicFont->MeasureString(text2, false);
+        // test measurements that factor in whitespace characters
+        // against measurements that do not factor in whitespace characters
 
-        if (fabs(XMVectorGetX(drawSize) - 302.f) > EPSILON
-            || fabs(XMVectorGetY(drawSize) - 70.f) > EPSILON)
+        auto text3 = L"aeiou";
+        auto text4 = L"a e i o u";
+        auto text5 = L"aeiou ";
+        auto text6 = L"  ";
+        auto testLineHeight = m_comicFont->GetLineSpacing();
+
+        const auto testPos = XMFLOAT2{ 10.0f, 15.0f };
+
+        // this test makes sure that including whitespace in the measurements
+        // for a string that does not include whitespace results in no change
+
+        auto drawSize3_1 = m_comicFont->MeasureString(text3, true);
+        auto drawSize3_2 = m_comicFont->MeasureString(text3, false);
+
+        if (XMVectorGetX(drawSize3_1) != XMVectorGetX(drawSize3_2))
         {
-            OutputDebugStringA("FAILED: MeasureString (3)\n");
+            OutputDebugStringA("FAILED: MeasureString ignoreSpace vs. !ignoreSpace test #1\n");
             success = false;
         }
 
-        rect = m_comicFont->MeasureDrawBounds(text2, XMFLOAT2(150, 350), false);
-
-        if (rect.top != 359
-            || rect.bottom != 420
-            || rect.left != 171
-            || rect.right != 452)
+        if (XMVectorGetY(drawSize3_2) != testLineHeight || XMVectorGetY(drawSize3_1) != XMVectorGetY(drawSize3_2))
         {
-            OutputDebugStringA("FAILED: MeasureDrawBounds (3)\n");
+            OutputDebugStringA("FAILED: MeasureString ignoreSpace vs. !ignoreSpace test #2\n");
+            success = false;
+        }
+
+        // this test makes sure that including whitespace in the measurements
+        // for a string that does include whitespace still results in no change
+        // if the whitespace is in the middle
+
+        auto drawSize4_1 = m_comicFont->MeasureString(text4, true);
+        auto drawSize4_2 = m_comicFont->MeasureString(text4, false);
+
+        if (XMVectorGetX(drawSize4_1) != XMVectorGetX(drawSize4_2))
+        {
+            OutputDebugStringA("FAILED: MeasureString ignoreSpace vs. !ignoreSpace test #3\n");
+            success = false;
+        }
+
+        if (XMVectorGetY(drawSize4_2) != testLineHeight || XMVectorGetY(drawSize4_1) != XMVectorGetY(drawSize4_2))
+        {
+            OutputDebugStringA("FAILED: MeasureString ignoreSpace vs. !ignoreSpace test #4\n");
+            success = false;
+        }
+
+        // this test makes sure that including whitespace in the measurements
+        // for a string that does include whitespace results in change
+        // if the whitespace is at the end for x, no change for y
+
+        auto drawSize5_1 = m_comicFont->MeasureString(text5, true);
+        auto drawSize5_2 = m_comicFont->MeasureString(text5, false);
+
+        if (XMVectorGetX(drawSize5_1) >= XMVectorGetX(drawSize5_2))
+        {
+            OutputDebugStringA("FAILED: MeasureString ignoreSpace vs. !ignoreSpace test #5\n");
+            success = false;
+        }
+
+        if (XMVectorGetY(drawSize5_2) != testLineHeight || XMVectorGetY(drawSize5_1) != XMVectorGetY(drawSize5_2))
+        {
+            OutputDebugStringA("FAILED: MeasureString ignoreSpace vs. !ignoreSpace test #6\n");
+            success = false;
+        }
+
+        // this test makes sure that including whitespace in the measurements
+        // for a string that only includes whitespace results in change
+
+        auto drawSize6_1 = m_comicFont->MeasureString(text6, true);
+        auto drawSize6_2 = m_comicFont->MeasureString(text6, false);
+
+        if (XMVectorGetX(drawSize6_1) >= XMVectorGetX(drawSize6_2))
+        {
+            OutputDebugStringA("FAILED: MeasureString ignoreSpace vs. !ignoreSpace test #7\n");
+            success = false;
+        }
+
+        if (XMVectorGetY(drawSize6_2) != testLineHeight || XMVectorGetY(drawSize6_1) >= XMVectorGetY(drawSize6_2))
+        {
+            OutputDebugStringA("FAILED: MeasureString ignoreSpace vs. !ignoreSpace test #8\n");
+            success = false;
+        }
+
+        // this test makes sure that including whitespace in the measurements
+        // for a draw bounds that does not include whitespace results in no change
+
+        auto rect3_1 = m_comicFont->MeasureDrawBounds(text3, testPos, true);
+        auto rect3_2 = m_comicFont->MeasureDrawBounds(text3, testPos, false);
+
+        if (rect3_1.left != rect3_2.left || rect3_1.top != rect3_2.top ||
+            rect3_1.right != rect3_2.right || rect3_1.bottom != rect3_2.bottom)
+        {
+            OutputDebugStringA("FAILED: MeasureDrawBounds ignoreSpace vs. !ignoreSpace test #1\n");
+            success = false;
+        }
+
+        // this test makes sure that including whitespace in the measurements
+        // for a string that does include whitespace results still in no change
+        // if the whitespace is in the middle for x, but results in change for y
+
+        auto rect4_1 = m_comicFont->MeasureDrawBounds(text4, testPos, true);
+        auto rect4_2 = m_comicFont->MeasureDrawBounds(text4, testPos, false);
+
+        if (rect4_1.left != rect4_2.left || rect4_1.right != rect4_2.right)
+        {
+            OutputDebugStringA("FAILED: MeasureDrawBounds ignoreSpace vs. !ignoreSpace test #2\n");
+            success = false;
+        }
+
+        if (rect4_1.top <= rect4_2.top || rect4_1.bottom >= rect4_2.bottom)
+        {
+            OutputDebugStringA("FAILED: MeasureDrawBounds ignoreSpace vs. !ignoreSpace test #3\n");
+            success = false;
+        }
+
+        // this test makes sure that including whitespace in the measurements
+        // for a string that does include whitespace results in change
+        // if the whitespace is at the end for x, and also change for y
+
+        auto rect5_1 = m_comicFont->MeasureDrawBounds(text5, testPos, true);
+        auto rect5_2 = m_comicFont->MeasureDrawBounds(text5, testPos, false);
+
+        if (rect5_1.left != rect5_2.left || rect5_1.right >= rect5_2.right)
+        {
+            OutputDebugStringA("FAILED: MeasureDrawBounds ignoreSpace vs. !ignoreSpace test #4\n");
+            success = false;
+        }
+
+        if (rect5_1.top <= rect5_2.top || rect5_1.bottom >= rect5_2.bottom)
+        {
+            OutputDebugStringA("FAILED: MeasureDrawBounds ignoreSpace vs. !ignoreSpace test #5\n");
+            success = false;
+        }
+
+        // this test makes sure that including whitespace in the measurements
+        // for a draw bounds that only includes whitespace results in change
+
+        auto rect6_1 = m_comicFont->MeasureDrawBounds(text6, testPos, true);
+        auto rect6_2 = m_comicFont->MeasureDrawBounds(text6, testPos, false);
+
+        if (rect6_1.left >= rect6_2.left || rect6_1.right >= rect6_2.right)
+        {
+            OutputDebugStringA("FAILED: MeasureDrawBounds ignoreSpace vs. !ignoreSpace test #6\n");
+            success = false;
+        }
+
+        if (rect6_1.top >= rect6_2.top || rect6_1.bottom >= rect6_2.bottom)
+        {
+            OutputDebugStringA("FAILED: MeasureDrawBounds ignoreSpace vs. !ignoreSpace test #7\n");
             success = false;
         }
     }
