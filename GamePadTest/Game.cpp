@@ -206,7 +206,7 @@ void Game::Update(DX::StepTimer const&)
                         else
                         {
                             char buff[1024] = {};
-                            sprintf_s(buff, "Player %d -> connected (type %u, %04X/%04X, id \"%ls\" (user fail %08X))\n", j, caps.gamepadType, caps.vid, caps.pid, caps.id.c_str(), hr);
+                            sprintf_s(buff, "Player %d -> connected (type %u, %04X/%04X, id \"%ls\" (user fail %08X))\n", j, caps.gamepadType, caps.vid, caps.pid, caps.id.c_str(), static_cast<unsigned int>(hr));
                             OutputDebugStringA(buff);
                         }
                     }

@@ -101,8 +101,8 @@ namespace
     };
 
 
-    typedef std::vector<TestVertex> VertexCollection;
-    typedef std::vector<uint16_t> IndexCollection;
+    using VertexCollection = std::vector<TestVertex>;
+    using IndexCollection = std::vector<uint16_t>;
 
     // Helper for creating a D3D vertex or index buffer.
     template<typename T>

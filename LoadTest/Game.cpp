@@ -401,7 +401,7 @@ void Game::Render()
         if (FAILED(hr))
         {
             char buff[128] = {};
-            sprintf_s(buff, "ERROR: SaveWICTextureToFile (PNG) failed %08X\n", hr);
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (PNG) failed %08X\n", static_cast<unsigned int>(hr));
             OutputDebugStringA(buff);
             success = false;
         }
@@ -420,7 +420,7 @@ void Game::Render()
         if (FAILED(hr))
         {
             char buff[128] = {};
-            sprintf_s(buff, "ERROR: SaveWICTextureToFile (JPG) failed %08X\n", hr);
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (JPG) failed %08X\n", static_cast<unsigned int>(hr));
             OutputDebugStringA(buff);
             success = false;
         }
@@ -440,7 +440,7 @@ void Game::Render()
         if (FAILED(hr))
         {
             char buff[128] = {};
-            sprintf_s(buff, "ERROR: SaveWICTextureToFile (BMP) failed %08X\n", hr);
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (BMP) failed %08X\n", static_cast<unsigned int>(hr));
             OutputDebugStringA(buff);
             success = false;
         }
@@ -474,7 +474,7 @@ void Game::Render()
         if (FAILED(hr))
         {
             char buff[128] = {};
-            sprintf_s(buff, "ERROR: SaveWICTextureToFile (TIFF) failed %08X\n", hr);
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (TIFF) failed %08X\n", static_cast<unsigned int>(hr));
             OutputDebugStringA(buff);
             success = false;
         }
@@ -493,7 +493,7 @@ void Game::Render()
         if (FAILED(hr))
         {
             char buff[128] = {};
-            sprintf_s(buff, "ERROR: SaveWICTextureToFile (DDS) failed %08X\n", hr);
+            sprintf_s(buff, "ERROR: SaveWICTextureToFile (DDS) failed %08X\n", static_cast<unsigned int>(hr));
             OutputDebugStringA(buff);
             success = false;
         }
