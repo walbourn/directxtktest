@@ -25,7 +25,7 @@
 // For UWP/PC, this tests using a linear F16 swapchain intead of HDR10
 //#define TEST_HDR_LINEAR
 
-extern void ExitGame();
+extern void ExitGame() noexcept;
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
 extern bool g_HDRMode;

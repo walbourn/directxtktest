@@ -22,7 +22,7 @@
 // Build for LH vs. RH coords
 //#define LH_COORDS
 
-extern void ExitGame();
+extern void ExitGame() noexcept;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

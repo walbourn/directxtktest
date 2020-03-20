@@ -28,7 +28,7 @@
 // Build with Reverb enabled or not
 #define USE_REVERB
 
-extern void ExitGame();
+extern void ExitGame() noexcept;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

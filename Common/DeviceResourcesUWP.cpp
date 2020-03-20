@@ -23,7 +23,7 @@ namespace
 {
 #if defined(_DEBUG)
     // Check for SDK Layer support.
-    inline bool SdkLayersAvailable()
+    inline bool SdkLayersAvailable() noexcept
     {
         HRESULT hr = D3D11CreateDevice(
             nullptr,
@@ -42,7 +42,7 @@ namespace
     }
 #endif
 
-    inline DXGI_FORMAT NoSRGB(DXGI_FORMAT fmt)
+    inline DXGI_FORMAT NoSRGB(DXGI_FORMAT fmt) noexcept
     {
         switch (fmt)
         {
@@ -52,7 +52,7 @@ namespace
         default:                                return fmt;
         }
     }
-};
+}
 
 // Constants used to calculate screen rotations
 namespace ScreenRotation
@@ -88,7 +88,7 @@ namespace ScreenRotation
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
         );
-};
+}
 
 // Constructor for DeviceResources.
 DeviceResources::DeviceResources(
@@ -359,9 +359,9 @@ void DeviceResources::CreateWindowSizeDependentResources()
     m_d3dContext->Flush();
 
     // Determine the render target size in pixels.
-    UINT backBufferWidth = std::max<UINT>(m_outputSize.right - m_outputSize.left, 1);
-    UINT backBufferHeight = std::max<UINT>(m_outputSize.bottom - m_outputSize.top, 1);
-    DXGI_FORMAT backBufferFormat = NoSRGB(m_backBufferFormat);
+    const UINT backBufferWidth = std::max<UINT>(static_cast<UINT>(m_outputSize.right - m_outputSize.left), 1u);
+    const UINT backBufferHeight = std::max<UINT>(static_cast<UINT>(m_outputSize.bottom - m_outputSize.top), 1u);
+    const DXGI_FORMAT backBufferFormat = NoSRGB(m_backBufferFormat);
 
     if (m_swapChain)
     {
@@ -378,7 +378,8 @@ void DeviceResources::CreateWindowSizeDependentResources()
         {
 #ifdef _DEBUG
             char buff[64] = {};
-            sprintf_s(buff, "Device Lost on ResizeBuffers: Reason code 0x%08X\n", (hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr);
+            sprintf_s(buff, "Device Lost on ResizeBuffers: Reason code 0x%08X\n",
+                static_cast<unsigned int>((hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr));
             OutputDebugStringA(buff);
 #endif
             // If the device was removed for any reason, a new device and swap chain will need to be created.
@@ -501,7 +502,7 @@ void DeviceResources::CreateWindowSizeDependentResources()
 }
 
 // This method is called when the CoreWindow is created (or re-created).
-void DeviceResources::SetWindow(IUnknown* window, int width, int height, DXGI_MODE_ROTATION rotation)
+void DeviceResources::SetWindow(IUnknown* window, int width, int height, DXGI_MODE_ROTATION rotation) noexcept
 {
     m_window = window;
 
@@ -631,7 +632,7 @@ void DeviceResources::Trim()
 // Present the contents of the swap chain to the screen.
 void DeviceResources::Present() 
 {
-    HRESULT hr;
+    HRESULT hr = E_FAIL;
     if (m_options & c_AllowTearing)
     {
         // Recommended to always use tearing if supported when using a sync interval of 0.
@@ -662,7 +663,8 @@ void DeviceResources::Present()
     {
 #ifdef _DEBUG
         char buff[64] = {};
-        sprintf_s(buff, "Device Lost on Present: Reason code 0x%08X\n", (hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr);
+        sprintf_s(buff, "Device Lost on Present: Reason code 0x%08X\n",
+            static_cast<unsigned int>((hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr));
         OutputDebugStringA(buff);
 #endif
         HandleDeviceLost();
@@ -693,14 +695,14 @@ void DeviceResources::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
     if (SUCCEEDED(hr))
     {
         for (UINT adapterIndex = 0;
-            DXGI_ERROR_NOT_FOUND != factory6->EnumAdapterByGpuPreference(
+            SUCCEEDED(factory6->EnumAdapterByGpuPreference(
                 adapterIndex,
                 DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
-                IID_PPV_ARGS(adapter.ReleaseAndGetAddressOf()));
+                IID_PPV_ARGS(adapter.ReleaseAndGetAddressOf())));
             adapterIndex++)
         {
             DXGI_ADAPTER_DESC1 desc;
-            adapter->GetDesc1(&desc);
+            ThrowIfFailed(adapter->GetDesc1(&desc));
 
             if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
             {
@@ -717,30 +719,32 @@ void DeviceResources::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
             break;
         }
     }
-    else
 #endif
-    for (UINT adapterIndex = 0;
-        DXGI_ERROR_NOT_FOUND != m_dxgiFactory->EnumAdapters1(
-            adapterIndex,
-            adapter.ReleaseAndGetAddressOf());
-        adapterIndex++)
+    if (!adapter)
     {
-        DXGI_ADAPTER_DESC1 desc;
-        adapter->GetDesc1(&desc);
-
-        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+        for (UINT adapterIndex = 0;
+            SUCCEEDED(m_dxgiFactory->EnumAdapters1(
+                adapterIndex,
+                adapter.ReleaseAndGetAddressOf()));
+            adapterIndex++)
         {
-            // Don't select the Basic Render Driver adapter.
-            continue;
-        }
+            DXGI_ADAPTER_DESC1 desc;
+            ThrowIfFailed(adapter->GetDesc1(&desc));
+
+            if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+            {
+                // Don't select the Basic Render Driver adapter.
+                continue;
+            }
 
 #ifdef _DEBUG
-        wchar_t buff[256] = {};
-        swprintf_s(buff, L"Direct3D Adapter (%u): VID:%04X, PID:%04X - %ls\n", adapterIndex, desc.VendorId, desc.DeviceId, desc.Description);
-        OutputDebugStringW(buff);
+            wchar_t buff[256] = {};
+            swprintf_s(buff, L"Direct3D Adapter (%u): VID:%04X, PID:%04X - %ls\n", adapterIndex, desc.VendorId, desc.DeviceId, desc.Description);
+            OutputDebugStringW(buff);
 #endif
 
-        break;
+            break;
+        }
     }
 
     *ppAdapter = adapter.Detach();

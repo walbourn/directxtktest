@@ -25,7 +25,7 @@
 // Build FL 10.0 vs. 9.1
 //#define FEATURE_LEVEL_9_X
 
-extern void ExitGame();
+extern void ExitGame() noexcept;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

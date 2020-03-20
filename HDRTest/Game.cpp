@@ -24,7 +24,7 @@
 // For UWP/PC, this tests using a linear F16 swapchain intead of HDR10
 //#define TEST_HDR_LINEAR
 
-extern void ExitGame();
+extern void ExitGame() noexcept;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

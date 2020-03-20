@@ -63,7 +63,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         wcex.hInstance = hInstance;
         wcex.hIcon = LoadIconW(hInstance, L"IDI_ICON");
         wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-        wcex.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
+        wcex.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
         wcex.lpszClassName = L"D3D11TestWindowClass";
         wcex.hIconSm = LoadIconW(wcex.hInstance, L"IDI_ICON");
         if (!RegisterClassExW(&wcex))
@@ -125,15 +125,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     CoUninitialize();
 
-    return (int) msg.wParam;
+    return static_cast<int>(msg.wParam);
 }
 
 // Windows procedure
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
-    HDC hdc;
-
     static bool s_in_sizemove = false;
     static bool s_in_suspend = false;
     static bool s_minimized = false;
@@ -150,7 +147,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         else
         {
-            hdc = BeginPaint(hWnd, &ps);
+            PAINTSTRUCT ps;
+            (void)BeginPaint(hWnd, &ps);
             EndPaint(hWnd, &ps);
         }
         break;
@@ -202,6 +200,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_GETMINMAXINFO:
+        if (lParam)
         {
             auto info = reinterpret_cast<MINMAXINFO*>(lParam);
             info->ptMinTrackSize.x = 320;
@@ -390,7 +389,7 @@ void ParseCommandLine(_In_ LPWSTR lpCmdLine)
 
 
 // Exit helper
-void ExitGame()
+void ExitGame() noexcept
 {
     PostQuitMessage(0);
 }

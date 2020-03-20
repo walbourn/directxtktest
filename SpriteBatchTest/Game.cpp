@@ -19,7 +19,7 @@
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
-extern void ExitGame();
+extern void ExitGame() noexcept;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

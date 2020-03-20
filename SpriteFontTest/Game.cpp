@@ -26,7 +26,7 @@ namespace
     const float EPSILON = 0.000001f;
 }
 
-extern void ExitGame();
+extern void ExitGame() noexcept;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
