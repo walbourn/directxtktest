@@ -47,7 +47,7 @@
 #include <Dbt.h>
 #endif
 
-#include <wrl.h>
+#include <wrl/client.h>
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #include <d3d11_x.h>

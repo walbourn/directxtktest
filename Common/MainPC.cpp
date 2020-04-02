@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Game.h"
 
+#include <wrl/wrappers/corewrappers.h>
 #include <shellapi.h>
 
 using namespace DirectX;
