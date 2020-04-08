@@ -42,7 +42,7 @@
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
     <ApplicationType>Windows Store</ApplicationType>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.14393.0</WindowsTargetPlatformMinVersion>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
   </PropertyGroup>
@@ -50,46 +50,46 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -125,36 +125,36 @@
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <OutDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <OutDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <OutDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <OutDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2017\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
@@ -322,7 +322,7 @@
     <AppxManifest Include="PackageUWP.appxmanifest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DirectXTK_Windows10_2017.vcxproj">
+    <ProjectReference Include="..\..\DirectXTK_Windows10_2019.vcxproj">
       <Project>{f4776924-619c-42c7-88b2-82c947ccc9e7}</Project>
     </ProjectReference>
   </ItemGroup>
