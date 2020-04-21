@@ -20,94 +20,13 @@
 #define NOHELP
 #pragma warning(pop)
 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
-#include <d3d11.h>
 #include "SimpleMath.h"
 
-#include <DirectXColors.h>
-
-#include <stdio.h>
-
-#include <functional>
-#include <map>
-#include <memory>
-#include <type_traits>
-#include <vector>
+#include "SimpleMathTest.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-static const float EPSILON = 0.000001f;
-static const float EPSILON2 = 0.00001f;
-static const float EPSILON3 = 0.001f;
-
-static const XMVECTORF32 VEPSILON = { { { EPSILON, EPSILON, EPSILON, EPSILON } } };
-static const XMVECTORF32 VEPSILON2 = { { { EPSILON2, EPSILON2, EPSILON2, EPSILON2 } } };
-static const XMVECTORF32 VEPSILON3 = { { { EPSILON3, EPSILON3, EPSILON3, EPSILON3 } } };
-
-
-void FormatValue(bool value, char* output, size_t outputSize) { strcpy_s(output, outputSize, value ? "true" : "false"); }
-void FormatValue(float value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f", value); }
-void FormatValue(uint32_t value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%08x", value); }
-void FormatValue(Vector3 const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f", value.x, value.y, value.z); }
-void FormatValue(Vector4 const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
-void FormatValue(Color const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
-void FormatValue(Plane const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
-void FormatValue(Quaternion const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "%f %f %f %f", value.x, value.y, value.z, value.w); }
-void FormatValue(Matrix const& value, char* output, size_t outputSize) { sprintf_s(output, outputSize, "\n    %f %f %f %f\n    %f %f %f %f\n    %f %f %f %f\n    %f %f %f %f\n", value._11, value._12, value._13, value._14, value._21, value._22, value._23, value._24, value._31, value._32, value._33, value._34, value._41, value._42, value._43, value._44); }
-
-
-struct near_equal_to
-{
-    bool operator() (float a, float b) const
-    {
-        return XMScalarNearEqual(a, b, EPSILON);
-    }
-
-    bool operator() (FXMVECTOR a, FXMVECTOR b) const
-    {
-        return XMVector4NearEqual(a, b, VEPSILON);
-    }
-
-    bool operator() (CXMMATRIX a, CXMMATRIX b) const
-    {
-        return XMVector4NearEqual(a.r[0], b.r[0], VEPSILON) &&
-            XMVector4NearEqual(a.r[1], b.r[1], VEPSILON) &&
-            XMVector4NearEqual(a.r[2], b.r[2], VEPSILON) &&
-            XMVector4NearEqual(a.r[3], b.r[3], VEPSILON);
-    }
-};
-
-
-template<typename TValue, typename TCompare>
-bool VerifyValue(TValue const& value, TValue const& expected, TCompare const& compare, char const* file, int line)
-{
-    if (compare(value, expected))
-        return true;
-
-    char valueString[256];
-    char expectedString[256];
-
-    FormatValue(value, valueString, sizeof(valueString));
-    FormatValue(expected, expectedString, sizeof(expectedString));
-
-    printf("ERROR: %s:%d: %s (expecting %s)\n", file, line, valueString, expectedString);
-
-    return false;
-}
-
-
-#define VerifyEqual(value, expected) \
-    success &= VerifyValue(value, expected, std::equal_to<decltype(value)>(), __FUNCTION__, __LINE__)
-
-#define VerifyNearEqual(value, expected) \
-    success &= VerifyValue(value, expected, near_equal_to(), __FUNCTION__, __LINE__)
-
-
-//-------------------------------------------------------------------------------------
 namespace
 {
     std::vector<SimpleMath::Rectangle> CreateIntersectedRectangles(const SimpleMath::Rectangle& target)
@@ -292,12 +211,6 @@ int TestRect()
     {
         RECT smallRct = { 50, 75, 100 + 50, 200 + 75 };
 
-        if (smallRct != smallRect)
-        {
-            printf("ERROR: RECT != small\n");
-            success = false;
-        }
-
         if (smallRect != smallRct)
         {
             printf("ERROR: RECT != small\n");
@@ -305,12 +218,6 @@ int TestRect()
         }
 
         RECT bigRct = { 15, 32, 1920 + 15, 1080 + 32 };
-
-        if (bigRct != bigRect)
-        {
-            printf("ERROR: RECT != big\n");
-            success = false;
-        }
 
         if (bigRect != bigRct)
         {
@@ -787,61 +694,61 @@ int TestRect()
         RECT ae = { 0, 0, 0, 0 };
         RECT bc = { 0, 0, 0, 0 };
 
-        if (ab != Rectangle::Intersect(a, b))
+        if (Rectangle(ab) != Rectangle::Intersect(a, b))
         {
             printf("ERROR: Intersect RECT 1\n");
             success = false;
         }
 
-        if (ac != Rectangle::Intersect(a, c))
+        if (Rectangle(ac) != Rectangle::Intersect(a, c))
         {
             printf("ERROR: Intersect RECT 2\n");
             success = false;
         }
 
-        if (ad != Rectangle::Intersect(a, d))
+        if (Rectangle(ad) != Rectangle::Intersect(a, d))
         {
             printf("ERROR: Intersect RECT 3\n");
             success = false;
         }
 
-        if (ae != Rectangle::Intersect(a, e))
+        if (Rectangle(ae) != Rectangle::Intersect(a, e))
         {
             printf("ERROR: Intersect RECT 4\n");
             success = false;
         }
 
-        if (bc != Rectangle::Intersect(b, c))
+        if (Rectangle(bc) != Rectangle::Intersect(b, c))
         {
             printf("ERROR: Intersect RECT 5\n");
             success = false;
         }
 
-        if (ab != Rectangle::Intersect(b, a))
+        if (Rectangle(ab) != Rectangle::Intersect(b, a))
         {
             printf("ERROR: Intersect RECT 6\n");
             success = false;
         }
 
-        if (ac != Rectangle::Intersect(c, a))
+        if (Rectangle(ac) != Rectangle::Intersect(c, a))
         {
             printf("ERROR: Intersect RECT 7\n");
             success = false;
         }
 
-        if (ad != Rectangle::Intersect(d, a))
+        if (Rectangle(ad) != Rectangle::Intersect(d, a))
         {
             printf("ERROR: Intersect RECT 8\n");
             success = false;
         }
 
-        if (ae != Rectangle::Intersect(e, a))
+        if (Rectangle(ae) != Rectangle::Intersect(e, a))
         {
             printf("ERROR: Intersect RECT 9\n");
             success = false;
         }
 
-        if (bc != Rectangle::Intersect(c, b))
+        if (Rectangle(bc) != Rectangle::Intersect(c, b))
         {
             printf("ERROR: Intersect RECT 10\n");
             success = false;
@@ -938,61 +845,61 @@ int TestRect()
         RECT bc = { 0, 0, 112, 23 };
 
         // Test non-ref overloads.
-        if (ab != Rectangle::Union(a, b))
+        if (Rectangle(ab) != Rectangle::Union(a, b))
         {
             printf("ERROR: Union 1\n");
             success = false;
         }
 
-        if (ac != Rectangle::Union(a, c))
+        if (Rectangle(ac) != Rectangle::Union(a, c))
         {
             printf("ERROR: Union 2\n");
             success = false;
         }
 
-        if (ad != Rectangle::Union(a, d))
+        if (Rectangle(ad) != Rectangle::Union(a, d))
         {
             printf("ERROR: Union 3\n");
             success = false;
         }
 
-        if (ae != Rectangle::Union(a, e))
+        if (Rectangle(ae) != Rectangle::Union(a, e))
         {
             printf("ERROR: Union 4\n");
             success = false;
         }
 
-        if (bc != Rectangle::Union(b, c))
+        if (Rectangle(bc) != Rectangle::Union(b, c))
         {
             printf("ERROR: Union 5\n");
             success = false;
         }
 
-        if (ab != Rectangle::Union(b, a))
+        if (Rectangle(ab) != Rectangle::Union(b, a))
         {
             printf("ERROR: Union 6\n");
             success = false;
         }
 
-        if (ac != Rectangle::Union(c, a))
+        if (Rectangle(ac) != Rectangle::Union(c, a))
         {
             printf("ERROR: Union 7\n");
             success = false;
         }
 
-        if (ad != Rectangle::Union(d, a))
+        if (Rectangle(ad) != Rectangle::Union(d, a))
         {
             printf("ERROR: Union 8\n");
             success = false;
         }
 
-        if (ae != Rectangle::Union(e, a))
+        if (Rectangle(ae) != Rectangle::Union(e, a))
         {
             printf("ERROR: Union 9\n");
             success = false;
         }
 
-        if (bc != Rectangle::Union(c, b))
+        if (Rectangle(bc) != Rectangle::Union(c, b))
         {
             printf("ERROR: Union 10\n");
             success = false;
@@ -5183,69 +5090,6 @@ int TestVP()
     }
 
     {
-        CD3D11_VIEWPORT d3d11vp(23.f, 42.f, 666.f, 1234.f, 0.f, 1.f);
-        Viewport vp(d3d11vp);
-
-        if (!XMScalarNearEqual(vp.x, d3d11vp.TopLeftX, EPSILON)
-            || !XMScalarNearEqual(vp.y, d3d11vp.TopLeftY, EPSILON)
-            || !XMScalarNearEqual(vp.width, d3d11vp.Width, EPSILON)
-            || !XMScalarNearEqual(vp.height, d3d11vp.Height, EPSILON)
-            || !XMScalarNearEqual(vp.minDepth, d3d11vp.MinDepth, EPSILON)
-            || !XMScalarNearEqual(vp.maxDepth, d3d11vp.MaxDepth, EPSILON))
-        {
-            printf("ERROR: D3D11_VIEWPORT ctor\n");
-            success = false;
-        }
-    }
-
-    {
-        CD3D11_VIEWPORT d3d11vp(23.f, 42.f, 666.f, 1234.f, 0.f, 1.f);
-        Viewport vp;
-        vp = d3d11vp;
-
-        if (!XMScalarNearEqual(vp.x, d3d11vp.TopLeftX, EPSILON)
-            || !XMScalarNearEqual(vp.y, d3d11vp.TopLeftY, EPSILON)
-            || !XMScalarNearEqual(vp.width, d3d11vp.Width, EPSILON)
-            || !XMScalarNearEqual(vp.height, d3d11vp.Height, EPSILON)
-            || !XMScalarNearEqual(vp.minDepth, d3d11vp.MinDepth, EPSILON)
-            || !XMScalarNearEqual(vp.maxDepth, d3d11vp.MaxDepth, EPSILON))
-        {
-            printf("ERROR: D3D11_VIEWPORT =\n");
-            success = false;
-        }
-    }
-
-    {
-        D3D11_VIEWPORT d3d11vp = vp5;
-
-        if (!XMScalarNearEqual(vp5.x, d3d11vp.TopLeftX, EPSILON)
-            || !XMScalarNearEqual(vp5.y, d3d11vp.TopLeftY, EPSILON)
-            || !XMScalarNearEqual(vp5.width, d3d11vp.Width, EPSILON)
-            || !XMScalarNearEqual(vp5.height, d3d11vp.Height, EPSILON)
-            || !XMScalarNearEqual(vp5.minDepth, d3d11vp.MinDepth, EPSILON)
-            || !XMScalarNearEqual(vp5.maxDepth, d3d11vp.MaxDepth, EPSILON))
-        {
-            printf("ERROR: operator D3D11_VIEWPORT\n");
-            success = false;
-        }
-    }
-
-    {
-        const D3D11_VIEWPORT* d3d11vp = vp5.Get11();
-
-        if (!XMScalarNearEqual(vp5.x, d3d11vp->TopLeftX, EPSILON)
-            || !XMScalarNearEqual(vp5.y, d3d11vp->TopLeftY, EPSILON)
-            || !XMScalarNearEqual(vp5.width, d3d11vp->Width, EPSILON)
-            || !XMScalarNearEqual(vp5.height, d3d11vp->Height, EPSILON)
-            || !XMScalarNearEqual(vp5.minDepth, d3d11vp->MinDepth, EPSILON)
-            || !XMScalarNearEqual(vp5.maxDepth, d3d11vp->MaxDepth, EPSILON))
-        {
-            printf("ERROR: Get\n");
-            success = false;
-        }
-    }
-
-    {
         if ( vp1.AspectRatio() != 0.f )
         {
             printf("ERROR: AspectRatio vp1\n");
@@ -5706,6 +5550,9 @@ int TestL()
 
 
 //-------------------------------------------------------------------------------------
+extern int TestD3D11();
+extern int TestD3D12();
+
 typedef int (*TestFN)();
 
 static struct Test
@@ -5724,6 +5571,8 @@ static struct Test
     { "Color", TestC },
     { "Ray", TestRay },
     { "Viewport", TestVP },
+    { "D3D11", TestD3D11 },
+    { "D3D12", TestD3D12 },
     { "std::less", TestL },
 };
 
@@ -5760,4 +5609,3 @@ int __cdecl main()
         return 1;
     }
 }
-
