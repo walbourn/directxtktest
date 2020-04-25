@@ -196,8 +196,16 @@ int __cdecl main()
 
         auto stream1 = wb->CreateStreamInstance(0u);
 
+        size_t streamDur = wb->GetSampleDurationMS(0u);
+
         printf("Playing #0: ");
         stream1->Play();
+
+        if (stream1->IsLooped())
+        {
+            printf("\nERROR: Play() should have put it into a non-looped mode\n");
+            return 1;
+        }
 
         ULONGLONG startTick = GetTickCount64();
 
@@ -205,32 +213,94 @@ int __cdecl main()
         {
             UPDATE
 
-                if (GetAsyncKeyState(VK_ESCAPE))
-                {
-                    while (GetAsyncKeyState(VK_ESCAPE))
-                        Sleep(10);
-                    break;
-                }
-
             printf(".");
             Sleep(200);
 
             ULONGLONG tick = GetTickCount64();
 
             if (tick > startTick + 60000)
-            {
-                printf("<timeout>\n");
                 break;
-            }
         }
 
-        stream1->Stop();
         printf("<done>\n");
 
+        ULONGLONG dur = GetTickCount64() - startTick;
+
+        if (dur < streamDur)
+        {
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, streamDur);
+            return 1;
+        }
+        else if (dur > (streamDur + 2000))
+        {
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, streamDur);
+            return 1;
+        }
+
+        // Restart
+        printf("\nPlaying stream instance for 2 seconds...\n");
+
+        stream1->Play();
+
+        if (stream1->IsLooped())
+        {
+            printf("\nERROR: Play() should have put it into a non-looped mode\n");
+            return 1;
+        }
+
+        startTick = GetTickCount64();
+
+        while (stream1->GetState() == PLAYING)
+        {
+            UPDATE
+
+            printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 2000)
+                break;
+        }
+
+        printf("\nRestarting...\n");
+        stream1->Stop();
+        stream1->Play();
+
+        startTick = GetTickCount64();
+
+        while (stream1->GetState() == PLAYING)
+        {
+            UPDATE
+
+                printf(".");
+            Sleep(200);
+        }
+
+        dur = GetTickCount64() - startTick;
+
+        if (dur < streamDur)
+        {
+            printf("\nERROR: Play() time (%llu) was unexpectedly short (%zu)\n", dur, streamDur);
+            return 1;
+        }
+        else if (dur > (streamDur + 2000))
+        {
+            printf("\nERROR: Play() time (%llu) was unexpectedly long (%zu)\n", dur, streamDur);
+            return 1;
+        }
+
+        // Loop
         auto stream2 = wb->CreateStreamInstance(2u);
 
         printf("\n\nPlaying #2 (looped): ");
         stream2->Play(true);
+
+        if (!stream2->IsLooped())
+        {
+            printf("\nERROR: Play(true) should have put it into a looped mode\n");
+            return 1;
+        }
 
         startTick = GetTickCount64();
 
@@ -254,7 +324,7 @@ int __cdecl main()
             if (tick > startTick + 80000)
             {
                 printf("<timeout>\n");
-                break;
+                return 1;
             }
             else if (exitloop && (tick > startTick + 45000))
             {
@@ -267,7 +337,203 @@ int __cdecl main()
         stream2->Stop();
         printf("<done>\n");
 
-        // TODO - Pause, Resume, Volume, Pan
+        // Additional tests
+        auto stream3 = wb->CreateStreamInstance(1u);
+
+        printf("\n\nPlaying #1 (looped): ");
+        stream3->Play(true);
+
+        printf("\nLooping for 15 seconds...\n");
+
+        if (!stream3->IsLooped())
+        {
+            printf("\nERROR: Play(true) should have put it into a looped mode\n");
+            return 1;
+        }
+
+        startTick = GetTickCount64();
+
+        while (stream3->GetState() == PLAYING)
+        {
+            UPDATE
+
+                printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 15000)
+                break;
+        }
+
+        // Pause
+        stream3->Pause();
+
+        if (stream3->GetState() != PAUSED)
+        {
+            printf("\nERROR: Pause should have put it into a PAUSED state\n");
+            return 1;
+        }
+
+        printf("\nPausing for 5 seconds...\n");
+
+        startTick = GetTickCount64();
+
+        for (;;)
+        {
+            UPDATE
+
+                printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 5000)
+                break;
+        }
+
+        // Resume
+        stream3->Resume();
+
+        printf("\nResuming for 5 seconds...\n");
+
+        if (stream3->GetState() != PLAYING)
+        {
+            printf("\nERROR: Play should have put it into a PLAYING state\n");
+            return 1;
+        }
+
+        startTick = GetTickCount64();
+
+        while (stream3->GetState() == PLAYING)
+        {
+            UPDATE
+
+                printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 5000)
+                break;
+        }
+
+        // Restart loop
+        stream3->Stop();
+        stream3->Play(true);
+
+        printf("\nRestarting for 10 seconds...\n");
+
+        if (stream3->GetState() != PLAYING)
+        {
+            printf("\nERROR: Play should have put it into a PLAYING state\n");
+            return 1;
+        }
+
+        startTick = GetTickCount64();
+
+        while (stream3->GetState() == PLAYING)
+        {
+            UPDATE
+
+                printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 10000)
+                break;
+        }
+
+        // Exit loop
+        stream3->Stop(false);
+
+        printf("\nExiting loop...\n");
+
+        if (stream3->IsLooped())
+        {
+            printf("\nERROR: Stop(false) should have put it into a non-looped mode\n");
+            return 1;
+        }
+
+        while (stream3->GetState() == PLAYING)
+        {
+            UPDATE
+
+                printf(".");
+            Sleep(200);
+        }
+
+        // Volume
+        stream3->Play(true);
+
+        printf("\nScaling volume...\n");
+
+        float acc = 0.f;
+        float step = 1.f / 10.f;
+
+        while (stream3->GetState() == PLAYING)
+        {
+            stream3->SetVolume(acc);
+            printf(".(%.1f)", acc);
+            Sleep(500);
+            acc += step;
+
+            if (acc > 1.f)
+            {
+                acc = 1.f;
+                step = -step;
+            }
+            else if (acc < 0.f)
+                break;
+
+            UPDATE
+        }
+
+        stream3->SetVolume(1.f);
+
+        // Pan
+        printf("\nPanning...\n");
+
+        acc = -1.f;
+        step = 1.f / 10.f;
+
+        while (stream3->GetState() == PLAYING)
+        {
+            stream3->SetPan(acc);
+            printf(".(%.1f)", acc);
+            Sleep(500);
+            acc += step;
+
+            if (acc > 1.f)
+                break;
+
+            UPDATE
+        }
+
+        stream3->SetPan(0.f);
+
+        // Pitch test (mono)
+        printf("\nPitch-shifting...\n");
+
+        acc = -1.f;
+        step = 1.f / 10.f;
+
+        while (stream3->GetState() == PLAYING)
+        {
+            stream3->SetPitch(acc);
+            printf(".(%.1f)", acc);
+            Sleep(500);
+            acc += step;
+
+            if (acc > 1.f)
+                break;
+
+            UPDATE
+        }
+
+        stream3->SetPitch(0.f);
+        stream3->Stop();
     }
 #endif
 
@@ -313,7 +579,7 @@ int __cdecl main()
             if (tick > startTick + 60000)
             {
                 printf("<timeout>\n");
-                break;
+                return 1;
             }
         }
 
@@ -347,7 +613,7 @@ int __cdecl main()
             if (tick > startTick + 80000)
             {
                 printf("<timeout>\n");
-                break;
+                return 1;
             }
             else if (exitloop && (tick > startTick + 45000))
             {
@@ -360,7 +626,40 @@ int __cdecl main()
         stream2->Stop();
         printf("<done>\n");
 
-        // TODO - Pause, Resume
+        auto stream3 = wb->CreateStreamInstance(1u);
+
+        printf("\n\nPlaying #1: ");
+        stream3->Play();
+
+        startTick = GetTickCount64();
+
+        while (stream3->GetState() == PLAYING)
+        {
+            UPDATE
+
+                if (GetAsyncKeyState(VK_ESCAPE))
+                {
+                    while (GetAsyncKeyState(VK_ESCAPE))
+                        Sleep(10);
+                    break;
+                }
+
+            printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 80000)
+            {
+                printf("<timeout>\n");
+                return 1;
+            }
+        }
+
+        stream3->Stop();
+        printf("<done>\n");
     }
 #endif
+
+    return 0;
 }
