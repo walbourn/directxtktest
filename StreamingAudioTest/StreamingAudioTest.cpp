@@ -33,6 +33,7 @@
 
 #define TEST_PCM
 #define TEST_ADPCM
+#define TEST_XWMA
 
 using namespace DirectX;
 
@@ -321,7 +322,7 @@ int __cdecl main()
 
             ULONGLONG tick = GetTickCount64();
 
-            if (tick > startTick + 80000)
+            if (tick > startTick + 100000)
             {
                 printf("<timeout>\n");
                 return 1;
@@ -610,7 +611,131 @@ int __cdecl main()
 
             ULONGLONG tick = GetTickCount64();
 
-            if (tick > startTick + 80000)
+            if (tick > startTick + 100000)
+            {
+                printf("<timeout>\n");
+                return 1;
+            }
+            else if (exitloop && (tick > startTick + 45000))
+            {
+                printf("<breaking loop>");
+                stream2->Stop(false);
+                exitloop = false;
+            }
+        }
+
+        stream2->Stop();
+        printf("<done>\n");
+
+        auto stream3 = wb->CreateStreamInstance(1u);
+
+        printf("\n\nPlaying #1: ");
+        stream3->Play();
+
+        startTick = GetTickCount64();
+
+        while (stream3->GetState() == PLAYING)
+        {
+            UPDATE
+
+                if (GetAsyncKeyState(VK_ESCAPE))
+                {
+                    while (GetAsyncKeyState(VK_ESCAPE))
+                        Sleep(10);
+                    break;
+                }
+
+            printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 100000)
+            {
+                printf("<timeout>\n");
+                return 1;
+            }
+        }
+
+        stream3->Stop();
+        printf("<done>\n");
+    }
+#endif
+
+#ifdef TEST_XWMA
+    {
+        // xWMA WaveBank
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"WaveBankxWMA.xwb");
+        printf("\n\nINFO: Loaded WaveBankxWMA.xwb\n");
+
+        char buff[64] = {};
+        auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
+
+        for (uint32_t j = 0; j < 3; ++j)
+        {
+            printf("\tIndex #%u (%zu bytes, %zu samples, %zu ms)\n",
+                j, wb->GetSampleSizeInBytes(j), wb->GetSampleDuration(j), wb->GetSampleDurationMS(j));
+            dump_wfx(wb->GetFormat(j, wfx, 64));
+        }
+
+        auto stream1 = wb->CreateStreamInstance(0u);
+
+        printf("Playing #0: ");
+        stream1->Play();
+
+        ULONGLONG startTick = GetTickCount64();
+
+        while (stream1->GetState() == PLAYING)
+        {
+            UPDATE
+
+                if (GetAsyncKeyState(VK_ESCAPE))
+                {
+                    while (GetAsyncKeyState(VK_ESCAPE))
+                        Sleep(10);
+                    break;
+                }
+
+            printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 60000)
+            {
+                printf("<timeout>\n");
+                return 1;
+            }
+        }
+
+        stream1->Stop();
+        printf("<done>\n");
+
+        auto stream2 = wb->CreateStreamInstance(2u);
+
+        printf("\n\nPlaying #2 (looped): ");
+        stream2->Play(true);
+
+        startTick = GetTickCount64();
+
+        bool exitloop = true;
+        while (stream2->GetState() == PLAYING)
+        {
+            UPDATE
+
+                if (GetAsyncKeyState(VK_ESCAPE))
+                {
+                    while (GetAsyncKeyState(VK_ESCAPE))
+                        Sleep(10);
+                    break;
+                }
+
+            printf(".");
+            Sleep(200);
+
+            ULONGLONG tick = GetTickCount64();
+
+            if (tick > startTick + 100000)
             {
                 printf("<timeout>\n");
                 return 1;
