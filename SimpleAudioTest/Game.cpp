@@ -327,7 +327,8 @@ void Game::Initialize(
 
     m_wbADPCM = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"ADPCMdroid.xwb");
     m_console->WriteLine(L"ADPCMdroid.xwb");
-    m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
+    m_console->Format(L"    Index #%u (%zu bytes, %zu samples, %zu ms)\n",
+        WB_INMEMORY_ENTRY,
         m_wbADPCM->GetSampleSizeInBytes(WB_INMEMORY_ENTRY),
         m_wbADPCM->GetSampleDuration(WB_INMEMORY_ENTRY),
         m_wbADPCM->GetSampleDurationMS(WB_INMEMORY_ENTRY));
@@ -353,7 +354,8 @@ void Game::Initialize(
 #if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
     m_wbXWMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xwmadroid.xwb");
     m_console->WriteLine(L"xwmadroid.xwb");
-    m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
+    m_console->Format(L"    Index #%u (%zu bytes, %zu samples, %zu ms)\n",
+        WB_INMEMORY_ENTRY,
         m_wbXWMA->GetSampleSizeInBytes(WB_INMEMORY_ENTRY),
         m_wbXWMA->GetSampleDuration(WB_INMEMORY_ENTRY),
         m_wbXWMA->GetSampleDurationMS(WB_INMEMORY_ENTRY));
@@ -380,7 +382,8 @@ void Game::Initialize(
 #if defined(_XBOX_ONE) && defined(_TITLE)
     m_wbXMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xmadroid.xwb");
     m_console->WriteLine(L"xmadroid.xwb");
-    m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
+    m_console->Format(L"    Index #%u (%zu bytes, %zu samples, %zu ms)\n",
+        WB_INMEMORY_ENTRY,
         m_wbXMA->GetSampleSizeInBytes(WB_INMEMORY_ENTRY),
         m_wbXMA->GetSampleDuration(WB_INMEMORY_ENTRY),
         m_wbXMA->GetSampleDurationMS(WB_INMEMORY_ENTRY));
