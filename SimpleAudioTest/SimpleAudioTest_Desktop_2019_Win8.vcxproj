@@ -187,7 +187,7 @@
   <ItemGroup>
     <None Include="..\BasicAudioTest\ADPCMdroid.xwb" />
     <None Include="..\BasicAudioTest\droid.xwb" />
-    <None Include="..\BasicAudioTest\xwmadroid.xwb" />
+    <None Include="..\StreamingAudioTest\WaveBankADPCM.xwb" />
     <None Include="comic.spritefont" />
     <None Include="Courier_16.spritefont" />
   </ItemGroup>
@@ -195,7 +195,6 @@
     <Media Include="..\BasicAudioTest\Alarm01.wav" />
     <Media Include="..\BasicAudioTest\Alarm01_adpcm.wav" />
     <Media Include="..\BasicAudioTest\Alarm01_float.wav" />
-    <Media Include="..\BasicAudioTest\Alarm01_xwma.wav" />
     <Media Include="tada.wav" />
   </ItemGroup>
   <ItemGroup>

@@ -87,6 +87,12 @@
     <None Include="Courier_16.spritefont">
       <Filter>Assets</Filter>
     </None>
+    <None Include="..\StreamingAudioTest\WaveBankADPCM.xwb">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\StreamingAudioTest\WaveBankxWMA.xwb">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageUWP.appxmanifest" />

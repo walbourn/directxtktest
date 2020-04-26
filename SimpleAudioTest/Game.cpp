@@ -26,6 +26,43 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
+
+namespace
+{
+    const unsigned int WB_INMEMORY_ENTRY = 8;
+    const unsigned int WB_STREAM_ENTRY = 1;
+
+    const wchar_t* STREAM_NAMES[] =
+    {
+        L"ADPCM",
+#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+        L"xWMA",
+#endif
+    };
+}
+
+SoundStreamInstance* Game::GetCurrentStream(unsigned int index)
+{
+#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+    if (index == 1)
+    {
+        if (!m_streamXWMA)
+        {
+            m_streamXWMA = m_wbstreamXWMA->CreateStreamInstance(WB_STREAM_ENTRY);
+        }
+        return m_streamXWMA.get();
+    }
+#else
+    UNREFERENCED_PARAMETER(index);
+#endif
+
+    if (!m_streamADPCM)
+    {
+        m_streamADPCM = m_wbstreamADPCM->CreateStreamInstance(WB_STREAM_ENTRY);
+    }
+    return m_streamADPCM.get();
+}
+
 namespace
 {
     void SetDeviceString(_In_ AudioEngine* engine, _Out_writes_(maxsize) wchar_t* deviceStr, size_t maxsize)
@@ -119,6 +156,7 @@ namespace
     
 // Constructor.
 Game::Game() noexcept(false) :
+    m_currentStream(0),
     m_critError(false),
     m_retrydefault(false),
     m_newAudio(false),
@@ -158,6 +196,12 @@ Game::Game() noexcept(false) :
 
 Game::~Game()
 {
+    m_streamADPCM.reset();
+
+#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+    m_streamXWMA.reset();
+#endif
+
     if (m_audEngine)
     {
         m_audEngine->Suspend();
@@ -232,8 +276,10 @@ void Game::Initialize(
 
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #define MEDIA_PATH L"..\\BasicAudioTest\\"
+#define STREAM_MEDIA_PATH L"..\\StreamingAudioTest\\"
 #else
 #define MEDIA_PATH
+#define STREAM_MEDIA_PATH
 #endif
 
     //--- WAV files ---
@@ -268,39 +314,66 @@ void Game::Initialize(
     //--- XWB Wave Banks ---
     m_wbPCM = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"droid.xwb");
     m_console->WriteLine(L"droid.xwb");
-    m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
-        m_wbPCM->GetSampleSizeInBytes(8),
-        m_wbPCM->GetSampleDuration(8),
-        m_wbPCM->GetSampleDurationMS(8));
+    m_console->Format(L"    Index #%u (%zu bytes, %zu samples, %zu ms)\n",
+        WB_INMEMORY_ENTRY,
+        m_wbPCM->GetSampleSizeInBytes(WB_INMEMORY_ENTRY),
+        m_wbPCM->GetSampleDuration(WB_INMEMORY_ENTRY),
+        m_wbPCM->GetSampleDurationMS(WB_INMEMORY_ENTRY));
     {
         char buff[64] = {};
         auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
-        dump_wfx(m_console.get(), m_wbPCM->GetFormat(8, wfx, 64));
+        dump_wfx(m_console.get(), m_wbPCM->GetFormat(WB_INMEMORY_ENTRY, wfx, 64));
     }
 
     m_wbADPCM = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"ADPCMdroid.xwb");
     m_console->WriteLine(L"ADPCMdroid.xwb");
     m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
-        m_wbADPCM->GetSampleSizeInBytes(8),
-        m_wbADPCM->GetSampleDuration(8),
-        m_wbADPCM->GetSampleDurationMS(8));
+        m_wbADPCM->GetSampleSizeInBytes(WB_INMEMORY_ENTRY),
+        m_wbADPCM->GetSampleDuration(WB_INMEMORY_ENTRY),
+        m_wbADPCM->GetSampleDurationMS(WB_INMEMORY_ENTRY));
     {
         char buff[64] = {};
         auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
-        dump_wfx(m_console.get(), m_wbADPCM->GetFormat(8, wfx, 64));
+        dump_wfx(m_console.get(), m_wbADPCM->GetFormat(WB_INMEMORY_ENTRY, wfx, 64));
+    }
+
+    m_wbstreamADPCM = std::make_unique<WaveBank>(m_audEngine.get(), STREAM_MEDIA_PATH L"WaveBankADPCM.xwb");
+    m_console->WriteLine(L"WaveBankADPCM.xwb");
+    m_console->Format(L"    Index #%u (%zu bytes, %zu samples, %zu ms)\n",
+        WB_STREAM_ENTRY,
+        m_wbstreamADPCM->GetSampleSizeInBytes(WB_STREAM_ENTRY),
+        m_wbstreamADPCM->GetSampleDuration(WB_STREAM_ENTRY),
+        m_wbstreamADPCM->GetSampleDurationMS(WB_STREAM_ENTRY));
+    {
+        char buff[64] = {};
+        auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
+        dump_wfx(m_console.get(), m_wbstreamADPCM->GetFormat(WB_STREAM_ENTRY, wfx, 64));
     }
 
 #if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
     m_wbXWMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xwmadroid.xwb");
     m_console->WriteLine(L"xwmadroid.xwb");
     m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
-        m_wbXWMA->GetSampleSizeInBytes(8),
-        m_wbXWMA->GetSampleDuration(8),
-        m_wbXWMA->GetSampleDurationMS(8));
+        m_wbXWMA->GetSampleSizeInBytes(WB_INMEMORY_ENTRY),
+        m_wbXWMA->GetSampleDuration(WB_INMEMORY_ENTRY),
+        m_wbXWMA->GetSampleDurationMS(WB_INMEMORY_ENTRY));
     {
         char buff[64] = {};
         auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
-        dump_wfx(m_console.get(), m_wbXWMA->GetFormat(8, wfx, 64));
+        dump_wfx(m_console.get(), m_wbXWMA->GetFormat(WB_INMEMORY_ENTRY, wfx, 64));
+    }
+
+    m_wbstreamXWMA = std::make_unique<WaveBank>(m_audEngine.get(), STREAM_MEDIA_PATH L"WaveBankxWMA.xwb");
+    m_console->WriteLine(L"WaveBankxWMA.xwb");
+    m_console->Format(L"    Index #%u (%zu bytes, %zu samples, %zu ms)\n",
+        WB_STREAM_ENTRY,
+        m_wbstreamXWMA->GetSampleSizeInBytes(WB_STREAM_ENTRY),
+        m_wbstreamXWMA->GetSampleDuration(WB_STREAM_ENTRY),
+        m_wbstreamXWMA->GetSampleDurationMS(WB_STREAM_ENTRY));
+    {
+        char buff[64] = {};
+        auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
+        dump_wfx(m_console.get(), m_wbstreamXWMA->GetFormat(WB_STREAM_ENTRY, wfx, 64));
     }
 #endif
 
@@ -308,13 +381,13 @@ void Game::Initialize(
     m_wbXMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xmadroid.xwb");
     m_console->WriteLine(L"xmadroid.xwb");
     m_console->Format(L"    Index #8 (%zu bytes, %zu samples, %zu ms)\n",
-        m_wbXMA->GetSampleSizeInBytes(8),
-        m_wbXMA->GetSampleDuration(8),
-        m_wbXMA->GetSampleDurationMS(8));
+        m_wbXMA->GetSampleSizeInBytes(WB_INMEMORY_ENTRY),
+        m_wbXMA->GetSampleDuration(WB_INMEMORY_ENTRY),
+        m_wbXMA->GetSampleDurationMS(WB_INMEMORY_ENTRY));
     {
         char buff[64] = {};
         auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
-        dump_wfx(m_console.get(), m_wbXMA->GetFormat(8, wfx, 64));
+        dump_wfx(m_console.get(), m_wbXMA->GetFormat(WB_INMEMORY_ENTRY, wfx, 64));
     }
 #endif
 }
@@ -379,12 +452,12 @@ void Game::Update(DX::StepTimer const&)
         if (m_gamepadButtons.dpadDown == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"PCM Wavebank started");
-            m_wbPCM->Play(8);
+            m_wbPCM->Play(WB_INMEMORY_ENTRY);
         }
         if (m_gamepadButtons.dpadLeft == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"ADPCM Wavebank started");
-            m_wbADPCM->Play(8);
+            m_wbADPCM->Play(WB_INMEMORY_ENTRY);
         }
 
 #if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
@@ -396,7 +469,7 @@ void Game::Update(DX::StepTimer const&)
         if (m_gamepadButtons.dpadRight == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"xWMA Wavebank started");
-            m_wbXWMA->Play(8);
+            m_wbXWMA->Play(WB_INMEMORY_ENTRY);
         }
 #endif
 
@@ -409,9 +482,19 @@ void Game::Update(DX::StepTimer const&)
         if (m_gamepadButtons.dpadUp == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"XMA2 Wavebank started");
-            m_wbXMA->Play(8);
+            m_wbXMA->Play(WB_INMEMORY_ENTRY);
         }
 #endif
+
+        if (m_gamepadButtons.leftShoulder == ButtonState::PRESSED || m_gamepadButtons.rightShoulder == ButtonState::PRESSED)
+        {
+            UpdateCurrentStream(m_gamepadButtons.leftShoulder == ButtonState::PRESSED);
+        }
+
+        if (m_gamepadButtons.leftTrigger == ButtonState::PRESSED || m_gamepadButtons.rightTrigger == ButtonState::PRESSED)
+        {
+            CycleCurrentStream(m_gamepadButtons.rightTrigger == ButtonState::PRESSED);
+        }
 
         if (m_gamepadButtons.menu == ButtonState::PRESSED)
         {
@@ -419,63 +502,150 @@ void Game::Update(DX::StepTimer const&)
             m_audEngine->TrimVoicePool();
         }
     }
-    else
-    {
-        if (m_keyboardButtons.IsKeyPressed(Keyboard::D1))
-        {
-            m_console->WriteLine(L"PCM alarm started");
-            m_alarmPCM->Play();
-        }
-        if (m_keyboardButtons.IsKeyPressed(Keyboard::D3))
-        {
-            m_console->WriteLine(L"ADPCM alarm started");
-            m_alarmADPCM->Play();
-        }
-        if (m_keyboardButtons.IsKeyPressed(Keyboard::D4))
-        {
-            m_console->WriteLine(L"FLOAT32 alarm started");
-            m_alarmFLOAT->Play();
-        }
-        if (m_keyboardButtons.IsKeyPressed(Keyboard::D5))
-        {
-            m_console->WriteLine(L"PCM tada started");
-            m_tadaPCM->Play();
-        }
 
-        if (m_keyboardButtons.IsKeyPressed(Keyboard::Q))
-        {
-            m_console->WriteLine(L"PCM Wavebank started");
-            m_wbPCM->Play(8);
-        }
-        if (m_keyboardButtons.IsKeyPressed(Keyboard::W))
-        {
-            m_console->WriteLine(L"ADPCM Wavebank started");
-            m_wbADPCM->Play(8);
-        }
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::D1))
+    {
+        m_console->WriteLine(L"PCM alarm started");
+        m_alarmPCM->Play();
+    }
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::D3))
+    {
+        m_console->WriteLine(L"ADPCM alarm started");
+        m_alarmADPCM->Play();
+    }
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::D4))
+    {
+        m_console->WriteLine(L"FLOAT32 alarm started");
+        m_alarmFLOAT->Play();
+    }
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::D5))
+    {
+        m_console->WriteLine(L"PCM tada started");
+        m_tadaPCM->Play();
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Q))
+    {
+        m_console->WriteLine(L"PCM Wavebank started");
+        m_wbPCM->Play(WB_INMEMORY_ENTRY);
+    }
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::W))
+    {
+        m_console->WriteLine(L"ADPCM Wavebank started");
+        m_wbADPCM->Play(WB_INMEMORY_ENTRY);
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::A) || m_keyboardButtons.IsKeyPressed(Keyboard::S))
+    {
+        UpdateCurrentStream(m_keyboardButtons.IsKeyPressed(Keyboard::A));
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::OemOpenBrackets) || m_keyboardButtons.IsKeyReleased(Keyboard::OemCloseBrackets))
+    {
+        CycleCurrentStream(m_keyboardButtons.IsKeyReleased(Keyboard::OemCloseBrackets));
+    }
 
 #if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
-        if (m_keyboardButtons.IsKeyPressed(Keyboard::D2))
-        {
-            m_console->WriteLine(L"xWMA alarm started");
-            m_alarmXWMA->Play();
-        }
-        if (m_keyboardButtons.IsKeyPressed(Keyboard::E))
-        {
-            m_console->WriteLine(L"xWMA Wavebank started");
-            m_wbXWMA->Play(8);
-        }
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::D2))
+    {
+        m_console->WriteLine(L"xWMA alarm started");
+        m_alarmXWMA->Play();
+    }
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::E))
+    {
+        m_console->WriteLine(L"xWMA Wavebank started");
+        m_wbXWMA->Play(WB_INMEMORY_ENTRY);
+    }
 #endif
 
-        if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
-        {
-            m_console->WriteLine(L"Voice pool trimmed");
-            m_audEngine->TrimVoicePool();
-        }
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
+    {
+        m_console->WriteLine(L"Voice pool trimmed");
+        m_audEngine->TrimVoicePool();
     }
 
     if (kb.Escape)
     {
         ExitGame();
+    }
+}
+
+void Game::UpdateCurrentStream(bool isplay)
+{
+    auto stream = GetCurrentStream(m_currentStream);
+    if (stream)
+    {
+        if (isplay)
+        {
+            if (stream->GetState() == SoundState::PLAYING)
+            {
+                wchar_t buff[64] = {};
+                swprintf_s(buff, L"%ls streaming wavebank already playing", STREAM_NAMES[m_currentStream]);
+                m_console->WriteLine(buff);
+            }
+            else
+            {
+                wchar_t buff[64] = {};
+                swprintf_s(buff, L"%ls streaming wavebank playing", STREAM_NAMES[m_currentStream]);
+                m_console->WriteLine(buff);
+
+                stream->Play(true);
+            }
+        }
+        else
+        {
+            if (stream->GetState() == SoundState::STOPPED)
+            {
+                wchar_t buff[64] = {};
+                swprintf_s(buff, L"%ls streaming wavebank already stopped", STREAM_NAMES[m_currentStream]);
+                m_console->WriteLine(buff);
+            }
+            else
+            {
+                wchar_t buff[64] = {};
+                swprintf_s(buff, L"%ls streaming wavebank stopping", STREAM_NAMES[m_currentStream]);
+                m_console->WriteLine(buff);
+                stream->Stop();
+            }
+        }
+    }
+    else
+    {
+        wchar_t buff[64] = {};
+        swprintf_s(buff, L"%ls streaming wavebank entry not found", STREAM_NAMES[m_currentStream]);
+        m_console->WriteLine(buff);
+    }
+}
+
+void Game::CycleCurrentStream(bool increment)
+{
+    auto stream = GetCurrentStream(m_currentStream);
+
+    bool wasplaying = false;
+    if (stream)
+    {
+        wasplaying = (stream->GetState() == SoundState::PLAYING);
+        stream->Stop();
+    }
+
+    if (increment)
+    {
+        m_currentStream = (m_currentStream + 1) % _countof(STREAM_NAMES);
+    }
+    else
+    {
+        m_currentStream = (m_currentStream - 1) % _countof(STREAM_NAMES);
+    }
+
+    if (wasplaying)
+    {
+        UpdateCurrentStream(true);
+    }
+    else
+    {
+        wchar_t buff[64] = {};
+        swprintf_s(buff, L"Current stream is %ls", STREAM_NAMES[m_currentStream]);
+        m_console->WriteLine(buff);
     }
 }
 #pragma endregion
@@ -510,11 +680,11 @@ void Game::Render()
     auto stats = m_audEngine->GetStatistics();
 
     wchar_t statsStr[256] = {};
-    swprintf_s(statsStr, L"Playing: %zu / %zu; Instances %zu; Voices %zu / %zu / %zu / %zu; %zu audio bytes",
+    swprintf_s(statsStr, L"Playing: %zu / %zu; Instances %zu; Voices %zu / %zu / %zu / %zu; %zu audio bytes; %zu stream bytes",
         stats.playingOneShots, stats.playingInstances,
         stats.allocatedInstances, stats.allocatedVoices, stats.allocatedVoices3d,
         stats.allocatedVoicesOneShot, stats.allocatedVoicesIdle,
-        stats.audioBytes);
+        stats.audioBytes, stats.streamingBytes);
 
     auto size = m_deviceResources->GetOutputSize();
 
@@ -544,6 +714,7 @@ void Game::Render()
     const wchar_t* help2 = nullptr;
     const wchar_t* help3 = nullptr;
     const wchar_t* help4 = nullptr;
+    const wchar_t* help5 = nullptr;
 
     if (m_gamepadPresent)
     {
@@ -552,16 +723,18 @@ void Game::Render()
 #else
         help1 = L"Press A, B, X, or Y to trigger Alarm.wav; LTrigger+A for Tada.wav";
 #endif
-        help2 = L"Press DPAD to trigger Wavebank entry #8";
-        help3 = L"Press MENU/START to trim voices";
-        help4 = L"Press VIEW/BACK to exit";
+        help2 = L"Press DPAD to trigger in-memory Wavebank entry";
+        help3 = L"Press RSB/LSB to start/stop streaming WaveBank entry; LT/RT to cycle stream bank";
+        help4 = L"Press MENU/START to trim voices";
+        help5 = L"Press VIEW/BACK to exit";
     }
     else
     {
         help1 = L"Press 1, 2, 3, or 4 to trigger Alarm.wav; 5 for Tada.wav";
-        help2 = L"Press Q, W, or E to trigger Wavebank entry #8";
-        help3 = L"Press Space to trim voices";
-        help4 = L"Press Esc to exit";
+        help2 = L"Press Q, W, or E to trigger Wavebank entry";
+        help3 = L"Press A/S to start/stop streaming WaveBank entry; [] to cycle stream bank";
+        help4 = L"Press Space to trim voices";
+        help5 = L"Press Esc to exit";
     }
 
     m_comicFont->DrawString(m_spriteBatch.get(), help1, pos, blue);
@@ -574,6 +747,9 @@ void Game::Render()
     pos.y += dy;
 
     m_comicFont->DrawString(m_spriteBatch.get(), help4, pos, blue);
+    pos.y += dy;
+
+    m_comicFont->DrawString(m_spriteBatch.get(), help5, pos, blue);
 
     m_spriteBatch->End();
 

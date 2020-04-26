@@ -184,6 +184,8 @@
     <None Include="..\BasicAudioTest\ADPCMdroid.xwb" />
     <None Include="..\BasicAudioTest\droid.xwb" />
     <None Include="..\BasicAudioTest\xwmadroid.xwb" />
+    <None Include="..\StreamingAudioTest\WaveBankADPCM.xwb" />
+    <None Include="..\StreamingAudioTest\WaveBankxWMA.xwb" />
     <None Include="comic.spritefont" />
     <None Include="Courier_16.spritefont" />
   </ItemGroup>

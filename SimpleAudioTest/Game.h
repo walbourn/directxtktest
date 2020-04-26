@@ -110,14 +110,18 @@ private:
     std::unique_ptr<DirectX::SpriteBatch>   m_spriteBatch;
     std::unique_ptr<DirectX::SpriteFont>    m_comicFont;
 
-    std::unique_ptr<DirectX::SoundEffect>   m_alarmPCM;
-    std::unique_ptr<DirectX::SoundEffect>   m_tadaPCM;
-    std::unique_ptr<DirectX::SoundEffect>   m_alarmADPCM;
-    std::unique_ptr<DirectX::SoundEffect>   m_alarmFLOAT;
+    std::unique_ptr<DirectX::SoundEffect>           m_alarmPCM;
+    std::unique_ptr<DirectX::SoundEffect>           m_tadaPCM;
+    std::unique_ptr<DirectX::SoundEffect>           m_alarmADPCM;
+    std::unique_ptr<DirectX::SoundEffect>           m_alarmFLOAT;
+
+    std::unique_ptr<DirectX::SoundStreamInstance>   m_streamADPCM;
 
 #if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
-    std::unique_ptr<DirectX::SoundEffect>   m_alarmXWMA;
-    std::unique_ptr<DirectX::WaveBank>      m_wbXWMA;
+    std::unique_ptr<DirectX::SoundEffect>           m_alarmXWMA;
+    std::unique_ptr<DirectX::WaveBank>              m_wbXWMA;
+    std::unique_ptr<DirectX::WaveBank>              m_wbstreamXWMA;
+    std::unique_ptr<DirectX::SoundStreamInstance>   m_streamXWMA;
 #endif
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
@@ -127,8 +131,11 @@ private:
 
     std::unique_ptr<DirectX::WaveBank>      m_wbPCM;
     std::unique_ptr<DirectX::WaveBank>      m_wbADPCM;
+    std::unique_ptr<DirectX::WaveBank>      m_wbstreamADPCM;
 
     std::unique_ptr<DX::TextConsole> m_console;
+
+    unsigned int m_currentStream;
 
     bool m_critError;
     bool m_retrydefault;
@@ -137,4 +144,8 @@ private:
     wchar_t m_deviceStr[256];
 
     bool m_gamepadPresent;
+
+    DirectX::SoundStreamInstance* GetCurrentStream(unsigned int);
+    void UpdateCurrentStream(bool isplay);
+    void CycleCurrentStream(bool increment);
 };

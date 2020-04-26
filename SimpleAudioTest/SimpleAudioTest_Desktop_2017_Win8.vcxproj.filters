@@ -45,10 +45,10 @@
     <None Include="..\BasicAudioTest\droid.xwb">
       <Filter>Assets</Filter>
     </None>
-    <None Include="..\BasicAudioTest\xwmadroid.xwb">
+    <None Include="Courier_16.spritefont">
       <Filter>Assets</Filter>
     </None>
-    <None Include="Courier_16.spritefont">
+    <None Include="..\StreamingAudioTest\WaveBankADPCM.xwb">
       <Filter>Assets</Filter>
     </None>
   </ItemGroup>
@@ -60,9 +60,6 @@
       <Filter>Assets</Filter>
     </Media>
     <Media Include="..\BasicAudioTest\Alarm01_float.wav">
-      <Filter>Assets</Filter>
-    </Media>
-    <Media Include="..\BasicAudioTest\Alarm01_xwma.wav">
       <Filter>Assets</Filter>
     </Media>
     <Media Include="tada.wav">
