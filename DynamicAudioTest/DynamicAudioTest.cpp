@@ -277,8 +277,6 @@ int __cdecl main()
         return 1;
     }
 
-    printf("\tPASS\n");
-
 #ifdef TEST_SINE_WAVE
 
     //
