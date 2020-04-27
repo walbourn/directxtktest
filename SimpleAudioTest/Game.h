@@ -24,6 +24,13 @@
 #include "StepTimer.h"
 #include "TextConsole.h"
 
+#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#define TEST_XWMA
+#endif
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+#define TEST_XMA2
+#endif
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -117,14 +124,14 @@ private:
 
     std::unique_ptr<DirectX::SoundStreamInstance>   m_streamADPCM;
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef TEST_XWMA
     std::unique_ptr<DirectX::SoundEffect>           m_alarmXWMA;
     std::unique_ptr<DirectX::WaveBank>              m_wbXWMA;
     std::unique_ptr<DirectX::WaveBank>              m_wbstreamXWMA;
     std::unique_ptr<DirectX::SoundStreamInstance>   m_streamXWMA;
 #endif
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef TEST_XMA2
     std::unique_ptr<DirectX::SoundEffect>   m_alarmXMA;
     std::unique_ptr<DirectX::WaveBank>      m_wbXMA;
 #endif
@@ -133,7 +140,7 @@ private:
     std::unique_ptr<DirectX::WaveBank>      m_wbADPCM;
     std::unique_ptr<DirectX::WaveBank>      m_wbstreamADPCM;
 
-    std::unique_ptr<DX::TextConsole> m_console;
+    std::unique_ptr<DX::TextConsole>        m_console;
 
     unsigned int m_currentStream;
 

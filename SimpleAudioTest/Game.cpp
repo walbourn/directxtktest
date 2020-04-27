@@ -35,7 +35,7 @@ namespace
     const wchar_t* STREAM_NAMES[] =
     {
         L"ADPCM",
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef TEST_XWMA
         L"xWMA",
 #endif
     };
@@ -43,7 +43,7 @@ namespace
 
 SoundStreamInstance* Game::GetCurrentStream(unsigned int index)
 {
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef TEST_XWMA
     if (index == 1)
     {
         if (!m_streamXWMA)
@@ -198,7 +198,7 @@ Game::~Game()
 {
     m_streamADPCM.reset();
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef TEST_XWMA
     m_streamXWMA.reset();
 #endif
 
@@ -299,15 +299,15 @@ void Game::Initialize(
     m_console->Write(L"Alarm01_float.wav: ");
     dump_wfx(m_console.get(), m_alarmFLOAT->GetFormat());
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef TEST_XWMA
     m_alarmXWMA = std::make_unique<SoundEffect>(m_audEngine.get(), MEDIA_PATH L"Alarm01_xwma.wav");
-    m_console->Write(L"Alarm01_xwma.wav: ");
+    m_console->Write(L"Alarm01_xwma.wav:  ");
     dump_wfx(m_console.get(), m_alarmXWMA->GetFormat());
 #endif
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef TEST_XMA2
     m_alarmXMA = std::make_unique<SoundEffect>(m_audEngine.get(), L"Alarm01_xma.wav");
-    m_console->Write(L"Alarm01_xma.wav: ");
+    m_console->Write(L"Alarm01_xma.wav:   ");
     dump_wfx(m_console.get(), m_alarmXMA->GetFormat());
 #endif
 
@@ -351,7 +351,7 @@ void Game::Initialize(
         dump_wfx(m_console.get(), m_wbstreamADPCM->GetFormat(WB_STREAM_ENTRY, wfx, 64));
     }
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef TEST_XWMA
     m_wbXWMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xwmadroid.xwb");
     m_console->WriteLine(L"xwmadroid.xwb");
     m_console->Format(L"    Index #%u (%zu bytes, %zu samples, %zu ms)\n",
@@ -377,9 +377,9 @@ void Game::Initialize(
         auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
         dump_wfx(m_console.get(), m_wbstreamXWMA->GetFormat(WB_STREAM_ENTRY, wfx, 64));
     }
-#endif
+#endif // xWMA
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef TEST_XMA2
     m_wbXMA = std::make_unique<WaveBank>(m_audEngine.get(), MEDIA_PATH L"xmadroid.xwb");
     m_console->WriteLine(L"xmadroid.xwb");
     m_console->Format(L"    Index #%u (%zu bytes, %zu samples, %zu ms)\n",
@@ -463,7 +463,7 @@ void Game::Update(DX::StepTimer const&)
             m_wbADPCM->Play(WB_INMEMORY_ENTRY);
         }
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef TEST_XWMA
         if (m_gamepadButtons.b == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"xWMA alarm started");
@@ -476,7 +476,7 @@ void Game::Update(DX::StepTimer const&)
         }
 #endif
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef TEST_XMA2
         if (m_gamepadButtons.rightStick == ButtonState::PRESSED)
         {
             m_console->WriteLine(L"XMA2 alarm started");
@@ -548,7 +548,7 @@ void Game::Update(DX::StepTimer const&)
         CycleCurrentStream(m_keyboardButtons.IsKeyReleased(Keyboard::OemCloseBrackets));
     }
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef TEST_XWMA
     if (m_keyboardButtons.IsKeyPressed(Keyboard::D2))
     {
         m_console->WriteLine(L"xWMA alarm started");
@@ -637,7 +637,7 @@ void Game::CycleCurrentStream(bool increment)
     }
     else
     {
-        m_currentStream = (m_currentStream - 1) % _countof(STREAM_NAMES);
+        m_currentStream = (m_currentStream + _countof(STREAM_NAMES) - 1) % _countof(STREAM_NAMES);
     }
 
     if (wasplaying)
@@ -721,7 +721,7 @@ void Game::Render()
 
     if (m_gamepadPresent)
     {
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef TEST_XMA2
         help1 = L"Press A, B, X, Y, or RThumb to trigger Alarm.wav; LTrigger+A for Tada.wav";
 #else
         help1 = L"Press A, B, X, or Y to trigger Alarm.wav; LTrigger+A for Tada.wav";
@@ -922,7 +922,8 @@ void Game::CreateWindowSizeDependentResources()
 {
     auto viewport = m_deviceResources->GetScreenViewport();
     m_spriteBatch->SetViewport(viewport);
-    
+    m_console->SetViewport(viewport);
+
     RECT size = m_deviceResources->GetOutputSize();
 
     RECT safeRect = Viewport::ComputeTitleSafeArea(UINT(size.right), UINT(size.bottom));
