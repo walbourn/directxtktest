@@ -44,6 +44,9 @@ namespace
     };
 }
 
+#pragma warning(push)
+#pragma warning(disable : 4100)
+
 SoundStreamInstance* Game::GetCurrentStream(unsigned int index)
 {
 #ifdef TEST_XWMA
@@ -74,6 +77,8 @@ SoundStreamInstance* Game::GetCurrentStream(unsigned int index)
     }
     return m_streamADPCM.get();
 }
+
+#pragma warning(pop)
 
 namespace
 {
