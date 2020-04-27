@@ -132,8 +132,10 @@ private:
 #endif
 
 #ifdef TEST_XMA2
-    std::unique_ptr<DirectX::SoundEffect>   m_alarmXMA;
-    std::unique_ptr<DirectX::WaveBank>      m_wbXMA;
+    std::unique_ptr<DirectX::SoundEffect>           m_alarmXMA;
+    std::unique_ptr<DirectX::WaveBank>              m_wbXMA;
+    std::unique_ptr<DirectX::WaveBank>              m_wbstreamXMA;
+    std::unique_ptr<DirectX::SoundStreamInstance>   m_streamXMA;
 #endif
 
     std::unique_ptr<DirectX::WaveBank>      m_wbPCM;
