@@ -1327,6 +1327,57 @@ void Game::UnitTests(bool success)
         }
     }
 
+    // WIC SQUARE flags
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"cup_small.jpg",
+            0,
+            D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+            WIC_LOADER_MAKE_SQUARE,
+            res.GetAddressOf(), nullptr));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, 683, 683))
+        {
+            OutputDebugStringA("FAILED: cup_small.jpg square res desc unexpected\n");
+            success = false;
+        }
+    }
+
+    // WIC POW2 flags
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"cup_small.jpg",
+            0,
+            D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+            WIC_LOADER_FIT_POW2,
+            res.GetAddressOf(), nullptr));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, 256, 512))
+        {
+            OutputDebugStringA("FAILED: cup_small.jpg pow2 res desc unexpected\n");
+            success = false;
+        }
+    }
+
+    // WIC POW2 + SQUARE flags
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"cup_small.jpg",
+            0,
+            D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+            WIC_LOADER_FIT_POW2 | WIC_LOADER_MAKE_SQUARE,
+            res.GetAddressOf(), nullptr));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, 512, 512))
+        {
+            OutputDebugStringA("FAILED: cup_small.jpg pow2+square res desc unexpected\n");
+            success = false;
+        }
+    }
+
     OutputDebugStringA(success ? "Passed\n" : "Failed\n");
     OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
 }
