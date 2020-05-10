@@ -34,7 +34,7 @@
 #define TEST_PCM
 #define TEST_ADPCM
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef USING_XAUDIO2_9
 #define TEST_XWMA
 #endif
 
