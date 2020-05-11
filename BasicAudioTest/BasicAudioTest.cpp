@@ -1479,7 +1479,7 @@ int __cdecl main()
         dump_stats( audEngine.get() );
     }
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+    #ifdef USING_XAUDIO2_9
 
     { // xWMA .WAV
         auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"musicmono_xwma.wav");
@@ -1834,7 +1834,7 @@ int __cdecl main()
         dump_stats( audEngine.get() );
     }
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+    #ifdef USING_XAUDIO2_9
 
     { // xWMA .WAV one-shots
         auto soundEffect = std::make_unique<SoundEffect>(audEngine.get(), L"Alarm01_xwma.wav");
@@ -2346,7 +2346,7 @@ int __cdecl main()
         }
     }
 
-#if defined(USING_XAUDIO2_7_DIRECTX) || defined(USING_XAUDIO2_9)
+#ifdef USING_XAUDIO2_9
 
     { // xWMV WaveBank
         auto wb = std::make_unique<WaveBank>(audEngine.get(), L"xwmadroid.xwb");
