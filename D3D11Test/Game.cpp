@@ -461,6 +461,27 @@ void Game::OnDeviceRestored()
 #endif
 #pragma endregion
 
+namespace
+{
+    inline bool CheckIsPowerOf2(size_t x) noexcept
+    {
+        if (!x)
+            return false;
+
+        return (ceil(log2(x)) == float(log2(x)));
+    }
+
+    inline size_t CheckAlignUp(size_t size, size_t alignment) noexcept
+    {
+        return ((size + alignment - 1) / alignment) * alignment;
+    }
+
+    inline size_t CheckAlignDown(size_t size, size_t alignment) noexcept
+    {
+        return (size / alignment) * alignment;
+    }
+}
+
 void Game::UnitTests()
 {
     bool success = true;
@@ -468,15 +489,36 @@ void Game::UnitTests()
 
     std::random_device rd;
     std::default_random_engine generator(rd());
+
+    {
+        for (size_t j = 0; j < 0x20000; ++j)
+        {
+            if (IsPowerOf2(j) != CheckIsPowerOf2(j))
+            {
+                OutputDebugStringA("ERROR: Failed IsPowerOf2 tests\n");
+                success = false;
+            }
+        }
+    }
+
+    // uint32_t
     {
         std::uniform_int_distribution<uint32_t> dist(1, UINT16_MAX);
         for (size_t j = 1; j < 0x20000; j <<= 1)
         {
+            if (!IsPowerOf2(j))
+            {
+                OutputDebugStringA("ERROR: Failed IsPowerOf2 Align(32)\n");
+                success = false;
+            }
+
             for (size_t k = 0; k < 20000; k++)
             {
                 uint32_t value = dist(generator);
                 uint32_t up = AlignUp(value, j);
                 uint32_t down = AlignDown(value, j);
+                auto upCheck = static_cast<uint32_t>(CheckAlignUp(value, j));
+                auto downCheck = static_cast<uint32_t>(CheckAlignDown(value, j));
 
                 if (!up)
                 {
@@ -503,19 +545,38 @@ void Game::UnitTests()
                     OutputDebugStringA("ERROR: Failed AlignDown(32) tests\n");
                     success = false;
                 }
+                else if (up != upCheck)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignUp(32) tests\n");
+                    success = false;
+                }
+                else if (down != downCheck)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignDown(32) tests\n");
+                    success = false;
+                }
             }
         }
     }
 
+    // uint64_t
     {
         std::uniform_int_distribution<uint64_t> dist(1, UINT32_MAX);
         for (size_t j = 1; j < 0x20000; j <<= 1)
         {
+            if (!IsPowerOf2(j))
+            {
+                OutputDebugStringA("ERROR: Failed IsPowerOf2 Align(64)\n");
+                success = false;
+            }
+
             for (size_t k = 0; k < 20000; k++)
             {
                 uint64_t value = dist(generator);
                 uint64_t up = AlignUp(value, j);
                 uint64_t down = AlignDown(value, j);
+                auto upCheck = static_cast<uint64_t>(CheckAlignUp(value, j));
+                auto downCheck = static_cast<uint64_t>(CheckAlignDown(value, j));
 
                 if (!up)
                 {
@@ -542,10 +603,19 @@ void Game::UnitTests()
                     OutputDebugStringA("ERROR: Failed AlignDown(64) tests\n");
                     success = false;
                 }
+                else if (up != upCheck)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignUp(64) tests\n");
+                    success = false;
+                }
+                else if (down != downCheck)
+                {
+                    OutputDebugStringA("ERROR: Failed AlignDown(64) tests\n");
+                    success = false;
+                }
             }
         }
     }
-
 
 #if defined(__cplusplus_winrt)
     // SimpleMath interop tests for Windows Runtime types
