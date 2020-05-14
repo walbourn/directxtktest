@@ -471,12 +471,12 @@ namespace
         return (ceil(log2(x)) == float(log2(x)));
     }
 
-    inline size_t CheckAlignUp(size_t size, size_t alignment) noexcept
+    inline uint64_t CheckAlignUp(uint64_t size, size_t alignment) noexcept
     {
         return ((size + alignment - 1) / alignment) * alignment;
     }
 
-    inline size_t CheckAlignDown(size_t size, size_t alignment) noexcept
+    inline uint64_t CheckAlignDown(uint64_t size, size_t alignment) noexcept
     {
         return (size / alignment) * alignment;
     }
@@ -575,8 +575,8 @@ void Game::UnitTests()
                 uint64_t value = dist(generator);
                 uint64_t up = AlignUp(value, j);
                 uint64_t down = AlignDown(value, j);
-                auto upCheck = static_cast<uint64_t>(CheckAlignUp(value, j));
-                auto downCheck = static_cast<uint64_t>(CheckAlignDown(value, j));
+                uint64_t upCheck = CheckAlignUp(value, j);
+                uint64_t downCheck = CheckAlignDown(value, j);
 
                 if (!up)
                 {
