@@ -26,12 +26,18 @@ namespace DX
     class TextConsole
     {
     public:
-        TextConsole();
-        TextConsole(_In_ ID3D11DeviceContext* context, _In_z_ const wchar_t* fontName);
+        TextConsole() noexcept;
+        TextConsole(_In_ ID3D11DeviceContext* context, _In_z_ const wchar_t* fontName) noexcept(false);
+
+        TextConsole(TextConsole&&) = delete;
+        TextConsole& operator= (TextConsole&&) = delete;
+
+        TextConsole(TextConsole const&) = delete;
+        TextConsole& operator= (TextConsole const&) = delete;
 
         void Render();
 
-        void Clear();
+        void Clear() noexcept;
 
         void Write(_In_z_ const wchar_t *str);
         void WriteLine(_In_z_ const wchar_t *str);
@@ -43,7 +49,7 @@ namespace DX
 
         void SetDebugOutput(bool debug) { m_debugOutput = debug; }
 
-        void ReleaseDevice();
+        void ReleaseDevice() noexcept;
         void RestoreDevice(_In_ ID3D11DeviceContext* context, _In_z_ const wchar_t* fontName);
 
         void SetViewport(const D3D11_VIEWPORT& viewPort);
