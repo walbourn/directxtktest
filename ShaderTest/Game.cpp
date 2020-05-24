@@ -274,6 +274,19 @@ namespace
         _Outptr_ ID3D11Buffer** compressedVertexBuffer,
         _Outptr_ ID3D11Buffer** indexBuffer)
     {
+        if (vertexBuffer)
+        {
+            *vertexBuffer = nullptr;
+        }
+        if (compressedVertexBuffer)
+        {
+            *compressedVertexBuffer = nullptr;
+        }
+        if (indexBuffer)
+        {
+            *indexBuffer = nullptr;
+        }
+
         VertexCollection vertices;
         IndexCollection indices;
 
@@ -342,8 +355,20 @@ namespace
         ComputeTangents(indices, vertices);
 
         // Create the D3D buffers.
-        CreateStaticBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer);
-        CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer);
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer)
+        );
+
+        assert(vertexBuffer != nullptr && *vertexBuffer != nullptr);
+        _Analysis_assume_(vertexBuffer != nullptr && *vertexBuffer != nullptr);
+
+
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer)
+        );
+
+        assert(indexBuffer != nullptr && *indexBuffer != nullptr);
+        _Analysis_assume_(indexBuffer != nullptr && *indexBuffer != nullptr);
 
         // Create the compressed version
         std::vector<TestCompressedVertex> cvertices;
@@ -354,7 +379,12 @@ namespace
             cvertices.emplace_back(std::move(cv));
         }
 
-        CreateStaticBuffer(device, cvertices, D3D11_BIND_VERTEX_BUFFER, compressedVertexBuffer);
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, cvertices, D3D11_BIND_VERTEX_BUFFER, compressedVertexBuffer)
+        );
+
+        assert(compressedVertexBuffer != nullptr && *compressedVertexBuffer != nullptr);
+        _Analysis_assume_(compressedVertexBuffer != nullptr && *compressedVertexBuffer != nullptr);
 
         return (int)indices.size();
     }
