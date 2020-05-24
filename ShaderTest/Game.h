@@ -112,7 +112,7 @@ private:
         {
             setEffectParameters(this);
 
-            CreateInputLayout(device, this, &inputLayout, &compressedInputLayout);
+            CreateTestInputLayout(device, this, &inputLayout, &compressedInputLayout);
         }
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool showCompressed)
@@ -162,7 +162,7 @@ private:
         {
             setEffectParameters(this);
 
-            CreateInputLayout(device, this, &inputLayout);
+            CreateTestInputLayout(device, this, &inputLayout);
         }
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection)
@@ -218,4 +218,10 @@ private:
     bool                                    m_showCompressed;
 
     float                                   m_delay;
+
+    static void CreateTestInputLayout(
+        _In_ ID3D11Device* device,
+        DirectX::IEffect* effect,
+        _Outptr_ ID3D11InputLayout** pInputLayout,
+        _Outptr_opt_ ID3D11InputLayout** pCompresedInputLayout = nullptr);
 };

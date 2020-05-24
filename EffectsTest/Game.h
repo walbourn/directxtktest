@@ -108,7 +108,7 @@ private:
         {
             setEffectParameters(this);
 
-            CreateInputLayout(device, this, &inputLayout);
+            CreateTestInputLayout(device, this, &inputLayout);
         }
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection)
@@ -163,4 +163,6 @@ private:
     DirectX::SimpleMath::Matrix             m_projection;
 
     UINT                                    m_indexCount;
+
+    static void CreateTestInputLayout(_In_ ID3D11Device* device, _In_ DirectX::IEffect* effect, _Out_ ID3D11InputLayout** pInputLayout);
 };

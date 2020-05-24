@@ -420,16 +420,9 @@ void Game::CreateDeviceDependentResources()
     m_effect = std::make_unique<BasicEffect>(device);
     m_effect->SetVertexColorEnabled(true);
 
-    void const* shaderByteCode;
-    size_t byteCodeLength;
-
-    m_effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-
     DX::ThrowIfFailed(
-            device->CreateInputLayout(VertexPositionColor::InputElements,
-                VertexPositionColor::InputElementCount,
-                shaderByteCode, byteCodeLength,
-                m_inputLayout.ReleaseAndGetAddressOf()));
+        CreateInputLayout<VertexPositionColor>(device, m_effect.get(), m_inputLayout.ReleaseAndGetAddressOf())
+    );
 
     m_states = std::make_unique<CommonStates>(device);
 

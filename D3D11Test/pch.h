@@ -82,6 +82,7 @@
 
 #include <stdio.h>
 
+#include "BufferHelpers.h"
 #include "CommonStates.h"
 #include "DDSTextureLoader.h"
 #include "DirectXHelpers.h"

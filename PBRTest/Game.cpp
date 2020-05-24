@@ -54,45 +54,6 @@ namespace
     const float row2 = -1.1f;
     const float row3 = -2.5f;
 
-    // Helper for creating a D3D vertex or index buffer.
-    template<typename T>
-    void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FLAG bindFlags, _Out_ ID3D11Buffer** pBuffer)
-    {
-        D3D11_BUFFER_DESC bufferDesc = {};
-
-        bufferDesc.ByteWidth = (UINT)data.size() * sizeof(T::value_type);
-        bufferDesc.BindFlags = bindFlags;
-        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
-        D3D11_SUBRESOURCE_DATA dataDesc = {};
-
-        dataDesc.pSysMem = data.data();
-
-        HRESULT hr = device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer);
-        DX::ThrowIfFailed(hr);
-
-        assert(pBuffer != 0);
-        _Analysis_assume_(pBuffer != 0);
-    }
-
-    // Helper for creating a D3D input layout.
-    void CreateInputLayout(_In_ ID3D11Device* device, IEffect* effect, _Out_ ID3D11InputLayout** pInputLayout)
-    {
-        void const* shaderByteCode;
-        size_t byteCodeLength;
-
-        effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-
-        HRESULT hr = device->CreateInputLayout(GeometricPrimitive::VertexType::InputElements,
-            GeometricPrimitive::VertexType::InputElementCount,
-            shaderByteCode, byteCodeLength,
-            pInputLayout);
-        DX::ThrowIfFailed(hr);
-
-        assert(pInputLayout != 0);
-        _Analysis_assume_(pInputLayout != 0);
-    }
-
     void ReadVBO(_In_z_ const wchar_t* name, std::vector<VertexPositionNormalTexture>& vertices, std::vector<uint16_t>& indices)
     {
         std::vector<uint8_t> blob;
@@ -917,15 +878,25 @@ void Game::CreateDeviceDependentResources()
         if (vertices.size() >= USHRT_MAX)
             throw std::exception("Too many vertices for 16-bit index buffer");
 
-        CreateInputLayout(device, m_normalMapEffect.get(), m_inputLayoutNM.ReleaseAndGetAddressOf());
+        DX::ThrowIfFailed(
+            CreateInputLayout<GeometricPrimitive::VertexType>(device, m_normalMapEffect.get(), m_inputLayoutNM.ReleaseAndGetAddressOf())
+        );
 
-        CreateInputLayout(device, m_pbr.get(), m_inputLayoutPBR.ReleaseAndGetAddressOf());
+        DX::ThrowIfFailed(
+            CreateInputLayout<GeometricPrimitive::VertexType>(device, m_pbr.get(), m_inputLayoutPBR.ReleaseAndGetAddressOf())
+        );
 
-        CreateInputLayout(device, m_debug.get(), m_inputLayoutDBG.ReleaseAndGetAddressOf());
-        
-        CreateBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.ReleaseAndGetAddressOf());
+        DX::ThrowIfFailed(
+            CreateInputLayout<GeometricPrimitive::VertexType>(device, m_debug.get(), m_inputLayoutDBG.ReleaseAndGetAddressOf())
+        );
 
-        CreateBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.ReleaseAndGetAddressOf());
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBuffer.ReleaseAndGetAddressOf())
+        );
+
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, m_vertexBuffer.ReleaseAndGetAddressOf())
+        );
 
         // Record index count for draw
         m_indexCount = static_cast<UINT>(indices.size());
@@ -942,11 +913,17 @@ void Game::CreateDeviceDependentResources()
         if (vertices.size() >= USHRT_MAX)
             throw std::exception("Too many vertices for 16-bit index buffer");
 
-        CreateInputLayout(device, m_pbrCube.get(), m_inputLayoutCube.ReleaseAndGetAddressOf());
+        DX::ThrowIfFailed(
+            CreateInputLayout<GeometricPrimitive::VertexType>(device, m_pbrCube.get(), m_inputLayoutCube.ReleaseAndGetAddressOf())
+        );
 
-        CreateBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBufferCube.ReleaseAndGetAddressOf());
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, m_indexBufferCube.ReleaseAndGetAddressOf())
+        );
 
-        CreateBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, m_vertexBufferCube.ReleaseAndGetAddressOf());
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, m_vertexBufferCube.ReleaseAndGetAddressOf())
+        );
 
         // Record index count for draw
         m_indexCountCube = static_cast<UINT>(indices.size());

@@ -43,53 +43,6 @@ namespace
     }
 
     //----------------------------------------------------------------------------------
-    // Helper for creating a D3D vertex or index buffer.
-    template<typename T>
-    void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FLAG bindFlags, _Out_ ID3D11Buffer** pBuffer)
-    {
-        D3D11_BUFFER_DESC bufferDesc = {};
-
-        bufferDesc.ByteWidth = (UINT)data.size() * sizeof(T::value_type);
-        bufferDesc.BindFlags = bindFlags;
-        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
-        D3D11_SUBRESOURCE_DATA dataDesc = {};
-
-        dataDesc.pSysMem = data.data();
-
-        DX::ThrowIfFailed(
-            device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer)
-        );
-
-        assert(pBuffer != 0 && *pBuffer != 0);
-        _Analysis_assume_(pBuffer != 0 && *pBuffer != 0);
-
-        SetDebugObjectName(*pBuffer, "ModelOBJ");
-    }
-
-    // Helper for creating a D3D input layout.
-    void CreateInputLayout(_In_ ID3D11Device* device, IEffect* effect, _Out_ ID3D11InputLayout** pInputLayout)
-    {
-        void const* shaderByteCode;
-        size_t byteCodeLength;
-
-        effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-
-        DX::ThrowIfFailed(
-            device->CreateInputLayout(VertexPositionNormalTexture::InputElements,
-                VertexPositionNormalTexture::InputElementCount,
-                shaderByteCode, byteCodeLength,
-                pInputLayout)
-        );
-
-        assert(pInputLayout != 0 && *pInputLayout != 0);
-        _Analysis_assume_(pInputLayout != 0 && *pInputLayout != 0);
-
-        SetDebugObjectName(*pInputLayout, "ModelOBJ");
-    }
-
-
-    //----------------------------------------------------------------------------------
     // Shared VB input element description
     INIT_ONCE g_InitOnce = INIT_ONCE_STATIC_INIT;
     std::shared_ptr<std::vector<D3D11_INPUT_ELEMENT_DESC>> g_vbdecl;
@@ -174,11 +127,15 @@ std::unique_ptr<Model> CreateModelFromOBJ(
 
     // Create Vertex Buffer
     Microsoft::WRL::ComPtr<ID3D11Buffer> vb;
-    CreateBuffer( d3dDevice, obj->vertices, D3D11_BIND_VERTEX_BUFFER, &vb );
+    DX::ThrowIfFailed(
+        CreateStaticBuffer(d3dDevice, obj->vertices, D3D11_BIND_VERTEX_BUFFER, vb.GetAddressOf())
+    );
 
     // Create Index Buffer
     Microsoft::WRL::ComPtr<ID3D11Buffer> ib;
-    CreateBuffer( d3dDevice, obj->indices, D3D11_BIND_INDEX_BUFFER, &ib );
+    DX::ThrowIfFailed(
+        CreateStaticBuffer(d3dDevice, obj->indices, D3D11_BIND_INDEX_BUFFER, ib.GetAddressOf())
+    );
 
     // Create mesh
     auto mesh = std::make_shared<ModelMesh>();
@@ -223,7 +180,9 @@ std::unique_ptr<Model> CreateModelFromOBJ(
             effect = fxFactory.CreateEffect( info, deviceContext );
 
             // Create input layout from effect
-            CreateInputLayout( d3dDevice, effect.get(), &il );
+            DX::ThrowIfFailed(
+                CreateInputLayout<VertexPositionNormalTexture>(d3dDevice, effect.get(), il.ReleaseAndGetAddressOf())
+            );
 
             curmaterial = *it;
         }

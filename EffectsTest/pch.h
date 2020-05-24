@@ -74,6 +74,7 @@
 
 #include <stdio.h>
 
+#include "BufferHelpers.h"
 #include "CommonStates.h"
 #include "DDSTextureLoader.h"
 #include "Effects.h"
