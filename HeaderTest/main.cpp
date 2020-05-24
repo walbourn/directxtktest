@@ -4,6 +4,7 @@
 // This test ensures that all public headers fully include all their dependancies, as well compile cleanly at maximum warning level
 
 extern void audiotest();
+extern void bufferhelperstest();
 extern void commonstatestest();
 extern void ddstextureloadertest();
 extern void directxhelperstest();
@@ -26,6 +27,7 @@ extern void wictextureloadertest();
 int main()
 {
     audiotest();
+    bufferhelperstest();
     commonstatestest();
     ddstextureloadertest();
     directxhelperstest();

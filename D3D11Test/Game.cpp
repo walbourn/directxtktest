@@ -421,7 +421,7 @@ void Game::CreateDeviceDependentResources()
     m_effect->SetVertexColorEnabled(true);
 
     DX::ThrowIfFailed(
-        CreateInputLayout<VertexPositionColor>(device, m_effect.get(), m_inputLayout.ReleaseAndGetAddressOf())
+        CreateInputLayoutFromEffect<VertexPositionColor>(device, m_effect.get(), m_inputLayout.ReleaseAndGetAddressOf())
     );
 
     m_states = std::make_unique<CommonStates>(device);
@@ -624,6 +624,66 @@ void Game::UnitTests()
         success = false;
     }
 #endif
+
+    auto device = m_deviceResources->GetD3DDevice();
+
+    // CreateStaticBuffer (BufferHelpers.h)
+    {
+        static const VertexPositionColor s_vertexData[3] =
+        {
+            { { 0.0f,   0.5f,  0.5f, 1.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },  // Top / Red
+            { { 0.5f,  -0.5f,  0.5f, 1.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },  // Right / Green
+            { { -0.5f, -0.5f,  0.5f, 1.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } }   // Left / Blue
+        };
+
+        ComPtr<ID3D11Buffer> vb;
+        if (FAILED(CreateStaticBuffer(device, s_vertexData, _countof(s_vertexData), sizeof(VertexPositionColor),
+            D3D11_BIND_VERTEX_BUFFER, vb.GetAddressOf())))
+        {
+            OutputDebugStringA("ERROR: Failed CreateStaticBuffer(1) test\n");
+            success = false;
+        }
+
+        ComPtr<ID3D11Buffer> vb2;
+        if (FAILED(CreateStaticBuffer(device, s_vertexData, _countof(s_vertexData),
+            D3D11_BIND_VERTEX_BUFFER, vb2.GetAddressOf())))
+        {
+            OutputDebugStringA("ERROR: Failed CreateStaticBuffer(2) test\n");
+            success = false;
+        }
+
+        ComPtr<ID3D11Buffer> vb3;
+        std::vector<VertexPositionColor> verts(s_vertexData, s_vertexData + _countof(s_vertexData));
+
+        if (FAILED(CreateStaticBuffer(device, verts, D3D11_BIND_VERTEX_BUFFER, vb3.GetAddressOf())))
+        {
+            OutputDebugStringA("ERROR: Failed CreateStaticBuffer(3) test\n");
+            success = false;
+        }
+    }
+
+    // CreateInputLayoutFromEffect (BufferHelpers.h)
+    {
+        static const D3D11_INPUT_ELEMENT_DESC s_inputElementDesc[2] =
+        {
+            { "SV_Position", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA,  0 },
+            { "COLOR",       0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA , 0 },
+        };
+
+        ComPtr<ID3D11InputLayout> il;
+        if (FAILED(CreateInputLayoutFromEffect(device, m_effect.get(), s_inputElementDesc, _countof(s_inputElementDesc), il.GetAddressOf())))
+        {
+            OutputDebugStringA("ERROR: Failed CreateInputLayoutFromEffect(1) test\n");
+            success = false;
+        }
+
+        ComPtr<ID3D11InputLayout> il2;
+        if (FAILED(CreateInputLayoutFromEffect<VertexPositionColor>(device, m_effect.get(), il2.GetAddressOf())))
+        {
+            OutputDebugStringA("ERROR: Failed CreateInputLayoutFromEffect(2) test\n");
+            success = false;
+        }
+    }
 
     OutputDebugStringA(success ? "Passed\n" : "Failed\n");
     OutputDebugStringA("***********  UNIT TESTS END  ***************\n");

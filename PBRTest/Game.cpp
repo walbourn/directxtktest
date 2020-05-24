@@ -879,15 +879,15 @@ void Game::CreateDeviceDependentResources()
             throw std::exception("Too many vertices for 16-bit index buffer");
 
         DX::ThrowIfFailed(
-            CreateInputLayout<GeometricPrimitive::VertexType>(device, m_normalMapEffect.get(), m_inputLayoutNM.ReleaseAndGetAddressOf())
+            CreateInputLayoutFromEffect<GeometricPrimitive::VertexType>(device, m_normalMapEffect.get(), m_inputLayoutNM.ReleaseAndGetAddressOf())
         );
 
         DX::ThrowIfFailed(
-            CreateInputLayout<GeometricPrimitive::VertexType>(device, m_pbr.get(), m_inputLayoutPBR.ReleaseAndGetAddressOf())
+            CreateInputLayoutFromEffect<GeometricPrimitive::VertexType>(device, m_pbr.get(), m_inputLayoutPBR.ReleaseAndGetAddressOf())
         );
 
         DX::ThrowIfFailed(
-            CreateInputLayout<GeometricPrimitive::VertexType>(device, m_debug.get(), m_inputLayoutDBG.ReleaseAndGetAddressOf())
+            CreateInputLayoutFromEffect<GeometricPrimitive::VertexType>(device, m_debug.get(), m_inputLayoutDBG.ReleaseAndGetAddressOf())
         );
 
         DX::ThrowIfFailed(
@@ -914,7 +914,7 @@ void Game::CreateDeviceDependentResources()
             throw std::exception("Too many vertices for 16-bit index buffer");
 
         DX::ThrowIfFailed(
-            CreateInputLayout<GeometricPrimitive::VertexType>(device, m_pbrCube.get(), m_inputLayoutCube.ReleaseAndGetAddressOf())
+            CreateInputLayoutFromEffect<GeometricPrimitive::VertexType>(device, m_pbrCube.get(), m_inputLayoutCube.ReleaseAndGetAddressOf())
         );
 
         DX::ThrowIfFailed(

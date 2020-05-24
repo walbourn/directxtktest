@@ -181,7 +181,7 @@ std::unique_ptr<Model> CreateModelFromOBJ(
 
             // Create input layout from effect
             DX::ThrowIfFailed(
-                CreateInputLayout<VertexPositionNormalTexture>(d3dDevice, effect.get(), il.ReleaseAndGetAddressOf())
+                CreateInputLayoutFromEffect<VertexPositionNormalTexture>(d3dDevice, effect.get(), il.ReleaseAndGetAddressOf())
             );
 
             curmaterial = *it;

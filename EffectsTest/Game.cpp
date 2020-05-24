@@ -159,8 +159,13 @@ namespace
         }
 
         // Create the D3D buffers.
-        CreateStaticBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer);
-        CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer);
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer)
+        );
+
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer)
+        );
 
         return (int)indices.size();
     }
@@ -170,7 +175,7 @@ _Use_decl_annotations_
 void Game::CreateTestInputLayout(ID3D11Device* device, IEffect* effect, ID3D11InputLayout** pInputLayout)
 {
     DX::ThrowIfFailed(
-        CreateInputLayout<TestVertex>(device, effect, pInputLayout)
+        CreateInputLayoutFromEffect<TestVertex>(device, effect, pInputLayout)
     );
 }
 
