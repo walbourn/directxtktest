@@ -963,7 +963,7 @@ void Game::UnitTests(bool success)
 
         D3D11_SUBRESOURCE_DATA initData = { s_pixels, 0, 0 };
 
-        DX::ThrowIfFailed(CreateStaticTexture(device, 4u, DXGI_FORMAT_B8G8R8A8_UNORM, initData,
+        DX::ThrowIfFailed(CreateTextureFromMemory(device, 4u, DXGI_FORMAT_B8G8R8A8_UNORM, initData,
             res.GetAddressOf(), nullptr));
 
         if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE1D, DXGI_FORMAT_B8G8R8A8_UNORM, 1, 4))
@@ -984,7 +984,7 @@ void Game::UnitTests(bool success)
 
         D3D11_SUBRESOURCE_DATA initData = { s_pixels, sizeof(uint32_t) * 8, 0 };
 
-        DX::ThrowIfFailed(CreateStaticTexture(device, 8u, 2u, DXGI_FORMAT_B8G8R8A8_UNORM, initData,
+        DX::ThrowIfFailed(CreateTextureFromMemory(device, 8u, 2u, DXGI_FORMAT_B8G8R8A8_UNORM, initData,
             res.GetAddressOf(), nullptr));
 
         if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_B8G8R8A8_UNORM, 1, 8, 2))
@@ -995,7 +995,7 @@ void Game::UnitTests(bool success)
 
         initData = { s_pixels, sizeof(uint32_t) * 4, 0 };
 
-        DX::ThrowIfFailed(CreateStaticTexture(device, 4u, 4u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+        DX::ThrowIfFailed(CreateTextureFromMemory(device, 4u, 4u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
             res.ReleaseAndGetAddressOf(), nullptr));
 
         if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 4, 4))
@@ -1015,7 +1015,7 @@ void Game::UnitTests(bool success)
         D3D11_SUBRESOURCE_DATA initData = { pixels.get(), sizeof(uint32_t) * 256, 0 };
 
         ComPtr<ID3D11ShaderResourceView> srv;
-        DX::ThrowIfFailed(CreateStaticTexture(device, context, 256u, 256u, DXGI_FORMAT_B8G8R8A8_UNORM, initData,
+        DX::ThrowIfFailed(CreateTextureFromMemory(device, context, 256u, 256u, DXGI_FORMAT_B8G8R8A8_UNORM, initData,
             res.GetAddressOf(), srv.GetAddressOf()));
 
         if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_B8G8R8A8_UNORM, 9, 256, 256))
@@ -1042,7 +1042,7 @@ void Game::UnitTests(bool success)
 
         D3D11_SUBRESOURCE_DATA initData = { s_pixels, sizeof(uint32_t) * 2, sizeof(uint32_t) * 4 };
 
-        DX::ThrowIfFailed(CreateStaticTexture(device, 2u, 2u, 4, DXGI_FORMAT_B8G8R8A8_UNORM, initData,
+        DX::ThrowIfFailed(CreateTextureFromMemory(device, 2u, 2u, 4, DXGI_FORMAT_B8G8R8A8_UNORM, initData,
             res.GetAddressOf(), nullptr));
 
         if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE3D, DXGI_FORMAT_B8G8R8A8_UNORM, 1, 2, 2, 4))
@@ -1053,12 +1053,12 @@ void Game::UnitTests(bool success)
 
         initData = { s_pixels, sizeof(uint32_t) * 4, sizeof(uint32_t) * 8 };
 
-        DX::ThrowIfFailed(CreateStaticTexture(device, 4u, 2u, 2u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+        DX::ThrowIfFailed(CreateTextureFromMemory(device, 4u, 2u, 2u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
             res.ReleaseAndGetAddressOf(), nullptr));
 
         if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE3D, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 4, 2, 2))
         {
-            OutputDebugStringA("FAILED: CreateStaticTexture 2Db res desc unexpected\n");
+            OutputDebugStringA("FAILED: CreateStaticTexture 3Db res desc unexpected\n");
             success = false;
         }
     }
