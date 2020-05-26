@@ -104,46 +104,6 @@ namespace
     using VertexCollection = std::vector<TestVertex>;
     using IndexCollection = std::vector<uint16_t>;
 
-    // Helper for creating a D3D vertex or index buffer.
-    template<typename T>
-    void CreateBuffer(_In_ ID3D11Device* device, T const& data, D3D11_BIND_FLAG bindFlags, _Out_ ID3D11Buffer** pBuffer)
-    {
-        D3D11_BUFFER_DESC bufferDesc = {};
-
-        bufferDesc.ByteWidth = (UINT)data.size() * sizeof(T::value_type);
-        bufferDesc.BindFlags = bindFlags;
-        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
-        D3D11_SUBRESOURCE_DATA dataDesc = {};
-
-        dataDesc.pSysMem = data.data();
-
-        HRESULT hr = device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer);
-        DX::ThrowIfFailed(hr);
-
-        assert(pBuffer != 0);
-        _Analysis_assume_(pBuffer != 0);
-    }
-
-
-    // Helper for creating a D3D input layout.
-    void CreateInputLayout(_In_ ID3D11Device* device, IEffect* effect, _Out_ ID3D11InputLayout** pInputLayout)
-    {
-        void const* shaderByteCode;
-        size_t byteCodeLength;
-
-        effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-
-        HRESULT hr = device->CreateInputLayout(TestVertex::InputElements,
-            TestVertex::InputElementCount,
-            shaderByteCode, byteCodeLength,
-            pInputLayout);
-        DX::ThrowIfFailed(hr);
-
-        assert(pInputLayout != 0);
-        _Analysis_assume_(pInputLayout != 0);
-    }
-
     #include "../../Src/TeapotData.inc"
 
     // Tessellates the specified bezier patch.
@@ -199,12 +159,25 @@ namespace
         }
 
         // Create the D3D buffers.
-        CreateBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer);
-        CreateBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer);
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer)
+        );
+
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer)
+        );
 
         return (int)indices.size();
     }
 } // anonymous namespace
+
+_Use_decl_annotations_
+void Game::CreateTestInputLayout(ID3D11Device* device, IEffect* effect, ID3D11InputLayout** pInputLayout)
+{
+    DX::ThrowIfFailed(
+        CreateInputLayoutFromEffect<TestVertex>(device, effect, pInputLayout)
+    );
+}
 
 Game::Game() noexcept(false) :
     m_indexCount(0)

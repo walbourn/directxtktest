@@ -267,122 +267,6 @@ namespace
         { "COLOR",        0, DXGI_FORMAT_B8G8R8A8_UNORM,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
-    // Helper for creating a D3D vertex or index buffer.
-    template<typename T>
-    void CreateBuffer(
-        _In_ ID3D11Device* device,
-        T const& data,
-        D3D11_BIND_FLAG bindFlags,
-        _Outptr_ ID3D11Buffer** pBuffer)
-    {
-        D3D11_BUFFER_DESC bufferDesc = {};
-
-        bufferDesc.ByteWidth = (UINT)data.size() * sizeof(T::value_type);
-        bufferDesc.BindFlags = bindFlags;
-        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-
-        D3D11_SUBRESOURCE_DATA dataDesc = {};
-
-        dataDesc.pSysMem = data.data();
-
-        HRESULT hr = device->CreateBuffer(&bufferDesc, &dataDesc, pBuffer);
-        DX::ThrowIfFailed(hr);
-
-        assert(pBuffer != 0 && *pBuffer != 0);
-        _Analysis_assume_(pBuffer != 0 && *pBuffer != 0);
-    }
-
-
-    // Helper for creating a D3D input layout.
-    void CreateInputLayout(
-        _In_ ID3D11Device* device,
-        IEffect* effect,
-        _Outptr_ ID3D11InputLayout** pInputLayout,
-        _Outptr_opt_ ID3D11InputLayout** pCompresedInputLayout = nullptr)
-    {
-        auto ibasic = dynamic_cast<BasicEffect*>(effect);
-        if (ibasic)
-            ibasic->SetBiasedVertexNormals(false);
-
-        auto ienvmap = dynamic_cast<EnvironmentMapEffect*>(effect);
-        if (ienvmap)
-            ienvmap->SetBiasedVertexNormals(false);
-
-        auto inmap = dynamic_cast<NormalMapEffect*>(effect);
-        if (inmap)
-            inmap->SetBiasedVertexNormals(false);
-
-        auto ipbr = dynamic_cast<PBREffect*>(effect);
-        if (ipbr)
-            ipbr->SetBiasedVertexNormals(false);
-
-        auto iskin = dynamic_cast<SkinnedEffect*>(effect);
-        if (iskin)
-            iskin->SetBiasedVertexNormals(false);
-
-        auto idbg = dynamic_cast<DebugEffect*>(effect);
-        if (idbg)
-            idbg->SetBiasedVertexNormals(false);
-
-        void const* shaderByteCode;
-        size_t byteCodeLength;
-
-        effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-
-        HRESULT hr = device->CreateInputLayout(TestVertex::InputElements,
-            TestVertex::InputElementCount,
-            shaderByteCode, byteCodeLength,
-            pInputLayout);
-        DX::ThrowIfFailed(hr);
-
-        assert(pInputLayout != 0 && *pInputLayout != 0);
-        _Analysis_assume_(pInputLayout != 0 && *pInputLayout != 0);
-
-        if (pCompresedInputLayout)
-        {
-            if (ibasic)
-            {
-                ibasic->SetBiasedVertexNormals(true);
-                ibasic->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-            }
-            else if (ienvmap)
-            {
-                ienvmap->SetBiasedVertexNormals(true);
-                ienvmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-            }
-            else if (inmap)
-            {
-                inmap->SetBiasedVertexNormals(true);
-                inmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-            }
-            else if (ipbr)
-            {
-                ipbr->SetBiasedVertexNormals(true);
-                ipbr->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-            }
-            else if (iskin)
-            {
-                iskin->SetBiasedVertexNormals(true);
-                iskin->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-            }
-            else if (idbg)
-            {
-                idbg->SetBiasedVertexNormals(true);
-                idbg->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-            }
-
-            hr = device->CreateInputLayout(TestCompressedVertex::InputElements,
-                TestCompressedVertex::InputElementCount,
-                shaderByteCode, byteCodeLength,
-                pCompresedInputLayout);
-            DX::ThrowIfFailed(hr);
-
-            assert(pCompresedInputLayout != 0 && *pCompresedInputLayout != 0);
-            _Analysis_assume_(pCompresedInputLayout != 0 && *pCompresedInputLayout != 0);
-        }
-    }
-
-
     // Creates a cube primitive.
     UINT CreateCube(
         _In_ ID3D11Device* device,
@@ -390,6 +274,19 @@ namespace
         _Outptr_ ID3D11Buffer** compressedVertexBuffer,
         _Outptr_ ID3D11Buffer** indexBuffer)
     {
+        if (vertexBuffer)
+        {
+            *vertexBuffer = nullptr;
+        }
+        if (compressedVertexBuffer)
+        {
+            *compressedVertexBuffer = nullptr;
+        }
+        if (indexBuffer)
+        {
+            *indexBuffer = nullptr;
+        }
+
         VertexCollection vertices;
         IndexCollection indices;
 
@@ -458,8 +355,20 @@ namespace
         ComputeTangents(indices, vertices);
 
         // Create the D3D buffers.
-        CreateBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer);
-        CreateBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer);
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, vertices, D3D11_BIND_VERTEX_BUFFER, vertexBuffer)
+        );
+
+        assert(vertexBuffer != nullptr && *vertexBuffer != nullptr);
+        _Analysis_assume_(vertexBuffer != nullptr && *vertexBuffer != nullptr);
+
+
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer)
+        );
+
+        assert(indexBuffer != nullptr && *indexBuffer != nullptr);
+        _Analysis_assume_(indexBuffer != nullptr && *indexBuffer != nullptr);
 
         // Create the compressed version
         std::vector<TestCompressedVertex> cvertices;
@@ -470,9 +379,105 @@ namespace
             cvertices.emplace_back(std::move(cv));
         }
 
-        CreateBuffer(device, cvertices, D3D11_BIND_VERTEX_BUFFER, compressedVertexBuffer);
+        DX::ThrowIfFailed(
+            CreateStaticBuffer(device, cvertices, D3D11_BIND_VERTEX_BUFFER, compressedVertexBuffer)
+        );
+
+        assert(compressedVertexBuffer != nullptr && *compressedVertexBuffer != nullptr);
+        _Analysis_assume_(compressedVertexBuffer != nullptr && *compressedVertexBuffer != nullptr);
 
         return (int)indices.size();
+    }
+}
+
+
+// Helper for creating a D3D input layout.
+_Use_decl_annotations_
+void Game::CreateTestInputLayout(
+    ID3D11Device* device,
+    IEffect* effect,
+    ID3D11InputLayout** pInputLayout,
+    ID3D11InputLayout** pCompresedInputLayout)
+{
+    auto ibasic = dynamic_cast<BasicEffect*>(effect);
+    if (ibasic)
+        ibasic->SetBiasedVertexNormals(false);
+
+    auto ienvmap = dynamic_cast<EnvironmentMapEffect*>(effect);
+    if (ienvmap)
+        ienvmap->SetBiasedVertexNormals(false);
+
+    auto inmap = dynamic_cast<NormalMapEffect*>(effect);
+    if (inmap)
+        inmap->SetBiasedVertexNormals(false);
+
+    auto ipbr = dynamic_cast<PBREffect*>(effect);
+    if (ipbr)
+        ipbr->SetBiasedVertexNormals(false);
+
+    auto iskin = dynamic_cast<SkinnedEffect*>(effect);
+    if (iskin)
+        iskin->SetBiasedVertexNormals(false);
+
+    auto idbg = dynamic_cast<DebugEffect*>(effect);
+    if (idbg)
+        idbg->SetBiasedVertexNormals(false);
+
+    void const* shaderByteCode;
+    size_t byteCodeLength;
+
+    effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+    HRESULT hr = device->CreateInputLayout(TestVertex::InputElements,
+        TestVertex::InputElementCount,
+        shaderByteCode, byteCodeLength,
+        pInputLayout);
+    DX::ThrowIfFailed(hr);
+
+    assert(pInputLayout != 0 && *pInputLayout != 0);
+    _Analysis_assume_(pInputLayout != 0 && *pInputLayout != 0);
+
+    if (pCompresedInputLayout)
+    {
+        if (ibasic)
+        {
+            ibasic->SetBiasedVertexNormals(true);
+            ibasic->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+        }
+        else if (ienvmap)
+        {
+            ienvmap->SetBiasedVertexNormals(true);
+            ienvmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+        }
+        else if (inmap)
+        {
+            inmap->SetBiasedVertexNormals(true);
+            inmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+        }
+        else if (ipbr)
+        {
+            ipbr->SetBiasedVertexNormals(true);
+            ipbr->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+        }
+        else if (iskin)
+        {
+            iskin->SetBiasedVertexNormals(true);
+            iskin->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+        }
+        else if (idbg)
+        {
+            idbg->SetBiasedVertexNormals(true);
+            idbg->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+        }
+
+        hr = device->CreateInputLayout(TestCompressedVertex::InputElements,
+            TestCompressedVertex::InputElementCount,
+            shaderByteCode, byteCodeLength,
+            pCompresedInputLayout);
+        DX::ThrowIfFailed(hr);
+
+        assert(pCompresedInputLayout != 0 && *pCompresedInputLayout != 0);
+        _Analysis_assume_(pCompresedInputLayout != 0 && *pCompresedInputLayout != 0);
     }
 }
 

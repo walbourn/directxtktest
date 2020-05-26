@@ -74,6 +74,7 @@
 
 #include <wincodec.h>
 
+#include "BufferHelpers.h"
 #include "DDSTextureLoader.h"
 #include "DirectXHelpers.h"
 #include "Effects.h"

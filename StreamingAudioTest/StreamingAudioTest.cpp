@@ -38,6 +38,10 @@
 #define TEST_XWMA
 #endif
 
+// C4619/4616 #pragma warning warnings
+// C26451 Arithmetic overflow
+#pragma warning(disable : 4619 4616 26451)
+
 using namespace DirectX;
 
 //--------------------------------------------------------------------------------------

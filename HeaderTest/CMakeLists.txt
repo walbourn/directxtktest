@@ -27,6 +27,7 @@ endif()
 add_executable(${PROJECT_NAME}
     main.cpp
     audiotest.cpp
+    bufferhelperstest.cpp
     commonstatestest.cpp
     ddstextureloadertest.cpp
     directxhelperstest.cpp
