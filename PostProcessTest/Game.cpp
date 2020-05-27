@@ -27,7 +27,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const int MaxScene = 27;
+    constexpr int MaxScene = 27;
 
     const DXGI_FORMAT c_sdrFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
     const DXGI_FORMAT c_hdrFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;

@@ -61,7 +61,7 @@ namespace
         XMFLOAT4 blendWeight;
         XMFLOAT4 color;
 
-        static const int InputElementCount = 8;
+        static constexpr unsigned int InputElementCount = 8;
         static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
     };
 
@@ -250,7 +250,7 @@ namespace
         XMUBYTEN4 blendWeight;
         XMCOLOR color;
 
-        static const int InputElementCount = 8;
+        static constexpr unsigned int InputElementCount = 8;
         static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
     };
 
@@ -291,7 +291,7 @@ namespace
         IndexCollection indices;
 
         // A box has six faces, each one pointing in a different direction.
-        const int FaceCount = 6;
+        constexpr int FaceCount = 6;
 
         static const XMVECTORF32 faceNormals[FaceCount] =
         {
