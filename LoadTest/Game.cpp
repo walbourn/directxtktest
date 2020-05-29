@@ -835,7 +835,7 @@ void Game::CreateDeviceDependentResources()
     {
         ComPtr<ID3D11Resource> res;
         DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, context, L"win95.bmp",
-            0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, true, res.GetAddressOf(), m_win95_2.ReleaseAndGetAddressOf()));
+            0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, WIC_LOADER_FORCE_SRGB, res.GetAddressOf(), m_win95_2.ReleaseAndGetAddressOf()));
 
         if (!ValidateDesc(m_win95_2.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 9))
         {
@@ -876,7 +876,7 @@ void Game::CreateDeviceDependentResources()
             ComPtr<ID3D11Resource> res;
             ComPtr<ID3D11ShaderResourceView> srv;
             DX::ThrowIfFailed(CreateWICTextureFromMemoryEx(device, context, blob.data(), blob.size(),
-                0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, true, res.GetAddressOf(), srv.ReleaseAndGetAddressOf()));
+                0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, WIC_LOADER_FORCE_SRGB, res.GetAddressOf(), srv.ReleaseAndGetAddressOf()));
 
             if (!ValidateDesc(srv.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 9))
             {
