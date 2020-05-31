@@ -660,6 +660,17 @@ void Game::UnitTests()
             OutputDebugStringA("ERROR: Failed CreateStaticBuffer(3) test\n");
             success = false;
         }
+
+        if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
+        {
+            ComPtr<ID3D11Buffer> vb4;
+            if (FAILED(CreateStaticBuffer(device, verts, D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS,
+                vb4.GetAddressOf())))
+            {
+                OutputDebugStringA("ERROR: Failed CreateStaticBuffer(4) test\n");
+                success = false;
+            }
+        }
     }
 
     // CreateInputLayoutFromEffect (BufferHelpers.h)
