@@ -132,4 +132,6 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Texture2D>             m_blur2Tex;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_blur2SRV;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView>      m_blur2RT;
+
+    float                                               m_delay;
 };

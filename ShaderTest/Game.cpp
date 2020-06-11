@@ -29,7 +29,8 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const float SWAP_TIME = 10.f;
+    constexpr float SWAP_TIME = 1.f;
+    constexpr float INTERACTIVE_TIME = 10.f;
 
     const float ortho_width = 6.f;
     const float ortho_height = 7.f;
@@ -589,7 +590,7 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_keyboardButtons.IsKeyPressed(Keyboard::Space) || (m_gamePadButtons.y == GamePad::ButtonStateTracker::PRESSED))
     {
         m_showCompressed = !m_showCompressed;
-        m_delay = SWAP_TIME;
+        m_delay = INTERACTIVE_TIME;
     }
     else if (!kb.Space && !(pad.IsConnected() && pad.IsYPressed()))
     {
