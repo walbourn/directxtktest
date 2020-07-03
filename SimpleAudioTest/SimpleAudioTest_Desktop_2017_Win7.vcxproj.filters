@@ -51,13 +51,13 @@
     <None Include="Courier_16.spritefont">
       <Filter>Assets</Filter>
     </None>
-    <None Include="packages.config" />
     <None Include="..\StreamingAudioTest\WaveBankADPCM.xwb">
       <Filter>Assets</Filter>
     </None>
     <None Include="..\StreamingAudioTest\WaveBankxWMA.xwb">
       <Filter>Assets</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\BasicAudioTest\Alarm01.wav">
