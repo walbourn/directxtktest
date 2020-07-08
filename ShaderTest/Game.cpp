@@ -1690,6 +1690,7 @@ void Game::CreateDeviceDependentResources()
     // EnvironmentMapEffect (per pixel lighting)
     m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
     {
+        effect->SetMode(EnvironmentMapEffect::Mapping_Cube);
         effect->SetPerPixelLighting(true);
         effect->EnableDefaultLighting();
         effect->SetEnvironmentMapSpecular(Colors::Blue);
@@ -1699,6 +1700,7 @@ void Game::CreateDeviceDependentResources()
 
     m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
     {
+        effect->SetMode(EnvironmentMapEffect::Mapping_Cube);
         effect->SetPerPixelLighting(true);
         effect->EnableDefaultLighting();
         effect->SetEnvironmentMapSpecular(Colors::Blue);
@@ -1710,6 +1712,7 @@ void Game::CreateDeviceDependentResources()
 
     m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
     {
+        effect->SetMode(EnvironmentMapEffect::Mapping_Cube);
         effect->SetPerPixelLighting(true);
         effect->EnableDefaultLighting();
         effect->SetEnvironmentMapSpecular(Colors::Blue);
@@ -1720,6 +1723,7 @@ void Game::CreateDeviceDependentResources()
 
     m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
     {
+        effect->SetMode(EnvironmentMapEffect::Mapping_Cube);
         effect->SetPerPixelLighting(true);
         effect->EnableDefaultLighting();
         effect->SetEnvironmentMapSpecular(Colors::Blue);
