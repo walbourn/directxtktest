@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: fuzzloaders.cpp
 //
-// Simple command-line tool for fuzz-testing the DDSTextureLoader and WICTextureLoader
+// Simple command-line tool for fuzz-testing the texture and sound loaders.
 //
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -40,6 +40,8 @@
 
 #include "DDSTextureLoader.h"
 #include "WICTextureLoader.h"
+#include "WaveBankReader.h"
+#include "WAVFileReader.h"
 
 #include <wrl\client.h>
 
@@ -67,7 +69,9 @@ enum OPTIONS
 {
     OPT_RECURSIVE = 1,
     OPT_DDS,
+    OPT_WAV,
     OPT_WIC,
+    OPT_XWB,
     OPT_MAX
 };
 
@@ -92,7 +96,9 @@ const SValue g_pOptions [] =
 {
     { L"r",         OPT_RECURSIVE },
     { L"dds",       OPT_DDS },
+    { L"wav",       OPT_WAV },
     { L"wic",       OPT_WIC },
+    { L"xwb",       OPT_XWB },
     { nullptr,      0 }
 };
 
@@ -206,11 +212,14 @@ namespace
 
     void PrintUsage()
     {
+        wprintf(L"DirectX Tool Kit for DX11\n\n");
         wprintf(L"Usage: fuzzloaders <options> <files>\n");
         wprintf(L"\n");
         wprintf(L"   -r                  wildcard filename search is recursive\n");
         wprintf(L"   -dds                force use of DDSTextureLoader\n");
+        wprintf(L"   -wav                force use of WAVFileReader\n");
         wprintf(L"   -wic                force use of WICTextureLoader\n");
+        wprintf(L"   -xwb                force use of WaveBankReader\n");
     }
 }
 
@@ -295,17 +304,12 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             switch (dwOption)
             {
             case OPT_DDS:
-                if (dwOptions & (1 << OPT_WIC))
-                {
-                    wprintf(L"-dds and -wic are mutually exclusive options\n");
-                    return 1;
-                }
-                break;
-
+            case OPT_WAV:
             case OPT_WIC:
-                if (dwOptions & (1 << OPT_DDS))
+            case OPT_XWB:
+                if ((dwOptions & ((1 << OPT_DDS) | (1 << OPT_WAV) | (1 << OPT_WIC) | (1 << OPT_XWB))) & ~(1 << dwOption))
                 {
-                    wprintf(L"-dds and -wic are mutually exclusive options\n");
+                    wprintf(L"-dds, -wav, -wic, and -xwb are mutually exclusive options\n");
                     return 1;
                 }
                 break;
@@ -351,19 +355,29 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         wchar_t ext[_MAX_EXT];
         _wsplitpath_s(pConv->szSrc, nullptr, 0, nullptr, 0, nullptr, 0, ext, _MAX_EXT);
         bool isdds = (_wcsicmp(ext, L".dds") == 0);
+        bool iswav = (_wcsicmp(ext, L".wav") == 0);
+        bool isxwb = (_wcsicmp(ext, L".xwb") == 0);
 
         bool usedds = false;
+        bool usewav = false;
+        bool usexwb = false;
         if (dwOptions & (1 << OPT_DDS))
         {
             usedds = true;
         }
-        else if (dwOptions & (1 << OPT_WIC))
+        else if (dwOptions & (1 << OPT_WAV))
         {
-            usedds = false;
+            usewav = true;
         }
-        else
+        else if (dwOptions & (1 << OPT_XWB))
+        {
+            usexwb = true;
+        }
+        else if (!(dwOptions & (1 << OPT_WIC)))
         {
             usedds = isdds;
+            usewav = iswav;
+            usexwb = isxwb;
         }
 
         // Load source image
@@ -395,6 +409,59 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(SUCCEEDED(hr) ? L"*" : L".");
             }
         }
+        else if (usewav)
+        {
+            std::unique_ptr<uint8_t[]> data;
+            DirectX::WAVData result = {};
+            hr = DirectX::LoadWAVAudioFromFileEx(pConv->szSrc, data, result);
+            if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+            {
+                wprintf(L"ERROR: WAVAudio file not not found:\n%ls\n", pConv->szSrc);
+                return 1;
+            }
+            else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_INVALID_DATA) && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && iswav)))
+            {
+#ifdef _DEBUG
+                char buff[128] = {};
+                sprintf_s(buff, "WAVAudio failed with %08X\n", static_cast<unsigned int>(hr));
+                OutputDebugStringA(buff);
+#endif
+                wprintf(L"!");
+            }
+            else
+            {
+                wprintf(SUCCEEDED(hr) ? L"*" : L".");
+            }
+        }
+        else if (usexwb)
+        {
+            auto wb = std::make_unique<DirectX::WaveBankReader>();
+            hr = wb->Open(pConv->szSrc);
+            if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+            {
+                wprintf(L"ERROR: XWBAudio file not not found:\n%ls\n", pConv->szSrc);
+                return 1;
+            }
+            else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && isxwb)))
+            {
+#ifdef _DEBUG
+                char buff[128] = {};
+                sprintf_s(buff, "XWBAudio failed with %08X\n", static_cast<unsigned int>(hr));
+                OutputDebugStringA(buff);
+#endif
+                wprintf(L"!");
+            }
+            else if (SUCCEEDED(hr))
+            {
+                wprintf(L"w");
+                wb->WaitOnPrepare();
+                wprintf(L"\b*");
+            }
+            else
+            {
+                wprintf(L".");
+            }
+        }
         else
         {
             hr = DirectX::CreateWICTextureFromFileEx(device.Get(), pConv->szSrc, 0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0, DirectX::WIC_LOADER_DEFAULT, tex.GetAddressOf(), nullptr);
@@ -420,7 +487,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         fflush(stdout);
     }
 
-    wprintf(L"\n");
+    wprintf(L"\n*** FUZZING COMPLETE ***\n");
 
     return 0;
 }
