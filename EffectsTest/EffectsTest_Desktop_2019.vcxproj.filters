@@ -33,6 +33,12 @@
     <Image Include="default.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="dualparabola.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="spheremap.bmp">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\DeviceResourcesPC.cpp">

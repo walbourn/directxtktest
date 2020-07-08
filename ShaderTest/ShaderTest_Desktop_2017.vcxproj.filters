@@ -80,5 +80,11 @@
     <Image Include="Sphere2Mat_occlusionRoughnessMetallic.png">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="spheremap.bmp">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="dualparabola.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>

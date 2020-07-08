@@ -33,7 +33,7 @@ namespace
     constexpr float INTERACTIVE_TIME = 10.f;
 
     const float ortho_width = 6.f;
-    const float ortho_height = 7.f;
+    const float ortho_height = 8.f;
 
     struct TestVertex
     {
@@ -503,7 +503,7 @@ Game::Game() noexcept(false) :
         );
 #elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3,
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
         DX::DeviceResources::c_Enable4K_Xbox
         );
 #else
@@ -1062,6 +1062,14 @@ void Game::CreateDeviceDependentResources()
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"cubemap.dds",
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
         nullptr, m_cubemap.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"spheremap.bmp",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB ? WIC_LOADER_FORCE_SRGB : WIC_LOADER_DEFAULT,
+        nullptr, m_envball.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"dualparabola.dds",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        nullptr, m_envdual.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"overlay.dds",
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
@@ -1722,6 +1730,92 @@ void Game::CreateDeviceDependentResources()
         effect->SetFogColor(Colors::Black);
     }));
 
+    // EnvironmentMapEffect sphere mapping (per pixel lighting only)
+    m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
+    {
+        effect->SetMode(EnvironmentMapEffect::Mapping_Sphere);
+        effect->EnableDefaultLighting();
+        effect->SetEnvironmentMapSpecular(Colors::Green);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envball.Get());
+    }));
+
+    m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
+    {
+        effect->SetMode(EnvironmentMapEffect::Mapping_Sphere);
+        effect->EnableDefaultLighting();
+        effect->SetEnvironmentMapSpecular(Colors::Green);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envball.Get());
+        effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
+    }));
+
+    m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
+    {
+        effect->SetMode(EnvironmentMapEffect::Mapping_Sphere);
+        effect->EnableDefaultLighting();
+        effect->SetEnvironmentMapSpecular(Colors::Green);
+        effect->SetFresnelFactor(0.f);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envball.Get());
+    }));
+
+    m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
+    {
+        effect->SetMode(EnvironmentMapEffect::Mapping_Sphere);
+        effect->EnableDefaultLighting();
+        effect->SetEnvironmentMapSpecular(Colors::Green);
+        effect->SetFresnelFactor(0.f);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envball.Get());
+        effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
+    }));
+
+    // EnvironmentMapEffect dual parabolic mapping (per pixel lighting only)
+    m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
+    {
+        effect->SetMode(EnvironmentMapEffect::Mapping_DualParabola);
+        effect->EnableDefaultLighting();
+        effect->SetEnvironmentMapSpecular(Colors::Red);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envdual.Get());
+    }));
+
+    m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
+    {
+        effect->SetMode(EnvironmentMapEffect::Mapping_DualParabola);
+        effect->EnableDefaultLighting();
+        effect->SetEnvironmentMapSpecular(Colors::Red);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envdual.Get());
+        effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
+    }));
+
+    m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
+    {
+        effect->SetMode(EnvironmentMapEffect::Mapping_DualParabola);
+        effect->EnableDefaultLighting();
+        effect->SetEnvironmentMapSpecular(Colors::Red);
+        effect->SetFresnelFactor(0.f);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envdual.Get());
+    }));
+
+    m_envmap.emplace_back(std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [=](EnvironmentMapEffect* effect)
+    {
+        effect->SetMode(EnvironmentMapEffect::Mapping_DualParabola);
+        effect->EnableDefaultLighting();
+        effect->SetEnvironmentMapSpecular(Colors::Red);
+        effect->SetFresnelFactor(0.f);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envdual.Get());
+        effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
+    }));
+
     //--- DualTextureEFfect ----------------------------------------------------------------
 
     m_dual.emplace_back(std::make_unique<EffectWithDecl<DualTextureEffect>>(device, [=](DualTextureEffect* effect)
@@ -2164,6 +2258,8 @@ void Game::OnDeviceLost()
 
     m_cat.Reset();
     m_cubemap.Reset();
+    m_envball.Reset();
+    m_envdual.Reset();
     m_overlay.Reset();
     m_defaultTex.Reset();
     m_brickDiffuse.Reset();

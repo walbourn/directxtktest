@@ -137,6 +137,8 @@ private:
     std::unique_ptr<EffectWithDecl<DirectX::SkinnedEffect>>     m_skinnedEffectNoSpecular;
 
     std::unique_ptr<EffectWithDecl<DirectX::EnvironmentMapEffect>>  m_envmap;
+    std::unique_ptr<EffectWithDecl<DirectX::EnvironmentMapEffect>>  m_spheremap;
+    std::unique_ptr<EffectWithDecl<DirectX::EnvironmentMapEffect>>  m_dparabolamap;
 
     std::unique_ptr<EffectWithDecl<DirectX::DualTextureEffect>> m_dualTexture;
 
@@ -150,6 +152,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cat;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_opaqueCat;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubemap;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_envball;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_envdual;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_overlay;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_defaultTex;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brickDiffuse;

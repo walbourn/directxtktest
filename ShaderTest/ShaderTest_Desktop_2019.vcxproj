@@ -193,11 +193,13 @@
     <Image Include="cat.dds" />
     <Image Include="cubemap.dds" />
     <Image Include="default.dds" />
+    <Image Include="dualparabola.dds" />
     <Image Include="overlay.dds" />
     <Image Include="Sphere2Mat_baseColor.png" />
     <Image Include="Sphere2Mat_emissive.png" />
     <Image Include="Sphere2Mat_normal.png" />
     <Image Include="Sphere2Mat_occlusionRoughnessMetallic.png" />
+    <Image Include="spheremap.bmp" />
     <Image Include="spnza_bricks_a.DDS" />
     <Image Include="spnza_bricks_a_normal.DDS" />
     <Image Include="spnza_bricks_a_specular.DDS" />

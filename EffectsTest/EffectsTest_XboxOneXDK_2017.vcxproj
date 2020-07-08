@@ -192,8 +192,10 @@
     <Image Include="cat.dds" />
     <Image Include="cubemap.dds" />
     <Image Include="default.dds" />
+    <Image Include="dualparabola.dds" />
     <Image Include="opaqueCat.dds" />
     <Image Include="overlay.dds" />
+    <Image Include="spheremap.bmp" />
     <Image Include="spnza_bricks_a.DDS" />
     <Image Include="spnza_bricks_a_normal.DDS" />
     <Image Include="spnza_bricks_a_specular.DDS" />
