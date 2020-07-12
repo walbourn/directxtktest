@@ -198,7 +198,7 @@ Game::Game() noexcept(false) :
         );
 #elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3,
+        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
         DX::DeviceResources::c_Enable4K_Xbox
         );
 #else
@@ -648,6 +648,12 @@ void Game::Render()
 
     m_envmap->SetPerPixelLighting(false);
 
+    m_spheremap->Apply(context, world * XMMatrixTranslation(col4, row5, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    m_dparabolamap->Apply(context, world * XMMatrixTranslation(col4, row6, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
     //--- DualTextureEFfect ----------------------------------------------------------------
 
     // Dual texture effect.
@@ -873,6 +879,14 @@ void Game::CreateDeviceDependentResources()
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
         nullptr, m_cubemap.ReleaseAndGetAddressOf()));
 
+    DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"spheremap.bmp",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB ? WIC_LOADER_FORCE_SRGB : WIC_LOADER_DEFAULT,
+        nullptr, m_envball.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"dualparabola.dds",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        nullptr, m_envdual.ReleaseAndGetAddressOf()));
+
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"overlay.dds",
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
         nullptr, m_overlay.ReleaseAndGetAddressOf()));
@@ -956,6 +970,26 @@ void Game::CreateDeviceDependentResources()
         effect->EnableDefaultLighting();
         effect->SetTexture(m_opaqueCat.Get());
         effect->SetEnvironmentMap(m_cubemap.Get());
+    });
+
+    m_spheremap = std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [&](EnvironmentMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetFresnelFactor(0.f);
+        effect->SetEnvironmentMapAmount(1.0f);
+        effect->SetMode(EnvironmentMapEffect::Mapping_Sphere);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envball.Get());
+    });
+
+    m_dparabolamap = std::make_unique<EffectWithDecl<EnvironmentMapEffect>>(device, [&](EnvironmentMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetFresnelFactor(0.f);
+        effect->SetEnvironmentMapAmount(1.0f);
+        effect->SetMode(EnvironmentMapEffect::Mapping_DualParabola);
+        effect->SetTexture(m_defaultTex.Get());
+        effect->SetEnvironmentMap(m_envdual.Get());
     });
 
     m_dualTexture = std::make_unique<EffectWithDecl<DualTextureEffect>>(device, [&](DualTextureEffect* effect)
@@ -1050,6 +1084,8 @@ void Game::OnDeviceLost()
     m_skinnedEffectNoSpecular.reset();
 
     m_envmap.reset();
+    m_spheremap.reset();
+    m_dparabolamap.reset();
 
     m_dualTexture.reset();
 
@@ -1063,6 +1099,8 @@ void Game::OnDeviceLost()
     m_cat.Reset();
     m_opaqueCat.Reset();
     m_cubemap.Reset();
+    m_envball.Reset();
+    m_envdual.Reset();
     m_overlay.Reset();
     m_defaultTex.Reset();
     m_brickDiffuse.Reset();

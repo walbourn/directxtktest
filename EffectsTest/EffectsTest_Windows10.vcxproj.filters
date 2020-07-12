@@ -72,5 +72,11 @@
     <Image Include="spnza_bricks_a_specular.DDS">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="dualparabola.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="spheremap.bmp">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>
