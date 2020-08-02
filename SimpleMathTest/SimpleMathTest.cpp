@@ -5583,6 +5583,14 @@ int __cdecl main()
     size_t npass = 0;
     bool success = true;
 
+    printf("*** SimpleMathTest (using DirectXMath version %03u)\n", DIRECTX_MATH_VERSION);
+
+    if (!XMVerifyCPUSupport())
+    {
+        printf("FAILED: XMVerifyCPUSupport reports a failure on this platform\n");
+        return 1;
+    }
+
     for( size_t j = 0; j < _countof(g_Tests); ++j )
     {
         printf("%s: ", g_Tests[j].name );
