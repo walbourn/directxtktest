@@ -44,8 +44,10 @@ namespace DX
         void ValidateDevice();
         void HandleDeviceLost();
         void RegisterDeviceNotify(IDeviceNotify* deviceNotify) noexcept { m_deviceNotify = deviceNotify; }
-        void Trim();
+        void Trim() noexcept;
         void Present();
+        void Suspend() noexcept;
+        void Resume() noexcept;
 
         // Device Accessors.
         RECT GetOutputSize() const noexcept             { return m_outputSize; }

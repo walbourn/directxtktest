@@ -35,6 +35,8 @@ namespace DX
         void SetWindow(IUnknown* window) noexcept { m_window = window; }
         void Prepare();
         void Present(UINT decompressFlags = D3D11X_DECOMPRESS_PROPAGATE_COLOR_CLEAR);
+        void Suspend() noexcept;
+        void Resume() noexcept;
 
         // Device Accessors.
         RECT GetOutputSize() const noexcept { return m_outputSize; }

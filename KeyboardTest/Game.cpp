@@ -528,18 +528,12 @@ void Game::OnDeactivated()
 
 void Game::OnSuspending()
 {
-#if defined(_XBOX_ONE) && defined(_TITLE)
-    auto context = m_deviceResources->GetD3DDeviceContext();
-    context->Suspend(0);
-#endif
+    m_deviceResources->Suspend();
 }
 
 void Game::OnResuming()
 {
-#if defined(_XBOX_ONE) && defined(_TITLE)
-    auto context = m_deviceResources->GetD3DDeviceContext();
-    context->Resume();
-#endif
+    m_deviceResources->Resume();
 
     m_tracker.Reset();
     m_timer.ResetElapsedTime();

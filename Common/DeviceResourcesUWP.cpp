@@ -620,7 +620,7 @@ void DeviceResources::HandleDeviceLost()
 
 // Call this method when the app suspends. It provides a hint to the driver that the app 
 // is entering an idle state and that temporary buffers can be reclaimed for use by other apps.
-void DeviceResources::Trim()
+void DeviceResources::Trim() noexcept
 {
     ComPtr<IDXGIDevice3> dxgiDevice;
     if (SUCCEEDED(m_d3dDevice.As(&dxgiDevice)))
@@ -679,6 +679,16 @@ void DeviceResources::Present()
             ThrowIfFailed(CreateDXGIFactory2(m_dxgiFactoryFlags, IID_PPV_ARGS(m_dxgiFactory.ReleaseAndGetAddressOf())));
         }
     }
+}
+
+// Handle GPU suspend/resume
+void DeviceResources::Suspend() noexcept
+{
+    Trim();
+}
+
+void DeviceResources::Resume() noexcept
+{
 }
 
 // This method acquires the first available hardware adapter.
