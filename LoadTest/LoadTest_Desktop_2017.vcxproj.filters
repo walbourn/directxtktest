@@ -50,7 +50,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
       <Filter>Common</Filter>
@@ -58,6 +57,7 @@
     <ClCompile Include="..\Common\MainPC.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="Game.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
@@ -69,6 +69,9 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\ReadData.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\DirectXTKTest.h">
       <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>

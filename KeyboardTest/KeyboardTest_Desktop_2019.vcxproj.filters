@@ -32,6 +32,9 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Game.h" />
+    <ClInclude Include="..\Common\DirectXTKTest.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture.dds">

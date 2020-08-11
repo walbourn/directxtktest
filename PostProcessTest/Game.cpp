@@ -3,12 +3,8 @@
 //
 // Developer unit test for DirectXTK PostProcess
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
@@ -41,14 +37,14 @@ Game::Game() noexcept(false) :
     m_scene(0),
     m_delay(0)
 {
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef XBOX
     m_deviceResources = std::make_unique<DX::DeviceResources>(
         c_sdrFormat, DXGI_FORMAT_D32_FLOAT, 2,
         DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
         | DX::DeviceResources::c_FastSemantics);
 #endif
-#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#elif defined(UWP)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
         c_sdrFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
         DX::DeviceResources::c_Enable4K_Xbox);
@@ -57,7 +53,7 @@ Game::Game() noexcept(false) :
         c_sdrFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0);
 #endif
 
-#if !defined(_XBOX_ONE) || !defined(_TITLE)
+#ifdef LOSTDEVICE
     m_deviceResources->RegisterDeviceNotify(this);
 #endif
 
@@ -66,23 +62,25 @@ Game::Game() noexcept(false) :
 
 // Initialize the Direct3D resources required to run.
 void Game::Initialize(
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
-    HWND window,
-#else
+#ifdef COREWINDOW
     IUnknown* window,
+#else
+    HWND window,
 #endif
     int width, int height, DXGI_MODE_ROTATION rotation)
 {
     m_gamePad = std::make_unique<GamePad>();
     m_keyboard = std::make_unique<Keyboard>();
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef XBOX
     UNREFERENCED_PARAMETER(rotation);
     UNREFERENCED_PARAMETER(width);
     UNREFERENCED_PARAMETER(height);
     m_deviceResources->SetWindow(window);
+#ifdef COREWINDOW
     m_keyboard->SetWindow(reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(window));
-#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#endif
+#elif defined(UWP)
     m_deviceResources->SetWindow(window, width, height, rotation);
     m_keyboard->SetWindow(reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(window));
 #else
@@ -195,7 +193,7 @@ void Game::Render()
         return;
     }
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
     m_deviceResources->Prepare();
 #endif
 
@@ -209,12 +207,12 @@ void Game::Render()
 
     m_shape->Draw(m_world, m_view, m_proj, Colors::White, m_texture.Get());
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
     context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
     // Post process.
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
     context->DecompressResource(m_sceneTex.Get(), 0, nullptr,
         m_sceneTex.Get(), 0, nullptr,
         c_hdrFormat, D3D11X_DECOMPRESS_PROPAGATE_COLOR_CLEAR);
@@ -295,7 +293,7 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -323,7 +321,7 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -351,7 +349,7 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -365,7 +363,7 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -392,7 +390,7 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -406,7 +404,7 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -421,7 +419,7 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -449,7 +447,7 @@ void Game::Render()
 
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -463,7 +461,7 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur1SRV.Get());
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -478,7 +476,7 @@ void Game::Render()
             m_basicPostProcess->SetSourceTexture(m_blur2SRV.Get());
             m_basicPostProcess->Process(context);
 
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
             context->FlushGpuCacheRange(D3D11_FLUSH_ENSURE_CB0_COHERENCY | D3D11_FLUSH_COLOR_BLOCK_INVALIDATE | D3D11_FLUSH_TEXTURE_L1_INVALIDATE | D3D11_FLUSH_TEXTURE_L2_INVALIDATE, nullptr, D3D11_FLUSH_GPU_CACHE_RANGE_ALL);
 #endif
 
@@ -614,13 +612,13 @@ void Game::Render()
     context->PSSetShaderResources(0, 2, nullsrv);
 
     // Show the new frame.
-#if defined(_XBOX_ONE) && defined(_TITLE) && defined(USE_FAST_SEMANTICS)
+#if defined(XBOX) && defined(USE_FAST_SEMANTICS)
     m_deviceResources->Present(0);
 #else
     m_deviceResources->Present();
 #endif
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef XBOX
     m_graphicsMemory->Commit();
 #endif
 }
@@ -675,7 +673,7 @@ void Game::OnResuming()
     m_timer.ResetElapsedTime();
 }
 
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
+#ifdef PC
 void Game::OnWindowMoved()
 {
     auto r = m_deviceResources->GetOutputSize();
@@ -683,10 +681,10 @@ void Game::OnWindowMoved()
 }
 #endif
 
-#if !defined(_XBOX_ONE) || !defined(_TITLE)
+#ifndef XBOX
 void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation)
 {
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#ifdef UWP
     if (!m_deviceResources->WindowSizeChanged(width, height, rotation))
         return;
 #else
@@ -699,7 +697,7 @@ void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotatio
 }
 #endif
 
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#ifdef UWP
 void Game::ValidateDevice()
 {
     m_deviceResources->ValidateDevice();
@@ -720,7 +718,7 @@ void Game::CreateDeviceDependentResources()
 {
     auto device = m_deviceResources->GetD3DDevice();
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef XBOX
     m_graphicsMemory = std::make_unique<GraphicsMemory>(device, m_deviceResources->GetBackBufferCount());
 #endif
 
@@ -803,7 +801,7 @@ void Game::CreateWindowSizeDependentResources()
         float(size.right) / float(size.bottom), 0.1f, 10.f);
 }
 
-#if !defined(_XBOX_ONE) || !defined(_TITLE)
+#ifdef LOSTDEVICE
 void Game::OnDeviceLost()
 {
     m_abstractPostProcess.reset();
@@ -887,7 +885,7 @@ void Game::ShaderTest()
         }
     }
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef XBOX
     ComPtr<ID3D11Texture2D> tex;
     ComPtr<ID3D11RenderTargetView> rtv;
     {

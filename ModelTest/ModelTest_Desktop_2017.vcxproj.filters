@@ -10,6 +10,9 @@
     <ClCompile Include="..\Common\MainPC.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\LoadTest\Game.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
@@ -171,6 +174,9 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="WaveFrontReader.h" />
+    <ClInclude Include="..\Common\DirectXTKTest.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\Common\settings.manifest">

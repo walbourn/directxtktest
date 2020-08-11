@@ -27,6 +27,9 @@
     <ClInclude Include="..\Common\DeviceResourcesXDK.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\DirectXTKTest.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageXDK.appxmanifest" />

@@ -3,24 +3,14 @@
 //
 // Developer unit test for DirectXTK - Simple Audio Test (UI-based BasicAudioTest)
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //--------------------------------------------------------------------------------------
 #pragma once
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
-#include "DeviceResourcesXDK.h"
-#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
-#include "DeviceResourcesUWP.h"
-#else
-#include "DeviceResourcesPC.h"
-#endif
+#include "DirectXTKTest.h"
 #include "StepTimer.h"
 #include "TextConsole.h"
 
@@ -28,14 +18,14 @@
 #define TEST_XWMA
 #endif
 
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef XBOX
 #define TEST_XMA2
 #endif
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
 class Game
-#if !defined(_XBOX_ONE) || !defined(_TITLE)
+#ifdef LOSTDEVICE
     final : public DX::IDeviceNotify
 #endif
 {
@@ -45,16 +35,16 @@ public:
     ~Game();
 
     // Initialization and management
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
-    void Initialize(HWND window, int width, int height, DXGI_MODE_ROTATION rotation);
-#else
+#ifdef COREWINDOW
     void Initialize(IUnknown* window, int width, int height, DXGI_MODE_ROTATION rotation);
+#else
+    void Initialize(HWND window, int width, int height, DXGI_MODE_ROTATION rotation);
 #endif
 
     // Basic game loop
     void Tick();
 
-#if !defined(_XBOX_ONE) || !defined(_TITLE)
+#ifdef LOSTDEVICE
     // IDeviceNotify
     virtual void OnDeviceLost() override;
     virtual void OnDeviceRestored() override;
@@ -66,15 +56,15 @@ public:
     void OnSuspending();
     void OnResuming();
 
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
+#ifdef PC
     void OnWindowMoved();
 #endif
 
-#if !defined(_XBOX_ONE) || !defined(_TITLE)
+#ifndef XBOX
     void OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation);
 #endif
 
-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#ifdef UWP
     void ValidateDevice();
 #endif
 
@@ -109,7 +99,7 @@ private:
     DirectX::GamePad::ButtonStateTracker    m_gamepadButtons;
 
     // DirectXTK Test Objects
-#if defined(_XBOX_ONE) && defined(_TITLE)
+#ifdef XBOX
     std::unique_ptr<DirectX::GraphicsMemory> m_graphicsMemory;
 #endif
 

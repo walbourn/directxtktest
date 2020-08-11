@@ -28,6 +28,9 @@
     <ClInclude Include="..\Common\StepTimer.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\DirectXTKTest.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Common\Logo.scale-100.png">
