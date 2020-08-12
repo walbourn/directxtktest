@@ -469,7 +469,11 @@ void Game::CreateWindowSizeDependentResources()
 #ifdef XBOX
     if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_UHD)
     {
+#ifdef GAMEINPUT
+        Mouse::SetResolution(true);
+#else
         Mouse::SetDpi(192.);
+#endif
     }
 #elif defined(UWP)
     if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_Xbox)
