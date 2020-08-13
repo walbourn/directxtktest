@@ -32,6 +32,13 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wcovered-switch-default"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#endif
+
+#pragma warning(disable : 4061)
+
 namespace
 {
     float dist = 10.f;
@@ -75,6 +82,9 @@ namespace
 
         case D3D_SRV_DIMENSION_TEXTURECUBEARRAY:
             return (desc.TextureCubeArray.NumCubes == (chkarray / 6) && desc.TextureCubeArray.MipLevels == chkmip);
+
+        default:
+            break;
         }
 
         return false;
@@ -154,6 +164,9 @@ namespace
                     return true;
                 }
             }
+            break;
+
+        default:
             break;
         }
 

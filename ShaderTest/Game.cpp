@@ -383,7 +383,7 @@ namespace
         assert(compressedVertexBuffer != nullptr && *compressedVertexBuffer != nullptr);
         _Analysis_assume_(compressedVertexBuffer != nullptr && *compressedVertexBuffer != nullptr);
 
-        return (int)indices.size();
+        return static_cast<UINT>(indices.size());
     }
 }
 
@@ -1990,7 +1990,7 @@ void Game::CreateDeviceDependentResources()
         m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
         {
             effect->EnableDefaultLighting();
-            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
         }));
 
         // PBREffect (textured)
@@ -1998,7 +1998,7 @@ void Game::CreateDeviceDependentResources()
         {
             effect->EnableDefaultLighting();
             effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
         }));
 
         // PBREffect (emissive)
@@ -2007,7 +2007,7 @@ void Game::CreateDeviceDependentResources()
             effect->EnableDefaultLighting();
             effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
             effect->SetEmissiveTexture(m_pbrEmissive.Get());
-            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
         }));
 
         // PBREffect (velocity)
@@ -2015,7 +2015,7 @@ void Game::CreateDeviceDependentResources()
         {
             effect->EnableDefaultLighting();
             effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
             effect->SetVelocityGeneration(true);
         }));
 
@@ -2025,7 +2025,7 @@ void Game::CreateDeviceDependentResources()
             effect->EnableDefaultLighting();
             effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
             effect->SetEmissiveTexture(m_pbrEmissive.Get());
-            effect->SetIBLTextures(m_radianceIBL.Get(), desc.TextureCube.MipLevels, m_irradianceIBL.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
             effect->SetVelocityGeneration(true);
         }));
     }

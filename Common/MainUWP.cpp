@@ -19,6 +19,13 @@ using namespace Windows::Foundation;
 using namespace Windows::Graphics::Display;
 using namespace DirectX;
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wcovered-switch-default"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#endif
+
+#pragma warning(disable : 4061)
+
 ref class ViewProvider sealed : public IFrameworkView
 {
 public:
@@ -394,6 +401,9 @@ private:
             case DisplayOrientations::PortraitFlipped:
                 rotation = DXGI_MODE_ROTATION_ROTATE90;
                 break;
+
+            default:
+                break;
             }
             break;
 
@@ -415,7 +425,13 @@ private:
             case DisplayOrientations::PortraitFlipped:
                 rotation = DXGI_MODE_ROTATION_ROTATE180;
                 break;
+
+            default:
+                break;
             }
+            break;
+
+        default:
             break;
         }
 

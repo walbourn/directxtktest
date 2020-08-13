@@ -73,32 +73,32 @@ namespace DX
         unsigned int            GetDeviceOptions() const noexcept       { return m_options; }
 
         // Performance events
-        void PIXBeginEvent(_In_z_ const wchar_t* name)
+        void PIXBeginEvent(_In_z_ const wchar_t* name) noexcept
         {
             m_d3dAnnotation->BeginEvent(name);
         }
 
-        void PIXEndEvent()
+        void PIXEndEvent() noexcept
         {
             m_d3dAnnotation->EndEvent();
         }
 
-        void PIXSetMarker(_In_z_ const wchar_t* name)
+        void PIXSetMarker(_In_z_ const wchar_t* name) noexcept
         {
             m_d3dAnnotation->SetMarker(name);
         }
 
-        static void DebugForceWarp(bool enable)
+        static void DebugForceWarp(bool enable) noexcept
         {
             s_debugForceWarp = enable;
         }
 
-        static void DebugPreferMinimumPower(bool enable)
+        static void DebugPreferMinimumPower(bool enable) noexcept
         {
             s_debugPreferMinPower = enable;
         }
 
-        static void DebugSetAdapter(int adapter)
+        static void DebugSetAdapter(int adapter) noexcept
         {
             s_debugAdapterOrdinal = adapter;
         }

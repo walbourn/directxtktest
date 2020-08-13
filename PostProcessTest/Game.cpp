@@ -891,8 +891,8 @@ void Game::ShaderTest()
     {
         auto size = m_deviceResources->GetOutputSize();
 
-        UINT width = size.right - size.left;
-        UINT height = size.bottom - size.top;
+        UINT width = UINT(size.right - size.left);
+        UINT height = UINT(size.bottom - size.top);
 
         CD3D11_TEXTURE2D_DESC desc(
             m_deviceResources->GetBackBufferFormat(), width, height,

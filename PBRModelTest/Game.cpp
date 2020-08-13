@@ -31,6 +31,13 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wcovered-switch-default"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#endif
+
+#pragma warning(disable : 4061)
+
 namespace
 {
     const XMVECTORF32 c_BrightYellow = { 2.f, 2.f, 0.f, 1.f };
@@ -289,7 +296,7 @@ void Game::Render()
     auto context = m_deviceResources->GetD3DDeviceContext();
 
     auto vp = m_deviceResources->GetOutputSize();
-    auto safeRect = Viewport::ComputeTitleSafeArea(vp.right - vp.left, vp.bottom - vp.top);
+    auto safeRect = Viewport::ComputeTitleSafeArea(UINT(vp.right - vp.left), UINT(vp.bottom - vp.top));
 
     //--- Set PBR lighting sources ---
     D3D11_SHADER_RESOURCE_VIEW_DESC desc;
@@ -300,8 +307,8 @@ void Game::Render()
         auto pbr = dynamic_cast<PBREffect*>(effect);
         if (pbr)
         {
-            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
-            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
         }
     });
 
@@ -310,8 +317,8 @@ void Game::Render()
         auto pbr = dynamic_cast<PBREffect*>(effect);
         if (pbr)
         {
-            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
-            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
         }
     });
 
@@ -320,8 +327,8 @@ void Game::Render()
         auto pbr = dynamic_cast<PBREffect*>(effect);
         if (pbr)
         {
-            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
-            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
         }
     });
 
@@ -330,8 +337,8 @@ void Game::Render()
         auto pbr = dynamic_cast<PBREffect*>(effect);
         if (pbr)
         {
-            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
-            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), desc.TextureCube.MipLevels, m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
         }
     });
 

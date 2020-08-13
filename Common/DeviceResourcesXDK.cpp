@@ -1,4 +1,4 @@
-﻿//
+//  
 // DeviceResources.cpp - A wrapper for the Direct3D 11 device and swapchain
 //                       (requires DirectX 11.X Xbox One Monolithic Runtime)
 //
@@ -260,8 +260,8 @@ void DeviceResources::CreateWindowSizeDependentResources()
         );
 
     m_outputSize.left = m_outputSize.top = 0;
-    m_outputSize.right = backBufferWidth;
-    m_outputSize.bottom = backBufferHeight;
+    m_outputSize.right = static_cast<LONG>(backBufferWidth);
+    m_outputSize.bottom = static_cast<LONG>(backBufferHeight);
 }
 
 // Prepare the render target for rendering.

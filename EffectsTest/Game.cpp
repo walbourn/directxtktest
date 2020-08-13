@@ -163,7 +163,7 @@ namespace
             CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer)
         );
 
-        return (int)indices.size();
+        return static_cast<UINT>(indices.size());
     }
 } // anonymous namespace
 

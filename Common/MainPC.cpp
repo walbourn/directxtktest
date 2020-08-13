@@ -5,8 +5,11 @@
 #include "pch.h"
 #include "Game.h"
 
+#pragma warning(push)
+#pragma warning(disable : 4265)
 #include <wrl/wrappers/corewrappers.h>
 #include <shellapi.h>
+#pragma warning(pop)
 
 using namespace DirectX;
 

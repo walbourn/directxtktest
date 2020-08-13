@@ -15,6 +15,13 @@
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wcovered-switch-default"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#endif
+
+#pragma warning(disable : 4061)
+
 namespace
 {
     const float SWAP_TIME = 3.f;
@@ -324,7 +331,7 @@ void Game::Render()
 
 #ifndef XBOX
     {
-        UINT w, h;
+        LONG w, h;
 
         auto outputSize = m_deviceResources->GetOutputSize();
 
@@ -342,17 +349,17 @@ void Game::Render()
             break;
         }
 
-        for (UINT x = 0; x < w; x += 100)
+        for (LONG x = 0; x < w; x += 100)
         {
             wchar_t tmp[16] = {};
-            swprintf_s(tmp, L"%u\n", x);
+            swprintf_s(tmp, L"%d\n", x);
             m_nonproportionalFont->DrawString(m_spriteBatch.get(), tmp, XMFLOAT2(float(x), float(h - 50)), yellow);
         }
 
-        for (UINT y = 0; y < h; y += 100)
+        for (LONG y = 0; y < h; y += 100)
         {
             wchar_t tmp[16] = {};
-            swprintf_s(tmp, L"%u\n", y);
+            swprintf_s(tmp, L"%d\n", y);
             m_nonproportionalFont->DrawString(m_spriteBatch.get(), tmp, XMFLOAT2(float(w - 100), float(y)), red);
         }
     }
