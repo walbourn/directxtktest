@@ -288,7 +288,7 @@ void Game::Update(DX::StepTimer const&)
         }
     }
 
-    m_state = m_gamePad->GetState(-1);
+    m_state = m_gamePad->GetState(GamePad::c_MostRecent);
 
     if (m_state.IsConnected())
     {
@@ -396,7 +396,7 @@ void Game::Update(DX::StepTimer const&)
         assert(m_tracker.back == m_tracker.view);
         assert(m_tracker.start == m_tracker.menu);
 
-        m_gamePad->SetVibration(-1, m_state.triggers.left, m_state.triggers.right);
+        m_gamePad->SetVibration(GamePad::c_MostRecent, m_state.triggers.left, m_state.triggers.right);
     }
     else
     {
