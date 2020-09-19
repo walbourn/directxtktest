@@ -48,6 +48,9 @@
     <Image Include="pentagon.tiff">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="text.tif">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />

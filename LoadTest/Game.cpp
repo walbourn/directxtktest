@@ -1509,6 +1509,50 @@ void Game::UnitTests(bool success)
         }
     }
 
+    // WIC RGBA32 + POW2 + SQUARE
+    {
+        ComPtr<ID3D11Resource> res;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"text.tif",
+            0,
+            D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), nullptr));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8_UNORM, 1, 1512, 359))
+        {
+            OutputDebugStringA("FAILED: text.tif res desc unexpected\n");
+            success = false;
+        }
+
+        ComPtr<ID3D11Resource> res2;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"text.tif",
+            0,
+            D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+            WIC_LOADER_FORCE_RGBA32 | WIC_LOADER_FIT_POW2,
+            res2.GetAddressOf(), nullptr));
+
+        if (!ValidateDesc(res2.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1024, 256))
+        {
+            OutputDebugStringA("FAILED: text.tif res rgba32+pow2 unexpected\n");
+            success = false;
+        }
+
+        ComPtr<ID3D11Resource> res3;
+
+        DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"text.tif",
+            0,
+            D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+            WIC_LOADER_FORCE_RGBA32 | WIC_LOADER_FIT_POW2 | WIC_LOADER_MAKE_SQUARE,
+            res3.GetAddressOf(), nullptr));
+
+        if (!ValidateDesc(res3.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1024, 1024))
+        {
+            OutputDebugStringA("FAILED: text.tif res rgba32+pow2+square unexpected\n");
+            success = false;
+        }
+    }
 
     OutputDebugStringA(success ? "Passed\n" : "Failed\n");
     OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
