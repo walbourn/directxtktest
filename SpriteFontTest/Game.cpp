@@ -24,9 +24,9 @@
 
 namespace
 {
-    const float SWAP_TIME = 3.f;
+    constexpr float SWAP_TIME = 3.f;
 
-    const float EPSILON = 0.000001f;
+    constexpr float EPSILON = 0.000001f;
 }
 
 extern void ExitGame() noexcept;
@@ -233,7 +233,7 @@ void Game::Render()
         SpriteEffects flip = (SpriteEffects)((int)(time / 100) & 3);
         m_multicoloredFont->DrawString(m_spriteBatch.get(), "OMG it's full of stars!", XMFLOAT2(610, 130), Colors::White, XM_PIDIV2, XMFLOAT2(0, 0), 1, flip);
 
-        m_comicFont->DrawString(m_spriteBatch.get(), u8"This is a larger block\nof text using a\nfont scaled to a\nsmaller size.\nSome c\x1234ha\x1543rac\x2453te\x1634r\x1563s are not in the font, but should show up as hyphens.", XMFLOAT2(10, 90), Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
+        m_comicFont->DrawString(m_spriteBatch.get(), u8"This is a larger block\nof text using a\nfont scaled to a\nsmaller size.\nSome c\xffha\xferac\xfdte\xffr\xfas are not in the font, but should show up as hyphens.", XMFLOAT2(10, 90), Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
 
         char tmp[256] = {};
         sprintf_s(tmp, "%llu frames", m_frame);
@@ -244,17 +244,17 @@ void Game::Render()
 
         float scale = sin(time / 100) + 1;
         auto spinText = "Spinning\nlike a cat";
-        auto size = m_comicFont->MeasureString(spinText);
-        m_comicFont->DrawString(m_spriteBatch.get(), spinText, XMVectorSet(150, 350, 0, 0), blue, time / 60, size / 2, scale);
+        Vector2 size = m_comicFont->MeasureString(spinText);
+        m_comicFont->DrawString(m_spriteBatch.get(), spinText, Vector2(150, 350), blue, time / 60, size / 2, scale);
 
         auto mirrorText = "It's a\nmirror...";
-        auto mirrorSize = m_comicFont->MeasureString(mirrorText);
-        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, XMVectorSet(400, 400, 0, 0), Colors::Black, 0, mirrorSize * XMVectorSet(0, 1, 0, 0), 1, SpriteEffects_None);
-        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, XMVectorSet(400, 400, 0, 0), gray, 0, mirrorSize * XMVectorSet(1, 1, 0, 0), 1, SpriteEffects_FlipHorizontally);
-        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, XMVectorSet(400, 400, 0, 0), gray, 0, mirrorSize * XMVectorSet(0, 0, 0, 0), 1, SpriteEffects_FlipVertically);
-        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, XMVectorSet(400, 400, 0, 0), dgray, 0, mirrorSize * XMVectorSet(1, 0, 0, 0), 1, SpriteEffects_FlipBoth);
+        Vector2 mirrorSize = m_comicFont->MeasureString(mirrorText);
+        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, Vector2(400, 400), Colors::Black, 0, mirrorSize * Vector2(0, 1), 1, SpriteEffects_None);
+        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, Vector2(400, 400), gray, 0, mirrorSize * Vector2(1, 1), 1, SpriteEffects_FlipHorizontally);
+        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, Vector2(400, 400), gray, 0, mirrorSize * Vector2(0, 0), 1, SpriteEffects_FlipVertically);
+        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, Vector2(400, 400), dgray, 0, mirrorSize * Vector2(1, 0), 1, SpriteEffects_FlipBoth);
 
-        m_japaneseFont->DrawString(m_spriteBatch.get(), u8"\x79C1\x306F\x65E5\x672C\x8A9E\x304C\x8A71\x305B\x306A\x3044\x306E\x3067\x3001\n\x79C1\x306F\x3053\x308C\x304C\x4F55\x3092\x610F\x5473\x3059\x308B\x306E\x304B\x308F\x304B\x308A\x307E\x305B\x3093", XMFLOAT2(10, 512));
+        m_japaneseFont->DrawString(m_spriteBatch.get(), L"\x79C1\x306F\x65E5\x672C\x8A9E\x304C\x8A71\x305B\x306A\x3044\x306E\x3067\x3001\n\x79C1\x306F\x3053\x308C\x304C\x4F55\x3092\x610F\x5473\x3059\x308B\x306E\x304B\x308F\x304B\x308A\x307E\x305B\x3093", XMFLOAT2(10, 512));
     }
     else
     {
@@ -276,15 +276,15 @@ void Game::Render()
 
         float scale = sin(time / 100) + 1;
         auto spinText = L"Spinning\nlike a cat";
-        auto size = m_comicFont->MeasureString(spinText);
-        m_comicFont->DrawString(m_spriteBatch.get(), spinText, XMVectorSet(150, 350, 0, 0), blue, time / 60, size / 2, scale);
+        Vector2 size = m_comicFont->MeasureString(spinText);
+        m_comicFont->DrawString(m_spriteBatch.get(), spinText, Vector2(150, 350), blue, time / 60, size / 2, scale);
 
         auto mirrorText = L"It's a\nmirror...";
-        auto mirrorSize = m_comicFont->MeasureString(mirrorText);
-        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, XMVectorSet(400, 400, 0, 0), Colors::Black, 0, mirrorSize * XMVectorSet(0, 1, 0, 0), 1, SpriteEffects_None);
-        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, XMVectorSet(400, 400, 0, 0), gray, 0, mirrorSize * XMVectorSet(1, 1, 0, 0), 1, SpriteEffects_FlipHorizontally);
-        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, XMVectorSet(400, 400, 0, 0), gray, 0, mirrorSize * XMVectorSet(0, 0, 0, 0), 1, SpriteEffects_FlipVertically);
-        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, XMVectorSet(400, 400, 0, 0), dgray, 0, mirrorSize * XMVectorSet(1, 0, 0, 0), 1, SpriteEffects_FlipBoth);
+        Vector2 mirrorSize = m_comicFont->MeasureString(mirrorText);
+        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, Vector2(400, 400), Colors::Black, 0, mirrorSize * Vector2(0, 1), 1, SpriteEffects_None);
+        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, Vector2(400, 400), gray, 0, mirrorSize * Vector2(1, 1), 1, SpriteEffects_FlipHorizontally);
+        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, Vector2(400, 400), gray, 0, mirrorSize * Vector2(0, 0), 1, SpriteEffects_FlipVertically);
+        m_comicFont->DrawString(m_spriteBatch.get(), mirrorText, Vector2(400, 400), dgray, 0, mirrorSize * Vector2(1, 0), 1, SpriteEffects_FlipBoth);
 
         m_japaneseFont->DrawString(m_spriteBatch.get(), L"\x79C1\x306F\x65E5\x672C\x8A9E\x304C\x8A71\x305B\x306A\x3044\x306E\x3067\x3001\n\x79C1\x306F\x3053\x308C\x304C\x4F55\x3092\x610F\x5473\x3059\x308B\x306E\x304B\x308F\x304B\x308A\x307E\x305B\x3093", XMFLOAT2(10, 512));
     }

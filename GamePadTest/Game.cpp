@@ -31,8 +31,7 @@ using Microsoft::WRL::ComPtr;
 // Constructor.
 Game::Game() noexcept(false) :
     m_state{},
-    m_lastStr(nullptr),
-    m_lastStrBuff{}
+    m_lastStr(nullptr)
 {
 #ifdef GAMMA_CORRECT_RENDERING
     const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
@@ -105,9 +104,6 @@ void Game::Initialize(
             MessageBoxW(window, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
             throw std::exception("GamePad not acting like a singleton");
         }
-
-        auto state = GamePad::Get().GetState(0);
-        state;
     }
 #endif
 

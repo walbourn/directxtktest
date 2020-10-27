@@ -5461,8 +5461,6 @@ int TestL()
     maprct[Rectangle(10, 20, 0, 0)] = 4;
     maprct[Rectangle(0, 0, 0, 0)] = 1;
 
-    Rectangle ab(12, 20, 2, 2);
-
     mapv2[ Vector2(3.f, 2.f) ] = 4;
     mapv2[ Vector2(1.f, 2.f) ] = 1;
     mapv2[ Vector2(2.f, 2.f) ] = 3;

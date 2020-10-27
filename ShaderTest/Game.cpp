@@ -28,8 +28,8 @@ namespace
     constexpr float SWAP_TIME = 1.f;
     constexpr float INTERACTIVE_TIME = 10.f;
 
-    const float ortho_width = 6.f;
-    const float ortho_height = 8.f;
+    constexpr float ortho_width = 6.f;
+    constexpr float ortho_height = 8.f;
 
     struct TestVertex
     {
@@ -38,7 +38,7 @@ namespace
             XMStoreFloat3(&this->position, position);
             XMStoreFloat3(&this->normal, normal);
             XMStoreFloat2(&this->textureCoordinate, textureCoordinate);
-            XMStoreFloat2(&this->textureCoordinate2, textureCoordinate * 3);
+            XMStoreFloat2(&this->textureCoordinate2, XMVectorScale(textureCoordinate, 3));
             XMStoreUByte4(&this->blendIndices, g_XMZero);
 
             XMStoreFloat3(&this->tangent, g_XMZero);
@@ -83,7 +83,7 @@ namespace
     void ComputeTangents(const IndexCollection& indices, VertexCollection& vertices)
     {
         static const float EPSILON = 0.0001f;
-        static const XMVECTORF32 s_flips = { 1.f, -1.f, -1.f, 1.f };
+        static const XMVECTORF32 s_flips = { { { 1.f, -1.f, -1.f, 1.f } } };
 
         size_t nFaces = indices.size() / 3;
         size_t nVerts = vertices.size();
@@ -216,13 +216,11 @@ namespace
             blendIndices = bn.blendIndices;
 
             XMVECTOR v = XMLoadFloat3(&bn.normal);
-            v = v * g_XMOneHalf;
-            v += g_XMOneHalf;
+            v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
             XMStoreFloat3PK(&this->normal, v);
 
             v = XMLoadFloat3(&bn.tangent);
-            v = v * g_XMOneHalf;
-            v += g_XMOneHalf;
+            v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
             XMStoreFloat3PK(&this->tangent, v);
 
             v = XMLoadFloat2(&bn.textureCoordinate);
@@ -292,20 +290,20 @@ namespace
 
         static const XMVECTORF32 faceNormals[FaceCount] =
         {
-            { 0,  0,  1 },
-            { 0,  0, -1 },
-            { 1,  0,  0 },
-            { -1,  0,  0 },
-            { 0,  1,  0 },
-            { 0, -1,  0 },
+            { { {  0,  0,  1, 0 } } },
+            { { {  0,  0, -1, 0 } }  },
+            { { {  1,  0,  0, 0 } }  },
+            { { { -1,  0,  0, 0 } }  },
+            { { {  0,  1,  0, 0 } }  },
+            { { {  0, -1,  0, 0 } }  },
         };
 
         static const XMVECTORF32 textureCoordinates[4] =
         {
-            { 1, 0 },
-            { 1, 1 },
-            { 0, 1 },
-            { 0, 0 },
+            { { { 1, 0, 0, 0 } } },
+            { { { 1, 1, 0, 0 } } },
+            { { { 0, 1, 0, 0 } } },
+            { { { 0, 0, 0, 0 } } },
         };
 
         static uint32_t colors[FaceCount]
@@ -318,18 +316,18 @@ namespace
             0xFF00FFFF,
         };
 
-        static const XMVECTORF32 tsize = { 0.25f, 0.25f, 0.25f, 0.f };
+        const Vector4 tsize(0.25f, 0.25f, 0.25f, 0.f);
 
         // Create each face in turn.
-        for (int i = 0; i < FaceCount; i++)
+        for (size_t i = 0; i < FaceCount; i++)
         {
-            XMVECTOR normal = faceNormals[i];
+            Vector4 normal = faceNormals[i].v;
 
             // Get two vectors perpendicular both to the face normal and to each other.
             XMVECTOR basis = (i >= 4) ? g_XMIdentityR2 : g_XMIdentityR1;
 
-            XMVECTOR side1 = XMVector3Cross(normal, basis);
-            XMVECTOR side2 = XMVector3Cross(normal, side1);
+            Vector4 side1 = XMVector3Cross(normal, basis);
+            Vector4 side2 = XMVector3Cross(normal, side1);
 
             // Six indices (two triangles) per face.
             size_t vbase = vertices.size();
@@ -1112,9 +1110,8 @@ void Game::CreateDeviceDependentResources()
     //--- BasicEffect ----------------------------------------------------------------------
 
     // BasicEffect (no texture)
-    m_basic.emplace_back(std::make_unique<EffectWithDecl<BasicEffect>>(device, [=](BasicEffect* effect)
+    m_basic.emplace_back(std::make_unique<EffectWithDecl<BasicEffect>>(device, [=](BasicEffect*)
     {
-        effect;
     }));
 
     m_basic.emplace_back(std::make_unique<EffectWithDecl<BasicEffect>>(device, [=](BasicEffect* effect)
@@ -2031,9 +2028,8 @@ void Game::CreateDeviceDependentResources()
     }
 
     //--- DebugEffect ----------------------------------------------------------------------
-    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect*)
     {
-        effect;
     }));
 
     m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
@@ -2077,9 +2073,8 @@ void Game::CreateDeviceDependentResources()
     //--- DGSLEffect -----------------------------------------------------------------------
 
     // DGSLEffect
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect*)
     {
-        effect;
     }));
 
     m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)

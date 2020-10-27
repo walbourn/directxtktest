@@ -93,6 +93,11 @@ private:
     std::unique_ptr<DirectX::GraphicsMemory>    m_graphicsMemory;
 #endif
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+#endif
+
     template<typename T>
     class EffectWithDecl : public T
     {
@@ -107,7 +112,7 @@ private:
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool showCompressed)
         {
-            SetMatrices(world, view, projection);
+            T::SetMatrices(world, view, projection);
 
             auto ibasic = dynamic_cast<BasicEffect*>(this);
             if (ibasic)
@@ -157,7 +162,7 @@ private:
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection)
         {
-            SetMatrices(world, view, projection);
+            T::SetMatrices(world, view, projection);
 
             T::Apply(context);
 
@@ -167,6 +172,10 @@ private:
     private:
         Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
     };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
     std::unique_ptr<DirectX::CommonStates>  m_states;
 

@@ -27,22 +27,22 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const float row0 = 2.7f;
-    const float row1 = 1.f;
-    const float row2 = -0.7f;
-    const float row3 = -2.5f;
+    constexpr float row0 = 2.7f;
+    constexpr float row1 = 1.f;
+    constexpr float row2 = -0.7f;
+    constexpr float row3 = -2.5f;
 
-    const float col0 = -7.5f;
-    const float col1 = -5.75f;
-    const float col2 = -4.25f;
-    const float col3 = -2.7f;
-    const float col4 = -1.25f;
-    const float col5 = 0.f;
-    const float col6 = 1.25f;
-    const float col7 = 2.5f;
-    const float col8 = 4.25f;
-    const float col9 = 5.75f;
-    const float col10 = 7.5f;
+    constexpr float col0 = -7.5f;
+    constexpr float col1 = -5.75f;
+    constexpr float col2 = -4.25f;
+    constexpr float col3 = -2.7f;
+    constexpr float col4 = -1.25f;
+    constexpr float col5 = 0.f;
+    constexpr float col6 = 1.25f;
+    constexpr float col7 = 2.5f;
+    constexpr float col8 = 4.25f;
+    constexpr float col9 = 5.75f;
+    constexpr float col10 = 7.5f;
 }
 
 Game::Game() noexcept(false) :
@@ -267,6 +267,7 @@ void Game::Render()
     lime.v = Colors::Lime;
     gray.v = Colors::Gray;
 #endif
+    SimpleMath::Vector4 white = Colors::White.v;
 
     //--- Draw shapes ----------------------------------------------------------------------
     m_cube->Draw(world * XMMatrixTranslation(col0, row0, 0), m_view, m_projection);
@@ -283,7 +284,7 @@ void Game::Render()
     m_box->Draw(world * XMMatrixTranslation(col8, row3, 0), m_view, m_projection, magenta);
 
     //--- Draw textured shapes -------------------------------------------------------------
-    m_cube->Draw(world * XMMatrixTranslation(col0, row1, 0), m_view, m_projection, Colors::White, m_reftxt.Get());
+    m_cube->Draw(world * XMMatrixTranslation(col0, row1, 0), m_view, m_projection, white, m_reftxt.Get());
     m_sphere->Draw(world * XMMatrixTranslation(col1, row1, 0), m_view, m_projection, red, m_reftxt.Get());
     m_geosphere->Draw(world * XMMatrixTranslation(col2, row1, 0), m_view, m_projection, green, m_reftxt.Get());
     m_cylinder->Draw(world * XMMatrixTranslation(col3, row1, 0), m_view, m_projection, lime, m_reftxt.Get());
@@ -295,7 +296,7 @@ void Game::Render()
     m_dodec->Draw(world * XMMatrixTranslation(col9, row1, 0), m_view, m_projection, blue, m_reftxt.Get());
     m_iso->Draw(world * XMMatrixTranslation(col10, row1, 0), m_view, m_projection, cyan, m_reftxt.Get());
     m_box->Draw(world * XMMatrixTranslation(col9, row3, 0), m_view, m_projection, magenta, m_reftxt.Get());
-    m_customBox->Draw(world * XMMatrixTranslation(col7, row3, 0), m_view, m_projection, Colors::White, m_reftxt.Get());
+    m_customBox->Draw(world * XMMatrixTranslation(col7, row3, 0), m_view, m_projection, white, m_reftxt.Get());
 
     //--- Draw shapes in wireframe ---------------------------------------------------------
     m_cube->Draw(world * XMMatrixTranslation(col0, row2, 0), m_view, m_projection, gray, nullptr, true);
@@ -312,11 +313,11 @@ void Game::Render()
     m_box->Draw(world * XMMatrixTranslation(col10, row3, 0), m_view, m_projection, gray, nullptr, true);
 
     //--- Draw shapes with alpha blending --------------------------------------------------
-    m_cube->Draw(world * XMMatrixTranslation(col0, row3, 0), m_view, m_projection, Colors::White * alphaFade);
-    m_cube->Draw(world * XMMatrixTranslation(col1, row3, 0), m_view, m_projection, Colors::White * alphaFade, m_cat.Get());
+    m_cube->Draw(world * XMMatrixTranslation(col0, row3, 0), m_view, m_projection, white * alphaFade);
+    m_cube->Draw(world * XMMatrixTranslation(col1, row3, 0), m_view, m_projection, white * alphaFade, m_cat.Get());
 
     //--- Draw shapes with custom device states --------------------------------------------
-    m_cube->Draw(world * XMMatrixTranslation(col2, row3, 0), m_view, m_projection, Colors::White * alphaFade, m_cat.Get(), false, [&]()
+    m_cube->Draw(world * XMMatrixTranslation(col2, row3, 0), m_view, m_projection, white * alphaFade, m_cat.Get(), false, [&]()
     {
         context->OMSetBlendState(m_states->NonPremultiplied(), Colors::White, 0xFFFFFFFF);
     });
@@ -531,7 +532,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    static const XMVECTORF32 cameraPosition = { 0, 0, 9 };
+    static const XMVECTORF32 cameraPosition = { { { 0.f, 0.f, 9.f, 0.f } } };
 
     auto size = m_deviceResources->GetOutputSize();
     float aspect = (float)size.right / (float)size.bottom;

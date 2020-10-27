@@ -82,20 +82,20 @@ namespace
         {
             if (wfx->cbSize < (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))
             {
-                printf("\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                printf("\tEXTENSIBLE, %u channels, %u-bit, %lu Hz, %u align, %lu avg\n",
                     wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
                 printf("\tERROR: Invalid WAVE_FORMAT_EXTENSIBLE\n");
             }
             else
             {
-                static const GUID s_wfexBase = { 0x00000000, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71 };
+                static const GUID s_wfexBase = { 0x00000000, 0x0000, 0x0010, { 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71 } };
 
                 auto wfex = reinterpret_cast<const WAVEFORMATEXTENSIBLE*>(wfx);
 
                 if (memcmp(reinterpret_cast<const BYTE*>(&wfex->SubFormat) + sizeof(DWORD),
                     reinterpret_cast<const BYTE*>(&s_wfexBase) + sizeof(DWORD), sizeof(GUID) - sizeof(DWORD)) != 0)
                 {
-                    printf("\tEXTENSIBLE, %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                    printf("\tEXTENSIBLE, %u channels, %u-bit, %lu Hz, %u align, %lu avg\n",
                         wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
                     printf("\tERROR: Unknown EXTENSIBLE SubFormat {%8.8lX-%4.4X-%4.4X-%2.2X%2.2X-%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X}\n",
                         wfex->SubFormat.Data1, wfex->SubFormat.Data2, wfex->SubFormat.Data3,
@@ -104,17 +104,17 @@ namespace
                 }
                 else
                 {
-                    printf("\tEXTENSIBLE %s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+                    printf("\tEXTENSIBLE %s (%lu), %u channels, %u-bit, %lu Hz, %u align, %lu avg\n",
                         GetFormatTagName(wfex->SubFormat.Data1), wfex->SubFormat.Data1,
                         wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
-                    printf("\t\t%u samples per block, %u valid bps, %u channel mask",
+                    printf("\t\t%u samples per block, %u valid bps, %lu channel mask",
                         wfex->Samples.wSamplesPerBlock, wfex->Samples.wValidBitsPerSample, wfex->dwChannelMask);
                 }
             }
         }
         else
         {
-            printf("\t%s (%u), %u channels, %u-bit, %u Hz, %u align, %u avg\n",
+            printf("\t%s (%u), %u channels, %u-bit, %lu Hz, %u align, %lu avg\n",
                 GetFormatTagName(wfx->wFormatTag), wfx->wFormatTag,
                 wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec, wfx->nBlockAlign, wfx->nAvgBytesPerSec);
         }
@@ -178,7 +178,7 @@ int __cdecl main()
         default:                        speakerConfig = "(unknown)"; break;
         }
 
-        printf("\tOutput format rate %u, channels %u, %s (%08X)\n", output.Format.nSamplesPerSec, output.Format.nChannels, speakerConfig, output.dwChannelMask);
+        printf("\tOutput format rate %lu, channels %u, %s (%08lX)\n", output.Format.nSamplesPerSec, output.Format.nChannels, speakerConfig, output.dwChannelMask);
     }
 
     if (!audEngine->IsAudioDevicePresent())

@@ -22,9 +22,9 @@
 
 namespace
 {
-    const float row0 = 2.f;
-    const float row1 = 0.f;
-    const float row2 = -2.f;
+    constexpr float row0 = 2.f;
+    constexpr float row1 = 0.f;
+    constexpr float row2 = -2.f;
 }
 
 extern void ExitGame() noexcept;
@@ -333,7 +333,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    static const XMVECTORF32 cameraPosition = { 0, 0, 6 };
+    static const XMVECTORF32 cameraPosition = { { { 0.f, 0.f, 6.f, 0.f } } };
 
     auto size = m_deviceResources->GetOutputSize();
     float aspect = (float)size.right / (float)size.bottom;

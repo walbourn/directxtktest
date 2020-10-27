@@ -105,5 +105,4 @@ private:
     DirectX::SimpleMath::Matrix                         m_proj;
 
     const wchar_t *                                     m_lastStr;
-    wchar_t                                             m_lastStrBuff[128];
 };

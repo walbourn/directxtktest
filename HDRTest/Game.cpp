@@ -36,20 +36,20 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const XMVECTORF32 c_BrightYellow = { 2.f, 2.f, 0.f, 1.f };
+    constexpr XMVECTORF32 c_BrightYellow = { { { 2.f, 2.f, 0.f, 1.f } } };
 
-    const XMVECTORF32 c_DimWhite = { .5f, .5f, .5f, 1.f };
-    const XMVECTORF32 c_BrightWhite = { 2.f, 2.f, 2.f, 1.f };
-    const XMVECTORF32 c_VeryBrightWhite = { 4.f, 4.f, 4.f, 1.f };
+    constexpr XMVECTORF32 c_DimWhite = { { { .5f, .5f, .5f, 1.f } } };
+    constexpr XMVECTORF32 c_BrightWhite = { { { 2.f, 2.f, 2.f, 1.f } } };
+    constexpr XMVECTORF32 c_VeryBrightWhite = { { { 4.f, 4.f, 4.f, 1.f } } };
 
-    const float row0 = -2.f;
+    constexpr float row0 = -2.f;
 
-    const float col0 = -5.f;
-    const float col1 = -3.5f;
-    const float col2 = -1.f;
-    const float col3 = 1.f;
-    const float col4 = 3.5f;
-    const float col5 = 5.f;
+    constexpr float col0 = -5.f;
+    constexpr float col1 = -3.5f;
+    constexpr float col2 = -1.f;
+    constexpr float col3 = 1.f;
+    constexpr float col4 = 3.5f;
+    constexpr float col5 = 5.f;
 }
 
 #ifdef XBOX
@@ -60,7 +60,7 @@ extern bool g_HDRMode;
 Game::Game() noexcept(false) :
     m_toneMapMode(ToneMapPostProcess::Reinhard)
 {
-#ifdef TEST_HDR_LINEAR
+#if defined(TEST_HDR_LINEAR) && !defined(XBOX)
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 #else
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
@@ -68,7 +68,7 @@ Game::Game() noexcept(false) :
 
 #ifdef XBOX
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_D32_FLOAT, 2,
+        c_DisplayFormat, DXGI_FORMAT_D32_FLOAT, 2,
         DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
         | DX::DeviceResources::c_FastSemantics
@@ -239,7 +239,6 @@ void Game::Render()
     float roll = time * 1.1f;
 
     XMMATRIX world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-    XMVECTOR quat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
 
     m_flatEffect->SetMatrices(world* XMMatrixTranslation(col0, row0, 0), m_view, m_projection);
     m_flatEffect->SetTexture(m_hdrImage1.Get());
@@ -488,7 +487,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    static const XMVECTORF32 cameraPosition = { 0, 0, 7 };
+    static const XMVECTORF32 cameraPosition = { { { 0.f, 0.f, 7.f, 0.f } } };
 
     auto size = m_deviceResources->GetOutputSize();
     float aspect = (float)size.right / (float)size.bottom;
@@ -553,7 +552,7 @@ void Game::CycleToneMapOperator()
 
     m_toneMapMode += 1;
 
-    if (m_toneMapMode >= ToneMapPostProcess::Operator_Max)
+    if (m_toneMapMode >= static_cast<int>(ToneMapPostProcess::Operator_Max))
     {
         m_toneMapMode = ToneMapPostProcess::Saturate;
     }
