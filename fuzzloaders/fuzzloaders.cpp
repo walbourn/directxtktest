@@ -108,7 +108,9 @@ const SValue g_pOptions [] =
 
 namespace
 {
+#ifdef _PREFAST_
 #pragma prefast(disable : 26018, "Only used with static internal arrays")
+#endif
 
     DWORD LookupByName(const wchar_t *pName, const SValue *pArray)
     {
@@ -121,19 +123,6 @@ namespace
         }
 
         return 0;
-    }
-
-    const wchar_t* LookupByValue(DWORD pValue, const SValue *pArray)
-    {
-        while (pArray->pName)
-        {
-            if (pValue == pArray->dwValue)
-                return pArray->pName;
-
-            pArray++;
-        }
-
-        return L"";
     }
 
     void SearchForFiles(const wchar_t* path, std::list<SConversion>& files, bool recursive)
@@ -261,7 +250,9 @@ HRESULT CreateDevice(ID3D11Device** pDev, ID3D11DeviceContext** pContext)
 //--------------------------------------------------------------------------------------
 // Entry-point
 //--------------------------------------------------------------------------------------
+#ifdef _PREFAST_
 #pragma prefast(disable : 28198, "Command-line tool, frees all memory on exit")
+#endif
 
 int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 {

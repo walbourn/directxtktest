@@ -25,8 +25,8 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const unsigned int WB_INMEMORY_ENTRY = 8;
-    const unsigned int WB_STREAM_ENTRY = 1;
+    constexpr unsigned int WB_INMEMORY_ENTRY = 8;
+    constexpr unsigned int WB_STREAM_ENTRY = 1;
 
     const wchar_t* STREAM_NAMES[] =
     {
@@ -45,6 +45,9 @@ namespace
 
 SoundStreamInstance* Game::GetCurrentStream(unsigned int index)
 {
+    if (index >= _countof(STREAM_NAMES))
+        return nullptr;
+
 #ifdef TEST_XWMA
     if (index == 1)
     {
@@ -134,7 +137,7 @@ namespace
             }
             else
             {
-                static const GUID s_wfexBase = { 0x00000000, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71 };
+                static const GUID s_wfexBase = { 0x00000000, 0x0000, 0x0010, { 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71 } };
 
                 auto wfex = reinterpret_cast<const WAVEFORMATEXTENSIBLE*>(wfx);
 

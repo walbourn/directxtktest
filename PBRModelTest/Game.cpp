@@ -40,11 +40,10 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const XMVECTORF32 c_BrightYellow = { 2.f, 2.f, 0.f, 1.f };
+    const XMVECTORF32 c_BrightYellow = { { { 2.f, 2.f, 0.f, 1.f } } };
 
-    const float row0 = 1.5f;
-    const float row1 = 0.f;
-    const float row2 = -1.5f;
+    constexpr float row0 = 1.5f;
+    constexpr float row1 = -1.5f;
 }
 
 // Constructor.
@@ -55,7 +54,7 @@ Game::Game() noexcept(false) :
     m_pitch(0),
     m_yaw(0)
 {
-#ifdef TEST_HDR_LINEAR
+#if defined(TEST_HDR_LINEAR) && !defined(XBOX)
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 #else
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
@@ -63,7 +62,7 @@ Game::Game() noexcept(false) :
 
 #ifdef XBOX
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_D32_FLOAT, 2,
+        c_DisplayFormat, DXGI_FORMAT_D32_FLOAT, 2,
         DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
         | DX::DeviceResources::c_FastSemantics
@@ -357,7 +356,7 @@ void Game::Render()
 
     {
         XMMATRIX scale = XMMatrixScaling(0.75f, 0.75f, 0.75f);
-        XMMATRIX trans = XMMatrixTranslation(-2.5f, row2, 0.f);
+        XMMATRIX trans = XMMatrixTranslation(-2.5f, row1, 0.f);
         local = XMMatrixMultiply(scale, trans);
         local = XMMatrixMultiply(world, local);
     }
@@ -365,7 +364,7 @@ void Game::Render()
 
     {
         XMMATRIX scale = XMMatrixScaling(0.1f, 0.1f, 0.1f);
-        XMMATRIX trans = XMMatrixTranslation(1.5f, row2, 0.f);
+        XMMATRIX trans = XMMatrixTranslation(1.5f, row1, 0.f);
         local = XMMatrixMultiply(scale, trans);
         local = XMMatrixMultiply(world, local);
     }
@@ -616,7 +615,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    static const XMVECTORF32 cameraPosition = { 0, 0, 6 };
+    static const XMVECTORF32 cameraPosition = { { { 0.f, 0.f, 6.f, 0.f } } };
 
     auto size = m_deviceResources->GetOutputSize();
     float aspect = (float)size.right / (float)size.bottom;
@@ -687,7 +686,7 @@ void Game::CycleToneMapOperator()
 
     m_toneMapMode += 1;
 
-    if (m_toneMapMode >= ToneMapPostProcess::Operator_Max)
+    if (m_toneMapMode >= static_cast<int>(ToneMapPostProcess::Operator_Max))
     {
         m_toneMapMode = ToneMapPostProcess::Saturate;
     }

@@ -41,21 +41,21 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
-    const XMVECTORF32 c_BrightYellow = { 2.f, 2.f, 0.f, 1.f };
+    constexpr XMVECTORF32 c_BrightYellow = { { { 2.f, 2.f, 0.f, 1.f } } };
 
-    const float col0 = -4.25f;
-    const float col1 = -3.f;
-    const float col2 = -1.75f;
-    const float col3 = -.6f;
-    const float col4 = .6f;
-    const float col5 = 1.75f;
-    const float col6 = 3.f;
-    const float col7 = 4.25f;
+    constexpr float col0 = -4.25f;
+    constexpr float col1 = -3.f;
+    constexpr float col2 = -1.75f;
+    constexpr float col3 = -.6f;
+    constexpr float col4 = .6f;
+    constexpr float col5 = 1.75f;
+    constexpr float col6 = 3.f;
+    constexpr float col7 = 4.25f;
 
-    const float row0 = 2.f;
-    const float row1 = 0.25f;
-    const float row2 = -1.1f;
-    const float row3 = -2.5f;
+    constexpr float row0 = 2.f;
+    constexpr float row1 = 0.25f;
+    constexpr float row2 = -1.1f;
+    constexpr float row3 = -2.5f;
 
     void ReadVBO(_In_z_ const wchar_t* name, std::vector<VertexPositionNormalTexture>& vertices, std::vector<uint16_t>& indices)
     {
@@ -70,7 +70,7 @@ namespace
             if (!inFile)
                 throw std::exception("ReadVBO");
 
-            if (len < sizeof(VBO::header_t))
+            if (len < static_cast<std::streampos>(sizeof(VBO::header_t)))
                 throw std::exception("ReadVBO");
 
             blob.resize(size_t(len));
@@ -123,7 +123,7 @@ Game::Game() noexcept(false) :
     m_pitch(0),
     m_yaw(0)
 {
-#ifdef TEST_HDR_LINEAR
+#if defined(TEST_HDR_LINEAR) && !defined(XBOX)
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 #else
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
@@ -131,7 +131,7 @@ Game::Game() noexcept(false) :
 
 #ifdef XBOX
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_D32_FLOAT, 2,
+        c_DisplayFormat, DXGI_FORMAT_D32_FLOAT, 2,
         DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
         | DX::DeviceResources::c_FastSemantics
@@ -1013,7 +1013,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    static const XMVECTORF32 cameraPosition = { 0, 0, 6 };
+    static const XMVECTORF32 cameraPosition = { { { 0.f, 0.f, 6.f, 0.f } } };
 
     auto size = m_deviceResources->GetOutputSize();
     float aspect = (float)size.right / (float)size.bottom;
@@ -1135,7 +1135,7 @@ void Game::CycleToneMapOperator()
 
     m_toneMapMode += 1;
 
-    if (m_toneMapMode >= ToneMapPostProcess::Operator_Max)
+    if (m_toneMapMode >= static_cast<int>(ToneMapPostProcess::Operator_Max))
     {
         m_toneMapMode = ToneMapPostProcess::Saturate;
     }

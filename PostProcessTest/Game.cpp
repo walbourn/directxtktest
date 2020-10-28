@@ -28,8 +28,8 @@ namespace
     constexpr float ADVANCE_TIME = 1.f;
     constexpr float INTERACTIVE_TIME = 10.f;
 
-    const DXGI_FORMAT c_sdrFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
-    const DXGI_FORMAT c_hdrFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    constexpr DXGI_FORMAT c_sdrFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
+    constexpr DXGI_FORMAT c_hdrFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 }
 
 // Constructor.
@@ -859,7 +859,7 @@ void Game::ShaderTest()
 
     for (int j = 0; j < static_cast<int>(BasicPostProcess::Effect_Max); ++j)
     {
-        m_basicPostProcess->SetEffect( static_cast<BasicPostProcess::Effect>(j));
+        m_basicPostProcess->SetEffect(static_cast<BasicPostProcess::Effect>(j));
         m_basicPostProcess->Process(context);
     }
 

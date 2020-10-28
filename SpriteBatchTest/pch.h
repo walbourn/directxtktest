@@ -29,6 +29,12 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4005)
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmacro-redefined"
+#endif
+
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #define NODRAWTEXT
@@ -36,6 +42,10 @@
 #define NOMCX
 #define NOSERVICE
 #define NOHELP
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 #pragma warning(pop)
 
 #define _CRTDBG_MAP_ALLOC
@@ -62,6 +72,7 @@
 #endif
 #endif
 
+#define _XM_NO_XMVECTOR_OVERLOADS_
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 
