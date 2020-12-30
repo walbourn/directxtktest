@@ -3443,14 +3443,14 @@ int TestV4()
         // <0
         result = Vector4(-10.0f, 3.86557627f, 15.6839724f, -5.10049248f);
         v = Vector4::Hermite(p1, t1, p2, t2, -1.f);
-        if (!XMVector4NearEqual(v, result, VEPSILON))
+        if (!XMVector4NearEqual(v, result, VEPSILON2))
         {
             printf("ERROR: hermite <0 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
         }
 
         Vector4::Hermite(p1, t1, p2, t2, -1.f, v);
-        if (!XMVector4NearEqual(v, result, VEPSILON))
+        if (!XMVector4NearEqual(v, result, VEPSILON2))
         {
             printf("ERROR: hermite(2) <0 %f %f %f %f\n", v.x, v.y, v.z, v.w);
             success = false;
