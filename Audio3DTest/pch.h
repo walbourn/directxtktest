@@ -53,7 +53,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#include <windows.h>
+#include <Windows.h>
 #include <Dbt.h>
 #endif
 
@@ -88,11 +88,11 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cstdio>
 #include <exception>
+#include <iterator>
 #include <memory>
 #include <stdexcept>
-
-#include <stdio.h>
 
 #include "Audio.h"
 #include "Keyboard.h"

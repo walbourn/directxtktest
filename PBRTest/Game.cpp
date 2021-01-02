@@ -954,9 +954,9 @@ void Game::CreateDeviceDependentResources()
         L"BrokenCube_emissive.png",
     };
 
-    static_assert(_countof(s_albetoTextures) == _countof(s_normalMapTextures), "Material array mismatch");
-    static_assert(_countof(s_albetoTextures) == _countof(s_rmaTextures), "Material array mismatch");
-    static_assert(_countof(s_albetoTextures) == _countof(s_emissiveTextures), "Material array mismatch");
+    static_assert(std::size(s_albetoTextures) == std::size(s_normalMapTextures), "Material array mismatch");
+    static_assert(std::size(s_albetoTextures) == std::size(s_rmaTextures), "Material array mismatch");
+    static_assert(std::size(s_albetoTextures) == std::size(s_emissiveTextures), "Material array mismatch");
 
     for (size_t j = 0; j < s_nMaterials; ++j)
     {
@@ -996,7 +996,7 @@ void Game::CreateDeviceDependentResources()
         L"SunSubMixer_specularIBL.dds",
     };
 
-    static_assert(_countof(s_radianceIBL) == _countof(s_irradianceIBL), "IBL array mismatch");
+    static_assert(std::size(s_radianceIBL) == std::size(s_irradianceIBL), "IBL array mismatch");
 
     for (size_t j = 0; j < s_nIBL; ++j)
     {

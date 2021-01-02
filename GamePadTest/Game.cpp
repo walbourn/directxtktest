@@ -167,7 +167,7 @@ void Game::Update(DX::StepTimer const&)
 #elif defined(COREWINDOW)
 
     HANDLE events[2] = { m_ctrlChanged.Get(), m_userChanged.Get() };
-    switch (WaitForMultipleObjects(_countof(events), events, FALSE, 0))
+    switch (WaitForMultipleObjects(static_cast<DWORD>(std::size(events)), events, FALSE, 0))
     {
     case WAIT_OBJECT_0:
         OutputDebugStringA("EVENT: Controller changed\n");

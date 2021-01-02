@@ -264,7 +264,7 @@ void Game::Render()
             { Vector3(-0.75f,  0.75f, 0.5f), Colors::White },
         };
 
-        m_batch->Draw(D3D_PRIMITIVE_TOPOLOGY_POINTLIST, points, _countof(points));
+        m_batch->Draw(D3D_PRIMITIVE_TOPOLOGY_POINTLIST, points, static_cast<UINT>(std::size(points)));
     }
 
     // Lines
@@ -629,7 +629,7 @@ void Game::UnitTests()
         };
 
         ComPtr<ID3D11Buffer> vb;
-        if (FAILED(CreateStaticBuffer(device, s_vertexData, _countof(s_vertexData), sizeof(VertexPositionColor),
+        if (FAILED(CreateStaticBuffer(device, s_vertexData, std::size(s_vertexData), sizeof(VertexPositionColor),
             D3D11_BIND_VERTEX_BUFFER, vb.GetAddressOf())))
         {
             OutputDebugStringA("ERROR: Failed CreateStaticBuffer(1) test\n");
@@ -637,7 +637,7 @@ void Game::UnitTests()
         }
 
         ComPtr<ID3D11Buffer> vb2;
-        if (FAILED(CreateStaticBuffer(device, s_vertexData, _countof(s_vertexData),
+        if (FAILED(CreateStaticBuffer(device, s_vertexData, std::size(s_vertexData),
             D3D11_BIND_VERTEX_BUFFER, vb2.GetAddressOf())))
         {
             OutputDebugStringA("ERROR: Failed CreateStaticBuffer(2) test\n");
@@ -645,7 +645,7 @@ void Game::UnitTests()
         }
 
         ComPtr<ID3D11Buffer> vb3;
-        std::vector<VertexPositionColor> verts(s_vertexData, s_vertexData + _countof(s_vertexData));
+        std::vector<VertexPositionColor> verts(s_vertexData, s_vertexData + std::size(s_vertexData));
 
         if (FAILED(CreateStaticBuffer(device, verts, D3D11_BIND_VERTEX_BUFFER, vb3.GetAddressOf())))
         {
@@ -674,7 +674,7 @@ void Game::UnitTests()
         };
 
         ComPtr<ID3D11InputLayout> il;
-        if (FAILED(CreateInputLayoutFromEffect(device, m_effect.get(), s_inputElementDesc, _countof(s_inputElementDesc), il.GetAddressOf())))
+        if (FAILED(CreateInputLayoutFromEffect(device, m_effect.get(), s_inputElementDesc, std::size(s_inputElementDesc), il.GetAddressOf())))
         {
             OutputDebugStringA("ERROR: Failed CreateInputLayoutFromEffect(1) test\n");
             success = false;

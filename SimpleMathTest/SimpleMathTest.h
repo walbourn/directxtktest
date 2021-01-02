@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 #include <functional>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <type_traits>

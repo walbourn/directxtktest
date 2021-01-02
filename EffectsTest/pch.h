@@ -52,7 +52,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#include <windows.h>
+#include <Windows.h>
 #endif
 
 #include <wrl/client.h>
@@ -79,12 +79,12 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cstdio>
 #include <exception>
+#include <iterator>
 #include <memory>
 #include <stdexcept>
 #include <vector>
-
-#include <stdio.h>
 
 #include "BufferHelpers.h"
 #include "CommonStates.h"

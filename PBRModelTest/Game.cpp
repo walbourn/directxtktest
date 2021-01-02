@@ -592,7 +592,7 @@ void Game::CreateDeviceDependentResources()
         IBL_PATH L"SunSubMixer_specularIBL.dds",
     };
 
-    static_assert(_countof(s_radianceIBL) == _countof(s_irradianceIBL), "IBL array mismatch");
+    static_assert(std::size(s_radianceIBL) == std::size(s_irradianceIBL), "IBL array mismatch");
 
     for (size_t j = 0; j < s_nIBL; ++j)
     {

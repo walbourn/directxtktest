@@ -1753,11 +1753,11 @@ int TestV2()
             Vector2(10, 20),
         };
 
-        auto buff = std::make_unique<Vector2[]>(_countof(points));
+        auto buff = std::make_unique<Vector2[]>(std::size(points));
 
-        Vector2::Transform(&points[0], _countof(points), m, buff.get());
+        Vector2::Transform(&points[0], std::size(points), m, buff.get());
 
-        for (size_t j = 0; j < _countof(points); ++j)
+        for (size_t j = 0; j < std::size(points); ++j)
         {
             Vector2 result = Vector2::Transform(points[j], m);
             v = buff[j];
@@ -1768,11 +1768,11 @@ int TestV2()
             }
         }
 
-        auto buff4 = std::make_unique<Vector4[]>(_countof(points));
+        auto buff4 = std::make_unique<Vector4[]>(std::size(points));
 
-        Vector2::Transform(&points[0], _countof(points), m, buff4.get());
+        Vector2::Transform(&points[0], std::size(points), m, buff4.get());
 
-        for (size_t j = 0; j < _countof(points); ++j)
+        for (size_t j = 0; j < std::size(points); ++j)
         {
             Vector4 result;
             Vector2::Transform(points[j], m, result);
@@ -1798,11 +1798,11 @@ int TestV2()
             Vector2(10, 20),
         };
 
-        auto buff = std::make_unique<Vector2[]>(_countof(points));
+        auto buff = std::make_unique<Vector2[]>(std::size(points));
 
-        Vector2::TransformNormal(&points[0], _countof(points), m, buff.get());
+        Vector2::TransformNormal(&points[0], std::size(points), m, buff.get());
 
-        for (size_t j = 0; j < _countof(points); ++j)
+        for (size_t j = 0; j < std::size(points); ++j)
         {
             Vector2 result = Vector2::TransformNormal(points[j], m);
             v = buff[j];
@@ -2701,11 +2701,11 @@ int TestV3()
             Vector3(10, 20, 30),
         };
 
-        auto buff = std::make_unique<Vector3[]>(_countof(points));
+        auto buff = std::make_unique<Vector3[]>(std::size(points));
 
-        Vector3::Transform(&points[0], _countof(points), m, buff.get());
+        Vector3::Transform(&points[0], std::size(points), m, buff.get());
 
-        for (size_t j = 0; j < _countof(points); ++j)
+        for (size_t j = 0; j < std::size(points); ++j)
         {
             Vector3 result = Vector3::Transform(points[j], m);
             v = buff[j];
@@ -2716,11 +2716,11 @@ int TestV3()
             }
         }
 
-        auto buff4 = std::make_unique<Vector4[]>(_countof(points));
+        auto buff4 = std::make_unique<Vector4[]>(std::size(points));
 
-        Vector3::Transform(&points[0], _countof(points), m, buff4.get());
+        Vector3::Transform(&points[0], std::size(points), m, buff4.get());
 
-        for (size_t j = 0; j < _countof(points); ++j)
+        for (size_t j = 0; j < std::size(points); ++j)
         {
             Vector4 result;
             Vector3::Transform(points[j], m, result);
@@ -2746,11 +2746,11 @@ int TestV3()
             Vector3(10, 20, 30),
         };
 
-        auto buff = std::make_unique<Vector3[]>(_countof(points));
+        auto buff = std::make_unique<Vector3[]>(std::size(points));
 
-        Vector3::TransformNormal(&points[0], _countof(points), m, buff.get());
+        Vector3::TransformNormal(&points[0], std::size(points), m, buff.get());
 
-        for (size_t j = 0; j < _countof(points); ++j)
+        for (size_t j = 0; j < std::size(points); ++j)
         {
             Vector3 result = Vector3::TransformNormal(points[j], m);
             v = buff[j];
@@ -3677,11 +3677,11 @@ int TestV4()
             Vector4(10, 20, 30, 1.f),
         };
 
-        auto buff = std::make_unique<Vector4[]>(_countof(points));
+        auto buff = std::make_unique<Vector4[]>(std::size(points));
         
-        Vector4::Transform( &points[0], _countof(points), m, buff.get() );
+        Vector4::Transform( &points[0], std::size(points), m, buff.get() );
 
-        for (size_t j = 0; j < _countof(points); ++j)
+        for (size_t j = 0; j < std::size(points); ++j)
         {
             Vector4 result = Vector4::Transform(points[j], m);
             v = buff[j];
@@ -5589,7 +5589,7 @@ int __cdecl main()
         return 1;
     }
 
-    for( size_t j = 0; j < _countof(g_Tests); ++j )
+    for( size_t j = 0; j < std::size(g_Tests); ++j )
     {
         printf("%s: ", g_Tests[j].name );
         if ( !g_Tests[j].func() )

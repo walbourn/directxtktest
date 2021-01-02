@@ -45,7 +45,7 @@ namespace
 
 SoundStreamInstance* Game::GetCurrentStream(unsigned int index)
 {
-    if (index >= _countof(STREAM_NAMES))
+    if (index >= std::size(STREAM_NAMES))
         return nullptr;
 
 #ifdef TEST_XWMA
@@ -668,11 +668,11 @@ void Game::CycleCurrentStream(bool increment)
 
     if (increment)
     {
-        m_currentStream = (m_currentStream + 1) % _countof(STREAM_NAMES);
+        m_currentStream = (m_currentStream + 1) % std::size(STREAM_NAMES);
     }
     else
     {
-        m_currentStream = (m_currentStream + _countof(STREAM_NAMES) - 1) % _countof(STREAM_NAMES);
+        m_currentStream = (m_currentStream + static_cast<unsigned int>(std::size(STREAM_NAMES)) - 1) % std::size(STREAM_NAMES);
     }
 
     if (wasplaying)

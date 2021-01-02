@@ -25,15 +25,15 @@
 #define NOHELP
 #pragma warning(pop)
 
-#include <windows.h>
+#include <Windows.h>
 
 #include <d3d11_1.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-
 #include <algorithm>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <iterator>
 #include <list>
 #include <memory>
 #include <vector>
@@ -224,7 +224,7 @@ HRESULT CreateDevice(ID3D11Device** pDev, ID3D11DeviceContext** pContext)
         D3D_DRIVER_TYPE_WARP,
         D3D_DRIVER_TYPE_NULL,
     };
-    const UINT numDriverTypes = ARRAYSIZE(driverTypes);
+    constexpr UINT numDriverTypes = static_cast<UINT>(std::size(driverTypes));
 
     HRESULT hr = E_FAIL;
 
