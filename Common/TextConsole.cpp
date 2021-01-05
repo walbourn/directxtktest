@@ -8,7 +8,8 @@
 #include "pch.h"
 #include "TextConsole.h"
 
-#include <assert.h>
+#include <algorithm>
+#include <cassert>
 
 using Microsoft::WRL::ComPtr;
 

@@ -118,7 +118,7 @@ void Game::Initialize(
 #ifdef PC
             MessageBoxW(window, L"Mouse not acting like a singleton", L"MouseTest", MB_ICONERROR);
 #else
-            throw std::exception("Mouse not acting like a singleton");
+            throw std::runtime_error("Mouse not acting like a singleton");
 #endif
         }
     }

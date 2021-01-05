@@ -15,6 +15,7 @@
 #include "SpriteBatch.h"
 #include "SpriteFont.h"
 
+#include <memory>
 #include <mutex>
 #include <vector>
 

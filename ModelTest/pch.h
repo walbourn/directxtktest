@@ -84,6 +84,7 @@
 #include <fstream>
 #include <memory>
 #include <stdexcept>
+#include <system_error>
 #include <unordered_map>
 
 #include "BufferHelpers.h"

@@ -185,7 +185,7 @@ void Game::Initialize(
     m_effect = m_soundEffect->CreateInstance(SoundEffectInstance_Use3D | SoundEffectInstance_ReverbUseFilters);
     if (!m_effect)
     {
-        throw std::exception("heli.wav");
+        throw std::runtime_error("heli.wav");
     }
 
     m_effect->Play(true);

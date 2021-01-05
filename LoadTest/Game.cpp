@@ -374,7 +374,7 @@ void Game::Render()
             if (wcscpy_s(sspath, MAX_PATH, szPath) > 0
                 || wcscat_s(sspath, L"\\") > 0)
             {
-                throw std::exception("TemporaryFolder");
+                throw std::runtime_error("TemporaryFolder");
             }
         }
 #else

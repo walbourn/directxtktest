@@ -13,7 +13,7 @@
 #include "DirectXHelpers.h"
 
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 #include <stdexcept>
 
 using namespace DirectX;
@@ -42,7 +42,7 @@ void RenderTexture::SetDevice(_In_ ID3D11Device* device)
         UINT formatSupport = 0;
         if (FAILED(device->CheckFormatSupport(m_format, &formatSupport)))
         {
-            throw std::exception("CheckFormatSupport");
+            throw std::runtime_error("CheckFormatSupport");
         }
 
         UINT32 required = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_RENDER_TARGET;
@@ -53,7 +53,7 @@ void RenderTexture::SetDevice(_In_ ID3D11Device* device)
             sprintf_s(buff, "RenderTexture: Device does not support the requested format (%u)!\n", m_format);
             OutputDebugStringA(buff);
 #endif
-            throw std::exception("RenderTexture");
+            throw std::runtime_error("RenderTexture");
         }
     }
 

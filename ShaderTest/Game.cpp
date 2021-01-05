@@ -105,7 +105,7 @@ namespace
                 || i1 >= nVerts
                 || i2 >= nVerts)
             {
-                throw std::exception("ComputeTangents");
+                throw std::out_of_range("ComputeTangents");
             }
 
             XMVECTOR t0 = XMLoadFloat2(&vertices[i0].textureCoordinate);

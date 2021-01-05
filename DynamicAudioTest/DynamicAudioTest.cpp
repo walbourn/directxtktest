@@ -24,12 +24,13 @@
 #pragma warning(pop)
 
 #define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
 #include <crtdbg.h>
 
 #include "Audio.h"
 
-#include <stdio.h>
+#include <cstdio>
+#include <cstdlib>
+#include <stdexcept>
 
 using namespace DirectX;
 
@@ -659,7 +660,7 @@ int __cdecl main()
                     LONGLONG llTimestamp;
                     ComPtr<IMFSample> sample;
                     if (FAILED(reader->ReadSample( DWORD(MF_SOURCE_READER_FIRST_AUDIO_STREAM), 0, &dwStreamIndex, &dwStreamFlags, &llTimestamp, sample.GetAddressOf())))
-                        throw std::exception("ReadSample");
+                        throw std::runtime_error("ReadSample");
 
                     if (dwStreamFlags & MF_SOURCE_READERF_ENDOFSTREAM)
                     {
@@ -669,7 +670,7 @@ int __cdecl main()
                     {
                         ComPtr<IMFMediaBuffer> mediaBuffer;
                         if (FAILED(sample->ConvertToContiguousBuffer(mediaBuffer.GetAddressOf())))
-                            throw std::exception("ConvertToContiguousBuffer");
+                            throw std::runtime_error("ConvertToContiguousBuffer");
 
                         BYTE* audioData = nullptr;
                         DWORD sampleBufferLength = 0;
@@ -692,7 +693,7 @@ int __cdecl main()
                             currentStreamBuffer %= MAX_BUFFER_COUNT;
                         }
                         else
-                            throw std::exception("Lock");
+                            throw std::runtime_error("Lock");
                     }
                 }
             }, wfx.nSamplesPerSec, wfx.nChannels, wfx.wBitsPerSample ) );

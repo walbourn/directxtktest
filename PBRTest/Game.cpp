@@ -64,24 +64,24 @@ namespace
             std::ifstream inFile(name, std::ios::in | std::ios::binary | std::ios::ate);
 
             if (!inFile)
-                throw std::exception("ReadVBO");
+                throw std::runtime_error("ReadVBO");
 
             std::streampos len = inFile.tellg();
             if (!inFile)
-                throw std::exception("ReadVBO");
+                throw std::runtime_error("ReadVBO");
 
             if (len < static_cast<std::streampos>(sizeof(VBO::header_t)))
-                throw std::exception("ReadVBO");
+                throw std::runtime_error("ReadVBO");
 
             blob.resize(size_t(len));
 
             inFile.seekg(0, std::ios::beg);
             if (!inFile)
-                throw std::exception("ReadVBO");
+                throw std::runtime_error("ReadVBO");
 
             inFile.read(reinterpret_cast<char*>(blob.data()), len);
             if (!inFile)
-                throw std::exception("ReadVBO");
+                throw std::runtime_error("ReadVBO");
 
             inFile.close();
         }
@@ -89,17 +89,17 @@ namespace
         auto hdr = reinterpret_cast<const VBO::header_t*>(blob.data());
 
         if (!hdr->numIndices || !hdr->numVertices)
-            throw std::exception("ReadVBO");
+            throw std::runtime_error("ReadVBO");
 
         static_assert(sizeof(VertexPositionNormalTexture) == 32, "VBO vertex size mismatch");
 
         size_t vertSize = sizeof(VertexPositionNormalTexture) * hdr->numVertices;
         if (blob.size() < (vertSize + sizeof(VBO::header_t)))
-            throw std::exception("End of file");
+            throw std::runtime_error("End of file");
 
         size_t indexSize = sizeof(uint16_t) * hdr->numIndices;
         if (blob.size() < (sizeof(VBO::header_t) + vertSize + indexSize))
-            throw std::exception("End of file");
+            throw std::runtime_error("End of file");
 
         vertices.resize(hdr->numVertices);
         auto verts = reinterpret_cast<const VertexPositionNormalTexture*>(blob.data() + sizeof(VBO::header_t));
@@ -875,7 +875,7 @@ void Game::CreateDeviceDependentResources()
 
         // Create the D3D buffers.
         if (vertices.size() >= USHRT_MAX)
-            throw std::exception("Too many vertices for 16-bit index buffer");
+            throw std::out_of_range("Too many vertices for 16-bit index buffer");
 
         DX::ThrowIfFailed(
             CreateInputLayoutFromEffect<GeometricPrimitive::VertexType>(device, m_normalMapEffect.get(), m_inputLayoutNM.ReleaseAndGetAddressOf())
@@ -910,7 +910,7 @@ void Game::CreateDeviceDependentResources()
 
         // Create the D3D buffers.
         if (vertices.size() >= USHRT_MAX)
-            throw std::exception("Too many vertices for 16-bit index buffer");
+            throw std::out_of_range("Too many vertices for 16-bit index buffer");
 
         DX::ThrowIfFailed(
             CreateInputLayoutFromEffect<GeometricPrimitive::VertexType>(device, m_pbrCube.get(), m_inputLayoutCube.ReleaseAndGetAddressOf())

@@ -102,7 +102,7 @@ void Game::Initialize(
         if (!thrown)
         {
             MessageBoxW(window, L"GamePad not acting like a singleton", L"GamePadTest", MB_ICONERROR);
-            throw std::exception("GamePad not acting like a singleton");
+            throw std::runtime_error("GamePad not acting like a singleton");
         }
     }
 #endif
@@ -112,7 +112,7 @@ void Game::Initialize(
     m_ctrlChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     if (!m_ctrlChanged.IsValid())
     {
-        throw std::exception("CreateEvent");
+        throw std::system_error(std::error_code(static_cast<int>(GetLastError()), std::system_category()), "CreateEvent");
     }
 
     m_gamePad->RegisterEvents(m_ctrlChanged.Get());
@@ -123,7 +123,7 @@ void Game::Initialize(
     m_userChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     if (!m_ctrlChanged.IsValid() || !m_userChanged.IsValid())
     {
-        throw std::exception("CreateEvent");
+        throw std::system_error(std::error_code(static_cast<int>(GetLastError()), std::system_category()), "CreateEvent");
     }
 
     m_gamePad->RegisterEvents( m_ctrlChanged.Get(), m_userChanged.Get() );

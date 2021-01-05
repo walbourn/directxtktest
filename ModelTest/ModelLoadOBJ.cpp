@@ -68,18 +68,18 @@ std::unique_ptr<Model> CreateModelFromOBJ(
     ModelLoaderFlags flags )
 {
     if ( !InitOnceExecuteOnce( &g_InitOnce, InitializeDecl, nullptr, nullptr ) )
-        throw std::exception("One-time initialization failed");
+        throw std::system_error(std::error_code(static_cast<int>(GetLastError()), std::system_category()), "InitOnceExecuteOnce");
 
     auto obj = std::make_unique<WaveFrontReader<uint16_t>>();
 
     if ( FAILED( obj->Load( szFileName ) ) )
     {
-        throw std::exception("Failed loading WaveFront file");
+        throw std::runtime_error("Failed loading WaveFront file");
     }
 
     if ( obj->vertices.empty() || obj->indices.empty() || obj->attributes.empty() || obj->materials.empty() )
     {
-        throw std::exception("Missing data in WaveFront file");
+        throw std::runtime_error("Missing data in WaveFront file");
     }
     
     // Sort by attributes

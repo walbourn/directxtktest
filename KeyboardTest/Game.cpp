@@ -111,7 +111,7 @@ void Game::Initialize(
 #ifdef PC
             MessageBoxW(window, L"Keyboard not acting like a singleton", L"KeyboardTest", MB_ICONERROR);
 #else
-            throw std::exception("Keyboard not acting like a singleton");
+            throw std::runtime_error("Keyboard not acting like a singleton");
 #endif
         }
     }
