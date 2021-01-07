@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cwchar>
 
 using Microsoft::WRL::ComPtr;
 

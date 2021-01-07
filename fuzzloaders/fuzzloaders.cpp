@@ -33,6 +33,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
+#include <cwchar>
 #include <iterator>
 #include <list>
 #include <memory>
