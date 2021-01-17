@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include <wrl/client.h>
 
 namespace DX
