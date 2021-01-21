@@ -13,6 +13,8 @@
 
 #include <wrl/client.h>
 
+#include <DirectXMath.h>
+
 namespace DX
 {
     class RenderTexture
