@@ -1,6 +1,6 @@
 ﻿# DirectX Tool Kit for DirectX 11 Simple Math Test
 #
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
 # http://go.microsoft.com/fwlink/?LinkID=615561
