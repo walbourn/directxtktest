@@ -189,6 +189,15 @@ void Game::Initialize(
     }
 
     m_effect->Play(true);
+
+    // Try all the default multi-channel setups
+    for (unsigned int j = 1; j < XAUDIO2_MAX_AUDIO_CHANNELS; ++j)
+    {
+        m_emitter.EnableDefaultMultiChannel(j);
+    }
+
+    // Set to the proper setup for this sound
+    m_emitter.EnableDefaultMultiChannel(m_effect->GetChannelCount());
 }
 
 #pragma region Frame Update
@@ -206,7 +215,7 @@ void Game::Tick()
 }
 
 // Updates the world.
-void Game::Update(DX::StepTimer const&)
+void Game::Update(DX::StepTimer const& timer)
 {
     auto pad = m_gamePad->GetState(0);
     auto kb = m_keyboard->GetState();
@@ -242,7 +251,7 @@ void Game::Update(DX::StepTimer const&)
 #endif
 
     // Time-based animation
-    float time = static_cast<float>(m_timer.GetTotalSeconds());
+    float time = static_cast<float>(timer.GetTotalSeconds());
 
     float posx = cosf(time) * 10.f;
     float posz = sinf(time) * 5.f;
@@ -252,7 +261,7 @@ void Game::Update(DX::StepTimer const&)
     m_emitterMatrix = XMMatrixTranslation(posx, 0, posz);
 #endif
 
-    float dt = static_cast<float>(m_timer.GetElapsedSeconds());
+    float dt = static_cast<float>(timer.GetElapsedSeconds());
 
     m_emitter.Update(m_emitterMatrix.Translation(), g_XMIdentityR1, dt);
 }
