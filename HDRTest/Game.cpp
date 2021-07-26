@@ -299,7 +299,7 @@ void Game::Render()
         {
         case ToneMapPostProcess::Reinhard: toneMapper = L"Reinhard"; break;
         case ToneMapPostProcess::ACESFilmic: toneMapper = L"ACES Filmic"; break;
-        default: toneMapper = L"None"; break;
+        default: toneMapper = L"Saturate"; break;
         }
 
         swprintf_s(info, L"HDR10 (%ls) [GameDVR: %ls]", hdrRot, toneMapper);
@@ -308,7 +308,7 @@ void Game::Render()
     {
         switch (m_toneMapMode)
         {
-        case ToneMapPostProcess::Saturate: wcscpy_s(info, L"None"); break;
+        case ToneMapPostProcess::Saturate: wcscpy_s(info, L"Saturate"); break;
         case ToneMapPostProcess::Reinhard: wcscpy_s(info, L"Reinhard"); break;
         case ToneMapPostProcess::ACESFilmic: wcscpy_s(info, L"ACES Filmic"); break;
         }
@@ -322,7 +322,7 @@ void Game::Render()
         {
         case ToneMapPostProcess::Reinhard:   info = L"Reinhard"; break;
         case ToneMapPostProcess::ACESFilmic: info = L"ACES Filmic"; break;
-        default:                             info = L"None"; break;
+        default:                             info = L"Saturate"; break;
         }
         break;
 
