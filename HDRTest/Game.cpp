@@ -314,16 +314,15 @@ void Game::Render()
         }
     }
 #else
-    const wchar_t* info = L"";
-
+    const wchar_t* info = nullptr;
     switch (m_deviceResources->GetColorSpace())
     {
     default:
         switch (m_toneMapMode)
         {
-        case ToneMapPostProcess::Saturate: info = L"None"; break;
-        case ToneMapPostProcess::Reinhard: info = L"Reinhard"; break;
+        case ToneMapPostProcess::Reinhard:   info = L"Reinhard"; break;
         case ToneMapPostProcess::ACESFilmic: info = L"ACES Filmic"; break;
+        default:                             info = L"None"; break;
         }
         break;
 
