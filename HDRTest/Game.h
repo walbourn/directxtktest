@@ -77,6 +77,7 @@ private:
     void CreateWindowSizeDependentResources();
 
     void CycleToneMapOperator();
+    void CycleColorRotation();
 
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
@@ -119,4 +120,5 @@ private:
     DirectX::SimpleMath::Matrix                         m_projection;
 
     int                                                 m_toneMapMode;
+    int                                                 m_hdr10Rotation;
 };
