@@ -67,7 +67,7 @@ extern bool g_HDRMode;
 // Constructor.
 Game::Game() noexcept(false) :
     m_toneMapMode(ToneMapPostProcess::Reinhard),
-    m_hdr10Rotation(ToneMapPostProcess::Default)
+    m_hdr10Rotation(ToneMapPostProcess::RGB_HD)
 {
 #if defined(TEST_HDR_LINEAR) && !defined(XBOX)
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
@@ -244,7 +244,6 @@ void Game::Render()
 
     m_batch->End();
 
-
     // Time-based animation
     float time = static_cast<float>(m_timer.GetTotalSeconds());
 
@@ -288,10 +287,10 @@ void Game::Render()
         const wchar_t* hdrRot = nullptr;
         switch (m_hdr10Rotation)
         {
-        case ToneMapPostProcess::DCI_P3:    hdrRot = L"DCI-P3"; break;
-        case ToneMapPostProcess::DisplayP3: hdrRot = L"Display P3"; break;
-        case 3:                             hdrRot = L"Custom: X709"; break;
-        default:                            hdrRot = L"Default"; break;
+        case ToneMapPostProcess::DCI_P3_D65:        hdrRot = L"DCI-P3-D65"; break;
+        case ToneMapPostProcess::DisplayP3Output:   hdrRot = L"Display P3 Output"; break;
+        case 3:                                     hdrRot = L"Custom: X709"; break;
+        default:                                    hdrRot = L"RGB HD"; break;
         }
 
         const wchar_t* toneMapper = nullptr;
@@ -308,9 +307,9 @@ void Game::Render()
     {
         switch (m_toneMapMode)
         {
-        case ToneMapPostProcess::Saturate: wcscpy_s(info, L"Saturate"); break;
         case ToneMapPostProcess::Reinhard: wcscpy_s(info, L"Reinhard"); break;
         case ToneMapPostProcess::ACESFilmic: wcscpy_s(info, L"ACES Filmic"); break;
+        default: wcscpy_s(info, L"Saturate"); break;
         }
     }
 #else
@@ -329,10 +328,10 @@ void Game::Render()
     case DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020:
         switch (m_hdr10Rotation)
         {
-        case ToneMapPostProcess::DCI_P3:    info = L"HDR10 (DCI-P3)"; break;
-        case ToneMapPostProcess::DisplayP3: info = L"HDR10 (Display P3)"; break;
-        case 3:                             info = L"HDR10 (Custom: X709)"; break;
-        default: info = L"HDR10"; break;
+        case ToneMapPostProcess::DCI_P3_D65:        info = L"HDR10 (DCI-P3-D65)"; break;
+        case ToneMapPostProcess::DisplayP3Output:   info = L"HDR10 (Display P3 Output)"; break;
+        case 3:                                     info = L"HDR10 (Custom: X709)"; break;
+        default:                                    info = L"HDR10 (RGB HD)"; break;
         }
         break;
 
@@ -342,7 +341,7 @@ void Game::Render()
     }
 #endif
 
-    m_font->DrawString(m_batch.get(), info, XMFLOAT2(float(safeRect.right - (safeRect.right / 4)), float(safeRect.bottom - (h/16))), c_BrightYellow);
+    m_font->DrawString(m_batch.get(), info, XMFLOAT2(float(safeRect.right - (safeRect.right / 4)), float(safeRect.bottom - (h / 16))), c_BrightYellow);
 
     m_batch->End();
 
@@ -627,6 +626,6 @@ void Game::CycleColorRotation()
 
     if (m_hdr10Rotation > 3)
     {
-        m_hdr10Rotation = ToneMapPostProcess::Default;
+        m_hdr10Rotation = ToneMapPostProcess::RGB_HD;
     }
 }
