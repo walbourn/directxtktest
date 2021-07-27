@@ -67,7 +67,7 @@ extern bool g_HDRMode;
 // Constructor.
 Game::Game() noexcept(false) :
     m_toneMapMode(ToneMapPostProcess::Reinhard),
-    m_hdr10Rotation(ToneMapPostProcess::RGB_HD)
+    m_hdr10Rotation(ToneMapPostProcess::HDTV_to_UHDTV)
 {
 #if defined(TEST_HDR_LINEAR) && !defined(XBOX)
     const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
@@ -287,10 +287,10 @@ void Game::Render()
         const wchar_t* hdrRot = nullptr;
         switch (m_hdr10Rotation)
         {
-        case ToneMapPostProcess::DCI_P3_D65:        hdrRot = L"DCI-P3-D65"; break;
-        case ToneMapPostProcess::DisplayP3Output:   hdrRot = L"Display P3 Output"; break;
-        case 3:                                     hdrRot = L"Custom: X709"; break;
-        default:                                    hdrRot = L"RGB HD"; break;
+        case ToneMapPostProcess::DCI_P3_D65_to_UHDTV:   hdrRot = L"P3-D65->UHDTV"; break;
+        case ToneMapPostProcess::HDTV_to_DCI_P3_D65:    hdrRot = L"HDTV->P3-D65"; break;
+        case 3:                                         hdrRot = L"Custom: X709"; break;
+        default:                                        hdrRot = L"HDTV->UHDTV"; break;
         }
 
         const wchar_t* toneMapper = nullptr;
@@ -312,7 +312,7 @@ void Game::Render()
         default: wcscpy_s(info, L"Saturate"); break;
         }
     }
-#else
+#else // !XBOX
     const wchar_t* info = nullptr;
     switch (m_deviceResources->GetColorSpace())
     {
@@ -328,10 +328,10 @@ void Game::Render()
     case DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020:
         switch (m_hdr10Rotation)
         {
-        case ToneMapPostProcess::DCI_P3_D65:        info = L"HDR10 (DCI-P3-D65)"; break;
-        case ToneMapPostProcess::DisplayP3Output:   info = L"HDR10 (Display P3 Output)"; break;
-        case 3:                                     info = L"HDR10 (Custom: X709)"; break;
-        default:                                    info = L"HDR10 (RGB HD)"; break;
+        case ToneMapPostProcess::DCI_P3_D65_to_UHDTV:   info = L"HDR10 (P3-D65->UHDTV)"; break;
+        case ToneMapPostProcess::HDTV_to_DCI_P3_D65:    info = L"HDR10 (HDTV->P3-D65)"; break;
+        case 3:                                         info = L"HDR10 (Custom: X709)"; break;
+        default:                                        info = L"HDR10 (HDTV->UHDTV)"; break;
         }
         break;
 
@@ -626,6 +626,6 @@ void Game::CycleColorRotation()
 
     if (m_hdr10Rotation > 3)
     {
-        m_hdr10Rotation = ToneMapPostProcess::RGB_HD;
+        m_hdr10Rotation = ToneMapPostProcess::HDTV_to_UHDTV;
     }
 }
