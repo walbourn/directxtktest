@@ -75,6 +75,8 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 
+    void CycleRenderMode();
+
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
@@ -107,7 +109,7 @@ private:
         {
             setEffectParameters(this);
 
-            CreateTestInputLayout(device, this, &inputLayout, &compressedInputLayout);
+            CreateTestInputLayout(device, this, &inputLayout, &compressedInputLayout, nullptr, nullptr);
         }
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool showCompressed)
@@ -124,11 +126,17 @@ private:
 
             auto inmap = dynamic_cast<NormalMapEffect*>(this);
             if (inmap)
+            {
                 inmap->SetBiasedVertexNormals(showCompressed);
+                inmap->SetInstancingEnabled(false);
+            }
 
             auto ipbr = dynamic_cast<PBREffect*>(this);
             if (ipbr)
+            {
                 ipbr->SetBiasedVertexNormals(showCompressed);
+                ipbr->SetInstancingEnabled(false);
+            }
 
             auto iskin = dynamic_cast<SkinnedEffect*>(this);
             if (iskin)
@@ -149,6 +157,46 @@ private:
     };
 
     template<typename T>
+    class InstancedEffectWithDecl : public T
+    {
+    public:
+        InstancedEffectWithDecl(ID3D11Device* device, std::function<void(T*)> setEffectParameters)
+            : T(device)
+        {
+            setEffectParameters(this);
+
+            CreateTestInputLayout(device, this, nullptr, nullptr, &inputLayout, &compressedInputLayout);
+        }
+
+        void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool showCompressed)
+        {
+            T::SetMatrices(world, view, projection);
+
+            auto inmap = dynamic_cast<NormalMapEffect*>(this);
+            if (inmap)
+            {
+                inmap->SetBiasedVertexNormals(showCompressed);
+                inmap->SetInstancingEnabled(true);
+            }
+
+            auto ipbr = dynamic_cast<PBREffect*>(this);
+            if (ipbr)
+            {
+                ipbr->SetBiasedVertexNormals(showCompressed);
+                ipbr->SetInstancingEnabled(true);
+            }
+
+            T::Apply(context);
+
+            context->IASetInputLayout((showCompressed) ? compressedInputLayout.Get() : inputLayout.Get());
+        }
+
+    private:
+        Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
+        Microsoft::WRL::ComPtr<ID3D11InputLayout> compressedInputLayout;
+    };
+
+    template<typename T>
     class DGSLEffectWithDecl : public T
     {
     public:
@@ -157,7 +205,7 @@ private:
         {
             setEffectParameters(this);
 
-            CreateTestInputLayout(device, this, &inputLayout);
+            CreateTestInputLayout(device, this, &inputLayout, nullptr, nullptr, nullptr);
         }
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection)
@@ -189,8 +237,12 @@ private:
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::DebugEffect>>> m_debug;
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::DGSLEffect>>> m_dgsl;
 
+    std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::NormalMapEffect>>> m_normalMapInstanced;
+    std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::PBREffect>>> m_pbrInstanced;
+
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_compressedVB;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>    m_instancedVB;
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_indexBuffer;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cat;
@@ -215,14 +267,28 @@ private:
     DirectX::SimpleMath::Matrix             m_projection;
 
     UINT                                    m_indexCount;
+    UINT                                    m_instanceCount;
 
-    bool                                    m_showCompressed;
+    std::unique_ptr<DirectX::XMFLOAT3X4[]>  m_instanceTransforms;
+
+    enum RenderMode
+    {
+        Render_Normal,
+        Render_Compressed,
+        Render_Instanced,
+        Render_CompressedInstanced,
+        Render_Max
+    };
+
+    unsigned int                            m_renderMode;
 
     float                                   m_delay;
 
     static void CreateTestInputLayout(
         _In_ ID3D11Device* device,
         DirectX::IEffect* effect,
-        _Outptr_ ID3D11InputLayout** pInputLayout,
-        _Outptr_opt_ ID3D11InputLayout** pCompresedInputLayout = nullptr);
+        _Outptr_opt_ ID3D11InputLayout** pInputLayout,
+        _Outptr_opt_ ID3D11InputLayout** pCompresedInputLayout,
+        _Outptr_opt_ ID3D11InputLayout** pInstancedLayout,
+        _Outptr_opt_ ID3D11InputLayout** pCompresedInstancedLayout);
 };

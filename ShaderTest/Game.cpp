@@ -60,6 +60,9 @@ namespace
 
         static constexpr unsigned int InputElementCount = 8;
         static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
+
+        static constexpr unsigned int InstancedInputElementCount = 11;
+        static const D3D11_INPUT_ELEMENT_DESC InstancedInputElements[InstancedInputElementCount];
     };
 
     const D3D11_INPUT_ELEMENT_DESC TestVertex::InputElements[] =
@@ -72,6 +75,21 @@ namespace
         { "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT,      0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "BLENDWEIGHT",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "COLOR",        0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+
+    const D3D11_INPUT_ELEMENT_DESC TestVertex::InstancedInputElements[] =
+    {
+        { "SV_Position",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "NORMAL",       0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "TANGENT",      0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "TEXCOORD",     0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "TEXCOORD",     1, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT,      0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "BLENDWEIGHT",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "COLOR",        0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "InstMatrix",   0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "InstMatrix",   1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "InstMatrix",   2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
     };
 
     using VertexCollection = std::vector<TestVertex>;
@@ -247,6 +265,9 @@ namespace
 
         static constexpr unsigned int InputElementCount = 8;
         static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
+
+        static constexpr unsigned int InstancedInputElementCount = 11;
+        static const D3D11_INPUT_ELEMENT_DESC InstancedInputElements[InstancedInputElementCount];
     };
 
 
@@ -260,6 +281,21 @@ namespace
         { "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT,   0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "BLENDWEIGHT",  0, DXGI_FORMAT_R8G8B8A8_UNORM,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "COLOR",        0, DXGI_FORMAT_B8G8R8A8_UNORM,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+
+    const D3D11_INPUT_ELEMENT_DESC TestCompressedVertex::InstancedInputElements[] =
+    {
+        { "SV_Position",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "NORMAL",       0, DXGI_FORMAT_R11G11B10_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "TANGENT",      0, DXGI_FORMAT_R11G11B10_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "TEXCOORD",     0, DXGI_FORMAT_R16G16_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "TEXCOORD",     1, DXGI_FORMAT_R16G16_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT,      0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "BLENDWEIGHT",  0, DXGI_FORMAT_R8G8B8A8_UNORM,     0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "COLOR",        0, DXGI_FORMAT_B8G8R8A8_UNORM,     0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+        { "InstMatrix",   0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "InstMatrix",   1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "InstMatrix",   2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
     };
 
     // Creates a cube primitive.
@@ -357,7 +393,6 @@ namespace
         assert(vertexBuffer != nullptr && *vertexBuffer != nullptr);
         _Analysis_assume_(vertexBuffer != nullptr && *vertexBuffer != nullptr);
 
-
         DX::ThrowIfFailed(
             CreateStaticBuffer(device, indices, D3D11_BIND_INDEX_BUFFER, indexBuffer)
         );
@@ -392,80 +427,92 @@ void Game::CreateTestInputLayout(
     ID3D11Device* device,
     IEffect* effect,
     ID3D11InputLayout** pInputLayout,
-    ID3D11InputLayout** pCompresedInputLayout)
+    ID3D11InputLayout** pCompresedInputLayout,
+    ID3D11InputLayout** pInstancedLayout,
+    ID3D11InputLayout** pCompresedInstancedLayout)
 {
     auto ibasic = dynamic_cast<BasicEffect*>(effect);
-    if (ibasic)
-        ibasic->SetBiasedVertexNormals(false);
-
     auto ienvmap = dynamic_cast<EnvironmentMapEffect*>(effect);
-    if (ienvmap)
-        ienvmap->SetBiasedVertexNormals(false);
-
     auto inmap = dynamic_cast<NormalMapEffect*>(effect);
-    if (inmap)
-        inmap->SetBiasedVertexNormals(false);
-
     auto ipbr = dynamic_cast<PBREffect*>(effect);
-    if (ipbr)
-        ipbr->SetBiasedVertexNormals(false);
-
     auto iskin = dynamic_cast<SkinnedEffect*>(effect);
-    if (iskin)
-        iskin->SetBiasedVertexNormals(false);
-
     auto idbg = dynamic_cast<DebugEffect*>(effect);
-    if (idbg)
-        idbg->SetBiasedVertexNormals(false);
 
-    void const* shaderByteCode;
-    size_t byteCodeLength;
+    void const* shaderByteCode = nullptr;
+    size_t byteCodeLength = 0;
 
-    effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+    if (pInputLayout)
+    {
+        *pInputLayout = nullptr;
 
-    HRESULT hr = device->CreateInputLayout(TestVertex::InputElements,
-        TestVertex::InputElementCount,
-        shaderByteCode, byteCodeLength,
-        pInputLayout);
-    DX::ThrowIfFailed(hr);
+        if (ibasic)
+            ibasic->SetBiasedVertexNormals(false);
 
-    assert(pInputLayout != 0 && *pInputLayout != 0);
-    _Analysis_assume_(pInputLayout != 0 && *pInputLayout != 0);
+        if (ienvmap)
+            ienvmap->SetBiasedVertexNormals(false);
+
+        if (inmap)
+        {
+            inmap->SetBiasedVertexNormals(false);
+            inmap->SetInstancingEnabled(false);
+        }
+
+        if (ipbr)
+        {
+            ipbr->SetBiasedVertexNormals(false);
+            ipbr->SetInstancingEnabled(false);
+        }
+
+        if (iskin)
+            iskin->SetBiasedVertexNormals(false);
+
+        if (idbg)
+            idbg->SetBiasedVertexNormals(false);
+
+        effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+        HRESULT hr = device->CreateInputLayout(TestVertex::InputElements,
+            TestVertex::InputElementCount,
+            shaderByteCode, byteCodeLength,
+            pInputLayout);
+        DX::ThrowIfFailed(hr);
+
+        assert(pInputLayout != 0 && *pInputLayout != 0);
+        _Analysis_assume_(pInputLayout != 0 && *pInputLayout != 0);
+    }
 
     if (pCompresedInputLayout)
     {
+        *pCompresedInputLayout = nullptr;
+
         if (ibasic)
         {
             ibasic->SetBiasedVertexNormals(true);
-            ibasic->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
         }
         else if (ienvmap)
         {
             ienvmap->SetBiasedVertexNormals(true);
-            ienvmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
         }
         else if (inmap)
         {
             inmap->SetBiasedVertexNormals(true);
-            inmap->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
         }
         else if (ipbr)
         {
             ipbr->SetBiasedVertexNormals(true);
-            ipbr->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
         }
         else if (iskin)
         {
             iskin->SetBiasedVertexNormals(true);
-            iskin->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
         }
         else if (idbg)
         {
             idbg->SetBiasedVertexNormals(true);
-            idbg->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
         }
 
-        hr = device->CreateInputLayout(TestCompressedVertex::InputElements,
+        effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+        HRESULT hr = device->CreateInputLayout(TestCompressedVertex::InputElements,
             TestCompressedVertex::InputElementCount,
             shaderByteCode, byteCodeLength,
             pCompresedInputLayout);
@@ -474,11 +521,66 @@ void Game::CreateTestInputLayout(
         assert(pCompresedInputLayout != 0 && *pCompresedInputLayout != 0);
         _Analysis_assume_(pCompresedInputLayout != 0 && *pCompresedInputLayout != 0);
     }
+
+    if (pInstancedLayout)
+    {
+        *pInstancedLayout = nullptr;
+
+        if (inmap)
+        {
+            inmap->SetBiasedVertexNormals(false);
+            inmap->SetInstancingEnabled(true);
+        }
+        else if (ipbr)
+        {
+            ipbr->SetBiasedVertexNormals(false);
+            ipbr->SetInstancingEnabled(true);
+        }
+
+        effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+        HRESULT hr = device->CreateInputLayout(TestVertex::InstancedInputElements,
+            TestVertex::InstancedInputElementCount,
+            shaderByteCode, byteCodeLength,
+            pInstancedLayout);
+        DX::ThrowIfFailed(hr);
+
+        assert(pInstancedLayout != 0 && *pInstancedLayout != 0);
+        _Analysis_assume_(pInstancedLayout != 0 && *pInstancedLayout != 0);
+    }
+
+    if (pCompresedInstancedLayout)
+    {
+        *pCompresedInstancedLayout = nullptr;
+
+        if (inmap)
+        {
+            inmap->SetBiasedVertexNormals(true);
+            inmap->SetInstancingEnabled(true);
+        }
+        else if (ipbr)
+        {
+            ipbr->SetBiasedVertexNormals(true);
+            ipbr->SetInstancingEnabled(true);
+        }
+
+        effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+        HRESULT hr = device->CreateInputLayout(TestCompressedVertex::InstancedInputElements,
+            TestCompressedVertex::InstancedInputElementCount,
+            shaderByteCode, byteCodeLength,
+            pCompresedInstancedLayout);
+        DX::ThrowIfFailed(hr);
+
+        assert(pCompresedInstancedLayout != 0 && *pCompresedInstancedLayout != 0);
+        _Analysis_assume_(pCompresedInstancedLayout != 0 && *pCompresedInstancedLayout != 0);
+    }
 }
 
 Game::Game() noexcept(false) :
     m_indexCount(0),
-    m_showCompressed(false),
+    m_instanceCount(0),
+    m_renderMode(Render_Normal),
     m_delay(0)
 {
 #ifdef GAMMA_CORRECT_RENDERING
@@ -585,7 +687,8 @@ void Game::Update(DX::StepTimer const& timer)
 
     if (m_keyboardButtons.IsKeyPressed(Keyboard::Space) || (m_gamePadButtons.y == GamePad::ButtonStateTracker::PRESSED))
     {
-        m_showCompressed = !m_showCompressed;
+        CycleRenderMode();
+
         m_delay = INTERACTIVE_TIME;
     }
     else if (!kb.Space && !(pad.IsConnected() && pad.IsYPressed()))
@@ -594,7 +697,7 @@ void Game::Update(DX::StepTimer const& timer)
 
         if (m_delay <= 0.f)
         {
-            m_showCompressed = !m_showCompressed;
+            CycleRenderMode();
             m_delay = SWAP_TIME;
         }
     }
@@ -622,11 +725,24 @@ void Game::Render()
     float pitch = time * 0.7f;
     float roll = time * 1.1f;
 
+    auto context = m_deviceResources->GetD3DDeviceContext();
+
     XMMATRIX world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
-    Clear();
+    {
+        size_t j = 0;
+        for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+        {
+            XMMATRIX m = world * XMMatrixTranslation(x, 0.f, 0.f);
+            XMStoreFloat3x4(&m_instanceTransforms[j], m);
+            ++j;
+        }
 
-    auto context = m_deviceResources->GetD3DDeviceContext();
+        MapGuard map(context, m_instancedVB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0);
+        memcpy(map.pData, m_instanceTransforms.get(), j * sizeof(XMFLOAT3X4));
+    }
+
+    Clear();
 
     // Set state objects.
     context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
@@ -641,291 +757,372 @@ void Game::Render()
 
     context->PSSetSamplers(0, 2, samplers);
 
-    // Set the vertex and index buffer.
-    if (m_showCompressed)
+    // Set the vertex and index buffers.
+    switch (m_renderMode)
+    {
+    case Render_Compressed:
     {
         UINT vertexStride = sizeof(TestCompressedVertex);
         UINT vertexOffset = 0;
 
         context->IASetVertexBuffers(0, 1, m_compressedVB.GetAddressOf(), &vertexStride, &vertexOffset);
     }
-    else
+    break;
+
+    case Render_Instanced:
+    {
+        UINT vertexStride[2] = { sizeof(TestVertex), sizeof(XMFLOAT3X4) };
+        UINT vertexOffset[2] = {};
+        ID3D11Buffer* vertexBuffers[2] = { m_vertexBuffer.Get(), m_instancedVB.Get() };
+
+        context->IASetVertexBuffers(0, 2, vertexBuffers, vertexStride, vertexOffset);
+    }
+    break;
+
+    case Render_CompressedInstanced:
+    {
+        UINT vertexStride[2] = { sizeof(TestCompressedVertex), sizeof(XMFLOAT3X4) };
+        UINT vertexOffset[2] = {};
+        ID3D11Buffer* vertexBuffers[2] = { m_compressedVB.Get(), m_instancedVB.Get() };
+
+        context->IASetVertexBuffers(0, 2, vertexBuffers, vertexStride, vertexOffset);
+    }
+    break;
+
+    default:
     {
         UINT vertexStride = sizeof(TestVertex);
         UINT vertexOffset = 0;
 
         context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
     }
+    break;
+    }
 
     context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    // BasicEffect
     float y = ortho_height - 0.5f;
-    {
-        auto it = m_basic.begin();
-        assert(it != m_basic.end());
 
-        for (; y > -ortho_height; y -= 1.f)
+    if (m_renderMode == Render_Instanced || m_renderMode == Render_CompressedInstanced)
+    {
+        bool showCompressed = (m_renderMode == Render_CompressedInstanced);
+
+        // NormalMapEffect (instanced)
         {
-            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+            auto it = m_normalMapInstanced.begin();
+            assert(it != m_normalMapInstanced.end());
+
+            for (; y > -ortho_height; y -= 1.f)
             {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
-                context->DrawIndexed(m_indexCount, 0, 0);
+                (*it)->Apply(context, XMMatrixTranslation(0, y, -1.f), m_view, m_projection, showCompressed);
+
+                context->DrawIndexedInstanced(m_indexCount, m_instanceCount, 0, 0, 0);
 
                 ++it;
-                if (it == m_basic.cend())
+                if (it == m_normalMapInstanced.cend())
                     break;
             }
 
-            if (it == m_basic.cend())
-                break;
+            // Make sure we drew all the effects
+            assert(it == m_normalMapInstanced.cend());
+
+            y -= 1.f;
         }
 
-        // Make sure we drew all the effects
-        assert(it == m_basic.cend());
-
-        y -= 1.f;
-    }
-
-    // SkinnedEffect
-    {
-        auto it = m_skinning.begin();
-        assert(it != m_skinning.end());
-
-        XMMATRIX bones[4] =
+        // PBREffect (instanced)
+        if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
         {
-            XMMatrixIdentity(),
-            XMMatrixIdentity(),
-            XMMatrixIdentity(),
-            XMMatrixIdentity(),
-        };
+            auto it = m_pbrInstanced.begin();
+            assert(it != m_pbrInstanced.end());
 
-        for (; y > -ortho_height; y -= 1.f)
-        {
-            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+            for (; y > -ortho_height; y -= 1.f)
             {
-                (*it)->SetBoneTransforms(bones, 4);
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
-                context->DrawIndexed(m_indexCount, 0, 0);
+                (*it)->Apply(context, XMMatrixTranslation(0, y, -1.f), m_view, m_projection, showCompressed);
+
+                context->DrawIndexedInstanced(m_indexCount, m_instanceCount, 0, 0, 0);
 
                 ++it;
-                if (it == m_skinning.cend())
+                if (it == m_pbrInstanced.cend())
                     break;
             }
 
-            if (it == m_skinning.cend())
-                break;
+            // Make sure we drew all the effects
+            assert(it == m_pbrInstanced.cend());
+
+            y -= 1.f;
         }
-
-        // Make sure we drew all the effects
-        assert(it == m_skinning.cend());
-
-        y -= 1.f;
     }
-
-    // EnvironmentMapEffect
+    else
     {
-        auto it = m_envmap.begin();
-        assert(it != m_envmap.end());
+        bool showCompressed = (m_renderMode == Render_Compressed);
 
-        for (; y > -ortho_height; y -= 1.f)
+        // BasicEffect
         {
-            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
-            {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
-                context->DrawIndexed(m_indexCount, 0, 0);
-
-                ++it;
-                if (it == m_envmap.cend())
-                    break;
-            }
-
-            if (it == m_envmap.cend())
-                break;
-        }
-
-        // Make sure we drew all the effects
-        assert(it == m_envmap.cend());
-
-        y -= 1.f;
-    }
-
-    // DualTextureEffect
-    {
-        auto it = m_dual.begin();
-        assert(it != m_dual.end());
-
-        for (; y > -ortho_height; y -= 1.f)
-        {
-            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
-            {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
-                context->DrawIndexed(m_indexCount, 0, 0);
-
-                ++it;
-                if (it == m_dual.cend())
-                    break;
-            }
-
-            if (it == m_dual.cend())
-                break;
-        }
-
-        // Make sure we drew all the effects
-        assert(it == m_dual.cend());
-
-        y -= 1.f;
-    }
-
-    // AlphaTestEffect
-    {
-        auto it = m_alphTest.begin();
-        assert(it != m_alphTest.end());
-
-        for (; y > -ortho_height; y -= 1.f)
-        {
-            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
-            {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
-                context->DrawIndexed(m_indexCount, 0, 0);
-
-                ++it;
-                if (it == m_alphTest.cend())
-                    break;
-            }
-
-            if (it == m_alphTest.cend())
-                break;
-        }
-
-        // Make sure we drew all the effects
-        assert(it == m_alphTest.cend());
-
-        y -= 1.f;
-    }
-
-    // NormalMapEffect
-    {
-        auto it = m_normalMap.begin();
-        assert(it != m_normalMap.end());
-
-        for (; y > -ortho_height; y -= 1.f)
-        {
-            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
-            {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
-                context->DrawIndexed(m_indexCount, 0, 0);
-
-                ++it;
-                if (it == m_normalMap.cend())
-                    break;
-            }
-
-            if (it == m_normalMap.cend())
-                break;
-        }
-
-        // Make sure we drew all the effects
-        assert(it == m_normalMap.cend());
-
-        y -= 1.f;
-    }
-
-    // PBREffect
-    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
-    {
-        context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
-
-        ID3D11RenderTargetView* views[] = { m_deviceResources->GetRenderTargetView(), m_velocityBuffer->GetRenderTargetView() };
-        context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
-
-        {
-            auto it = m_pbr.begin();
-            assert(it != m_pbr.end());
+            auto it = m_basic.begin();
+            assert(it != m_basic.end());
 
             for (; y > -ortho_height; y -= 1.f)
             {
                 for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
                 {
-                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
                     context->DrawIndexed(m_indexCount, 0, 0);
 
                     ++it;
-                    if (it == m_pbr.cend())
+                    if (it == m_basic.cend())
                         break;
                 }
 
-                if (it == m_pbr.cend())
+                if (it == m_basic.cend())
                     break;
             }
 
             // Make sure we drew all the effects
-            assert(it == m_pbr.cend());
+            assert(it == m_basic.cend());
 
             y -= 1.f;
         }
 
-        views[1] = nullptr;
-        context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
-
-        context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
-    }
-
-    // DebugEffect
-    {
-        auto it = m_debug.begin();
-        assert(it != m_debug.end());
-
-        for (; y > -ortho_height; y -= 1.f)
+        // SkinnedEffect
         {
-            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
-            {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, m_showCompressed);
-                context->DrawIndexed(m_indexCount, 0, 0);
+            auto it = m_skinning.begin();
+            assert(it != m_skinning.end());
 
-                ++it;
+            XMMATRIX bones[4] =
+            {
+                XMMatrixIdentity(),
+                XMMatrixIdentity(),
+                XMMatrixIdentity(),
+                XMMatrixIdentity(),
+            };
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->SetBoneTransforms(bones, 4);
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_skinning.cend())
+                        break;
+                }
+
+                if (it == m_skinning.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_skinning.cend());
+
+            y -= 1.f;
+        }
+
+        // EnvironmentMapEffect
+        {
+            auto it = m_envmap.begin();
+            assert(it != m_envmap.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_envmap.cend())
+                        break;
+                }
+
+                if (it == m_envmap.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_envmap.cend());
+
+            y -= 1.f;
+        }
+
+        // DualTextureEffect
+        {
+            auto it = m_dual.begin();
+            assert(it != m_dual.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_dual.cend())
+                        break;
+                }
+
+                if (it == m_dual.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_dual.cend());
+
+            y -= 1.f;
+        }
+
+        // AlphaTestEffect
+        {
+            auto it = m_alphTest.begin();
+            assert(it != m_alphTest.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_alphTest.cend())
+                        break;
+                }
+
+                if (it == m_alphTest.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_alphTest.cend());
+
+            y -= 1.f;
+        }
+
+        // NormalMapEffect
+        {
+            auto it = m_normalMap.begin();
+            assert(it != m_normalMap.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_normalMap.cend())
+                        break;
+                }
+
+                if (it == m_normalMap.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_normalMap.cend());
+
+            y -= 1.f;
+        }
+
+        // PBREffect
+        if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
+        {
+            context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
+
+            ID3D11RenderTargetView* views[] = { m_deviceResources->GetRenderTargetView(), m_velocityBuffer->GetRenderTargetView() };
+            context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
+
+            {
+                auto it = m_pbr.begin();
+                assert(it != m_pbr.end());
+
+                for (; y > -ortho_height; y -= 1.f)
+                {
+                    for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                    {
+                        (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                        context->DrawIndexed(m_indexCount, 0, 0);
+
+                        ++it;
+                        if (it == m_pbr.cend())
+                            break;
+                    }
+
+                    if (it == m_pbr.cend())
+                        break;
+                }
+
+                // Make sure we drew all the effects
+                assert(it == m_pbr.cend());
+
+                y -= 1.f;
+            }
+
+            views[1] = nullptr;
+            context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
+
+            context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
+        }
+
+        // DebugEffect
+        {
+            auto it = m_debug.begin();
+            assert(it != m_debug.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_debug.cend())
+                        break;
+                }
+
                 if (it == m_debug.cend())
                     break;
             }
 
-            if (it == m_debug.cend())
-                break;
+            // Make sure we drew all the effects
+            assert(it == m_debug.cend());
+
+            y -= 1.f;
         }
 
-        // Make sure we drew all the effects
-        assert(it == m_debug.cend());
-
-        y -= 1.f;
-    }
-
-    // DGSLEffect
-    if (!m_showCompressed)
-    {
-        auto it = m_dgsl.begin();
-        assert(it != m_dgsl.end());
-
-        for (; y > -ortho_height; y -= 1.f)
+        // DGSLEffect
+        if (!showCompressed)
         {
-            for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
-            {
-                (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
-                context->DrawIndexed(m_indexCount, 0, 0);
+            auto it = m_dgsl.begin();
+            assert(it != m_dgsl.end());
 
-                ++it;
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_dgsl.cend())
+                        break;
+                }
+
                 if (it == m_dgsl.cend())
                     break;
             }
 
-            if (it == m_dgsl.cend())
-                break;
+            // Make sure we drew all the effects
+            assert(it == m_dgsl.cend());
+
+            y -= 1.f;
         }
-
-        // Make sure we drew all the effects
-        assert(it == m_dgsl.cend());
-
-        y -= 1.f;
     }
 
     // Show the new frame.
@@ -1106,6 +1303,39 @@ void Game::CreateDeviceDependentResources()
         m_vertexBuffer.ReleaseAndGetAddressOf(),
         m_compressedVB.ReleaseAndGetAddressOf(),
         m_indexBuffer.ReleaseAndGetAddressOf());
+
+    {
+        size_t j = 0;
+        for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+        {
+            ++j;
+        }
+        m_instanceCount = static_cast<UINT>(j);
+
+        m_instanceTransforms = std::make_unique<XMFLOAT3X4[]>(j);
+
+        constexpr XMFLOAT3X4 s_identity = { 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f };
+
+        j = 0;
+        for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+        {
+            m_instanceTransforms[j] = s_identity;
+            m_instanceTransforms[j]._14 = x;
+            ++j;
+        }
+
+        D3D11_BUFFER_DESC desc = {};
+        desc.ByteWidth = static_cast<UINT>(j * sizeof(XMFLOAT3X4));
+        desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        desc.Usage = D3D11_USAGE_DYNAMIC;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+        D3D11_SUBRESOURCE_DATA initData = { m_instanceTransforms.get(), 0, 0 };
+
+        DX::ThrowIfFailed(
+            device->CreateBuffer(&desc, &initData, m_instancedVB.ReleaseAndGetAddressOf())
+        );
+    }
 
     //--- BasicEffect ----------------------------------------------------------------------
 
@@ -1920,6 +2150,13 @@ void Game::CreateDeviceDependentResources()
         effect->SetFogColor(Colors::Black);
     }));
 
+    m_normalMapInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NormalMapEffect>>(device, [=](NormalMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetTexture(m_brickDiffuse.Get());
+        effect->SetNormalTexture(m_brickNormal.Get());
+    }));
+
     // NormalMapEffect (specular)
     m_normalMap.emplace_back(std::make_unique<EffectWithDecl<NormalMapEffect>>(device, [=](NormalMapEffect* effect)
     {
@@ -1937,6 +2174,14 @@ void Game::CreateDeviceDependentResources()
         effect->SetSpecularTexture(m_brickSpecular.Get());
         effect->SetFogEnabled(true);
         effect->SetFogColor(Colors::Black);
+    }));
+
+    m_normalMapInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NormalMapEffect>>(device, [=](NormalMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetTexture(m_brickDiffuse.Get());
+        effect->SetNormalTexture(m_brickNormal.Get());
+        effect->SetSpecularTexture(m_brickSpecular.Get());
     }));
 
     // NormalMapEffect (vertex color)
@@ -1978,6 +2223,14 @@ void Game::CreateDeviceDependentResources()
         effect->SetFogColor(Colors::Black);
     }));
 
+    m_normalMapInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NormalMapEffect>>(device, [=](NormalMapEffect* effect)
+    {
+        effect->EnableDefaultLighting();
+        effect->SetVertexColorEnabled(true);
+        effect->SetTexture(m_brickDiffuse.Get());
+        effect->SetNormalTexture(m_brickNormal.Get());
+    }));
+
     //--- PBREffect ------------------------------------------------------------------------
     if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
     {
@@ -1987,6 +2240,18 @@ void Game::CreateDeviceDependentResources()
         m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
         {
             effect->EnableDefaultLighting();
+            effect->SetConstantAlbedo(Colors::Cyan);
+            effect->SetConstantMetallic(0.5f);
+            effect->SetConstantRoughness(0.75f);
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
+        }));
+
+        m_pbrInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetConstantAlbedo(Colors::Cyan);
+            effect->SetConstantMetallic(0.5f);
+            effect->SetConstantRoughness(0.75f);
             effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
         }));
 
@@ -1998,8 +2263,23 @@ void Game::CreateDeviceDependentResources()
             effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
         }));
 
+        m_pbrInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
+        }));
+
         // PBREffect (emissive)
         m_pbr.emplace_back(std::make_unique<EffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetEmissiveTexture(m_pbrEmissive.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
+        }));
+
+        m_pbrInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<PBREffect>>(device, [=](PBREffect* effect)
         {
             effect->EnableDefaultLighting();
             effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
@@ -2243,7 +2523,9 @@ void Game::OnDeviceLost()
     m_dual.clear();
     m_alphTest.clear();
     m_normalMap.clear();
+    m_normalMapInstanced.clear();
     m_pbr.clear();
+    m_pbrInstanced.clear();
     m_debug.clear();
     m_dgsl.clear();
 
@@ -2264,6 +2546,7 @@ void Game::OnDeviceLost()
     m_irradianceIBL.Reset();
 
     m_vertexBuffer.Reset();
+    m_instancedVB.Reset();
     m_compressedVB.Reset();
     m_indexBuffer.Reset();
 
@@ -2278,3 +2561,13 @@ void Game::OnDeviceRestored()
 }
 #endif
 #pragma endregion
+
+void Game::CycleRenderMode()
+{
+    m_renderMode += 1;
+
+    if (m_renderMode >= Render_Max)
+    {
+        m_renderMode = Render_Normal;
+    }
+}
