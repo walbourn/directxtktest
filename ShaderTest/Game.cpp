@@ -446,28 +446,32 @@ void Game::CreateTestInputLayout(
         *pInputLayout = nullptr;
 
         if (ibasic)
+        {
             ibasic->SetBiasedVertexNormals(false);
-
-        if (ienvmap)
+        }
+        else if (ienvmap)
+        {
             ienvmap->SetBiasedVertexNormals(false);
-
-        if (inmap)
+        }
+        else if (inmap)
         {
             inmap->SetBiasedVertexNormals(false);
             inmap->SetInstancingEnabled(false);
         }
-
-        if (ipbr)
+        else if (ipbr)
         {
             ipbr->SetBiasedVertexNormals(false);
             ipbr->SetInstancingEnabled(false);
         }
-
-        if (iskin)
+        else if (iskin)
+        {
             iskin->SetBiasedVertexNormals(false);
-
-        if (idbg)
+        }
+        else if (idbg)
+        {
             idbg->SetBiasedVertexNormals(false);
+            idbg->SetInstancingEnabled(false);
+        }
 
         effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
@@ -536,6 +540,11 @@ void Game::CreateTestInputLayout(
             ipbr->SetBiasedVertexNormals(false);
             ipbr->SetInstancingEnabled(true);
         }
+        else if (idbg)
+        {
+            idbg->SetBiasedVertexNormals(false);
+            idbg->SetInstancingEnabled(true);
+        }
 
         effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
@@ -562,6 +571,11 @@ void Game::CreateTestInputLayout(
         {
             ipbr->SetBiasedVertexNormals(true);
             ipbr->SetInstancingEnabled(true);
+        }
+        else if (idbg)
+        {
+            idbg->SetBiasedVertexNormals(true);
+            idbg->SetInstancingEnabled(true);
         }
 
         effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
@@ -738,6 +752,8 @@ void Game::Render()
             ++j;
         }
 
+        assert(j == m_instanceCount);
+
         MapGuard map(context, m_instancedVB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0);
         memcpy(map.pData, m_instanceTransforms.get(), j * sizeof(XMFLOAT3X4));
     }
@@ -850,6 +866,28 @@ void Game::Render()
 
             // Make sure we drew all the effects
             assert(it == m_pbrInstanced.cend());
+
+            y -= 1.f;
+        }
+
+        // DebugEffect (instanced)
+        {
+            auto it = m_debugInstanced.begin();
+            assert(it != m_debugInstanced.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                (*it)->Apply(context, XMMatrixTranslation(0, y, -1.f), m_view, m_projection, showCompressed);
+
+                context->DrawIndexedInstanced(m_indexCount, m_instanceCount, 0, 0, 0);
+
+                ++it;
+                if (it == m_debugInstanced.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_debugInstanced.cend());
 
             y -= 1.f;
         }
@@ -1304,6 +1342,7 @@ void Game::CreateDeviceDependentResources()
         m_compressedVB.ReleaseAndGetAddressOf(),
         m_indexBuffer.ReleaseAndGetAddressOf());
 
+    // Create instance transforms.
     {
         size_t j = 0;
         for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
@@ -2312,6 +2351,10 @@ void Game::CreateDeviceDependentResources()
     {
     }));
 
+    m_debugInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<DebugEffect>>(device, [=](DebugEffect*)
+    {
+    }));
+
     m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
     {
         effect->SetMode(DebugEffect::Mode_Normals);
@@ -2328,6 +2371,11 @@ void Game::CreateDeviceDependentResources()
     }));
 
     m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
+    {
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_debugInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<DebugEffect>>(device, [=](DebugEffect* effect)
     {
         effect->SetVertexColorEnabled(true);
     }));
@@ -2523,11 +2571,13 @@ void Game::OnDeviceLost()
     m_dual.clear();
     m_alphTest.clear();
     m_normalMap.clear();
-    m_normalMapInstanced.clear();
     m_pbr.clear();
-    m_pbrInstanced.clear();
     m_debug.clear();
     m_dgsl.clear();
+
+    m_normalMapInstanced.clear();
+    m_pbrInstanced.clear();
+    m_debugInstanced.clear();
 
     m_cat.Reset();
     m_cubemap.Reset();

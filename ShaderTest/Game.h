@@ -144,7 +144,10 @@ private:
 
             auto idbg = dynamic_cast<DebugEffect*>(this);
             if (idbg)
-                idbg->SetBiasedVertexNormals(true);
+            {
+                idbg->SetBiasedVertexNormals(showCompressed);
+                idbg->SetInstancingEnabled(false);
+            }
 
             T::Apply(context);
 
@@ -184,6 +187,13 @@ private:
             {
                 ipbr->SetBiasedVertexNormals(showCompressed);
                 ipbr->SetInstancingEnabled(true);
+            }
+
+            auto idbg = dynamic_cast<DebugEffect*>(this);
+            if (idbg)
+            {
+                idbg->SetBiasedVertexNormals(showCompressed);
+                idbg->SetInstancingEnabled(true);
             }
 
             T::Apply(context);
@@ -239,6 +249,7 @@ private:
 
     std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::NormalMapEffect>>> m_normalMapInstanced;
     std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::PBREffect>>> m_pbrInstanced;
+    std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::DebugEffect>>> m_debugInstanced;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_compressedVB;
