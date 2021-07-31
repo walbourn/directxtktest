@@ -63,6 +63,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PBRModelTest_Desktop_2019",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StreamingAudioTest_Desktop_2019_Win8", "StreamingAudioTest\StreamingAudioTest_Desktop_2019_Win8.vcxproj", "{49A006E0-354D-45B5-AE7B-2C2F92DF7928}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D9144566-B53A-4787-A95F-32D78755F1EE}"
+	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
