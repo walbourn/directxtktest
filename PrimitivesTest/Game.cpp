@@ -350,8 +350,8 @@ void Game::Render()
     //--- Draw shapes using custom effects with instancing ---------------------------------
     m_instancedEffect->SetFogEnabled(true);
 #ifdef LH_COORDS
-    m_instancedEffect->SetFogStart(-6);
-    m_instancedEffect->SetFogEnd(-8);
+    m_instancedEffect->SetFogStart(-9);
+    m_instancedEffect->SetFogEnd(-10);
 #else
     m_instancedEffect->SetFogStart(9);
     m_instancedEffect->SetFogEnd(10);
