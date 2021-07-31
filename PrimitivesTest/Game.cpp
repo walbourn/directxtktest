@@ -27,6 +27,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
+    constexpr float rowtop = 4.f;
     constexpr float row0 = 2.7f;
     constexpr float row1 = 1.f;
     constexpr float row2 = -0.7f;
@@ -46,6 +47,7 @@ namespace
 }
 
 Game::Game() noexcept(false) :
+    m_instanceCount(0),
     m_spinning(true),
     m_pitch(0),
     m_yaw(0)
@@ -345,6 +347,41 @@ void Game::Render()
 
     m_cube->Draw(m_customEffect.get(), m_customIL.Get());
 
+    //--- Draw shapes using custom effects with instancing ---------------------------------
+    m_instancedEffect->SetFogEnabled(true);
+#ifdef LH_COORDS
+    m_instancedEffect->SetFogStart(-6);
+    m_instancedEffect->SetFogEnd(-8);
+#else
+    m_instancedEffect->SetFogStart(9);
+    m_instancedEffect->SetFogEnd(10);
+#endif
+    m_instancedEffect->SetFogColor(cornflower);
+
+    {
+        {
+            size_t j = 0;
+            for (float x = -8.f; x <= 8.f; x += 3.f)
+            {
+                XMMATRIX m = world * XMMatrixTranslation(x, 0.f, cos(time + float(j) * XM_PIDIV4));
+                XMStoreFloat3x4(&m_instanceTransforms[j], m);
+                ++j;
+            }
+
+            assert(j == m_instanceCount);
+
+            MapGuard map(context, m_instancedVB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0);
+            memcpy(map.pData, m_instanceTransforms.get(), j * sizeof(XMFLOAT3X4));
+        }
+
+        UINT stride = sizeof(XMFLOAT3X4);
+        UINT offset = 0;
+        context->IASetVertexBuffers(1, 1, m_instancedVB.GetAddressOf(), &stride, &offset);
+
+        m_instancedEffect->SetWorld(XMMatrixTranslation(0.f, rowtop, 0.f));
+        m_teapot->DrawInstanced(m_instancedEffect.get(), m_instancedIL.Get(), m_instanceCount);
+    }
+
     // Show the new frame.
     m_deviceResources->Present();
 
@@ -470,6 +507,10 @@ void Game::CreateDeviceDependentResources()
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
         nullptr, m_reftxt.ReleaseAndGetAddressOf()));
 
+    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"normalMap.dds",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false,
+        nullptr, m_normalMap.ReleaseAndGetAddressOf()));
+
 #ifdef LH_COORDS
     bool rhcoords = false;
 #else
@@ -527,6 +568,64 @@ void Game::CreateDeviceDependentResources()
     m_customEffect->SetDiffuseColor(g_XMOne);
 
     m_cube->CreateInputLayout(m_customEffect.get(), m_customIL.ReleaseAndGetAddressOf());
+
+    m_instancedEffect = std::make_unique <NormalMapEffect>(device);
+    m_instancedEffect->EnableDefaultLighting();
+    m_instancedEffect->SetTexture(m_dxlogo.Get());
+    m_instancedEffect->SetNormalTexture(m_normalMap.Get());
+    m_instancedEffect->SetInstancingEnabled(true);
+
+    {
+        static const D3D11_INPUT_ELEMENT_DESC s_InputElements[] =
+        {
+            // GeometricPrimitive::VertexType
+            { "SV_Position", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+            { "NORMAL",      0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+            { "TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
+            // XMFLOAT3X4
+            { "InstMatrix",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+            { "InstMatrix",  1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+            { "InstMatrix",  2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        };
+
+        CreateInputLayoutFromEffect(device, m_instancedEffect.get(),
+            s_InputElements, std::size(s_InputElements),
+            m_instancedIL.ReleaseAndGetAddressOf());
+
+        // Create instance transforms.
+        {
+            size_t j = 0;
+            for (float x = -8.f; x <= 8.f; x += 3.f)
+            {
+                ++j;
+            }
+            m_instanceCount = static_cast<UINT>(j);
+
+            m_instanceTransforms = std::make_unique<XMFLOAT3X4[]>(j);
+
+            constexpr XMFLOAT3X4 s_identity = { 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f };
+
+            j = 0;
+            for (float x = -8.f; x <= 8.f; x += 3.f)
+            {
+                m_instanceTransforms[j] = s_identity;
+                m_instanceTransforms[j]._14 = x;
+                ++j;
+            }
+
+            D3D11_BUFFER_DESC desc = {};
+            desc.ByteWidth = static_cast<UINT>(j * sizeof(XMFLOAT3X4));
+            desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+            desc.Usage = D3D11_USAGE_DYNAMIC;
+            desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+            D3D11_SUBRESOURCE_DATA initData = { m_instanceTransforms.get(), 0, 0 };
+
+            DX::ThrowIfFailed(
+                device->CreateBuffer(&desc, &initData, m_instancedVB.ReleaseAndGetAddressOf())
+            );
+        }
+    }
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -555,6 +654,9 @@ void Game::CreateWindowSizeDependentResources()
 
     m_customEffect->SetView(m_view);
     m_customEffect->SetProjection(m_projection);
+
+    m_instancedEffect->SetView(m_view);
+    m_instancedEffect->SetProjection(m_projection);
 }
 
 #ifdef LOSTDEVICE
@@ -578,11 +680,17 @@ void Game::OnDeviceLost()
     m_customBox2.reset();
 
     m_customEffect.reset();
+    m_instancedEffect.reset();
 
     m_customIL.Reset();
+    m_instancedIL.Reset();
+
     m_cat.Reset();
     m_dxlogo.Reset();
     m_reftxt.Reset();
+    m_normalMap.Reset();
+
+    m_instancedVB.Reset();
 }
 
 void Game::OnDeviceRestored()

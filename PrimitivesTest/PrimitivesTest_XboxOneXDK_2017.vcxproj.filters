@@ -56,6 +56,9 @@
     <Image Include="reftexture.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="normalMap.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageXDK.appxmanifest" />

@@ -110,14 +110,22 @@ private:
     std::unique_ptr<DirectX::GeometricPrimitive>    m_customBox2;
 
     std::unique_ptr<DirectX::BasicEffect>           m_customEffect;
+    std::unique_ptr<DirectX::NormalMapEffect>       m_instancedEffect;
 
     Microsoft::WRL::ComPtr<ID3D11InputLayout>           m_customIL;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>           m_instancedIL;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_cat;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_dxlogo;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_reftxt;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_normalMap;
 
     DirectX::SimpleMath::Matrix                         m_view;
     DirectX::SimpleMath::Matrix                         m_projection;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer>                m_instancedVB;
+
+    UINT                                                m_instanceCount;
+    std::unique_ptr<DirectX::XMFLOAT3X4[]>              m_instanceTransforms;
 
     bool m_spinning;
     float m_pitch;
