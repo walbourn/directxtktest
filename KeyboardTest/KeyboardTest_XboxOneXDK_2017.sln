@@ -7,6 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyboardTest_XboxOneXDK_201
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_XboxOneXDK_2017", "..\..\DirectXTK_XboxOneXDK_2017.vcxproj", "{4FDFDCCD-EE2E-415C-B458-1E8FDB0D85F2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5D97D95E-5382-4E3C-9ED0-D782EDC95AB8}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.editorconfig = ..\..\.editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Durango = Debug|Durango
@@ -32,5 +37,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {35CB6A28-5CD8-4900-A45E-9C7BCC0BFFE3}
 	EndGlobalSection
 EndGlobal

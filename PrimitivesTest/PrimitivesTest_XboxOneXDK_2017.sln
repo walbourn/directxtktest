@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 15.0.28307.1585
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PrimitivesTest_XboxOneXDK_2017", "PrimitivesTest_XboxOneXDK_2017.vcxproj", "{876A7437-F77E-4317-9219-4440D66480B8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_XboxOneXDK_2017", "..\..\DirectXTK_XboxOneXDK_2017.vcxproj", "{4FDFDCCD-EE2E-415C-B458-1E8FDB0D85F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{395B37B9-0608-4F51-9B23-DAE77A94AF9C}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.editorconfig = ..\..\.editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,5 +37,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CF1FF2A0-1338-43EA-8FB1-C91150483D5D}
 	EndGlobalSection
 EndGlobal
