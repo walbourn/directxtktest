@@ -42,12 +42,14 @@ namespace
 {
     const XMVECTORF32 c_BrightYellow = { { { 2.f, 2.f, 0.f, 1.f } } };
 
+    constexpr float rowtop = 6.f;
     constexpr float row0 = 1.5f;
     constexpr float row1 = -1.5f;
 }
 
 // Constructor.
 Game::Game() noexcept(false) :
+    m_instanceCount(0),
     m_toneMapMode(ToneMapPostProcess::Reinhard),
     m_ibl(0),
     m_spinning(true),
@@ -341,6 +343,16 @@ void Game::Render()
         }
     });
 
+    m_cubeInst->UpdateEffects([&](IEffect* effect)
+    {
+        auto pbr = dynamic_cast<PBREffect*>(effect);
+        if (pbr)
+        {
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
+        }
+    });
+
     //--- Draw SDKMESH models ---
     XMMATRIX local = XMMatrixTranslation(1.5f, row0, 0.f);
     local = XMMatrixMultiply(world, local);
@@ -369,6 +381,51 @@ void Game::Render()
         local = XMMatrixMultiply(world, local);
     }
     m_robot->Draw(context, *m_states, local, m_view, m_projection);
+
+    //--- Draw with instancing ---
+    local = XMMatrixTranslation(0.f, rowtop, 0.f) * XMMatrixScaling(0.25f, 0.25f, 0.25f);
+    {
+        {
+            size_t j = 0;
+            for (float x = -16.f; x <= 16.f; x += 4.f)
+            {
+                XMMATRIX m = world * XMMatrixTranslation(x, rowtop, cos(time + float(j) * XM_PIDIV4));
+                XMStoreFloat3x4(&m_instanceTransforms[j], m);
+                ++j;
+            }
+
+            assert(j == m_instanceCount);
+
+            MapGuard map(context, m_instancedVB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0);
+            memcpy(map.pData, m_instanceTransforms.get(), j * sizeof(XMFLOAT3X4));
+        }
+
+        UINT stride = sizeof(XMFLOAT3X4);
+        UINT offset = 0;
+        context->IASetVertexBuffers(1, 1, m_instancedVB.GetAddressOf(), &stride, &offset);
+
+        for (auto mit = m_cubeInst->meshes.cbegin(); mit != m_cubeInst->meshes.cend(); ++mit)
+        {
+            auto mesh = mit->get();
+            assert(mesh != 0);
+
+            mesh->PrepareForRendering(context, *m_states.get());
+
+            for (auto it = mesh->meshParts.cbegin(); it != mesh->meshParts.cend(); ++it)
+            {
+                auto part = it->get();
+                assert(part != 0);
+
+                auto imatrices = dynamic_cast<IEffectMatrices*>(part->effect.get());
+                if (imatrices)
+                {
+                    imatrices->SetMatrices(local, m_view, m_projection);
+                }
+
+                part->DrawInstanced(context, part->effect.get(), part->inputLayout.Get(), m_instanceCount);
+            }
+        }
+    }
 
     // Render HUD
     m_batch->Begin();
@@ -610,6 +667,83 @@ void Game::CreateDeviceDependentResources()
     m_sphere = Model::CreateFromSDKMESH(device, L"Sphere.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
     m_sphere2 = Model::CreateFromSDKMESH(device, L"Sphere2.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
     m_robot = Model::CreateFromSDKMESH(device, L"ToyRobot.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+
+    // Create instanced mesh.
+    m_fxFactory->SetSharing(false); // We do not want to reuse the effects created above!
+    m_cubeInst = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+
+    static const D3D11_INPUT_ELEMENT_DESC s_instElements[] =
+    {
+        // XMFLOAT3X4
+        { "InstMatrix",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "InstMatrix",  1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "InstMatrix",  2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+    };
+
+    m_cubeInst->UpdateEffects([&](IEffect* effect)
+    {
+        auto pbr = dynamic_cast<PBREffect*>(effect);
+        if (pbr)
+        {
+            pbr->SetInstancingEnabled(true);
+        }
+    });
+
+    for (auto mit = m_cubeInst->meshes.begin(); mit != m_cubeInst->meshes.end(); ++mit)
+    {
+        auto mesh = mit->get();
+        assert(mesh != 0);
+
+        for (auto it = mesh->meshParts.begin(); it != mesh->meshParts.end(); ++it)
+        {
+            auto part = it->get();
+            assert(part != 0);
+
+            auto il = *part->vbDecl;
+            il.push_back(s_instElements[0]);
+            il.push_back(s_instElements[1]);
+            il.push_back(s_instElements[2]);
+
+            DX::ThrowIfFailed(
+                CreateInputLayoutFromEffect(device, part->effect.get(),
+                    il.data(), il.size(),
+                    part->inputLayout.ReleaseAndGetAddressOf()));
+        }
+    }
+
+    // Create instance transforms.
+    {
+        size_t j = 0;
+        for (float x = -16.f; x <= 16.f; x += 4.f)
+        {
+            ++j;
+        }
+        m_instanceCount = static_cast<UINT>(j);
+
+        m_instanceTransforms = std::make_unique<XMFLOAT3X4[]>(j);
+
+        constexpr XMFLOAT3X4 s_identity = { 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f };
+
+        j = 0;
+        for (float x = -16.f; x <= 16.f; x += 4.f)
+        {
+            m_instanceTransforms[j] = s_identity;
+            m_instanceTransforms[j]._14 = x;
+            ++j;
+        }
+
+        D3D11_BUFFER_DESC desc = {};
+        desc.ByteWidth = static_cast<UINT>(j * sizeof(XMFLOAT3X4));
+        desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        desc.Usage = D3D11_USAGE_DYNAMIC;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+        D3D11_SUBRESOURCE_DATA initData = { m_instanceTransforms.get(), 0, 0 };
+
+        DX::ThrowIfFailed(
+            device->CreateBuffer(&desc, &initData, m_instancedVB.ReleaseAndGetAddressOf())
+        );
+    }
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -660,6 +794,7 @@ void Game::OnDeviceLost()
     m_sphere.reset();
     m_sphere2.reset();
     m_robot.reset();
+    m_cubeInst.reset();
 
     m_fxFactory.reset();
 

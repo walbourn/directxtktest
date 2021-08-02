@@ -103,6 +103,7 @@ private:
     std::unique_ptr<DirectX::Model>             m_sphere;
     std::unique_ptr<DirectX::Model>             m_sphere2;
     std::unique_ptr<DirectX::Model>             m_robot;
+    std::unique_ptr<DirectX::Model>             m_cubeInst;
     std::unique_ptr<DirectX::PBREffectFactory>  m_fxFactory;
 
     static const size_t s_nIBL = 3;
@@ -114,8 +115,13 @@ private:
     std::unique_ptr<DirectX::ToneMapPostProcess>    m_toneMap;
     std::unique_ptr<DX::RenderTexture>              m_hdrScene;
 
-    DirectX::SimpleMath::Matrix             m_view;
-    DirectX::SimpleMath::Matrix             m_projection;
+    DirectX::SimpleMath::Matrix                     m_view;
+    DirectX::SimpleMath::Matrix                     m_projection;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer>            m_instancedVB;
+
+    UINT                                            m_instanceCount;
+    std::unique_ptr<DirectX::XMFLOAT3X4[]>          m_instanceTransforms;
 
     int m_toneMapMode;
     uint32_t m_ibl;
