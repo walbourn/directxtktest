@@ -325,6 +325,7 @@
     <Image Include="..\Common\WideLogo.scale-100.png" />
     <Image Include="cat.dds" />
     <Image Include="dx5_logo.dds" />
+    <Image Include="normalMap.dds" />
     <Image Include="reftexture.dds" />
   </ItemGroup>
   <ItemGroup>

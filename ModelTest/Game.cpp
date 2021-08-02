@@ -38,9 +38,11 @@ extern std::unique_ptr<Model> CreateModelFromOBJ(
     _In_ ID3D11DeviceContext* context,
     _In_z_ const wchar_t* szFileName,
     _In_ IEffectFactory& fxFactory,
+    bool enableInstacing,
     ModelLoaderFlags flags);
 
 Game::Game() noexcept(false) :
+    m_instanceCount(0),
     m_spinning(true),
     m_pitch(0),
     m_yaw(0)
@@ -329,9 +331,7 @@ void Game::Render()
         auto lights = dynamic_cast<IEffectLights*>(effect);
         if (lights)
             lights->EnableDefaultLighting();
-    });
-    m_cup->UpdateEffects([&](IEffect* effect)
-    {
+
         auto fog = dynamic_cast<IEffectFog*>(effect);
         if (fog)
         {
@@ -367,13 +367,52 @@ void Game::Render()
             auto imatrices = dynamic_cast<IEffectMatrices*>(part->effect.get());
             if (imatrices) imatrices->SetWorld(local);
 
-            if (device->GetFeatureLevel() >= D3D_FEATURE_LEVEL_9_3)
+            part->Draw(context, part->effect.get(), part->inputLayout.Get());
+        }
+    }
+
+        // Custom drawing using instancing
+    if (device->GetFeatureLevel() >= D3D_FEATURE_LEVEL_9_3)
+    {
+        {
+            size_t j = 0;
+            for (float y = -4.f; y <= 4.f; y += 1.f)
             {
-                part->DrawInstanced(context, part->effect.get(), part->inputLayout.Get(), 1);
+                XMMATRIX m = world * XMMatrixTranslation(0.f, y, cos(time + float(j) * XM_PIDIV4));
+                XMStoreFloat3x4(&m_instanceTransforms[j], m);
+                ++j;
             }
-            else
+
+            assert(j == m_instanceCount);
+
+            MapGuard map(context, m_instancedVB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0);
+            memcpy(map.pData, m_instanceTransforms.get(), j * sizeof(XMFLOAT3X4));
+        }
+
+        UINT stride = sizeof(XMFLOAT3X4);
+        UINT offset = 0;
+        context->IASetVertexBuffers(1, 1, m_instancedVB.GetAddressOf(), &stride, &offset);
+
+        local = XMMatrixTranslation(6.f, 0, 0);
+        for (auto mit = m_cupInst->meshes.cbegin(); mit != m_cupInst->meshes.cend(); ++mit)
+        {
+            auto mesh = mit->get();
+            assert(mesh != 0);
+
+            mesh->PrepareForRendering(context, *m_states.get());
+
+            for (auto it = mesh->meshParts.cbegin(); it != mesh->meshParts.cend(); ++it)
             {
-                part->Draw(context, part->effect.get(), part->inputLayout.Get());
+                auto part = it->get();
+                assert(part != 0);
+
+                auto imatrices = dynamic_cast<IEffectMatrices*>(part->effect.get());
+                if (imatrices)
+                {
+                    imatrices->SetMatrices(local, m_view, m_projection);
+                }
+
+                part->DrawInstanced(context, part->effect.get(), part->inputLayout.Get(), m_instanceCount);
             }
         }
     }
@@ -584,9 +623,11 @@ void Game::CreateDeviceDependentResources()
 
     // Wavefront OBJ
 #ifdef GAMMA_CORRECT_RENDERING
-    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, (ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise) | ModelLoader_MaterialColorsSRGB);
+    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, false, (ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise) | ModelLoader_MaterialColorsSRGB);
+    m_cupInst = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, true, (ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise) | ModelLoader_MaterialColorsSRGB);
 #else
-    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, false, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_cupInst = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, true, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
 #endif
 
     // VBO
@@ -627,6 +668,40 @@ void Game::CreateDeviceDependentResources()
     m_dwarf = Model::CreateFromSDKMESH(device, L"dwarf.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
     m_lmap = Model::CreateFromSDKMESH(device, L"SimpleLightMap.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
     m_nmap = Model::CreateFromSDKMESH(device, L"Helmet.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+
+    // Create instance transforms.
+    {
+        size_t j = 0;
+        for (float y = -4.f; y <= 4.f; y += 1.f)
+        {
+            ++j;
+        }
+        m_instanceCount = static_cast<UINT>(j);
+
+        m_instanceTransforms = std::make_unique<XMFLOAT3X4[]>(j);
+
+        constexpr XMFLOAT3X4 s_identity = { 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f };
+
+        j = 0;
+        for (float y = -4.f; y <= 4.f; y += 1.f)
+        {
+            m_instanceTransforms[j] = s_identity;
+            m_instanceTransforms[j]._24 = y;
+            ++j;
+        }
+
+        D3D11_BUFFER_DESC desc = {};
+        desc.ByteWidth = static_cast<UINT>(j * sizeof(XMFLOAT3X4));
+        desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        desc.Usage = D3D11_USAGE_DYNAMIC;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+        D3D11_SUBRESOURCE_DATA initData = { m_instanceTransforms.get(), 0, 0 };
+
+        DX::ThrowIfFailed(
+            device->CreateBuffer(&desc, &initData, m_instancedVB.ReleaseAndGetAddressOf())
+        );
+    }
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -661,6 +736,7 @@ void Game::OnDeviceLost()
     m_effect.reset();
 
     m_cup.reset();
+    m_cupInst.reset();
     m_cupMesh.reset();
     m_vbo.reset();
     m_vbo2.reset();
@@ -672,6 +748,8 @@ void Game::OnDeviceLost()
     m_dwarf.reset();
     m_lmap.reset();
     m_nmap.reset();
+
+    m_instancedVB.Reset();
 
     m_abstractFXFactory.reset();
     m_fxFactory.reset();

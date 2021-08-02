@@ -158,6 +158,12 @@
     <Image Include="Helmet_spec.dds">
       <Filter>Assets\Normalmap</Filter>
     </Image>
+    <Image Include="normalMap.dds">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="smoothMap.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo">
