@@ -346,6 +346,7 @@
     <Image Include="Pack.dds" />
     <Image Include="pants_diff.dds" />
     <Image Include="Plane001LightingMap.dds" />
+    <Image Include="smoothMap.dds" />
     <Image Include="StripeConcrete.dds" />
     <Image Include="Text001LightingMap.dds" />
     <Image Include="Tiny_skin.dds" />

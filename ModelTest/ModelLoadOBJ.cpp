@@ -194,7 +194,16 @@ std::unique_ptr<Model> CreateModelFromOBJ(
             {
                 // Hack to make sure we use NormalMapEffect in order to test instancing.
                 info.enableNormalMaps = true;
-                info.normalTexture = L"normalMap.dds";
+
+                if (!*info.diffuseTexture)
+                {
+                    info.diffuseTexture = L"default.dds";
+                    info.normalTexture = L"smoothMap.dds";
+                }
+                else
+                {
+                    info.normalTexture = L"normalMap.dds";
+                }
             }
 
             if (mat.bSpecular)

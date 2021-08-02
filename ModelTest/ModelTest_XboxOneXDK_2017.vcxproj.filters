@@ -157,6 +157,9 @@
     <Image Include="normalMap.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="smoothMap.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageXDK.appxmanifest" />
