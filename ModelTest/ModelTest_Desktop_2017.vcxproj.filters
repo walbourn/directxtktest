@@ -10,9 +10,6 @@
     <ClCompile Include="..\Common\MainPC.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\LoadTest\Game.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
@@ -162,6 +159,9 @@
     </Image>
     <Image Include="Helmet_spec.dds">
       <Filter>Assets\Normalmap</Filter>
+    </Image>
+    <Image Include="normalMap.dds">
+      <Filter>Assets</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

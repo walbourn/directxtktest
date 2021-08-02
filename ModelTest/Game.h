@@ -99,6 +99,7 @@ private:
     std::shared_ptr<DirectX::EnvironmentMapEffect> m_effect;
 
     std::unique_ptr<DirectX::Model>         m_cup;
+    std::unique_ptr<DirectX::Model>         m_cupInst;
     std::unique_ptr<DirectX::Model>         m_cupMesh;
     std::unique_ptr<DirectX::Model>         m_vbo;
     std::unique_ptr<DirectX::Model>         m_vbo2;
@@ -120,7 +121,11 @@ private:
     DirectX::SimpleMath::Matrix             m_view;
     DirectX::SimpleMath::Matrix             m_projection;
 
-    std::unique_ptr<DirectX::XMMATRIX[], DirectX::aligned_deleter> m_bones;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>                            m_instancedVB;
+
+    UINT                                                            m_instanceCount;
+    std::unique_ptr<DirectX::XMFLOAT3X4[]>                          m_instanceTransforms;
+    std::unique_ptr<DirectX::XMMATRIX[], DirectX::aligned_deleter>  m_bones;
 
     bool m_spinning;
     float m_pitch;

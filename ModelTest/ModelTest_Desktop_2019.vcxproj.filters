@@ -160,6 +160,9 @@
     <Image Include="Helmet_spec.dds">
       <Filter>Assets\Normalmap</Filter>
     </Image>
+    <Image Include="normalMap.dds">
+      <Filter>Assets\Normalmap</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />

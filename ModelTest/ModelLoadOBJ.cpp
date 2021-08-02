@@ -46,6 +46,15 @@ namespace
     // Shared VB input element description
     INIT_ONCE g_InitOnce = INIT_ONCE_STATIC_INIT;
     std::shared_ptr<std::vector<D3D11_INPUT_ELEMENT_DESC>> g_vbdecl;
+    std::shared_ptr<std::vector<D3D11_INPUT_ELEMENT_DESC>> g_vbdeclInst;
+
+    static const D3D11_INPUT_ELEMENT_DESC s_instElements[] =
+    {
+        // XMFLOAT3X4
+        { "InstMatrix",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "InstMatrix",  1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "InstMatrix",  2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+    };
 
     BOOL CALLBACK InitializeDecl(PINIT_ONCE initOnce, PVOID Parameter, PVOID *lpContext)
     {
@@ -54,6 +63,13 @@ namespace
         UNREFERENCED_PARAMETER(lpContext);
         g_vbdecl = std::make_shared<std::vector<D3D11_INPUT_ELEMENT_DESC>>(VertexPositionNormalTexture::InputElements,
             VertexPositionNormalTexture::InputElements + VertexPositionNormalTexture::InputElementCount);
+
+        g_vbdeclInst = std::make_shared<std::vector<D3D11_INPUT_ELEMENT_DESC>>(VertexPositionNormalTexture::InputElements,
+            VertexPositionNormalTexture::InputElements + VertexPositionNormalTexture::InputElementCount);
+        g_vbdeclInst->push_back(s_instElements[0]);
+        g_vbdeclInst->push_back(s_instElements[1]);
+        g_vbdeclInst->push_back(s_instElements[2]);
+
         return TRUE;
     }
 }
@@ -65,6 +81,7 @@ std::unique_ptr<Model> CreateModelFromOBJ(
     _In_ ID3D11DeviceContext* deviceContext,
     _In_z_ const wchar_t* szFileName,
     _In_ IEffectFactory& fxFactory,
+    bool enableInstacing,
     ModelLoaderFlags flags )
 {
     if ( !InitOnceExecuteOnce( &g_InitOnce, InitializeDecl, nullptr, nullptr ) )
@@ -169,20 +186,44 @@ std::unique_ptr<Model> CreateModelFromOBJ(
             info.ambientColor = GetMaterialColor(mat.vAmbient.x, mat.vAmbient.y, mat.vAmbient.z, (flags & ModelLoader_MaterialColorsSRGB) != 0);
             info.diffuseColor = GetMaterialColor(mat.vDiffuse.x, mat.vDiffuse.y, mat.vDiffuse.z, (flags & ModelLoader_MaterialColorsSRGB) != 0);
 
+            info.diffuseTexture = mat.strTexture;
+
+            if (enableInstacing)
+            {
+                // Hack to make sure we use NormalMapEffect in order to test instancing.
+                info.enableNormalMaps = true;
+                info.normalTexture = L"normalMap.dds";
+            }
+
             if ( mat.bSpecular )
             {
                 info.specularPower = static_cast<float>(mat.nShininess);
                 info.specularColor = mat.vSpecular;
             }
-
-            info.diffuseTexture = mat.strTexture;
-
             effect = fxFactory.CreateEffect( info, deviceContext );
 
-            // Create input layout from effect
-            DX::ThrowIfFailed(
-                CreateInputLayoutFromEffect<VertexPositionNormalTexture>(d3dDevice, effect.get(), il.ReleaseAndGetAddressOf())
-            );
+            if (enableInstacing)
+            {
+                auto inmap = dynamic_cast<NormalMapEffect*>(effect.get());
+                if (inmap)
+                {
+                    inmap->SetInstancingEnabled(true);
+                }
+
+                // Create input layout from effect
+                DX::ThrowIfFailed(
+                    CreateInputLayoutFromEffect(d3dDevice, effect.get(),
+                        g_vbdeclInst->data(), g_vbdeclInst->size(),
+                        il.ReleaseAndGetAddressOf())
+                );
+            }
+            else
+            {
+                // Create input layout from effect
+                DX::ThrowIfFailed(
+                    CreateInputLayoutFromEffect<VertexPositionNormalTexture>(d3dDevice, effect.get(), il.ReleaseAndGetAddressOf())
+                );
+            }
 
             curmaterial = *it;
         }
@@ -201,7 +242,7 @@ std::unique_ptr<Model> CreateModelFromOBJ(
             part->indexBuffer = ib;
             part->vertexBuffer = vb;
             part->effect = effect;
-            part->vbDecl = g_vbdecl;
+            part->vbDecl = (enableInstacing) ? g_vbdeclInst : g_vbdecl;
             part->isAlpha = alpha;
             
             mesh->meshParts.emplace_back( part );

@@ -136,5 +136,89 @@ namespace DX
     }
 }
 
+// Adapters for older DirectXMath used by Xbox One XDK
+#if DIRECTX_MATH_VERSION < 313
+#pragma warning(push)
+#pragma warning(disable : 4201)
+
+namespace DirectX
+{
+    struct XMFLOAT3X4
+    {
+        union
+        {
+            struct
+            {
+                float _11, _12, _13, _14;
+                float _21, _22, _23, _24;
+                float _31, _32, _33, _34;
+            };
+            float m[3][4];
+            float f[12];
+        };
+
+        XMFLOAT3X4() = default;
+
+        XMFLOAT3X4(const XMFLOAT3X4&) = default;
+        XMFLOAT3X4& operator=(const XMFLOAT3X4&) = default;
+
+        XMFLOAT3X4(XMFLOAT3X4&&) = default;
+        XMFLOAT3X4& operator=(XMFLOAT3X4&&) = default;
+
+        constexpr XMFLOAT3X4(float m00, float m01, float m02, float m03,
+            float m10, float m11, float m12, float m13,
+            float m20, float m21, float m22, float m23) noexcept
+            : _11(m00), _12(m01), _13(m02), _14(m03),
+            _21(m10), _22(m11), _23(m12), _24(m13),
+            _31(m20), _32(m21), _33(m22), _34(m23) {}
+        explicit XMFLOAT3X4(_In_reads_(12) const float* pArray) noexcept
+        {
+            assert(pArray != nullptr);
+
+            m[0][0] = pArray[0];
+            m[0][1] = pArray[1];
+            m[0][2] = pArray[2];
+            m[0][3] = pArray[3];
+
+            m[1][0] = pArray[4];
+            m[1][1] = pArray[5];
+            m[1][2] = pArray[6];
+            m[1][3] = pArray[7];
+
+            m[2][0] = pArray[8];
+            m[2][1] = pArray[9];
+            m[2][2] = pArray[10];
+            m[2][3] = pArray[11];
+        }
+
+        float operator() (size_t Row, size_t Column) const noexcept { return m[Row][Column]; }
+        float& operator() (size_t Row, size_t Column) noexcept { return m[Row][Column]; }
+    };
+
+    inline void XM_CALLCONV XMStoreFloat3x4(_Out_ XMFLOAT3X4* pDestination, _In_ FXMMATRIX M) noexcept
+    {
+        XMFLOAT4X4A m;
+        XMStoreFloat4x4A(&m, M);
+
+        pDestination->m[0][0] = m._11;
+        pDestination->m[0][1] = m._21;
+        pDestination->m[0][2] = m._31;
+        pDestination->m[0][3] = m._41;
+
+        pDestination->m[1][0] = m._12;
+        pDestination->m[1][1] = m._22;
+        pDestination->m[1][2] = m._32;
+        pDestination->m[1][3] = m._42;
+
+        pDestination->m[2][0] = m._13;
+        pDestination->m[2][1] = m._23;
+        pDestination->m[2][2] = m._33;
+        pDestination->m[2][3] = m._43;
+    }
+}
+
+#pragma warning(pop)
+#endif // DIRECTX_MATH_VERSION
+
 // Enable off by default warnings to improve code conformance
 #pragma warning(default : 4061 4062 4191 4242 4263 4264 4265 4266 4289 4302 4365 4746 4826 4841 4987 5029 5038 5042)
