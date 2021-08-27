@@ -352,16 +352,16 @@ void Game::Render()
 
         // Custom drawing
     local = XMMatrixRotationX(cos(time)) * XMMatrixTranslation(-5.f, row0, cos(time) * 2.f);
-    for (auto mit = m_cup->meshes.cbegin(); mit != m_cup->meshes.cend(); ++mit)
+    for (const auto& mit : m_cup->meshes)
     {
-        auto mesh = mit->get();
+        auto mesh = mit.get();
         assert(mesh != 0);
 
         mesh->PrepareForRendering(context, *m_states.get());
 
-        for (auto it = mesh->meshParts.cbegin(); it != mesh->meshParts.cend(); ++it)
+        for (const auto& it : mesh->meshParts)
         {
-            auto part = it->get();
+            auto part = it.get();
             assert(part != 0);
 
             auto imatrices = dynamic_cast<IEffectMatrices*>(part->effect.get());
@@ -394,16 +394,16 @@ void Game::Render()
         context->IASetVertexBuffers(1, 1, m_instancedVB.GetAddressOf(), &stride, &offset);
 
         local = XMMatrixTranslation(6.f, 0, 0);
-        for (auto mit = m_cupInst->meshes.cbegin(); mit != m_cupInst->meshes.cend(); ++mit)
+        for (const auto& mit : m_cupInst->meshes)
         {
-            auto mesh = mit->get();
+            auto mesh = mit.get();
             assert(mesh != 0);
 
             mesh->PrepareForRendering(context, *m_states.get());
 
-            for (auto it = mesh->meshParts.cbegin(); it != mesh->meshParts.cend(); ++it)
+            for (const auto& it : mesh->meshParts)
             {
-                auto part = it->get();
+                auto part = it.get();
                 assert(part != 0);
 
                 auto imatrices = dynamic_cast<IEffectMatrices*>(part->effect.get());

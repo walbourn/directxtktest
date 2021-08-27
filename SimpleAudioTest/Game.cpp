@@ -275,9 +275,9 @@ void Game::Initialize(
             char buff[1024] = {};
             sprintf_s(buff,"\nINFO: Found %zu audio devices:\n", enumList.size());
             OutputDebugStringA(buff);
-            for (auto it = enumList.cbegin(); it != enumList.cend(); ++it)
+            for (const auto& it : enumList)
             {
-                sprintf_s(buff, "\t\"%ls\"\n", it->description.c_str());
+                sprintf_s(buff, "\t\"%ls\"\n", it.description.c_str());
                 OutputDebugStringA(buff);
             }
         }

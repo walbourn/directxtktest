@@ -189,9 +189,9 @@ int __cdecl main()
     else
     {
         printf("INFO: Found %zu audio devices:\n", enumList.size() );
-        for( auto it = enumList.cbegin(); it != enumList.cend(); ++it )
+        for (const auto& it : enumList)
         {
-            printf( "\t\"%ls\"\n", it->description.c_str() );
+            printf("\t\"%ls\"\n", it.description.c_str());
         }
     }
 

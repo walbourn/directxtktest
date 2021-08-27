@@ -135,12 +135,12 @@ std::unique_ptr<Model> CreateModelFromOBJ(
         obj->attributes.clear();
         obj->indices.clear();
 
-        for (auto it = faces.cbegin(); it != faces.cend(); ++it)
+        for (const auto& it : faces)
         {
-            obj->attributes.push_back(it->attribute);
-            obj->indices.push_back(it->a);
-            obj->indices.push_back(it->b);
-            obj->indices.push_back(it->c);
+            obj->attributes.push_back(it.attribute);
+            obj->indices.push_back(it.a);
+            obj->indices.push_back(it.b);
+            obj->indices.push_back(it.c);
         }
     }
 

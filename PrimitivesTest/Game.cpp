@@ -540,10 +540,10 @@ void Game::CreateDeviceDependentResources()
         assert(customVerts.size() == 24);
         assert(customIndices.size() == 36);
 
-        for (auto it = customVerts.begin(); it != customVerts.end(); ++it)
+        for (auto& it : customVerts)
         {
-            it->textureCoordinate.x *= 5.f;
-            it->textureCoordinate.y *= 5.f;
+            it.textureCoordinate.x *= 5.f;
+            it.textureCoordinate.y *= 5.f;
         }
 
         m_customBox = GeometricPrimitive::CreateCustom(context, customVerts, customIndices);

@@ -5422,11 +5422,11 @@ int EnsureSorted(std::map<T, int>& map)
 
     int expected = 1;
 
-    for (auto it = map.begin(); it != map.end(); ++it)
+    for (const auto& it : map)
     {
-        if (it->second != expected)
+        if (it.second != expected)
         {
-            printf("std::less<%s> error: expecting %d, got %d\n", typeid(T).name(), expected, it->second);
+            printf("std::less<%s> error: expecting %d, got %d\n", typeid(T).name(), expected, it.second);
             success = false;
         }
 

@@ -342,10 +342,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         return 1;
     }
 
-    for (auto pConv = conversion.begin(); pConv != conversion.end(); ++pConv)
+    for (auto& pConv : conversion)
     {
         wchar_t ext[_MAX_EXT];
-        _wsplitpath_s(pConv->szSrc, nullptr, 0, nullptr, 0, nullptr, 0, ext, _MAX_EXT);
+        _wsplitpath_s(pConv.szSrc, nullptr, 0, nullptr, 0, nullptr, 0, ext, _MAX_EXT);
         bool isdds = (_wcsicmp(ext, L".dds") == 0);
         bool iswav = (_wcsicmp(ext, L".wav") == 0);
         bool isxwb = (_wcsicmp(ext, L".xwb") == 0);
@@ -374,17 +374,17 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
         // Load source image
 #ifdef _DEBUG
-        OutputDebugStringW(pConv->szSrc);
+        OutputDebugStringW(pConv.szSrc);
         OutputDebugStringA("\n");
 #endif
 
         ComPtr<ID3D11Resource> tex;
         if (usedds)
         {
-            hr = DirectX::CreateDDSTextureFromFileEx(device.Get(), pConv->szSrc, 0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0, false, tex.GetAddressOf(), nullptr, nullptr);
+            hr = DirectX::CreateDDSTextureFromFileEx(device.Get(), pConv.szSrc, 0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0, false, tex.GetAddressOf(), nullptr, nullptr);
             if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
             {
-                wprintf(L"ERROR: DDSTexture file not not found:\n%ls\n", pConv->szSrc);
+                wprintf(L"ERROR: DDSTexture file not not found:\n%ls\n", pConv.szSrc);
                 return 1;
             }
             else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && isdds)))
@@ -405,10 +405,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         {
             std::unique_ptr<uint8_t[]> data;
             DirectX::WAVData result = {};
-            hr = DirectX::LoadWAVAudioFromFileEx(pConv->szSrc, data, result);
+            hr = DirectX::LoadWAVAudioFromFileEx(pConv.szSrc, data, result);
             if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
             {
-                wprintf(L"ERROR: WAVAudio file not not found:\n%ls\n", pConv->szSrc);
+                wprintf(L"ERROR: WAVAudio file not not found:\n%ls\n", pConv.szSrc);
                 return 1;
             }
             else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_INVALID_DATA) && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && iswav)))
@@ -428,10 +428,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         else if (usexwb)
         {
             auto wb = std::make_unique<DirectX::WaveBankReader>();
-            hr = wb->Open(pConv->szSrc);
+            hr = wb->Open(pConv.szSrc);
             if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
             {
-                wprintf(L"ERROR: XWBAudio file not not found:\n%ls\n", pConv->szSrc);
+                wprintf(L"ERROR: XWBAudio file not not found:\n%ls\n", pConv.szSrc);
                 return 1;
             }
             else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && isxwb)))
@@ -456,10 +456,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else
         {
-            hr = DirectX::CreateWICTextureFromFileEx(device.Get(), pConv->szSrc, 0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0, DirectX::WIC_LOADER_DEFAULT, tex.GetAddressOf(), nullptr);
+            hr = DirectX::CreateWICTextureFromFileEx(device.Get(), pConv.szSrc, 0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0, DirectX::WIC_LOADER_DEFAULT, tex.GetAddressOf(), nullptr);
             if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
             {
-                wprintf(L"ERROR: WICTexture file not found:\n%ls\n", pConv->szSrc);
+                wprintf(L"ERROR: WICTexture file not found:\n%ls\n", pConv.szSrc);
                 return 1;
             }
             else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != WINCODEC_ERR_COMPONENTNOTFOUND && hr != E_OUTOFMEMORY && hr != WINCODEC_ERR_BADHEADER)

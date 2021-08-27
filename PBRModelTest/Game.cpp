@@ -404,16 +404,16 @@ void Game::Render()
         UINT offset = 0;
         context->IASetVertexBuffers(1, 1, m_instancedVB.GetAddressOf(), &stride, &offset);
 
-        for (auto mit = m_cubeInst->meshes.cbegin(); mit != m_cubeInst->meshes.cend(); ++mit)
+        for (const auto& mit : m_cubeInst->meshes)
         {
-            auto mesh = mit->get();
+            auto mesh = mit.get();
             assert(mesh != 0);
 
             mesh->PrepareForRendering(context, *m_states.get());
 
-            for (auto it = mesh->meshParts.cbegin(); it != mesh->meshParts.cend(); ++it)
+            for (const auto& it : mesh->meshParts)
             {
-                auto part = it->get();
+                auto part = it.get();
                 assert(part != 0);
 
                 auto imatrices = dynamic_cast<IEffectMatrices*>(part->effect.get());
@@ -689,14 +689,14 @@ void Game::CreateDeviceDependentResources()
         }
     });
 
-    for (auto mit = m_cubeInst->meshes.begin(); mit != m_cubeInst->meshes.end(); ++mit)
+    for (const auto& mit : m_cubeInst->meshes)
     {
-        auto mesh = mit->get();
+        auto mesh = mit.get();
         assert(mesh != 0);
 
-        for (auto it = mesh->meshParts.begin(); it != mesh->meshParts.end(); ++it)
+        for (const auto& it : mesh->meshParts)
         {
-            auto part = it->get();
+            auto part = it.get();
             assert(part != 0);
 
             auto il = *part->vbDecl;
