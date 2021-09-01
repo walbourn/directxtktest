@@ -929,7 +929,7 @@ void Game::CreateDeviceDependentResources()
     }
 
     // Load textures
-    static const wchar_t* s_albetoTextures[s_nMaterials] =
+    static const wchar_t* s_albedoTextures[s_nMaterials] =
     {
         L"SphereMat_baseColor.png",
         L"Sphere2Mat_baseColor.png",
@@ -954,14 +954,14 @@ void Game::CreateDeviceDependentResources()
         L"BrokenCube_emissive.png",
     };
 
-    static_assert(std::size(s_albetoTextures) == std::size(s_normalMapTextures), "Material array mismatch");
-    static_assert(std::size(s_albetoTextures) == std::size(s_rmaTextures), "Material array mismatch");
-    static_assert(std::size(s_albetoTextures) == std::size(s_emissiveTextures), "Material array mismatch");
+    static_assert(std::size(s_albedoTextures) == std::size(s_normalMapTextures), "Material array mismatch");
+    static_assert(std::size(s_albedoTextures) == std::size(s_rmaTextures), "Material array mismatch");
+    static_assert(std::size(s_albedoTextures) == std::size(s_emissiveTextures), "Material array mismatch");
 
     for (size_t j = 0; j < s_nMaterials; ++j)
     {
         DX::ThrowIfFailed(
-            CreateWICTextureFromFile(device, s_albetoTextures[j], nullptr, m_baseColor[j].ReleaseAndGetAddressOf())
+            CreateWICTextureFromFile(device, s_albedoTextures[j], nullptr, m_baseColor[j].ReleaseAndGetAddressOf())
         );
 
         DX::ThrowIfFailed(
