@@ -171,7 +171,6 @@
   <ItemGroup>
     <Image Include="cat.dds" />
     <Image Include="cubemap.dds" />
-    <Image Include="default.dds" />
     <Image Include="dualparabola.dds" />
     <Image Include="opaqueCat.dds" />
     <Image Include="overlay.dds" />

@@ -154,7 +154,6 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_envball;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_envdual;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_overlay;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_defaultTex;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brickDiffuse;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brickNormal;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brickSpecular;

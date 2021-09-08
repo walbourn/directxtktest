@@ -885,10 +885,6 @@ void Game::CreateDeviceDependentResources()
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
         nullptr, m_overlay.ReleaseAndGetAddressOf()));
 
-    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"default.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
-        nullptr, m_defaultTex.ReleaseAndGetAddressOf()));
-
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"spnza_bricks_a.DDS",
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
         nullptr, m_brickDiffuse.ReleaseAndGetAddressOf()));
@@ -972,7 +968,6 @@ void Game::CreateDeviceDependentResources()
         effect->SetFresnelFactor(0.f);
         effect->SetEnvironmentMapAmount(1.0f);
         effect->SetMode(EnvironmentMapEffect::Mapping_Sphere);
-        effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_envball.Get());
     });
 
@@ -982,7 +977,6 @@ void Game::CreateDeviceDependentResources()
         effect->SetFresnelFactor(0.f);
         effect->SetEnvironmentMapAmount(1.0f);
         effect->SetMode(EnvironmentMapEffect::Mapping_DualParabola);
-        effect->SetTexture(m_defaultTex.Get());
         effect->SetEnvironmentMap(m_envdual.Get());
     });
 
@@ -1010,8 +1004,6 @@ void Game::CreateDeviceDependentResources()
     {
         effect->EnableDefaultLighting();
         effect->SetDiffuseColor(Colors::White);
-        effect->SetTexture(m_defaultTex.Get());
-        effect->SetNormalTexture(m_brickNormal.Get());
         effect->SetSpecularTexture(m_brickSpecular.Get());
     });
 
@@ -1020,7 +1012,6 @@ void Game::CreateDeviceDependentResources()
         effect->EnableDefaultLighting();
         effect->DisableSpecular();
         effect->SetDiffuseColor(Colors::White);
-        effect->SetTexture(m_defaultTex.Get());
         effect->SetNormalTexture(m_brickNormal.Get());
     });
 
@@ -1096,7 +1087,6 @@ void Game::OnDeviceLost()
     m_envball.Reset();
     m_envdual.Reset();
     m_overlay.Reset();
-    m_defaultTex.Reset();
     m_brickDiffuse.Reset();
     m_brickNormal.Reset();
     m_brickSpecular.Reset();
