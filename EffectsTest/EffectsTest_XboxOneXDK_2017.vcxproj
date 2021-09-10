@@ -192,7 +192,6 @@
     <Image Include="..\Common\WideLogo.scale-100.png" />
     <Image Include="cat.dds" />
     <Image Include="cubemap.dds" />
-    <Image Include="default.dds" />
     <Image Include="dualparabola.dds" />
     <Image Include="opaqueCat.dds" />
     <Image Include="overlay.dds" />

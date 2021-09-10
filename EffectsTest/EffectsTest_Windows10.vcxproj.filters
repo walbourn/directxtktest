@@ -57,9 +57,6 @@
     <Image Include="cubemap.dds">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="default.dds">
-      <Filter>Assets</Filter>
-    </Image>
     <Image Include="opaqueCat.dds">
       <Filter>Assets</Filter>
     </Image>
