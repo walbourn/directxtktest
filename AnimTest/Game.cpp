@@ -98,9 +98,9 @@ void Game::Initialize(
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
 
-    m_bones.reset(reinterpret_cast<XMMATRIX*>(_aligned_malloc(sizeof(XMMATRIX) * SkinnedEffect::MaxBones, 16)));
+    m_bones = ModelBone::MakeArray(IEffectSkinning::MaxBones);
     XMMATRIX id = XMMatrixIdentity();
-    for (size_t j = 0; j < SkinnedEffect::MaxBones; ++j)
+    for (size_t j = 0; j < IEffectSkinning::MaxBones; ++j)
     {
         m_bones[j] = id;
     }
@@ -325,9 +325,11 @@ void Game::CreateDeviceDependentResources()
     m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
 
     // DirectX SDK Mesh
-    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    ModelLoaderFlags flags = ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise;
 
-    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, flags | ModelLoader_IncludeFrames);
+
+    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, flags | ModelLoader_IncludeSkeleton);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
