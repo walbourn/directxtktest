@@ -20,13 +20,6 @@
 // Build for LH vs. RH coords
 //#define LH_COORDS
 
-namespace
-{
-    constexpr float row0 = 2.f;
-    constexpr float row1 = 0.f;
-    constexpr float row2 = -2.f;
-}
-
 extern void ExitGame() noexcept;
 
 using namespace DirectX;
@@ -34,6 +27,39 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
  
+
+namespace
+{
+    constexpr float row0 = 2.f;
+    constexpr float row1 = 0.f;
+    constexpr float row2 = -2.f;
+
+    void DumpBones(const ModelBone::Collection& bones, _In_z_ const char* name)
+    {
+        char buff[128] = {};
+        if (bones.empty())
+        {
+            sprintf_s(buff, "ERROR: %s is missing model bones!\n", name);
+            OutputDebugStringA(buff);
+        }
+        else
+        {
+            sprintf_s(buff, "%s: contains %zu bones\n", name, bones.size());
+            OutputDebugStringA(buff);
+
+            for (auto it : bones)
+            {
+                sprintf_s(buff, "\t'%ls' (%s | %s | %s)\n",
+                    it.name.c_str(),
+                    (it.childIndex != ModelBone::c_Invalid) ? "has children" : "no children",
+                    (it.siblingIndex != ModelBone::c_Invalid) ? "has sibling" : "no siblings",
+                    (it.parentIndex != ModelBone::c_Invalid) ? "has parent" : "no parent");
+                OutputDebugStringA(buff);
+            }
+        }
+    }
+}
+
 Game::Game() noexcept(false)
 {
 #ifdef GAMMA_CORRECT_RENDERING
@@ -322,14 +348,21 @@ void Game::CreateDeviceDependentResources()
 #endif
 
     // Visual Studio CMO
-    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
+    ModelLoaderFlags flags = ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise;
+    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags | ModelLoader_IncludeSkeleton);
+
+    DumpBones(m_teapot->bones, "teapot.cmo");
 
     // DirectX SDK Mesh
-    ModelLoaderFlags flags = ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise;
+    flags = ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise;
 
-    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, flags | ModelLoader_IncludeFrames);
+    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, flags | ModelLoader_IncludeBones);
+
+    DumpBones(m_tank->bones, "TankScene.sdkmesh");
 
     m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, flags | ModelLoader_IncludeSkeleton);
+
+    DumpBones(m_soldier->bones, "soldier.sdkmesh");
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
