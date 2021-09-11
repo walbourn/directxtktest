@@ -349,7 +349,7 @@ void Game::CreateDeviceDependentResources()
 
     // Visual Studio CMO
     ModelLoaderFlags flags = ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise;
-    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags | ModelLoader_IncludeSkeleton);
+    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags | ModelLoader_IncludeBones);
 
     DumpBones(m_teapot->bones, "teapot.cmo");
 
@@ -360,7 +360,7 @@ void Game::CreateDeviceDependentResources()
 
     DumpBones(m_tank->bones, "TankScene.sdkmesh");
 
-    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, flags | ModelLoader_IncludeSkeleton);
+    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, flags | ModelLoader_IncludeBones);
 
     DumpBones(m_soldier->bones, "soldier.sdkmesh");
 }
