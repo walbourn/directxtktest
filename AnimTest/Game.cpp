@@ -188,10 +188,39 @@ void Game::Render()
 
     auto context = m_deviceResources->GetD3DDeviceContext();
 
+    // Tank scene (rigid-body animation)
     XMMATRIX local = XMMatrixMultiply(XMMatrixScaling(0.3f, 0.3f, 0.3f), XMMatrixTranslation(0.f, row2, 0.f));
     local = XMMatrixMultiply(world, local);
-    m_tank->Draw(context, *m_states, local, m_view, m_projection);
 
+    constexpr uint32_t rootBone = 0;
+    uint32_t tankBone = ModelBone::c_Invalid;
+    uint32_t barricadeBone = ModelBone::c_Invalid;
+    uint32_t count = 0;
+    for (auto it : m_tank->bones)
+    {
+        if (_wcsicmp(L"tank_geo", it.name.c_str()) == 0)
+        {
+            tankBone = count;
+        }
+        else if (_wcsicmp(L"barricade_geo", it.name.c_str()) == 0)
+        {
+            barricadeBone = count;
+        }
+
+        ++count;
+    }
+
+    m_tank->boneMatrices[rootBone] = XMMatrixRotationY((time / 10.f) * XM_PI);
+    m_tank->boneMatrices[tankBone] = XMMatrixRotationY(time * XM_PI);
+
+    m_tank->boneMatrices[barricadeBone] = XMMatrixTranslation(0.f, cosf(time) * 2.f, 0.f);
+
+    auto bones = ModelBone::MakeArray(m_tank->bones.size());
+    m_tank->CopyAbsoluteBoneTransformsTo(m_tank->bones.size(), bones.get());
+
+    m_tank->Draw(context, *m_states, m_tank->bones.size(), bones.get(), local, m_view, m_projection);
+
+    // Teapot
     m_teapot->UpdateEffects([&](IEffect* effect)
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
