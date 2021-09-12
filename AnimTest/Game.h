@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: Game.h
 //
-// Developer unit test for DirectXTK Model animation (under development)
+// Developer unit test for DirectXTK Model animation
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -13,22 +13,6 @@
 #include "DirectXTKTest.h"
 #include "StepTimer.h"
 
-
-struct SkinningData
-{
-    const DirectX::Model*               m_model;
-    DirectX::ModelBone::TransformArray  m_bindPose;
-    DirectX::ModelBone::TransformArray  m_invBindPose;
-
-    explicit SkinningData(_In_ DirectX::Model* model);
-    ~SkinningData() = default;
-
-    SkinningData(SkinningData&&) = default;
-    SkinningData& operator= (SkinningData&&) = default;
-
-    SkinningData(SkinningData const&) = delete;
-    SkinningData& operator= (SkinningData const&) = delete;
-};
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -115,11 +99,7 @@ private:
     std::unique_ptr<DirectX::CommonStates>  m_states;
 
     std::unique_ptr<DirectX::Model>         m_teapot;
-    std::unique_ptr<SkinningData>           m_teapotSkin;
-
     std::unique_ptr<DirectX::Model>         m_soldier;
-    std::unique_ptr<SkinningData>           m_soldierSkin;
-
     std::unique_ptr<DirectX::Model>         m_tank;
 
     std::unique_ptr<DirectX::EffectFactory> m_fxFactory;
