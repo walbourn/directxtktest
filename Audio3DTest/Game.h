@@ -26,6 +26,12 @@ public:
     Game() noexcept(false);
     ~Game();
 
+    Game(Game&&) = default;
+    Game& operator= (Game&&) = default;
+
+    Game(Game const&) = delete;
+    Game& operator= (Game const&) = delete;
+
     // Initialization and management
 #ifdef COREWINDOW
     void Initialize(IUnknown* window, int width, int height, DXGI_MODE_ROTATION rotation);
