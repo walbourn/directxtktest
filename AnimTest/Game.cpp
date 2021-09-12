@@ -26,7 +26,6 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
- 
 
 namespace
 {
@@ -57,6 +56,63 @@ namespace
                 OutputDebugStringA(buff);
             }
         }
+    }
+
+    void DumpMatrices(
+        size_t nbones,
+        _In_reads_(nbones) const XMMATRIX *boneTransforms,
+        _In_z_ const char* name)
+    {
+        char buff[128] = {};
+        if (!nbones || !boneTransforms)
+        {
+            sprintf_s(buff, "ERROR: %s is missing bone transforms!\n", name);
+            OutputDebugStringA(buff);
+        }
+        else
+        {
+            sprintf_s(buff, "%s: transforms for %zu bones\n", name, nbones);
+            OutputDebugStringA(buff);
+
+            for (size_t j = 0; j < nbones; ++j)
+            {
+                auto m = reinterpret_cast<const XMFLOAT4X4*>(&boneTransforms[j]);
+                sprintf_s(buff, "\t[%zu]\t[%f %f %f %f]\n",
+                    j, m->_11, m->_12, m->_13, m->_14);
+                OutputDebugStringA(buff);
+
+                sprintf_s(buff, "\t\t[%f %f %f %f]\n",
+                    m->_21, m->_22, m->_23, m->_24);
+                OutputDebugStringA(buff);
+
+                sprintf_s(buff, "\t\t[%f %f %f %f]\n",
+                    m->_31, m->_32, m->_33, m->_34);
+                OutputDebugStringA(buff);
+
+                sprintf_s(buff, "\t\t[%f %f %f %f]\n",
+                    m->_41, m->_42, m->_43, m->_44);
+                OutputDebugStringA(buff);
+            }
+        }
+    }
+}
+
+SkinningData::SkinningData(_In_ Model* model) :
+    m_model(model)
+{
+    assert(model != 0);
+
+    size_t nbones = model->bones.size();
+    if (!nbones)
+        throw std::runtime_error("Model has no bones!");
+
+    m_bindPose = ModelBone::MakeArray(nbones);
+    model->CopyAbsoluteBoneTransformsTo(nbones, m_bindPose.get());
+
+    m_invBindPose = ModelBone::MakeArray(nbones);
+    for (size_t j = 0; j < nbones; ++j)
+    {
+        m_invBindPose[j] = XMMatrixInverse(nullptr, m_bindPose[j]);
     }
 }
 
@@ -281,16 +337,6 @@ void Game::Render()
     local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(2.f, row1, 0.f));
     local = XMMatrixMultiply(world, local);
 
-    auto bindPose = ModelBone::MakeArray(m_soldier->bones.size());
-    m_soldier->CopyAbsoluteBoneTransformsTo(m_soldier->bones.size(), bindPose.get());
-        // For SDKMESH skinning, the matrix data is the bind pose
-
-    auto invBindPose = ModelBone::MakeArray(m_soldier->bones.size());
-    for (size_t j = 0; j < m_soldier->bones.size(); ++j)
-    {
-        invBindPose[j] = XMMatrixInverse(nullptr, bindPose[j]);
-    }
-
     auto animBones = ModelBone::MakeArray(m_soldier->bones.size());
     m_soldier->CopyBoneTransformsTo(m_soldier->bones.size(), animBones.get());
     animBones[upperArmL] = XMMatrixRotationX(time * XM_PI);
@@ -306,7 +352,7 @@ void Game::Render()
 
     for (size_t j = 0; j < m_soldier->bones.size(); ++j)
     {
-        bones[j] = XMMatrixMultiply(invBindPose[j], targetBones[j]);
+        bones[j] = XMMatrixMultiply(m_soldierSkin->m_invBindPose[j], targetBones[j]);
     }
 
     m_soldier->DrawSkinned(context, *m_states,
@@ -430,21 +476,31 @@ void Game::CreateDeviceDependentResources()
 #endif
 
     // Visual Studio CMO
-    ModelLoaderFlags flags = ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise;
-    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags | ModelLoader_IncludeBones);
+    ModelLoaderFlags flags = (ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise)
+        | ModelLoader_IncludeBones;
+    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags);
 
     DumpBones(m_teapot->bones, "teapot.cmo");
 
     // DirectX SDK Mesh
-    flags = ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise;
+    flags = (ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise)
+        | ModelLoader_IncludeBones;
 
-    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, flags | ModelLoader_IncludeBones);
+    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, flags);
 
     DumpBones(m_tank->bones, "TankScene.sdkmesh");
 
-    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, flags | ModelLoader_IncludeBones);
+    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, flags);
 
     DumpBones(m_soldier->bones, "soldier.sdkmesh");
+
+    // Setup skinning data
+    m_teapotSkin = std::make_unique<SkinningData>(m_teapot.get());
+
+    //DumpMatrices(m_teapot->bones.size(), m_teapot->boneMatrices.get(), "teapot.cmo");
+    //DumpMatrices(m_teapot->bones.size(), m_teapotSkin->m_bindPose.get(), "teapot.cmo");
+
+    m_soldierSkin = std::make_unique<SkinningData>(m_soldier.get());
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -473,6 +529,9 @@ void Game::CreateWindowSizeDependentResources()
 void Game::OnDeviceLost()
 {
     m_states.reset();
+
+    m_teapotSkin.reset();
+    m_soldierSkin.reset();
 
     m_teapot.reset();
     m_soldier.reset();
