@@ -26,6 +26,13 @@ class Game
 public:
 
     Game() noexcept(false);
+    ~Game() = default;
+
+    Game(Game&&) = default;
+    Game& operator= (Game&&) = default;
+
+    Game(Game const&) = delete;
+    Game& operator= (Game const&) = delete;
 
     // Initialization and management
 #ifdef COREWINDOW

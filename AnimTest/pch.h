@@ -77,6 +77,8 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <cstdio>
 #include <cwchar>
