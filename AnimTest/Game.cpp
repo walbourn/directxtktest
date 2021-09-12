@@ -195,19 +195,21 @@ void Game::Render()
     constexpr uint32_t rootBone = 0;
     uint32_t tankBone = ModelBone::c_Invalid;
     uint32_t barricadeBone = ModelBone::c_Invalid;
-    uint32_t count = 0;
-    for (auto it : m_tank->bones)
     {
-        if (_wcsicmp(L"tank_geo", it.name.c_str()) == 0)
+        uint32_t count = 0;
+        for (auto it : m_tank->bones)
         {
-            tankBone = count;
-        }
-        else if (_wcsicmp(L"barricade_geo", it.name.c_str()) == 0)
-        {
-            barricadeBone = count;
-        }
+            if (_wcsicmp(L"tank_geo", it.name.c_str()) == 0)
+            {
+                tankBone = count;
+            }
+            else if (_wcsicmp(L"barricade_geo", it.name.c_str()) == 0)
+            {
+                barricadeBone = count;
+            }
 
-        ++count;
+            ++count;
+        }
     }
 
     m_tank->boneMatrices[rootBone] = XMMatrixRotationY((time / 10.f) * XM_PI);
@@ -217,10 +219,11 @@ void Game::Render()
 
     auto bones = ModelBone::MakeArray(m_tank->bones.size());
     m_tank->CopyAbsoluteBoneTransformsTo(m_tank->bones.size(), bones.get());
+        // For SDKMESH rigid-body, the matrix data is the local position to use.
 
     m_tank->Draw(context, *m_states, m_tank->bones.size(), bones.get(), local, m_view, m_projection);
 
-    // Teapot
+    // Teapot (direct-mapped bones)
     m_teapot->UpdateEffects([&](IEffect* effect)
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
@@ -230,16 +233,41 @@ void Game::Render()
     local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-2.f, row0, 0.f));
     m_teapot->Draw(context, *m_states, local, m_view, m_projection);
 
-    m_teapot->UpdateEffects([&](IEffect* effect)
-    {
-        auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
-        if (skinnedEffect)
-            skinnedEffect->SetBoneTransforms(m_bones.get(), SkinnedEffect::MaxBones);
-    });
     local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-2.f, row1, 0.f));
-    m_teapot->Draw(context, *m_states, local, m_view, m_projection);
+    m_teapot->DrawSkinned(context, *m_states,
+        m_teapot->bones.size(), m_bones.get(),
+        local, m_view, m_projection);
 
-    // Draw SDKMESH models
+    // Draw SDKMESH models (bone influences)
+    uint32_t upperArmR = ModelBone::c_Invalid;
+    uint32_t upperArmL = ModelBone::c_Invalid;
+    uint32_t leftLeg = ModelBone::c_Invalid;
+    uint32_t rightLeg = ModelBone::c_Invalid;
+    {
+        uint32_t count = 0;
+        for (auto it : m_soldier->bones)
+        {
+            if (_wcsicmp(L"R_UpperArm", it.name.c_str()) == 0)
+            {
+                upperArmR = count;
+            }
+            else if (_wcsicmp(L"L_UpperArm", it.name.c_str()) == 0)
+            {
+                upperArmL = count;
+            }
+            else if (_wcsicmp(L"L_Thigh1", it.name.c_str()) == 0)
+            {
+                leftLeg = count;
+            }
+            else if (_wcsicmp(L"R_Thigh", it.name.c_str()) == 0)
+            {
+                rightLeg = count;
+            }
+
+            ++count;
+        }
+    }
+
     m_soldier->UpdateEffects([&](IEffect* effect)
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
@@ -250,15 +278,40 @@ void Game::Render()
     local = XMMatrixMultiply(world, local);
     m_soldier->Draw(context, *m_states, local, m_view, m_projection);
 
-    m_soldier->UpdateEffects([&](IEffect* effect)
-    {
-        auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
-        if (skinnedEffect)
-            skinnedEffect->SetBoneTransforms(m_bones.get(), SkinnedEffect::MaxBones);
-    });
     local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(2.f, row1, 0.f));
     local = XMMatrixMultiply(world, local);
-    m_soldier->Draw(context, *m_states, local, m_view, m_projection);
+
+    auto bindPose = ModelBone::MakeArray(m_soldier->bones.size());
+    m_soldier->CopyAbsoluteBoneTransformsTo(m_soldier->bones.size(), bindPose.get());
+        // For SDKMESH skinning, the matrix data is the bind pose
+
+    auto invBindPose = ModelBone::MakeArray(m_soldier->bones.size());
+    for (size_t j = 0; j < m_soldier->bones.size(); ++j)
+    {
+        invBindPose[j] = XMMatrixInverse(nullptr, bindPose[j]);
+    }
+
+    auto animBones = ModelBone::MakeArray(m_soldier->bones.size());
+    m_soldier->CopyBoneTransformsTo(m_soldier->bones.size(), animBones.get());
+    animBones[upperArmL] = XMMatrixRotationX(time * XM_PI);
+    animBones[upperArmR] = XMMatrixRotationX(time * XM_PI);
+    animBones[rightLeg] = XMMatrixMultiply(XMMatrixRotationX(-time * XM_PI), XMMatrixRotationZ(XM_PIDIV2  + XM_PIDIV4));
+    animBones[leftLeg] = XMMatrixMultiply(XMMatrixRotationX(time * XM_PI), XMMatrixRotationZ(XM_PI));
+
+    auto targetBones = ModelBone::MakeArray(m_soldier->bones.size());
+    m_soldier->CopyAbsoluteBoneTransforms(m_soldier->bones.size(),
+        animBones.get(), targetBones.get());
+
+    bones = ModelBone::MakeArray(m_soldier->bones.size());
+
+    for (size_t j = 0; j < m_soldier->bones.size(); ++j)
+    {
+        bones[j] = XMMatrixMultiply(invBindPose[j], targetBones[j]);
+    }
+
+    m_soldier->DrawSkinned(context, *m_states,
+        m_soldier->bones.size(), bones.get(),
+        local, m_view, m_projection);
 
     // Show the new frame.
     m_deviceResources->Present();
