@@ -492,12 +492,12 @@ void Game::CreateDeviceDependentResources()
     ModelLoaderFlags flags = (ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise)
         | ModelLoader_IncludeBones;
 
-    size_t clipsOffset;
-    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags, &clipsOffset);
+    size_t animsOffset;
+    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags, &animsOffset);
 
     DumpBones(m_teapot->bones, "teapot.cmo");
 
-    if (!clipsOffset)
+    if (!animsOffset)
     {
         OutputDebugStringA("ERROR: 'teapot.cmo' - No animation clips found in file!\n");
     }
