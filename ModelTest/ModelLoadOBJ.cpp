@@ -47,8 +47,8 @@ namespace
     //----------------------------------------------------------------------------------
     // Shared VB input element description
     INIT_ONCE g_InitOnce = INIT_ONCE_STATIC_INIT;
-    std::shared_ptr<std::vector<D3D11_INPUT_ELEMENT_DESC>> g_vbdecl;
-    std::shared_ptr<std::vector<D3D11_INPUT_ELEMENT_DESC>> g_vbdeclInst;
+    std::shared_ptr<ModelMeshPart::InputLayoutList> g_vbdecl;
+    std::shared_ptr<ModelMeshPart::InputLayoutList> g_vbdeclInst;
 
     static const D3D11_INPUT_ELEMENT_DESC s_instElements[] =
     {
@@ -63,10 +63,10 @@ namespace
         UNREFERENCED_PARAMETER(initOnce);
         UNREFERENCED_PARAMETER(Parameter);
         UNREFERENCED_PARAMETER(lpContext);
-        g_vbdecl = std::make_shared<std::vector<D3D11_INPUT_ELEMENT_DESC>>(VertexPositionNormalTexture::InputElements,
+        g_vbdecl = std::make_shared<ModelMeshPart::InputLayoutList>(VertexPositionNormalTexture::InputElements,
             VertexPositionNormalTexture::InputElements + VertexPositionNormalTexture::InputElementCount);
 
-        g_vbdeclInst = std::make_shared<std::vector<D3D11_INPUT_ELEMENT_DESC>>(VertexPositionNormalTexture::InputElements,
+        g_vbdeclInst = std::make_shared<ModelMeshPart::InputLayoutList>(VertexPositionNormalTexture::InputElements,
             VertexPositionNormalTexture::InputElements + VertexPositionNormalTexture::InputElementCount);
         g_vbdeclInst->push_back(s_instElements[0]);
         g_vbdeclInst->push_back(s_instElements[1]);
