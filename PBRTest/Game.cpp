@@ -57,7 +57,7 @@ namespace
     constexpr float row2 = -1.1f;
     constexpr float row3 = -2.5f;
 
-    void ReadVBO(_In_z_ const wchar_t* name, std::vector<VertexPositionNormalTexture>& vertices, std::vector<uint16_t>& indices)
+    void ReadVBO(_In_z_ const wchar_t* name, GeometricPrimitive::VertexCollection& vertices, GeometricPrimitive::IndexCollection& indices)
     {
         std::vector<uint8_t> blob;
         {
@@ -868,8 +868,8 @@ void Game::CreateDeviceDependentResources()
 
     // Create test geometry
     {
-        std::vector<GeometricPrimitive::VertexType> vertices;
-        std::vector<uint16_t> indices;
+        GeometricPrimitive::VertexCollection vertices;
+        GeometricPrimitive::IndexCollection indices;
 
         GeometricPrimitive::CreateSphere(vertices, indices);
 
@@ -903,8 +903,8 @@ void Game::CreateDeviceDependentResources()
 
     // Create cube geometry
     {
-        std::vector<GeometricPrimitive::VertexType> vertices;
-        std::vector<uint16_t> indices;
+        GeometricPrimitive::VertexCollection vertices;
+        GeometricPrimitive::IndexCollection indices;
 
         ReadVBO(L"BrokenCube.vbo", vertices, indices);
 
