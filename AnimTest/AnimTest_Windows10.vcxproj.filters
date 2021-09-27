@@ -30,6 +30,7 @@
     <ClCompile Include="..\Common\MainUWP.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="Animation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="..\Common\DirectXTKTest.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="Animation.h" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageUWP.appxmanifest" />
@@ -106,6 +108,9 @@
     </None>
     <None Include="teapot.cmo">
       <Filter>Assets\VSStarter</Filter>
+    </None>
+    <None Include="soldier.sdkmesh_anim">
+      <Filter>Assets\Soldier</Filter>
     </None>
   </ItemGroup>
 </Project>

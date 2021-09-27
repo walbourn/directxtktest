@@ -517,6 +517,8 @@ void Game::CreateDeviceDependentResources()
     m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, flags);
 
     DumpBones(m_soldier->bones, "soldier.sdkmesh");
+
+    DX::ThrowIfFailed(m_soldierAnim.Load(L"soldier.sdkmesh_anim"));
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

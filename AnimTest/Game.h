@@ -10,6 +10,7 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
+#include "Animation.h"
 #include "DirectXTKTest.h"
 #include "StepTimer.h"
 
@@ -108,4 +109,6 @@ private:
     DirectX::SimpleMath::Matrix             m_projection;
 
     DirectX::ModelBone::TransformArray      m_bones;
+
+    DX::AnimationSDKMESH                    m_soldierAnim;
 };
