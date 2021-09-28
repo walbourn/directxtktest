@@ -307,37 +307,6 @@ void Game::Render()
         local, m_view, m_projection);
 
     // Draw SDKMESH models (bone influences)
-    uint32_t upperArmR = ModelBone::c_Invalid;
-    uint32_t upperArmL = ModelBone::c_Invalid;
-    uint32_t leftLeg = ModelBone::c_Invalid;
-    uint32_t rightLeg = ModelBone::c_Invalid;
-    nbones = 0;
-    {
-        for (auto it : m_soldier->bones)
-        {
-            if (_wcsicmp(L"R_UpperArm", it.name.c_str()) == 0)
-            {
-                upperArmR = nbones;
-            }
-            else if (_wcsicmp(L"L_UpperArm", it.name.c_str()) == 0)
-            {
-                upperArmL = nbones;
-            }
-            else if (_wcsicmp(L"L_Thigh1", it.name.c_str()) == 0)
-            {
-                leftLeg = nbones;
-            }
-            else if (_wcsicmp(L"R_Thigh", it.name.c_str()) == 0)
-            {
-                rightLeg = nbones;
-            }
-
-            ++nbones;
-        }
-
-        assert(nbones == m_soldier->bones.size());
-    }
-
     m_soldier->UpdateEffects([&](IEffect* effect)
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
@@ -349,24 +318,12 @@ void Game::Render()
     m_soldier->Draw(context, *m_states, local, m_view, m_projection);
 
     local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(2.f, row1, 0.f));
+    local = XMMatrixMultiply(XMMatrixRotationY(XM_PI), local);
     local = XMMatrixMultiply(world, local);
 
-    animBones = ModelBone::MakeArray(nbones);
-    m_soldier->CopyBoneTransformsTo(nbones, animBones.get());
-    animBones[upperArmL] = XMMatrixRotationX(time * XM_PI);
-    animBones[upperArmR] = XMMatrixRotationX(time * XM_PI);
-    animBones[rightLeg] = XMMatrixMultiply(XMMatrixRotationX(-time * XM_PI), XMMatrixRotationZ(XM_PIDIV2  + XM_PIDIV4));
-    animBones[leftLeg] = XMMatrixMultiply(XMMatrixRotationX(time * XM_PI), XMMatrixRotationZ(XM_PI));
-
-    targetBones = ModelBone::MakeArray(nbones);
-    m_soldier->CopyAbsoluteBoneTransforms(nbones, animBones.get(), targetBones.get());
-
+    nbones = m_soldier->bones.size();
     bones = ModelBone::MakeArray(nbones);
-
-    for (size_t j = 0; j < nbones; ++j)
-    {
-        bones[j] = XMMatrixMultiply(m_soldier->invBindPoseMatrices[j], targetBones[j]);
-    }
+    m_soldierAnim.Apply(*m_soldier, m_timer.GetTotalSeconds(), m_soldier->bones.size(), bones.get());
 
     m_soldier->DrawSkinned(context, *m_states,
         nbones, bones.get(),
@@ -519,6 +476,11 @@ void Game::CreateDeviceDependentResources()
     DumpBones(m_soldier->bones, "soldier.sdkmesh");
 
     DX::ThrowIfFailed(m_soldierAnim.Load(L"soldier.sdkmesh_anim"));
+
+    if (!m_soldierAnim.Bind(*m_soldier))
+    {
+        OutputDebugStringA("ERROR: Bind of soldier to animation failed to find any matching bones!\n");
+    }
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

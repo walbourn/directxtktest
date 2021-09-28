@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: Animation.h
 //
-// Simple animation playback system for SDKMESH and CMO
+// Simple animation playback system for SDKMESH for DirectX Tool Kit
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -12,6 +12,7 @@
 #include <Model.h>
 
 #include <memory>
+#include <vector>
 
 
 namespace DX
@@ -34,10 +35,22 @@ namespace DX
         {
             m_animData.reset();
             m_animSize = 0;
+            m_boneToTrack.clear();
+            m_animBones.reset();
         }
 
+        bool Bind(const DirectX::Model& model);
+
+        void Apply(
+            const DirectX::Model& model,
+            double time,
+            size_t nbones,
+            _Out_writes_(nbones) DirectX::XMMATRIX* boneTransforms) const;
+
     private:
-        std::unique_ptr<uint8_t[]>  m_animData;
-        size_t                      m_animSize;
+        std::unique_ptr<uint8_t[]>          m_animData;
+        size_t                              m_animSize;
+        std::vector<uint32_t>               m_boneToTrack;
+        DirectX::ModelBone::TransformArray  m_animBones;
     };
 }
