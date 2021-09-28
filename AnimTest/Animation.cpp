@@ -159,7 +159,7 @@ bool AnimationSDKMESH::Bind(const Model& model)
         {
             if (_wcsicmp(frameName, it.name.c_str()) == 0)
             {
-                m_boneToTrack[count] = j;
+                m_boneToTrack[count] = static_cast<uint32_t>(j);
                 result = true;
                 break;
             }

@@ -60,7 +60,7 @@ namespace
 
     void DumpMatrices(
         size_t nbones,
-        _In_reads_(nbones) const XMMATRIX *boneTransforms,
+        _In_reads_(nbones) const XMMATRIX* boneTransforms,
         _In_z_ const char* name)
     {
         char buff[128] = {};
@@ -321,7 +321,7 @@ void Game::Render()
     local = XMMatrixMultiply(XMMatrixRotationY(XM_PI), local);
     local = XMMatrixMultiply(world, local);
 
-    nbones = m_soldier->bones.size();
+    nbones = static_cast<uint32_t>(m_soldier->bones.size());
     bones = ModelBone::MakeArray(nbones);
     m_soldierAnim.Apply(*m_soldier, m_timer.GetTotalSeconds(), m_soldier->bones.size(), bones.get());
 
