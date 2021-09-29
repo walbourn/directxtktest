@@ -484,8 +484,11 @@ void Game::CreateWindowSizeDependentResources()
 #endif
 
 #ifdef UWP
-    XMMATRIX orient = XMLoadFloat4x4(&m_deviceResources->GetOrientationTransform3D());
-    m_projection *= orient;
+    {
+        auto orient3d = m_deviceResources->GetOrientationTransform3D();
+        XMMATRIX orient = XMLoadFloat4x4(&orient3d);
+        m_projection *= orient;
+    }
 #endif
 }
 
