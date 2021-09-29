@@ -12,6 +12,7 @@
     <ClInclude Include="..\Common\DirectXTKTest.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="Animation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
@@ -22,6 +23,7 @@
     <ClCompile Include="..\Common\MainXDK.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="Animation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageXDK.appxmanifest" />
@@ -105,6 +107,9 @@
     </None>
     <None Include="TankScene.sdkmesh">
       <Filter>Assets\Tank</Filter>
+    </None>
+    <None Include="soldier.sdkmesh_anim">
+      <Filter>Assets\Soldier</Filter>
     </None>
   </ItemGroup>
 </Project>

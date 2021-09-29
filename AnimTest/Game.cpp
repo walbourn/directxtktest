@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: Game.cpp
 //
-// Developer unit test for DirectXTK Model animation (under development)
+// Developer unit test for DirectXTK Model animation
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -20,20 +20,83 @@
 // Build for LH vs. RH coords
 //#define LH_COORDS
 
-namespace
-{
-    constexpr float row0 = 2.f;
-    constexpr float row1 = 0.f;
-    constexpr float row2 = -2.f;
-}
-
 extern void ExitGame() noexcept;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
- 
+
+namespace
+{
+    constexpr float row0 = 2.f;
+    constexpr float row1 = 0.f;
+    constexpr float row2 = -2.f;
+
+    void DumpBones(const ModelBone::Collection& bones, _In_z_ const char* name)
+    {
+        char buff[128] = {};
+        if (bones.empty())
+        {
+            sprintf_s(buff, "ERROR: %s is missing model bones!\n", name);
+            OutputDebugStringA(buff);
+        }
+        else
+        {
+            sprintf_s(buff, "%s: contains %zu bones\n", name, bones.size());
+            OutputDebugStringA(buff);
+
+            for (auto it : bones)
+            {
+                sprintf_s(buff, "\t'%ls' (%s | %s | %s)\n",
+                    it.name.c_str(),
+                    (it.childIndex != ModelBone::c_Invalid) ? "has children" : "no children",
+                    (it.siblingIndex != ModelBone::c_Invalid) ? "has sibling" : "no siblings",
+                    (it.parentIndex != ModelBone::c_Invalid) ? "has parent" : "no parent");
+                OutputDebugStringA(buff);
+            }
+        }
+    }
+
+    void DumpMatrices(
+        size_t nbones,
+        _In_reads_(nbones) const XMMATRIX* boneTransforms,
+        _In_z_ const char* name)
+    {
+        char buff[128] = {};
+        if (!nbones || !boneTransforms)
+        {
+            sprintf_s(buff, "ERROR: %s is missing bone transforms!\n", name);
+            OutputDebugStringA(buff);
+        }
+        else
+        {
+            sprintf_s(buff, "%s: transforms for %zu bones\n", name, nbones);
+            OutputDebugStringA(buff);
+
+            for (size_t j = 0; j < nbones; ++j)
+            {
+                auto m = reinterpret_cast<const XMFLOAT4X4*>(&boneTransforms[j]);
+                sprintf_s(buff, "\t[%zu]\t[%f %f %f %f]\n",
+                    j, m->_11, m->_12, m->_13, m->_14);
+                OutputDebugStringA(buff);
+
+                sprintf_s(buff, "\t\t[%f %f %f %f]\n",
+                    m->_21, m->_22, m->_23, m->_24);
+                OutputDebugStringA(buff);
+
+                sprintf_s(buff, "\t\t[%f %f %f %f]\n",
+                    m->_31, m->_32, m->_33, m->_34);
+                OutputDebugStringA(buff);
+
+                sprintf_s(buff, "\t\t[%f %f %f %f]\n",
+                    m->_41, m->_42, m->_43, m->_44);
+                OutputDebugStringA(buff);
+            }
+        }
+    }
+}
+
 Game::Game() noexcept(false)
 {
 #ifdef GAMMA_CORRECT_RENDERING
@@ -98,9 +161,9 @@ void Game::Initialize(
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
 
-    m_bones.reset(reinterpret_cast<XMMATRIX*>(_aligned_malloc(sizeof(XMMATRIX) * SkinnedEffect::MaxBones, 16)));
+    m_bones = ModelBone::MakeArray(IEffectSkinning::MaxBones);
     XMMATRIX id = XMMatrixIdentity();
-    for (size_t j = 0; j < SkinnedEffect::MaxBones; ++j)
+    for (size_t j = 0; j < IEffectSkinning::MaxBones; ++j)
     {
         m_bones[j] = id;
     }
@@ -119,14 +182,19 @@ void Game::Tick()
 }
 
 // Updates the world.
-void Game::Update(DX::StepTimer const&)
+void Game::Update(DX::StepTimer const& timer)
 {
+    float elapsedTime = float(timer.GetElapsedSeconds());
+
     auto pad = m_gamePad->GetState(0);
     auto kb = m_keyboard->GetState();
     if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
     {
         ExitGame();
     }
+
+    m_soldierAnim.Update(elapsedTime);
+    m_teapotAnim.Update(elapsedTime);
 }
 #pragma endregion
 
@@ -162,10 +230,44 @@ void Game::Render()
 
     auto context = m_deviceResources->GetD3DDeviceContext();
 
+    // Tank scene (rigid-body animation)
     XMMATRIX local = XMMatrixMultiply(XMMatrixScaling(0.3f, 0.3f, 0.3f), XMMatrixTranslation(0.f, row2, 0.f));
     local = XMMatrixMultiply(world, local);
-    m_tank->Draw(context, *m_states, local, m_view, m_projection);
 
+    constexpr uint32_t rootBone = 0;
+    uint32_t tankBone = ModelBone::c_Invalid;
+    uint32_t barricadeBone = ModelBone::c_Invalid;
+    uint32_t nbones = 0;
+    {
+        for (auto it : m_tank->bones)
+        {
+            if (_wcsicmp(L"tank_geo", it.name.c_str()) == 0)
+            {
+                tankBone = nbones;
+            }
+            else if (_wcsicmp(L"barricade_geo", it.name.c_str()) == 0)
+            {
+                barricadeBone = nbones;
+            }
+
+            ++nbones;
+        }
+
+        assert(nbones == m_tank->bones.size());
+    }
+
+    m_tank->boneMatrices[rootBone] = XMMatrixRotationY((time / 10.f) * XM_PI);
+    m_tank->boneMatrices[tankBone] = XMMatrixRotationY(time * XM_PI);
+
+    m_tank->boneMatrices[barricadeBone] = XMMatrixTranslation(0.f, cosf(time) * 2.f, 0.f);
+
+    auto bones = ModelBone::MakeArray(nbones);
+    m_tank->CopyAbsoluteBoneTransformsTo(nbones, bones.get());
+        // For SDKMESH rigid-body, the matrix data is the local position to use.
+
+    m_tank->Draw(context, *m_states, nbones, bones.get(), local, m_view, m_projection);
+
+    // Teapot (direct-mapped bones)
     m_teapot->UpdateEffects([&](IEffect* effect)
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
@@ -175,16 +277,16 @@ void Game::Render()
     local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-2.f, row0, 0.f));
     m_teapot->Draw(context, *m_states, local, m_view, m_projection);
 
-    m_teapot->UpdateEffects([&](IEffect* effect)
-    {
-        auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
-        if (skinnedEffect)
-            skinnedEffect->SetBoneTransforms(m_bones.get(), SkinnedEffect::MaxBones);
-    });
-    local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-2.f, row1, 0.f));
-    m_teapot->Draw(context, *m_states, local, m_view, m_projection);
+    nbones = static_cast<uint32_t>(m_teapot->bones.size());
+    bones = ModelBone::MakeArray(nbones);
+    m_teapotAnim.Apply(*m_teapot, m_teapot->bones.size(), bones.get());
 
-    // Draw SDKMESH models
+    local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-2.f, row1, 0.f));
+    m_teapot->DrawSkinned(context, *m_states,
+        nbones, bones.get(),
+        local, m_view, m_projection);
+
+    // Draw SDKMESH models (bone influences)
     m_soldier->UpdateEffects([&](IEffect* effect)
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
@@ -195,15 +297,17 @@ void Game::Render()
     local = XMMatrixMultiply(world, local);
     m_soldier->Draw(context, *m_states, local, m_view, m_projection);
 
-    m_soldier->UpdateEffects([&](IEffect* effect)
-    {
-        auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
-        if (skinnedEffect)
-            skinnedEffect->SetBoneTransforms(m_bones.get(), SkinnedEffect::MaxBones);
-    });
     local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(2.f, row1, 0.f));
+    local = XMMatrixMultiply(XMMatrixRotationY(XM_PI), local);
     local = XMMatrixMultiply(world, local);
-    m_soldier->Draw(context, *m_states, local, m_view, m_projection);
+
+    nbones = static_cast<uint32_t>(m_soldier->bones.size());
+    bones = ModelBone::MakeArray(nbones);
+    m_soldierAnim.Apply(*m_soldier, m_soldier->bones.size(), bones.get());
+
+    m_soldier->DrawSkinned(context, *m_states,
+        nbones, bones.get(),
+        local, m_view, m_projection);
 
     // Show the new frame.
     m_deviceResources->Present();
@@ -322,12 +426,45 @@ void Game::CreateDeviceDependentResources()
 #endif
 
     // Visual Studio CMO
-    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
+    ModelLoaderFlags flags = (ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise)
+        | ModelLoader_IncludeBones;
+
+    size_t animsOffset;
+    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags, &animsOffset);
+
+    DumpBones(m_teapot->bones, "teapot.cmo");
+
+    if (!animsOffset)
+    {
+        OutputDebugStringA("ERROR: 'teapot.cmo' - No animation clips found in file!\n");
+    }
+    else
+    {
+        DX::ThrowIfFailed(m_teapotAnim.Load(L"teapot.cmo", animsOffset, L"Take 001"));
+
+        OutputDebugStringA("'teapot.cmo' contains animation clips.\n");
+    }
 
     // DirectX SDK Mesh
-    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    flags = (ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise)
+        | ModelLoader_IncludeBones;
 
-    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_tank = Model::CreateFromSDKMESH(device, L"TankScene.sdkmesh", *m_fxFactory, flags);
+
+    DumpBones(m_tank->bones, "TankScene.sdkmesh");
+
+    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, flags);
+
+    DumpBones(m_soldier->bones, "soldier.sdkmesh");
+
+    DX::ThrowIfFailed(m_soldierAnim.Load(L"soldier.sdkmesh_anim"));
+
+    if (!m_soldierAnim.Bind(*m_soldier))
+    {
+        OutputDebugStringA("ERROR: Bind of soldier to animation failed to find any matching bones!\n");
+    }
+
+    m_teapotAnim.Bind(*m_teapot);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

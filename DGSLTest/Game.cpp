@@ -109,10 +109,9 @@ void Game::Initialize(
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
 
-    m_bones.reset(reinterpret_cast<XMMATRIX*>(_aligned_malloc(sizeof(XMMATRIX) * SkinnedEffect::MaxBones, 16)));
-
+    m_bones = ModelBone::MakeArray(DGSLEffect::MaxBones);
     XMMATRIX id = XMMatrixIdentity();
-    for (size_t j = 0; j < SkinnedEffect::MaxBones; ++j)
+    for (size_t j = 0; j < DGSLEffect::MaxBones; ++j)
     {
         m_bones[j] = id;
     }
@@ -419,19 +418,23 @@ void Game::CreateDeviceDependentResources()
 #endif
 
     // Visual Studio CMO
-    m_teapotUnlit = Model::CreateFromCMO(device, L"teapot_unlit.cmo", *m_fx, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
-    m_teapotLambert = Model::CreateFromCMO(device, L"teapot_lambert.cmo", *m_fx, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
-    m_teapotPhong = Model::CreateFromCMO(device, L"teapot_phong.cmo", *m_fx, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
-    m_teapotTest = Model::CreateFromCMO(device, L"teapot_phong.cmo", *m_fx, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
+    ModelLoaderFlags flags = ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise;
 
-    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fx, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
+    m_teapotUnlit = Model::CreateFromCMO(device, L"teapot_unlit.cmo", *m_fx, flags);
+    m_teapotLambert = Model::CreateFromCMO(device, L"teapot_lambert.cmo", *m_fx, flags);
+    m_teapotPhong = Model::CreateFromCMO(device, L"teapot_phong.cmo", *m_fx, flags);
+    m_teapotTest = Model::CreateFromCMO(device, L"teapot_phong.cmo", *m_fx, flags);
 
-    m_gamelevel = Model::CreateFromCMO(device, L"gamelevel.cmo", *m_fx, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
+    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fx, flags);
 
-    m_ship = Model::CreateFromCMO(device, L"25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo", *m_fx, ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise);
+    m_gamelevel = Model::CreateFromCMO(device, L"gamelevel.cmo", *m_fx, flags);
+
+    m_ship = Model::CreateFromCMO(device, L"25ab10e8-621a-47d4-a63d-f65a00bc1549_model.cmo", *m_fx, flags);
 
     // DirectX SDK Mesh
-    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fx, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    flags = ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise;
+
+    m_soldier = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fx, flags);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

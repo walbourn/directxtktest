@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: Game.h
 //
-// Developer unit test for DirectXTK Model animation (under development)
+// Developer unit test for DirectXTK Model animation
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -10,10 +10,9 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
+#include "Animation.h"
 #include "DirectXTKTest.h"
 #include "StepTimer.h"
-
-#include "PlatformHelpers.h"
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -109,5 +108,8 @@ private:
     DirectX::SimpleMath::Matrix             m_view;
     DirectX::SimpleMath::Matrix             m_projection;
 
-    std::unique_ptr<DirectX::XMMATRIX[], DirectX::aligned_deleter> m_bones;
+    DirectX::ModelBone::TransformArray      m_bones;
+
+    DX::AnimationSDKMESH                    m_soldierAnim;
+    DX::AnimationCMO                        m_teapotAnim;
 };
