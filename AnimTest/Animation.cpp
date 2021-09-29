@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: Animation.cpp
 //
-// Simple animation playback system for SDKMESH for DirectX Tool Kit
+// Simple animation playback system for CMO and SDKMESH for DirectX Tool Kit
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -17,6 +17,9 @@
 using namespace DX;
 using namespace DirectX;
 
+//--------------------------------------------------------------------------------------
+// DirectX SDK SDKMESH animation
+//--------------------------------------------------------------------------------------
 namespace
 {
 #pragma pack(push,8)
@@ -63,6 +66,7 @@ namespace
 }
 
 AnimationSDKMESH::AnimationSDKMESH() noexcept :
+    m_animTime(0.0),
     m_animSize(0)
 {
 }
@@ -173,9 +177,14 @@ bool AnimationSDKMESH::Bind(const Model& model)
     return result;
 }
 
+void AnimationSDKMESH::Update(float delta)
+{
+    m_animTime += delta;
+}
+
+_Use_decl_annotations_
 void AnimationSDKMESH::Apply(
     const DirectX::Model& model,
-    double time,
     size_t nbones,
     XMMATRIX* boneTransforms) const
 {
@@ -200,7 +209,7 @@ void AnimationSDKMESH::Apply(
     assert(header->Version == SDKMESH_FILE_VERSION);
 
     // Determine animation time
-    auto tick = static_cast<uint32_t>(header->AnimationFPS * time);
+    auto tick = static_cast<uint32_t>(header->AnimationFPS * m_animTime);
     tick %= header->NumAnimationKeys;
 
     // Compute local bone transforms
@@ -228,6 +237,205 @@ void AnimationSDKMESH::Apply(
             XMMATRIX scale = XMMatrixScaling(data->Scaling.x, data->Scaling.y, data->Scaling.z);
 
             m_animBones[j] = XMMatrixMultiply(XMMatrixMultiply(rotation, scale), trans);
+        }
+    }
+
+    // Compute absolute locations
+    model.CopyAbsoluteBoneTransforms(nbones, m_animBones.get(), boneTransforms);
+
+    // Adjust for model's bind pose.
+    for (size_t j = 0; j < nbones; ++j)
+    {
+        boneTransforms[j] = XMMatrixMultiply(model.invBindPoseMatrices[j], boneTransforms[j]);
+    }
+}
+
+
+//--------------------------------------------------------------------------------------
+// Visual Studio Starter Kit CMO animation
+//--------------------------------------------------------------------------------------
+namespace
+{
+#pragma pack(push,1)
+
+    struct Clip
+    {
+        float StartTime;
+        float EndTime;
+        uint32_t keys;
+    };
+
+    static_assert(sizeof(Clip) == 12, "CMO Mesh structure size incorrect");
+
+    struct Keyframe
+    {
+        uint32_t BoneIndex;
+        float Time;
+        DirectX::XMFLOAT4X4 Transform;
+    };
+
+    static_assert(sizeof(Keyframe) == 72, "CMO Mesh structure size incorrect");
+
+#pragma pack(pop)
+}
+
+AnimationCMO::AnimationCMO() noexcept :
+    m_animTime(0.f),
+    m_startTime(0.f),
+    m_endTime(0.f)
+{
+}
+
+_Use_decl_annotations_
+HRESULT AnimationCMO::Load(const wchar_t* fileName, size_t offset, const wchar_t* clipName)
+{
+    if (!fileName || !offset)
+        return E_INVALIDARG;
+
+    std::ifstream inFile(fileName, std::ios::in | std::ios::binary | std::ios::ate);
+    if (!inFile)
+        return E_FAIL;
+
+    std::streampos len = inFile.tellg();
+    if (!inFile)
+        return E_FAIL;
+
+    if (len > UINT32_MAX)
+        return HRESULT_FROM_WIN32(ERROR_FILE_TOO_LARGE);
+
+    inFile.seekg(static_cast<std::streamoff>(offset), std::ios::beg);
+    if (!inFile)
+        return E_FAIL;
+
+    auto remaining = len - static_cast<std::streamoff>(offset);
+
+    if (remaining < sizeof(uint32_t))
+        return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
+
+    auto dataSize = static_cast<size_t>(remaining);
+    std::unique_ptr<uint8_t[]> blob(new (std::nothrow) uint8_t[dataSize]);
+    if (!blob)
+        return E_OUTOFMEMORY;
+
+    inFile.read(reinterpret_cast<char*>(blob.get()), remaining);
+    if (!inFile)
+        return E_FAIL;
+
+    inFile.close();
+
+    auto nClips = reinterpret_cast<const uint32_t*>(blob.get());
+    size_t usedSize = sizeof(uint32_t);
+    if (dataSize < usedSize)
+        return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
+
+    if (!nClips)
+        return E_FAIL;
+
+    for (size_t j = 0; j < *nClips; ++j)
+    {
+        // Clip name
+        auto nName = reinterpret_cast<const uint32_t*>(blob.get() + usedSize);
+        usedSize += sizeof(uint32_t);
+        if (dataSize < usedSize)
+            return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
+
+        auto name = reinterpret_cast<const wchar_t*>(blob.get() + usedSize);
+
+        usedSize += sizeof(wchar_t) * (*nName);
+        if (dataSize < usedSize)
+            return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
+
+        auto clip = reinterpret_cast<const Clip*>(blob.get() + usedSize);
+        usedSize += sizeof(Clip);
+        if (dataSize < usedSize)
+            return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
+
+        if (!clip->keys)
+            return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+
+        auto keys = reinterpret_cast<const Keyframe*>(blob.get() + usedSize);
+        usedSize += sizeof(Keyframe) * clip->keys;
+        if (dataSize < usedSize)
+            return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
+
+        if (!clipName || _wcsicmp(clipName, name) == 0)
+        {
+            m_startTime = clip->StartTime;
+            m_endTime = clip->EndTime;
+
+            m_keys.resize(clip->keys);
+            m_transforms = ModelBone::MakeArray(clip->keys);
+
+            for (size_t k = 0; k < clip->keys; ++k)
+            {
+                m_keys[k].first = keys[k].BoneIndex;
+                m_keys[k].second = keys[k].Time;
+                m_transforms[k] = XMLoadFloat4x4(&keys[k].Transform);
+            }
+
+            return S_OK;
+        }
+    }
+
+    return E_FAIL;
+}
+
+void AnimationCMO::Bind(const Model& model)
+{
+    assert(!m_keys.empty());
+
+    m_animBones = ModelBone::MakeArray(model.bones.size());
+}
+
+void AnimationCMO::Update(float delta)
+{
+    m_animTime += delta;
+    if (m_animTime > m_endTime)
+    {
+        m_animTime -= m_endTime;
+    }
+}
+
+_Use_decl_annotations_
+void AnimationCMO::Apply(
+    const Model& model,
+    size_t nbones,
+    XMMATRIX* boneTransforms) const
+{
+    assert(!m_keys.empty());
+
+    if (!nbones || !boneTransforms)
+    {
+        throw std::invalid_argument("Bone transforms array required");
+    }
+
+    if (nbones < model.bones.size())
+    {
+        throw std::invalid_argument("Bone transforms array is too small");
+    }
+
+    if (model.bones.empty())
+    {
+        throw std::runtime_error("Model is missing bones");
+    }
+
+    // Compute local bone transforms
+    model.CopyBoneTransformsTo(nbones, m_animBones.get());
+
+
+    // Apply keyframes
+    if (m_animTime >= m_startTime)
+    {
+        size_t k = 0;
+        for (auto kit : m_keys)
+        {
+            if (kit.second > m_animTime)
+            {
+                break;
+            }
+
+            m_animBones[kit.first] = m_transforms[k];
+            ++k;
         }
     }
 

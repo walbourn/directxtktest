@@ -182,14 +182,19 @@ void Game::Tick()
 }
 
 // Updates the world.
-void Game::Update(DX::StepTimer const&)
+void Game::Update(DX::StepTimer const& timer)
 {
+    float elapsedTime = float(timer.GetElapsedSeconds());
+
     auto pad = m_gamePad->GetState(0);
     auto kb = m_keyboard->GetState();
     if (kb.Escape || (pad.IsConnected() && pad.IsViewPressed()))
     {
         ExitGame();
     }
+
+    m_soldierAnim.Update(elapsedTime);
+    m_teapotAnim.Update(elapsedTime);
 }
 #pragma endregion
 
@@ -263,21 +268,6 @@ void Game::Render()
     m_tank->Draw(context, *m_states, nbones, bones.get(), local, m_view, m_projection);
 
     // Teapot (direct-mapped bones)
-    uint32_t spoutBone = ModelBone::c_Invalid;
-    nbones = 0;
-    {
-        for (auto it : m_teapot->bones)
-        {
-            if (_wcsicmp(L"Bone003", it.name.c_str()) == 0)
-            {
-                spoutBone = nbones;
-            }
-
-            ++nbones;
-        }
-
-        assert(nbones == m_teapot->bones.size());
-    }
     m_teapot->UpdateEffects([&](IEffect* effect)
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
@@ -287,19 +277,9 @@ void Game::Render()
     local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-2.f, row0, 0.f));
     m_teapot->Draw(context, *m_states, local, m_view, m_projection);
 
-    auto animBones = ModelBone::MakeArray(nbones);
-    m_teapot->CopyBoneTransformsTo(nbones, animBones.get());
-    animBones[spoutBone] = XMMatrixRotationX(time * XM_PI);
-
-    auto targetBones = ModelBone::MakeArray(nbones);
-    m_teapot->CopyAbsoluteBoneTransforms(nbones, animBones.get(), targetBones.get());
-
+    nbones = static_cast<uint32_t>(m_teapot->bones.size());
     bones = ModelBone::MakeArray(nbones);
-
-    for (size_t j = 0; j < nbones; ++j)
-    {
-        bones[j] = XMMatrixMultiply(m_teapot->invBindPoseMatrices[j], targetBones[j]);
-    }
+    m_teapotAnim.Apply(*m_teapot, m_teapot->bones.size(), bones.get());
 
     local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-2.f, row1, 0.f));
     m_teapot->DrawSkinned(context, *m_states,
@@ -323,7 +303,7 @@ void Game::Render()
 
     nbones = static_cast<uint32_t>(m_soldier->bones.size());
     bones = ModelBone::MakeArray(nbones);
-    m_soldierAnim.Apply(*m_soldier, m_timer.GetTotalSeconds(), m_soldier->bones.size(), bones.get());
+    m_soldierAnim.Apply(*m_soldier, m_soldier->bones.size(), bones.get());
 
     m_soldier->DrawSkinned(context, *m_states,
         nbones, bones.get(),
@@ -460,6 +440,8 @@ void Game::CreateDeviceDependentResources()
     }
     else
     {
+        DX::ThrowIfFailed(m_teapotAnim.Load(L"teapot.cmo", animsOffset, L"Take 001"));
+
         OutputDebugStringA("'teapot.cmo' contains animation clips.\n");
     }
 
@@ -481,6 +463,8 @@ void Game::CreateDeviceDependentResources()
     {
         OutputDebugStringA("ERROR: Bind of soldier to animation failed to find any matching bones!\n");
     }
+
+    m_teapotAnim.Bind(*m_teapot);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

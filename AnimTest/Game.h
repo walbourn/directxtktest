@@ -111,4 +111,5 @@ private:
     DirectX::ModelBone::TransformArray      m_bones;
 
     DX::AnimationSDKMESH                    m_soldierAnim;
+    DX::AnimationCMO                        m_teapotAnim;
 };
