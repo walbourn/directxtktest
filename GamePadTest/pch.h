@@ -84,6 +84,7 @@
 #include <memory>
 #include <stdexcept>
 #include <system_error>
+#include <type_traits>
 
 #include "GamePad.h"
 #include "GraphicsMemory.h"

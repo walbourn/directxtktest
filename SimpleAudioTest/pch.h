@@ -92,6 +92,7 @@
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <type_traits>
 
 #include "Audio.h"
 #include "GamePad.h"

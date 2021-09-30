@@ -104,6 +104,17 @@ static_assert(std::is_move_assignable<VertexPositionNormalTangentColorTextureSki
 
 //--------------------------------------------------------------------------------------
 
+static_assert(std::is_nothrow_move_constructible<CommonStates>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<CommonStates>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<GraphicsMemory>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<GraphicsMemory>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<PrimitiveBatch<VertexPositionColor>>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<PrimitiveBatch<VertexPositionColor>>::value, "Move Assign.");
+
+//--------------------------------------------------------------------------------------
+
 // Constructor.
 Game::Game() noexcept(false)
 {

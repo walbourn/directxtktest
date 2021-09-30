@@ -35,6 +35,19 @@ namespace
     constexpr float row2 = -2.f;
 }
 
+//--------------------------------------------------------------------------------------
+
+static_assert(std::is_nothrow_move_constructible<DGSLEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<DGSLEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<DGSLEffectFactory>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<DGSLEffectFactory>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Assign.");
+
+//--------------------------------------------------------------------------------------
+
 Game::Game() noexcept(false)
 {
 #ifdef GAMMA_CORRECT_RENDERING

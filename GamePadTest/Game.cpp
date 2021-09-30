@@ -28,6 +28,12 @@ using namespace DirectX;
 
 using Microsoft::WRL::ComPtr;
 
+static_assert(std::is_nothrow_move_constructible<GamePad>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<GamePad>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<GamePad::ButtonStateTracker>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<GamePad::ButtonStateTracker>::value, "Move Assign.");
+
 // Constructor.
 Game::Game() noexcept(false) :
     m_state{},

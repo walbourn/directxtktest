@@ -87,6 +87,7 @@
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <type_traits>
 
 #include "Mouse.h"
 #include "Keyboard.h"

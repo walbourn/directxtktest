@@ -177,6 +177,43 @@ void Game::CreateTestInputLayout(ID3D11Device* device, IEffect* effect, ID3D11In
     );
 }
 
+//--------------------------------------------------------------------------------------
+
+static_assert(std::is_nothrow_move_constructible<BasicEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<BasicEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<AlphaTestEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<AlphaTestEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<DualTextureEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<DualTextureEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<EnvironmentMapEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<EnvironmentMapEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<SkinnedEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<SkinnedEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<NormalMapEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<NormalMapEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<PBREffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<PBREffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<DebugEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<DebugEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<IEffectFactory::EffectInfo>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<IEffectFactory::EffectInfo>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<EffectFactory>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<EffectFactory>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<PBREffectFactory>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<PBREffectFactory>::value, "Move Assign.");
+
+//--------------------------------------------------------------------------------------
+
 Game::Game() noexcept(false) :
     m_indexCount(0)
 {

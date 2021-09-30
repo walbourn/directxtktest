@@ -169,7 +169,35 @@ namespace
         }
     }
 }
-    
+
+//--------------------------------------------------------------------------------------
+
+static_assert(std::is_nothrow_move_constructible<AudioEngine>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<AudioEngine>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<WaveBank>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<WaveBank>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<SoundEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<SoundEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<AudioListener>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<AudioListener>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<AudioEmitter>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<AudioEmitter>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<SoundEffectInstance>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<SoundEffectInstance>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<SoundStreamInstance>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<SoundStreamInstance>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<DynamicSoundEffectInstance>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<DynamicSoundEffectInstance>::value, "Move Assign.");
+
+//--------------------------------------------------------------------------------------
+
 // Constructor.
 Game::Game() noexcept(false) :
     m_currentStream(0),

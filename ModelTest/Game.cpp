@@ -41,6 +41,27 @@ extern std::unique_ptr<Model> CreateModelFromOBJ(
     bool enableInstacing,
     ModelLoaderFlags flags);
 
+
+//--------------------------------------------------------------------------------------
+
+// BUGBUG: why is Model not is_nothrow_move_constructible?
+static_assert(std::is_move_constructible<Model>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<Model>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<ModelMesh>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<ModelMesh>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<ModelMeshPart>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<ModelMeshPart>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<ModelBone>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<ModelBone>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<ModelBone::TransformArray>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<ModelBone::TransformArray>::value, "Move Assign.");
+
+//--------------------------------------------------------------------------------------
+
 Game::Game() noexcept(false) :
     m_instanceCount(0),
     m_spinning(true),

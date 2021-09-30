@@ -88,6 +88,7 @@
 #include <memory>
 #include <stdexcept>
 #include <vector>
+#include <type_traits>
 
 #include "BufferHelpers.h"
 #include "CommonStates.h"

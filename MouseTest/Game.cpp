@@ -28,6 +28,12 @@ namespace
     constexpr XMVECTORF32 ROOM_BOUNDS = { { { 8.f, 6.f, 12.f, 0.f } } };
 }
 
+static_assert(std::is_nothrow_move_constructible<Mouse>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<Mouse>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<Mouse::ButtonStateTracker>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<Mouse::ButtonStateTracker>::value, "Move Assign.");
+
 // Constructor.
 Game::Game() noexcept(false) :
     m_ms{},

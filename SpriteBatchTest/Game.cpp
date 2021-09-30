@@ -30,6 +30,9 @@ namespace
     }
 }
 
+static_assert(std::is_nothrow_move_constructible<SpriteBatch>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<SpriteBatch>::value, "Move Assign.");
+
 Game::Game() noexcept(false)
 {
 #ifdef GAMMA_CORRECT_RENDERING

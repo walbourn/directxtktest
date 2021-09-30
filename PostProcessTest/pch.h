@@ -86,6 +86,7 @@
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <type_traits>
 
 #include "DDSTextureLoader.h"
 #include "GamePad.h"

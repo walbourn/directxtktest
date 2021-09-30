@@ -30,6 +30,12 @@ namespace
     constexpr float MOVEMENT_GAIN = 0.07f;
 }
 
+static_assert(std::is_nothrow_move_constructible<Keyboard>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<Keyboard>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<Keyboard::KeyboardStateTracker>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<Keyboard::KeyboardStateTracker>::value, "Move Assign.");
+
 // Constructor.
 Game::Game() noexcept(false) :
     m_kb{},
