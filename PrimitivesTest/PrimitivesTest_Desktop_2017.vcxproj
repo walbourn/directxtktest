@@ -22,7 +22,7 @@
     <ProjectGuid>{DA8EBCA6-B579-4210-B718-C80FD1FF4688}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>PrimitivesTest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
