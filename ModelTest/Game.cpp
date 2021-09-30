@@ -44,7 +44,7 @@ extern std::unique_ptr<Model> CreateModelFromOBJ(
 
 //--------------------------------------------------------------------------------------
 
-// BUGBUG: why is Model not is_nothrow_move_constructible?
+// Note VS 2017 incorrectly returns 'false' for is_nothrow_move_constructible<Model>
 static_assert(std::is_move_constructible<Model>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<Model>::value, "Move Assign.");
 
