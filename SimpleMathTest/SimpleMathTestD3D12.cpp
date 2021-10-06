@@ -23,6 +23,8 @@
 #include <d3d12.h>
 #include "SimpleMath.h"
 
+#define D3DX12_NO_STATE_OBJECT_HELPERS
+#define D3DX12_NO_CHECK_FEATURE_SUPPORT_CLASS
 #pragma warning(push)
 #pragma warning(disable : 26495)
 #include "d3dx12.h"
