@@ -1161,6 +1161,34 @@ void Game::Render()
 
             y -= 1.f;
         }
+
+        // SkinnedDGSLEffect
+        if (!showCompressed)
+        {
+            auto it = m_dgslSkinned.begin();
+            assert(it != m_dgslSkinned.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_dgslSkinned.cend())
+                        break;
+                }
+
+                if (it == m_dgslSkinned.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_dgslSkinned.cend());
+
+            y -= 1.f;
+        }
     }
 
     // Show the new frame.
@@ -2401,33 +2429,33 @@ void Game::CreateDeviceDependentResources()
     //--- DGSLEffect -----------------------------------------------------------------------
 
     // DGSLEffect
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect*)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect*)
     {
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->EnableDefaultLighting();
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->EnableDefaultLighting();
         effect->SetSpecularColor(Colors::Blue);
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetVertexColorEnabled(true);
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetVertexColorEnabled(true);
         effect->EnableDefaultLighting();
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetVertexColorEnabled(true);
         effect->EnableDefaultLighting();
@@ -2436,20 +2464,20 @@ void Game::CreateDeviceDependentResources()
 
 
     // DGSLEffect (textured)
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetTextureEnabled(true);
         effect->SetTexture(m_cat.Get());
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetTextureEnabled(true);
         effect->SetTexture(m_cat.Get());
         effect->EnableDefaultLighting();
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetTextureEnabled(true);
         effect->SetTexture(m_cat.Get());
@@ -2458,32 +2486,32 @@ void Game::CreateDeviceDependentResources()
     }));
 
     // DGSLEffect (alpha discard)
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetAlphaDiscardEnable(true);
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetAlphaDiscardEnable(true);
         effect->EnableDefaultLighting();
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetAlphaDiscardEnable(true);
         effect->EnableDefaultLighting();
         effect->SetSpecularColor(Colors::Blue);
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetAlphaDiscardEnable(true);
         effect->SetTextureEnabled(true);
         effect->SetTexture(m_cat.Get());
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetAlphaDiscardEnable(true);
         effect->SetTextureEnabled(true);
@@ -2491,7 +2519,7 @@ void Game::CreateDeviceDependentResources()
         effect->EnableDefaultLighting();
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, false, [=](DGSLEffect* effect)
+    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, [=](DGSLEffect* effect)
     {
         effect->SetAlphaDiscardEnable(true);
         effect->SetTextureEnabled(true);
@@ -2501,34 +2529,34 @@ void Game::CreateDeviceDependentResources()
     }));
 
     // DGSLEffect (skinning)
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, true, [=](DGSLEffect* effect)
+    m_dgslSkinned.emplace_back(std::make_unique<DGSLEffectWithDecl<SkinnedDGSLEffect>>(device, [=](SkinnedDGSLEffect* effect)
     {
         effect->SetWeightsPerVertex(4);
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, true, [=](DGSLEffect* effect)
+    m_dgslSkinned.emplace_back(std::make_unique<DGSLEffectWithDecl<SkinnedDGSLEffect>>(device, [=](SkinnedDGSLEffect* effect)
     {
         effect->SetWeightsPerVertex(2);
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, true, [=](DGSLEffect* effect)
+    m_dgslSkinned.emplace_back(std::make_unique<DGSLEffectWithDecl<SkinnedDGSLEffect>>(device, [=](SkinnedDGSLEffect* effect)
     {
         effect->SetWeightsPerVertex(1);
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, true, [=](DGSLEffect* effect)
+    m_dgslSkinned.emplace_back(std::make_unique<DGSLEffectWithDecl<SkinnedDGSLEffect>>(device, [=](SkinnedDGSLEffect* effect)
     {
         effect->SetVertexColorEnabled(true);
         effect->SetWeightsPerVertex(4);
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, true, [=](DGSLEffect* effect)
+    m_dgslSkinned.emplace_back(std::make_unique<DGSLEffectWithDecl<SkinnedDGSLEffect>>(device, [=](SkinnedDGSLEffect* effect)
     {
         effect->SetVertexColorEnabled(true);
         effect->SetWeightsPerVertex(2);
     }));
 
-    m_dgsl.emplace_back(std::make_unique<DGSLEffectWithDecl<DGSLEffect>>(device, true, [=](DGSLEffect* effect)
+    m_dgslSkinned.emplace_back(std::make_unique<DGSLEffectWithDecl<SkinnedDGSLEffect>>(device, [=](SkinnedDGSLEffect* effect)
     {
         effect->SetVertexColorEnabled(true);
         effect->SetWeightsPerVertex(1);
@@ -2574,6 +2602,7 @@ void Game::OnDeviceLost()
     m_pbr.clear();
     m_debug.clear();
     m_dgsl.clear();
+    m_dgslSkinned.clear();
 
     m_normalMapInstanced.clear();
     m_pbrInstanced.clear();
