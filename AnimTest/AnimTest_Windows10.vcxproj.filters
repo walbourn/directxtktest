@@ -98,6 +98,18 @@
     <Image Include="default.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="head_norm.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="jacket_norm.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="pants_norm.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="upbody_norm.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="TankScene.sdkmesh">

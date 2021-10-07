@@ -65,6 +65,18 @@
     <Image Include="turret_norm.dds">
       <Filter>Assets\Tank</Filter>
     </Image>
+    <Image Include="head_norm.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="jacket_norm.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="pants_norm.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
+    <Image Include="upbody_norm.dds">
+      <Filter>Assets\Soldier</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />

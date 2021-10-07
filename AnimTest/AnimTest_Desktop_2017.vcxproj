@@ -192,10 +192,14 @@
     <Image Include="default.dds" />
     <Image Include="ground_diff.dds" />
     <Image Include="ground_norm.dds" />
+    <Image Include="head_norm.dds" />
+    <Image Include="jacket_norm.dds" />
     <Image Include="left_engine_diff.dds" />
     <Image Include="left_engine_norm.dds" />
+    <Image Include="pants_norm.dds" />
     <Image Include="turret_diff.dds" />
     <Image Include="turret_norm.dds" />
+    <Image Include="upbody_norm.dds" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\DeviceResourcesPC.cpp" />
