@@ -297,6 +297,16 @@ void Game::Render()
     local = XMMatrixMultiply(world, local);
     m_soldier->Draw(context, *m_states, local, m_view, m_projection);
 
+    m_soldierDiff->UpdateEffects([&](IEffect* effect)
+        {
+            auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
+            if (skinnedEffect)
+                skinnedEffect->ResetBoneTransforms();
+        });
+    local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(4.f, row0, 0.f));
+    local = XMMatrixMultiply(world, local);
+    m_soldierDiff->Draw(context, *m_states, local, m_view, m_projection);
+
     local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(2.f, row1, 0.f));
     local = XMMatrixMultiply(XMMatrixRotationY(XM_PI), local);
     local = XMMatrixMultiply(world, local);
@@ -306,6 +316,14 @@ void Game::Render()
     m_soldierAnim.Apply(*m_soldier, m_soldier->bones.size(), bones.get());
 
     m_soldier->DrawSkinned(context, *m_states,
+        nbones, bones.get(),
+        local, m_view, m_projection);
+
+    local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(4.f, row1, 0.f));
+    local = XMMatrixMultiply(XMMatrixRotationY(XM_PI), local);
+    local = XMMatrixMultiply(world, local);
+
+    m_soldierDiff->DrawSkinned(context, *m_states,
         nbones, bones.get(),
         local, m_view, m_projection);
 
@@ -464,6 +482,9 @@ void Game::CreateDeviceDependentResources()
         OutputDebugStringA("ERROR: Bind of soldier to animation failed to find any matching bones!\n");
     }
 
+    m_fxFactory->EnableNormalMapEffect(false);
+    m_soldierDiff = Model::CreateFromSDKMESH(device, L"soldier.sdkmesh", *m_fxFactory, flags);
+
     m_teapotAnim.Bind(*m_teapot);
 }
 
@@ -499,6 +520,7 @@ void Game::OnDeviceLost()
 
     m_teapot.reset();
     m_soldier.reset();
+    m_soldierDiff.reset();
     m_tank.reset();
 
     m_fxFactory.reset();

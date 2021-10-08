@@ -101,6 +101,7 @@ private:
 
     std::unique_ptr<DirectX::Model>         m_teapot;
     std::unique_ptr<DirectX::Model>         m_soldier;
+    std::unique_ptr<DirectX::Model>         m_soldierDiff;
     std::unique_ptr<DirectX::Model>         m_tank;
 
     std::unique_ptr<DirectX::EffectFactory> m_fxFactory;
