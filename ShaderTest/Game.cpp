@@ -434,6 +434,7 @@ void Game::CreateTestInputLayout(
     auto ibasic = dynamic_cast<BasicEffect*>(effect);
     auto ienvmap = dynamic_cast<EnvironmentMapEffect*>(effect);
     auto inmap = dynamic_cast<NormalMapEffect*>(effect);
+    // TODO - SkinnedNormalMapEffect
     auto ipbr = dynamic_cast<PBREffect*>(effect);
     auto iskin = dynamic_cast<SkinnedEffect*>(effect);
     auto idbg = dynamic_cast<DebugEffect*>(effect);
@@ -1066,6 +1067,9 @@ void Game::Render()
 
             y -= 1.f;
         }
+
+        // SkinnedNormalMapEffect
+        // TODO -
 
         // PBREffect
         if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
@@ -2297,6 +2301,9 @@ void Game::CreateDeviceDependentResources()
         effect->SetTexture(m_brickDiffuse.Get());
         effect->SetNormalTexture(m_brickNormal.Get());
     }));
+
+    //--- SkinnedNormalMapEffect -----------------------------------------------------------
+    // TODO -
 
     //--- PBREffect ------------------------------------------------------------------------
     if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
