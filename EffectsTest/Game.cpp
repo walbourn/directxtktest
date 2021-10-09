@@ -203,8 +203,9 @@ static_assert(std::is_nothrow_move_assignable<PBREffect>::value, "Move Assign.")
 static_assert(std::is_nothrow_move_constructible<DebugEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<DebugEffect>::value, "Move Assign.");
 
+// VS 2017 on XDK incorrectly thinks it's not noexcept
 static_assert(std::is_nothrow_move_constructible<IEffectFactory::EffectInfo>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<IEffectFactory::EffectInfo>::value, "Move Assign.");
+static_assert(std::is_move_assignable<IEffectFactory::EffectInfo>::value, "Move Assign.");
 
 static_assert(std::is_nothrow_move_constructible<EffectFactory>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<EffectFactory>::value, "Move Assign.");

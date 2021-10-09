@@ -181,11 +181,12 @@ static_assert(std::is_nothrow_move_assignable<WaveBank>::value, "Move Assign.");
 static_assert(std::is_nothrow_move_constructible<SoundEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<SoundEffect>::value, "Move Assign.");
 
+// VS 2017 on XDK incorrectly thinks it's not noexcept
 static_assert(std::is_nothrow_move_constructible<AudioListener>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<AudioListener>::value, "Move Assign.");
+static_assert(std::is_move_assignable<AudioListener>::value, "Move Assign.");
 
 static_assert(std::is_nothrow_move_constructible<AudioEmitter>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<AudioEmitter>::value, "Move Assign.");
+static_assert(std::is_move_assignable<AudioEmitter>::value, "Move Assign.");
 
 static_assert(std::is_nothrow_move_constructible<SoundEffectInstance>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<SoundEffectInstance>::value, "Move Assign.");
