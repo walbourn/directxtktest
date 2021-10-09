@@ -434,7 +434,6 @@ void Game::CreateTestInputLayout(
     auto ibasic = dynamic_cast<BasicEffect*>(effect);
     auto ienvmap = dynamic_cast<EnvironmentMapEffect*>(effect);
     auto inmap = dynamic_cast<NormalMapEffect*>(effect);
-    // TODO - SkinnedNormalMapEffect
     auto ipbr = dynamic_cast<PBREffect*>(effect);
     auto iskin = dynamic_cast<SkinnedEffect*>(effect);
     auto idbg = dynamic_cast<DebugEffect*>(effect);
@@ -1042,13 +1041,15 @@ void Game::Render()
         }
 
         // NormalMapEffect
+        float lastx = 0.f;
         {
             auto it = m_normalMap.begin();
             assert(it != m_normalMap.end());
 
             for (; y > -ortho_height; y -= 1.f)
             {
-                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                float x;
+                for (x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
                 {
                     (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
                     context->DrawIndexed(m_indexCount, 0, 0);
@@ -1057,6 +1058,7 @@ void Game::Render()
                     if (it == m_normalMap.cend())
                         break;
                 }
+                lastx = x;
 
                 if (it == m_normalMap.cend())
                     break;
@@ -1065,11 +1067,35 @@ void Game::Render()
             // Make sure we drew all the effects
             assert(it == m_normalMap.cend());
 
-            y -= 1.f;
+            // SkinnedNormalMapEffect should be on same line...
         }
 
         // SkinnedNormalMapEffect
-        // TODO -
+        {
+            auto it = m_skinningNormalMap.begin();
+            assert(it != m_skinningNormalMap.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = lastx + 1.f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_skinningNormalMap.cend())
+                        break;
+                }
+
+                if (it == m_skinningNormalMap.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_skinningNormalMap.cend());
+
+            y -= 1.f;
+        }
 
         // PBREffect
         if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
@@ -1146,7 +1172,8 @@ void Game::Render()
 
             for (; y > -ortho_height; y -= 1.f)
             {
-                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                float x;
+                for (x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
                 {
                     (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
                     context->DrawIndexed(m_indexCount, 0, 0);
@@ -1155,6 +1182,7 @@ void Game::Render()
                     if (it == m_dgsl.cend())
                         break;
                 }
+                lastx = x;
 
                 if (it == m_dgsl.cend())
                     break;
@@ -1163,7 +1191,7 @@ void Game::Render()
             // Make sure we drew all the effects
             assert(it == m_dgsl.cend());
 
-            y -= 1.f;
+            // SkinnedDGSLEffect should be on same line...
         }
 
         // SkinnedDGSLEffect
@@ -1174,7 +1202,7 @@ void Game::Render()
 
             for (; y > -ortho_height; y -= 1.f)
             {
-                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                for (float x = lastx + 1.f; x < ortho_width; x += 1.f)
                 {
                     (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
                     context->DrawIndexed(m_indexCount, 0, 0);
@@ -2303,7 +2331,42 @@ void Game::CreateDeviceDependentResources()
     }));
 
     //--- SkinnedNormalMapEffect -----------------------------------------------------------
-    // TODO -
+
+    // SkinnedNormalMapEffect (no specular)
+    m_skinningNormalMap.emplace_back(std::make_unique<EffectWithDecl<SkinnedNormalMapEffect>>(device, [=](SkinnedNormalMapEffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetTexture(m_brickDiffuse.Get());
+            effect->SetNormalTexture(m_brickNormal.Get());
+        }));
+
+    m_skinningNormalMap.emplace_back(std::make_unique<EffectWithDecl<SkinnedNormalMapEffect>>(device, [=](SkinnedNormalMapEffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetTexture(m_brickDiffuse.Get());
+            effect->SetNormalTexture(m_brickNormal.Get());
+            effect->SetFogEnabled(true);
+            effect->SetFogColor(Colors::Black);
+        }));
+
+    // SkinnedNormalMapEffect (specular)
+    m_skinningNormalMap.emplace_back(std::make_unique<EffectWithDecl<SkinnedNormalMapEffect>>(device, [=](SkinnedNormalMapEffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetTexture(m_brickDiffuse.Get());
+            effect->SetNormalTexture(m_brickNormal.Get());
+            effect->SetSpecularTexture(m_brickSpecular.Get());
+        }));
+
+    m_skinningNormalMap.emplace_back(std::make_unique<EffectWithDecl<SkinnedNormalMapEffect>>(device, [=](SkinnedNormalMapEffect* effect)
+        {
+            effect->EnableDefaultLighting();
+            effect->SetTexture(m_brickDiffuse.Get());
+            effect->SetNormalTexture(m_brickNormal.Get());
+            effect->SetSpecularTexture(m_brickSpecular.Get());
+            effect->SetFogEnabled(true);
+            effect->SetFogColor(Colors::Black);
+        }));
 
     //--- PBREffect ------------------------------------------------------------------------
     if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
@@ -2606,6 +2669,7 @@ void Game::OnDeviceLost()
     m_dual.clear();
     m_alphTest.clear();
     m_normalMap.clear();
+    m_skinningNormalMap.clear();
     m_pbr.clear();
     m_debug.clear();
     m_dgsl.clear();

@@ -250,6 +250,7 @@ private:
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::DualTextureEffect>>> m_dual;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::AlphaTestEffect>>> m_alphTest;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::NormalMapEffect>>> m_normalMap;
+    std::vector<std::unique_ptr<EffectWithDecl<DirectX::SkinnedNormalMapEffect>>> m_skinningNormalMap;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::PBREffect>>> m_pbr;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::DebugEffect>>> m_debug;
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::DGSLEffect>>> m_dgsl;
