@@ -43,8 +43,9 @@ static_assert(std::is_nothrow_move_assignable<DGSLEffect>::value, "Move Assign."
 static_assert(std::is_nothrow_move_constructible<DGSLEffectFactory>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<DGSLEffectFactory>::value, "Move Assign.");
 
+// VS 2017 on XDK incorrectly thinks it's not noexcept
 static_assert(std::is_nothrow_move_constructible<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Assign.");
+static_assert(std::is_move_assignable<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Assign.");
 
 //--------------------------------------------------------------------------------------
 

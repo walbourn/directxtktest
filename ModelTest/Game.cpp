@@ -48,8 +48,9 @@ extern std::unique_ptr<Model> CreateModelFromOBJ(
 static_assert(std::is_move_constructible<Model>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<Model>::value, "Move Assign.");
 
-static_assert(std::is_nothrow_move_constructible<ModelMesh>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<ModelMesh>::value, "Move Assign.");
+// VS 2017 on XDK incorrectly thinks it's not noexcept
+static_assert(std::is_move_constructible<ModelMesh>::value, "Move Ctor.");
+static_assert(std::is_move_assignable<ModelMesh>::value, "Move Assign.");
 
 static_assert(std::is_nothrow_move_constructible<ModelMeshPart>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<ModelMeshPart>::value, "Move Assign.");
