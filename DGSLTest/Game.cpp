@@ -123,9 +123,9 @@ void Game::Initialize(
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
 
-    m_bones = ModelBone::MakeArray(DGSLEffect::MaxBones);
+    m_bones = ModelBone::MakeArray(SkinnedDGSLEffect::MaxBones);
     XMMATRIX id = XMMatrixIdentity();
-    for (size_t j = 0; j < DGSLEffect::MaxBones; ++j)
+    for (size_t j = 0; j < SkinnedDGSLEffect::MaxBones; ++j)
     {
         m_bones[j] = id;
     }

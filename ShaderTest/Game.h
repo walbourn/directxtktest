@@ -217,8 +217,8 @@ private:
     class DGSLEffectWithDecl : public T
     {
     public:
-        DGSLEffectWithDecl(ID3D11Device* device, bool skinning, std::function<void(T*)> setEffectParameters)
-            : T(device, nullptr, skinning)
+        DGSLEffectWithDecl(ID3D11Device* device, std::function<void(T*)> setEffectParameters)
+            : T(device, nullptr)
         {
             setEffectParameters(this);
 
@@ -250,9 +250,11 @@ private:
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::DualTextureEffect>>> m_dual;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::AlphaTestEffect>>> m_alphTest;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::NormalMapEffect>>> m_normalMap;
+    std::vector<std::unique_ptr<EffectWithDecl<DirectX::SkinnedNormalMapEffect>>> m_skinningNormalMap;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::PBREffect>>> m_pbr;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::DebugEffect>>> m_debug;
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::DGSLEffect>>> m_dgsl;
+    std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::SkinnedDGSLEffect>>> m_dgslSkinned;
 
     std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::NormalMapEffect>>> m_normalMapInstanced;
     std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::PBREffect>>> m_pbrInstanced;
