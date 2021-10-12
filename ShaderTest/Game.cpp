@@ -1098,6 +1098,7 @@ void Game::Render()
         }
 
         // PBREffect
+        lastx = 0.f;
         if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
         {
             context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
@@ -1111,7 +1112,8 @@ void Game::Render()
 
                 for (; y > -ortho_height; y -= 1.f)
                 {
-                    for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                    float x;
+                    for (x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
                     {
                         (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
                         context->DrawIndexed(m_indexCount, 0, 0);
@@ -1120,6 +1122,7 @@ void Game::Render()
                         if (it == m_pbr.cend())
                             break;
                     }
+                    lastx = x;
 
                     if (it == m_pbr.cend())
                         break;
@@ -1128,7 +1131,7 @@ void Game::Render()
                 // Make sure we drew all the effects
                 assert(it == m_pbr.cend());
 
-                y -= 1.f;
+                // SkinnedPBREffect should be on same line...
             }
 
             views[1] = nullptr;
@@ -1145,7 +1148,7 @@ void Game::Render()
 
             for (; y > -ortho_height; y -= 1.f)
             {
-                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                for (float x = lastx + 1.f; x < ortho_width; x += 1.f)
                 {
                     (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
                     context->DrawIndexed(m_indexCount, 0, 0);
