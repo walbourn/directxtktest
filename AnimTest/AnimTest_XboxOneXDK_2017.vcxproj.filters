@@ -12,7 +12,7 @@
     <ClInclude Include="..\Common\DirectXTKTest.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="Animation.h" />
+    <ClInclude Include="..\Common\Animation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
@@ -23,7 +23,7 @@
     <ClCompile Include="..\Common\MainXDK.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="..\Common\Animation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageXDK.appxmanifest" />

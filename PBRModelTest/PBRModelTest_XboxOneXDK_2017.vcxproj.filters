@@ -39,6 +39,9 @@
     <ClInclude Include="..\Common\DirectXTKTest.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Animation.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -50,6 +53,9 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\RenderTexture.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Animation.cpp">
       <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
@@ -166,6 +172,9 @@
     </None>
     <None Include="ToyRobot.sdkmesh">
       <Filter>Assets\Robot</Filter>
+    </None>
+    <None Include="teapot.cmo">
+      <Filter>Assets</Filter>
     </None>
   </ItemGroup>
 </Project>

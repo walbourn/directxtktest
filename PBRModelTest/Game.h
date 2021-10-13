@@ -10,6 +10,7 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
+#include "Animation.h"
 #include "DirectXTKTest.h"
 #include "StepTimer.h"
 
@@ -111,6 +112,7 @@ private:
     std::unique_ptr<DirectX::Model>             m_sphere2;
     std::unique_ptr<DirectX::Model>             m_robot;
     std::unique_ptr<DirectX::Model>             m_cubeInst;
+    std::unique_ptr<DirectX::Model>             m_teapot;
     std::unique_ptr<DirectX::PBREffectFactory>  m_fxFactory;
 
     static const size_t s_nIBL = 3;
@@ -130,9 +132,11 @@ private:
     UINT                                            m_instanceCount;
     std::unique_ptr<DirectX::XMFLOAT3X4[]>          m_instanceTransforms;
 
-    int m_toneMapMode;
-    uint32_t m_ibl;
-    bool m_spinning;
-    float m_pitch;
-    float m_yaw;
+    int                                             m_toneMapMode;
+    uint32_t                                        m_ibl;
+    bool                                            m_spinning;
+    float                                           m_pitch;
+    float                                           m_yaw;
+
+    DX::AnimationCMO                                m_teapotAnim;
 };
