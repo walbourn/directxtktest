@@ -191,7 +191,7 @@ void Game::Render()
     float s = 1 + sin(time * 1.7f) * 0.5f;
     XMMATRIX scale = XMMatrixScaling(s, s, s);
 
-    for (size_t j = 0; j < SkinnedEffect::MaxBones; ++j)
+    for (size_t j = 0; j < SkinnedDGSLEffect::MaxBones; ++j)
     {
         m_bones[j] = scale;
     }
@@ -287,7 +287,7 @@ void Game::Render()
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
         if (skinnedEffect)
-            skinnedEffect->SetBoneTransforms(m_bones.get(), SkinnedEffect::MaxBones);
+            skinnedEffect->SetBoneTransforms(m_bones.get(), IEffectSkinning::MaxBones);
     });
     local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(0.f, row0, 0.f));
     m_teapot->Draw(context, *m_states, local, m_view, m_projection);
@@ -307,7 +307,7 @@ void Game::Render()
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
         if (skinnedEffect)
         {
-            skinnedEffect->SetBoneTransforms(m_bones.get(), SkinnedEffect::MaxBones);
+            skinnedEffect->SetBoneTransforms(m_bones.get(), IEffectSkinning::MaxBones);
         }
     });
 

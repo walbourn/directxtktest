@@ -131,9 +131,9 @@ void Game::Initialize(
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
 
-    m_bones = ModelBone::MakeArray(SkinnedEffect::MaxBones);
+    m_bones = ModelBone::MakeArray(IEffectSkinning::MaxBones);
     XMMATRIX id = XMMatrixIdentity();
-    for (size_t j = 0; j < SkinnedEffect::MaxBones; ++j)
+    for (size_t j = 0; j < IEffectSkinning::MaxBones; ++j)
     {
         m_bones[j] = id;
     }
@@ -271,7 +271,7 @@ void Game::Render()
 
     XMMATRIX scale = XMMatrixScaling(s, s, s);
 
-    for (size_t j = 0; j < SkinnedEffect::MaxBones; ++j)
+    for (size_t j = 0; j < IEffectSkinning::MaxBones; ++j)
     {
         m_bones[j] = scale;
     }
@@ -463,7 +463,7 @@ void Game::Render()
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
         if (skinnedEffect)
-            skinnedEffect->SetBoneTransforms(m_bones.get(), SkinnedEffect::MaxBones);
+            skinnedEffect->SetBoneTransforms(m_bones.get(), IEffectSkinning::MaxBones);
     });
     local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-3.5f, row1, 0.f));
     local = XMMatrixMultiply(world, local);
@@ -508,7 +508,7 @@ void Game::Render()
     {
         auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
         if (skinnedEffect)
-            skinnedEffect->SetBoneTransforms(m_bones.get(), SkinnedEffect::MaxBones);
+            skinnedEffect->SetBoneTransforms(m_bones.get(), IEffectSkinning::MaxBones);
     });
     local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(2.5f, row1, 0.f));
     m_soldier->Draw(context, *m_states, local, m_view, m_projection);
