@@ -221,7 +221,7 @@ void Game::Render()
 
     XMMATRIX scale = XMMatrixScaling(s, s, s);
 
-    for (size_t j = 0; j < SkinnedEffect::MaxBones; ++j)
+    for (size_t j = 0; j < IEffectSkinning::MaxBones; ++j)
     {
         m_bones[j] = scale;
     }

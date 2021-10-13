@@ -695,13 +695,15 @@ void Game::CycleCurrentStream(bool increment)
         stream->Stop();
     }
 
+    constexpr auto nStreams = static_cast<unsigned int>(std::size(STREAM_NAMES));
+
     if (increment)
     {
-        m_currentStream = (m_currentStream + 1) % std::size(STREAM_NAMES);
+        m_currentStream = (m_currentStream + 1) % nStreams;
     }
     else
     {
-        m_currentStream = (m_currentStream + static_cast<unsigned int>(std::size(STREAM_NAMES)) - 1) % std::size(STREAM_NAMES);
+        m_currentStream = (m_currentStream + nStreams - 1) % nStreams;
     }
 
     if (wasplaying)

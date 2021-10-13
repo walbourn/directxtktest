@@ -178,6 +178,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\Animation.h" />
     <ClInclude Include="..\Common\DeviceResourcesPC.h" />
     <ClInclude Include="..\Common\DirectXTKTest.h" />
     <ClInclude Include="..\Common\RenderTexture.h" />
@@ -186,6 +187,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\Animation.cpp" />
     <ClCompile Include="..\Common\DeviceResourcesPC.cpp" />
     <ClCompile Include="..\Common\MainPC.cpp" />
     <ClCompile Include="..\Common\RenderTexture.cpp" />
@@ -210,6 +212,7 @@
     <None Include="comic.spritefont" />
     <None Include="Sphere.sdkmesh" />
     <None Include="Sphere2.sdkmesh" />
+    <None Include="teapot.cmo" />
     <None Include="ToyRobot.sdkmesh" />
   </ItemGroup>
   <ItemGroup>

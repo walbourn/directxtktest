@@ -172,6 +172,7 @@
     </FXCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\Animation.h" />
     <ClInclude Include="..\Common\DeviceResourcesXDK.h" />
     <ClInclude Include="..\Common\DirectXTKTest.h" />
     <ClInclude Include="..\Common\RenderTexture.h" />
@@ -180,6 +181,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\Animation.cpp" />
     <ClCompile Include="..\Common\DeviceResourcesXDK.cpp" />
     <ClCompile Include="..\Common\MainXDK.cpp" />
     <ClCompile Include="..\Common\RenderTexture.cpp" />
@@ -243,6 +245,11 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'">true</DeploymentContent>
     </None>
     <None Include="Sphere2.sdkmesh">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Durango'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'">true</DeploymentContent>
+    </None>
+    <None Include="teapot.cmo">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Durango'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Durango'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Profile|Durango'">true</DeploymentContent>

@@ -87,7 +87,7 @@
     <ClCompile Include="..\Common\MainPC.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="..\Common\Animation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
@@ -101,7 +101,7 @@
     <ClInclude Include="..\Common\DirectXTKTest.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="Animation.h" />
+    <ClInclude Include="..\Common\Animation.h" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\Common\settings.manifest">

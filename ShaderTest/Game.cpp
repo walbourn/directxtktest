@@ -1098,6 +1098,7 @@ void Game::Render()
         }
 
         // PBREffect
+        lastx = 0.f;
         if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
         {
             context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
@@ -1111,7 +1112,8 @@ void Game::Render()
 
                 for (; y > -ortho_height; y -= 1.f)
                 {
-                    for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                    float x;
+                    for (x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
                     {
                         (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
                         context->DrawIndexed(m_indexCount, 0, 0);
@@ -1120,6 +1122,7 @@ void Game::Render()
                         if (it == m_pbr.cend())
                             break;
                     }
+                    lastx = x;
 
                     if (it == m_pbr.cend())
                         break;
@@ -1128,13 +1131,41 @@ void Game::Render()
                 // Make sure we drew all the effects
                 assert(it == m_pbr.cend());
 
-                y -= 1.f;
+                // SkinnedPBREffect should be on same line...
             }
 
             views[1] = nullptr;
             context->OMSetRenderTargets(2, views, m_deviceResources->GetDepthStencilView());
 
             context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
+        }
+
+        // SkinnedPBREffect
+        if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
+        {
+            auto it = m_skinningPbr.begin();
+            assert(it != m_skinningPbr.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = lastx + 1.f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_skinningPbr.cend())
+                        break;
+                }
+
+                if (it == m_skinningPbr.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_skinningPbr.cend());
+
+            y -= 1.f;
         }
 
         // DebugEffect
@@ -2444,6 +2475,39 @@ void Game::CreateDeviceDependentResources()
         }));
     }
 
+    //--- SkinnedPBREffect -----------------------------------------------------------------
+    if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
+    {
+        D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+        m_radianceIBL->GetDesc(&desc);
+
+        m_skinningPbr.emplace_back(std::make_unique<EffectWithDecl<SkinnedPBREffect>>(device, [=](SkinnedPBREffect* effect)
+            {
+                effect->EnableDefaultLighting();
+                effect->SetConstantAlbedo(Colors::Cyan);
+                effect->SetConstantMetallic(0.5f);
+                effect->SetConstantRoughness(0.75f);
+                effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
+            }));
+
+        // SkinnedPBREffect (textured)
+        m_skinningPbr.emplace_back(std::make_unique<EffectWithDecl<SkinnedPBREffect>>(device, [=](SkinnedPBREffect* effect)
+            {
+                effect->EnableDefaultLighting();
+                effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+                effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
+            }));
+
+        // SkinnedPBREffect (emissive)
+        m_skinningPbr.emplace_back(std::make_unique<EffectWithDecl<SkinnedPBREffect>>(device, [=](SkinnedPBREffect* effect)
+            {
+                effect->EnableDefaultLighting();
+                effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+                effect->SetEmissiveTexture(m_pbrEmissive.Get());
+                effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
+            }));
+    }
+
     //--- DebugEffect ----------------------------------------------------------------------
     m_debug.emplace_back(std::make_unique<EffectWithDecl<DebugEffect>>(device, [=](DebugEffect*)
     {
@@ -2671,6 +2735,7 @@ void Game::OnDeviceLost()
     m_normalMap.clear();
     m_skinningNormalMap.clear();
     m_pbr.clear();
+    m_skinningPbr.clear();
     m_debug.clear();
     m_dgsl.clear();
     m_dgslSkinned.clear();

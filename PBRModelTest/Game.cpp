@@ -44,7 +44,8 @@ namespace
 
     constexpr float rowtop = 6.f;
     constexpr float row0 = 1.5f;
-    constexpr float row1 = -1.5f;
+    constexpr float row1 = 0.f;
+    constexpr float row2 = -1.5f;
 }
 
 // Constructor.
@@ -136,8 +137,10 @@ void Game::Tick()
 }
 
 // Updates the world.
-void Game::Update(DX::StepTimer const&)
+void Game::Update(DX::StepTimer const& timer)
 {
+    float elapsedTime = float(timer.GetElapsedSeconds());
+
     auto kb = m_keyboard->GetState();
     m_keyboardButtons.Update(kb);
 
@@ -252,6 +255,8 @@ void Game::Update(DX::StepTimer const&)
     {
         CycleToneMapOperator();
     }
+
+    m_teapotAnim.Update(elapsedTime);
 }
 #pragma endregion
 
@@ -348,6 +353,15 @@ void Game::Render()
         }
     });
 
+    m_teapot->UpdateEffects([&](IEffect* effect)
+    {
+        auto pbr = dynamic_cast<PBREffect*>(effect);
+        if (pbr)
+        {
+            pbr->SetIBLTextures(m_radianceIBL[m_ibl].Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL[m_ibl].Get());
+        }
+    });
+
     //--- Draw SDKMESH models ---
     XMMATRIX local = XMMatrixTranslation(1.5f, row0, 0.f);
     local = XMMatrixMultiply(world, local);
@@ -363,7 +377,7 @@ void Game::Render()
 
     {
         XMMATRIX scale = XMMatrixScaling(0.75f, 0.75f, 0.75f);
-        XMMATRIX trans = XMMatrixTranslation(-2.5f, row1, 0.f);
+        XMMATRIX trans = XMMatrixTranslation(-2.5f, row2, 0.f);
         local = XMMatrixMultiply(scale, trans);
         local = XMMatrixMultiply(world, local);
     }
@@ -371,7 +385,7 @@ void Game::Render()
 
     {
         XMMATRIX scale = XMMatrixScaling(0.1f, 0.1f, 0.1f);
-        XMMATRIX trans = XMMatrixTranslation(1.5f, row1, 0.f);
+        XMMATRIX trans = XMMatrixTranslation(1.5f, row2, 0.f);
         local = XMMatrixMultiply(scale, trans);
         local = XMMatrixMultiply(world, local);
     }
@@ -421,6 +435,18 @@ void Game::Render()
             }
         }
     }
+
+    //--- Draw with skinning ---
+    local = XMMatrixMultiply(XMMatrixScaling(0.02f, 0.02f, 0.02f), XMMatrixTranslation(4.f, row1, 0.f));
+    local = XMMatrixMultiply(world, local);
+
+    auto nbones = static_cast<uint32_t>(m_teapot->bones.size());
+    auto bones = ModelBone::MakeArray(nbones);
+    m_teapotAnim.Apply(*m_teapot, m_teapot->bones.size(), bones.get());
+
+    m_teapot->DrawSkinned(context, *m_states,
+        nbones, bones.get(),
+        local, m_view, m_projection);
 
     // Render HUD
     m_batch->Begin();
@@ -658,14 +684,15 @@ void Game::CreateDeviceDependentResources()
     }
 
     // DirectX SDK Mesh
-    m_cube = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
-    m_sphere = Model::CreateFromSDKMESH(device, L"Sphere.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
-    m_sphere2 = Model::CreateFromSDKMESH(device, L"Sphere2.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
-    m_robot = Model::CreateFromSDKMESH(device, L"ToyRobot.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    ModelLoaderFlags flags = ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise;
+    m_cube = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, flags);
+    m_sphere = Model::CreateFromSDKMESH(device, L"Sphere.sdkmesh", *m_fxFactory, flags);
+    m_sphere2 = Model::CreateFromSDKMESH(device, L"Sphere2.sdkmesh", *m_fxFactory, flags);
+    m_robot = Model::CreateFromSDKMESH(device, L"ToyRobot.sdkmesh", *m_fxFactory, flags);
 
     // Create instanced mesh.
     m_fxFactory->SetSharing(false); // We do not want to reuse the effects created above!
-    m_cubeInst = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
+    m_cubeInst = Model::CreateFromSDKMESH(device, L"BrokenCube.sdkmesh", *m_fxFactory, flags);
 
     static const D3D11_INPUT_ELEMENT_DESC s_instElements[] =
     {
@@ -739,6 +766,26 @@ void Game::CreateDeviceDependentResources()
             device->CreateBuffer(&desc, &initData, m_instancedVB.ReleaseAndGetAddressOf())
         );
     }
+
+    // Create skinning teapot.
+    flags = (ccw ? ModelLoader_CounterClockwise : ModelLoader_Clockwise)
+        | ModelLoader_IncludeBones;
+
+    size_t animsOffset;
+    m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags, &animsOffset);
+
+    if (!animsOffset)
+    {
+        OutputDebugStringA("ERROR: 'teapot.cmo' - No animation clips found in file!\n");
+    }
+    else
+    {
+        DX::ThrowIfFailed(m_teapotAnim.Load(L"teapot.cmo", animsOffset, L"Take 001"));
+
+        OutputDebugStringA("'teapot.cmo' contains animation clips.\n");
+    }
+
+    m_teapotAnim.Bind(*m_teapot);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -790,6 +837,7 @@ void Game::OnDeviceLost()
     m_sphere2.reset();
     m_robot.reset();
     m_cubeInst.reset();
+    m_teapot.reset();
 
     m_fxFactory.reset();
 
