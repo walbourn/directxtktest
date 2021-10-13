@@ -8,6 +8,21 @@
       <UniqueIdentifier>6221faa9-54e7-4b82-8834-9fe138cfe5bb</UniqueIdentifier>
       <Extensions>bmp;dds;fbx;gif;jpg;jpeg;tga;tiff;tif;png</Extensions>
     </Filter>
+    <Filter Include="Assets\IBL">
+      <UniqueIdentifier>{96d5ecec-cb34-4bb4-92f5-40670e9ca937}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\BrokenCube">
+      <UniqueIdentifier>{35690896-64d4-4c50-9b93-87f071f22e0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Sphere">
+      <UniqueIdentifier>{a098c255-6120-4a7b-bd6f-8847a669dd7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Robot">
+      <UniqueIdentifier>{f38164ca-f021-437a-8d9a-fb81e13a7af2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Logos">
+      <UniqueIdentifier>{3859e1f6-d4d2-4a02-8785-cbe11ce325b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -39,118 +54,118 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\Common\Logo.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="..\Common\SmallLogo.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="..\Common\SplashScreen.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="..\Common\StoreLogo.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="..\Common\WideLogo.scale-100.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="BrokenCube_baseColor.DDS">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="BrokenCube_emissive.DDS">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="BrokenCube_normal.DDS">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="BrokenCube_occlusionRoughnessMetallic.DDS">
-      <Filter>Assets</Filter>
-    </Image>
     <Image Include="..\PBRTest\Atrium_diffuseIBL.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\IBL</Filter>
     </Image>
     <Image Include="..\PBRTest\Atrium_specularIBL.dds">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="..\PBRTest\Garage_diffuseIBL.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\IBL</Filter>
     </Image>
     <Image Include="..\PBRTest\Garage_specularIBL.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\IBL</Filter>
     </Image>
-    <Image Include="..\PBRTest\SunSubMixer_diffuseIBL.dds">
-      <Filter>Assets</Filter>
+    <Image Include="..\PBRTest\Garage_diffuseIBL.dds">
+      <Filter>Assets\IBL</Filter>
     </Image>
     <Image Include="..\PBRTest\SunSubMixer_specularIBL.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\IBL</Filter>
     </Image>
-    <Image Include="Sphere2Mat_baseColor.DDS">
-      <Filter>Assets</Filter>
+    <Image Include="..\PBRTest\SunSubMixer_diffuseIBL.dds">
+      <Filter>Assets\IBL</Filter>
     </Image>
-    <Image Include="Sphere2Mat_emissive.DDS">
-      <Filter>Assets</Filter>
+    <Image Include="BrokenCube_baseColor.DDS">
+      <Filter>Assets\BrokenCube</Filter>
     </Image>
-    <Image Include="Sphere2Mat_normal.DDS">
-      <Filter>Assets</Filter>
+    <Image Include="BrokenCube_emissive.DDS">
+      <Filter>Assets\BrokenCube</Filter>
     </Image>
-    <Image Include="Sphere2Mat_occlusionRoughnessMetallic.DDS">
-      <Filter>Assets</Filter>
+    <Image Include="BrokenCube_normal.DDS">
+      <Filter>Assets\BrokenCube</Filter>
     </Image>
-    <Image Include="SphereMat_baseColor.DDS">
-      <Filter>Assets</Filter>
+    <Image Include="BrokenCube_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets\BrokenCube</Filter>
     </Image>
-    <Image Include="SphereMat_normal.DDS">
-      <Filter>Assets</Filter>
+    <Image Include="..\Common\Logo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
     </Image>
-    <Image Include="SphereMat_occlusionRoughnessMetallic.DDS">
-      <Filter>Assets</Filter>
+    <Image Include="..\Common\SmallLogo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
     </Image>
     <Image Include="matFloor_baseColor.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Robot</Filter>
     </Image>
     <Image Include="matFloor_normal.DDS">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Robot</Filter>
     </Image>
     <Image Include="matFloor_occlusionRoughnessMetallic.DDS">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Robot</Filter>
     </Image>
     <Image Include="matToyRobot_baseColor.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Robot</Filter>
     </Image>
     <Image Include="matToyRobot_normal.DDS">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Robot</Filter>
     </Image>
     <Image Include="matToyRobot_occlusionRoughnessMetallic.DDS">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Robot</Filter>
     </Image>
     <Image Include="matWoodBlocks_baseColor.dds">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Robot</Filter>
     </Image>
     <Image Include="matWoodBlocks_normal.DDS">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Robot</Filter>
     </Image>
     <Image Include="matWoodBlocks_occlusionRoughnessMetallic.DDS">
-      <Filter>Assets</Filter>
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_baseColor.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_emissive.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_normal.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="SphereMat_baseColor.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="SphereMat_normal.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="SphereMat_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="..\Common\WideLogo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\StoreLogo.scale-100.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="..\Common\SplashScreen.scale-100.png">
+      <Filter>Assets\Logos</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageUWP.appxmanifest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="BrokenCube.sdkmesh">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="Sphere.sdkmesh">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="Sphere2.sdkmesh">
-      <Filter>Assets</Filter>
-    </None>
-    <None Include="ToyRobot.sdkmesh">
-      <Filter>Assets</Filter>
-    </None>
     <None Include="comic.spritefont">
       <Filter>Assets</Filter>
+    </None>
+    <None Include="BrokenCube.sdkmesh">
+      <Filter>Assets\BrokenCube</Filter>
+    </None>
+    <None Include="Sphere.sdkmesh">
+      <Filter>Assets\Sphere</Filter>
+    </None>
+    <None Include="Sphere2.sdkmesh">
+      <Filter>Assets\Sphere</Filter>
+    </None>
+    <None Include="ToyRobot.sdkmesh">
+      <Filter>Assets\Robot</Filter>
     </None>
   </ItemGroup>
 </Project>
