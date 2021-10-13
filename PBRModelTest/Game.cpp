@@ -438,6 +438,7 @@ void Game::Render()
 
     //--- Draw with skinning ---
     local = XMMatrixMultiply(XMMatrixScaling(0.02f, 0.02f, 0.02f), XMMatrixTranslation(4.f, row1, 0.f));
+    local = XMMatrixMultiply(world, local);
 
     auto nbones = static_cast<uint32_t>(m_teapot->bones.size());
     auto bones = ModelBone::MakeArray(nbones);
