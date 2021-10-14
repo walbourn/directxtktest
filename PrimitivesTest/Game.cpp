@@ -18,6 +18,8 @@
 // Build for LH vs. RH coords
 //#define LH_COORDS
 
+#define REVERSEZ
+
 extern void ExitGame() noexcept;
 
 using namespace DirectX;
@@ -407,8 +409,15 @@ void Game::Clear()
 #else
     color.v = Colors::CornflowerBlue;
 #endif
+
+#ifdef REVERSEZ
+    constexpr float c_zclear = 0.f;
+#else
+    constexpr float c_zclear = 1.f;
+#endif
+
     context->ClearRenderTargetView(renderTarget, color);
-    context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+    context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, c_zclear, 0);
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
     // Set the viewport.
@@ -639,12 +648,22 @@ void Game::CreateWindowSizeDependentResources()
     auto size = m_deviceResources->GetOutputSize();
     float aspect = (float)size.right / (float)size.bottom;
 
+#ifdef REVERSEZ
+    constexpr float c_nearz = 10.f;
+    constexpr float c_farz = 1.f;
+
+    GeometricPrimitive::SetDepthBufferMode(true);
+#else
+    constexpr float c_nearz = 1.f;
+    constexpr float c_farz = 10.f;
+#endif
+
 #ifdef LH_COORDS
     m_view = XMMatrixLookAtLH(cameraPosition, g_XMZero, XMVectorSet(0, 1, 0, 0));
-    m_projection = XMMatrixPerspectiveFovLH(1, aspect, 1, 10);
+    m_projection = XMMatrixPerspectiveFovLH(1, aspect, c_nearz, c_farz);
 #else
     m_view = XMMatrixLookAtRH(cameraPosition, g_XMZero, XMVectorSet(0, 1, 0, 0));
-    m_projection = XMMatrixPerspectiveFovRH(1, aspect, 1, 10);
+    m_projection = XMMatrixPerspectiveFovRH(1, aspect, c_nearz, c_farz);
 #endif
 
 #ifdef UWP
