@@ -88,6 +88,7 @@
 #include <fstream>
 #include <memory>
 #include <stdexcept>
+#include <tuple>
 
 #include "BufferHelpers.h"
 #include "CommonStates.h"

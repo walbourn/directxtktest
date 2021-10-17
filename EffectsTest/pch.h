@@ -88,6 +88,7 @@
 #include <memory>
 #include <stdexcept>
 #include <vector>
+#include <tuple>
 #include <type_traits>
 
 #include "BufferHelpers.h"

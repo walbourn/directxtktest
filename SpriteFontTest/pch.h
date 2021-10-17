@@ -91,6 +91,7 @@
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <tuple>
 #include <type_traits>
 
 #include "GamePad.h"

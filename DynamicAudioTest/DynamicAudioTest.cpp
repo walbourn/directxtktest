@@ -31,6 +31,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
+#include <tuple>
 
 using namespace DirectX;
 
@@ -685,7 +686,7 @@ int __cdecl main()
 
                             memcpy_s(buffers[currentStreamBuffer].get(), sampleBufferLength, audioData, sampleBufferLength);
 
-                            (void) mediaBuffer->Unlock();
+                            std::ignore = mediaBuffer->Unlock();
 
                             effect->SubmitBuffer(buffers[currentStreamBuffer].get(), sampleBufferLength);
 

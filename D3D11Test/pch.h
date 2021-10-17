@@ -91,6 +91,7 @@
 #include <memory>
 #include <random>
 #include <stdexcept>
+#include <tuple>
 #include <type_traits>
 
 #include "BufferHelpers.h"

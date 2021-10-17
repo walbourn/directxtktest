@@ -86,6 +86,7 @@
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <tuple>
 
 #include "CommonStates.h"
 #include "Effects.h"
