@@ -12,12 +12,10 @@ using namespace DX;
 
 using Microsoft::WRL::ComPtr;
 
-#if defined(NTDDI_WIN10_RS3)
 #include "Gamingdeviceinformation.h"
 
 #include <libloaderapi2.h>
 extern "C" IMAGE_DOS_HEADER __ImageBase;
-#endif
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
@@ -119,7 +117,6 @@ DeviceResources::DeviceResources(
         m_options(flags),
         m_deviceNotify(nullptr)
 {
-#if defined(NTDDI_WIN10_RS3)
     if (QueryOptionalDelayLoadedAPI(reinterpret_cast<HMODULE>(&__ImageBase),
         "api-ms-win-gaming-deviceinformation-l1-1-0.dll",
         "GetGamingDeviceModelInformation",
@@ -172,7 +169,6 @@ DeviceResources::DeviceResources(
         }
     }
     else
-#endif
     {
         m_options &= ~c_Enable4K_Xbox;
     }
@@ -707,7 +703,6 @@ void DeviceResources::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
 
     ComPtr<IDXGIAdapter1> adapter;
 
-#if defined(__dxgi1_6_h__) && defined(NTDDI_WIN10_RS4)
     ComPtr<IDXGIFactory6> factory6;
     HRESULT hr = m_dxgiFactory.As(&factory6);
     if (SUCCEEDED(hr))
@@ -737,7 +732,7 @@ void DeviceResources::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
             break;
         }
     }
-#endif
+
     if (!adapter)
     {
         for (UINT adapterIndex = 0;

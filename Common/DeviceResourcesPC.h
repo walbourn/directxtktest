@@ -44,8 +44,8 @@ namespace DX
         void HandleDeviceLost();
         void RegisterDeviceNotify(IDeviceNotify* deviceNotify) noexcept { m_deviceNotify = deviceNotify; }
         void Present();
-        void Suspend() noexcept {};
-        void Resume() noexcept {};
+        void Suspend() noexcept {}
+        void Resume() noexcept {}
 
         // Device Accessors.
         RECT GetOutputSize() const noexcept { return m_outputSize; }
@@ -73,17 +73,17 @@ namespace DX
         unsigned int            GetDeviceOptions() const noexcept       { return m_options; }
 
         // Performance events
-        void PIXBeginEvent(_In_z_ const wchar_t* name) noexcept
+        void PIXBeginEvent(_In_z_ const wchar_t* name)
         {
             m_d3dAnnotation->BeginEvent(name);
         }
 
-        void PIXEndEvent() noexcept
+        void PIXEndEvent()
         {
             m_d3dAnnotation->EndEvent();
         }
 
-        void PIXSetMarker(_In_z_ const wchar_t* name) noexcept
+        void PIXSetMarker(_In_z_ const wchar_t* name)
         {
             m_d3dAnnotation->SetMarker(name);
         }

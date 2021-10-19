@@ -100,7 +100,7 @@ namespace
     // Helper for computing tangents (see DirectXMesh <http://go.microsoft.com/fwlink/?LinkID=324981>)
     void ComputeTangents(const IndexCollection& indices, VertexCollection& vertices)
     {
-        static const float EPSILON = 0.0001f;
+        constexpr float EPSILON = 0.0001f;
         static const XMVECTORF32 s_flips = { { { 1.f, -1.f, -1.f, 1.f } } };
 
         size_t nFaces = indices.size() / 3;

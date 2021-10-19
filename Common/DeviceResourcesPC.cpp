@@ -175,7 +175,7 @@ void DeviceResources::CreateDeviceResources()
     };
 
     UINT featLevelCount = 0;
-    for (; featLevelCount < static_cast<int>(std::size(s_featureLevels)); ++featLevelCount)
+    for (; featLevelCount < static_cast<UINT>(std::size(s_featureLevels)); ++featLevelCount)
     {
         if (s_featureLevels[featLevelCount] < m_d3dMinFeatureLevel)
             break;

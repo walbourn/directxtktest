@@ -115,7 +115,7 @@ private:
     std::unique_ptr<DirectX::Model>             m_teapot;
     std::unique_ptr<DirectX::PBREffectFactory>  m_fxFactory;
 
-    static const size_t s_nIBL = 3;
+    static constexpr size_t s_nIBL = 3;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_radianceIBL[s_nIBL];
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_irradianceIBL[s_nIBL];

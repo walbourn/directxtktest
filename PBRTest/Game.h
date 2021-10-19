@@ -130,8 +130,8 @@ private:
     std::unique_ptr<DirectX::PBREffect>             m_pbrCube;
     std::unique_ptr<DirectX::DebugEffect>           m_debug;
 
-    static const size_t s_nMaterials = 3;
-    static const size_t s_nIBL = 3;
+    static constexpr size_t s_nMaterials = 3;
+    static constexpr size_t s_nIBL = 3;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_baseColor[s_nMaterials];
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_normalMap[s_nMaterials];
