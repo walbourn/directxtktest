@@ -113,7 +113,7 @@ HRESULT AnimationSDKMESH::Load(_In_z_ const wchar_t* fileName)
         || header->FrameTransformType != 0 /*FTT_RELATIVE*/
         || header->NumAnimationKeys == 0
         || header->NumFrames == 0
-        || header->AnimationFPS <= 0.f)
+        || header->AnimationFPS == 0)
         return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
 
     uint64_t dataSize = header->AnimationDataOffset + header->AnimationDataSize;
@@ -209,7 +209,7 @@ void AnimationSDKMESH::Apply(
     assert(header->Version == SDKMESH_FILE_VERSION);
 
     // Determine animation time
-    auto tick = static_cast<uint32_t>(header->AnimationFPS * m_animTime);
+    auto tick = static_cast<uint32_t>(static_cast<float>(header->AnimationFPS) * m_animTime);
     tick %= header->NumAnimationKeys;
 
     // Compute local bone transforms
