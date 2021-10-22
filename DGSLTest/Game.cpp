@@ -40,6 +40,9 @@ namespace
 static_assert(std::is_nothrow_move_constructible<DGSLEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<DGSLEffect>::value, "Move Assign.");
 
+static_assert(std::is_nothrow_move_constructible<SkinnedDGSLEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<SkinnedDGSLEffect>::value, "Move Assign.");
+
 static_assert(std::is_nothrow_move_constructible<DGSLEffectFactory>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<DGSLEffectFactory>::value, "Move Assign.");
 

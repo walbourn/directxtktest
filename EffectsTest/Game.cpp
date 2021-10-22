@@ -197,8 +197,14 @@ static_assert(std::is_nothrow_move_assignable<SkinnedEffect>::value, "Move Assig
 static_assert(std::is_nothrow_move_constructible<NormalMapEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<NormalMapEffect>::value, "Move Assign.");
 
+static_assert(std::is_nothrow_move_constructible<SkinnedNormalMapEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<SkinnedNormalMapEffect>::value, "Move Assign.");
+
 static_assert(std::is_nothrow_move_constructible<PBREffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<PBREffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<SkinnedPBREffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<SkinnedPBREffect>::value, "Move Assign.");
 
 static_assert(std::is_nothrow_move_constructible<DebugEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<DebugEffect>::value, "Move Assign.");
