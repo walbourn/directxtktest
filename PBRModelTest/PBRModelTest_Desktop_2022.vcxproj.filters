@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>21d85cb1-3ff8-475a-adae-561b8c01b3ef</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>7f399e36-071a-493e-863f-4f08f6f94708</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dds;dlg;fbx;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Assets\IBL">
+      <UniqueIdentifier>{61f748a2-3cc4-4b4b-a0ad-a7507118620a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\BrokenCube">
+      <UniqueIdentifier>{113ab261-7bdf-4f52-a707-ff3d70244efa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Robot">
+      <UniqueIdentifier>{d02dc075-f464-4684-ad43-5a2630651689}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Sphere">
+      <UniqueIdentifier>{4b781acd-c5a6-4d4f-98e5-c67053ba9960}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="..\Common\DeviceResourcesPC.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\RenderTexture.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\DirectXTKTest.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Animation.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\MainPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\RenderTexture.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Animation.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Common\settings.manifest">
+      <Filter>Common</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="comic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="BrokenCube.sdkmesh">
+      <Filter>Assets\BrokenCube</Filter>
+    </None>
+    <None Include="ToyRobot.sdkmesh">
+      <Filter>Assets\Robot</Filter>
+    </None>
+    <None Include="Sphere.sdkmesh">
+      <Filter>Assets\Sphere</Filter>
+    </None>
+    <None Include="Sphere2.sdkmesh">
+      <Filter>Assets\Sphere</Filter>
+    </None>
+    <None Include="teapot.cmo">
+      <Filter>Assets</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\PBRTest\Atrium_diffuseIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="..\PBRTest\Atrium_specularIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="..\PBRTest\Garage_diffuseIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="..\PBRTest\Garage_specularIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="..\PBRTest\SunSubMixer_diffuseIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="..\PBRTest\SunSubMixer_specularIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="BrokenCube_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets\BrokenCube</Filter>
+    </Image>
+    <Image Include="BrokenCube_baseColor.DDS">
+      <Filter>Assets\BrokenCube</Filter>
+    </Image>
+    <Image Include="BrokenCube_emissive.DDS">
+      <Filter>Assets\BrokenCube</Filter>
+    </Image>
+    <Image Include="BrokenCube_normal.DDS">
+      <Filter>Assets\BrokenCube</Filter>
+    </Image>
+    <Image Include="matFloor_baseColor.dds">
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="matFloor_normal.DDS">
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="matFloor_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="matToyRobot_baseColor.dds">
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="matToyRobot_normal.DDS">
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="matToyRobot_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="matWoodBlocks_baseColor.dds">
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="matWoodBlocks_normal.DDS">
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="matWoodBlocks_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets\Robot</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_baseColor.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_emissive.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_normal.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="SphereMat_baseColor.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="SphereMat_normal.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="SphereMat_occlusionRoughnessMetallic.DDS">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

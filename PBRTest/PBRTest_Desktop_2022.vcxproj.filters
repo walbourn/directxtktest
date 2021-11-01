@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>a4829015-4dc0-43eb-81a4-237cb18c9428</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>85c7fa53-e71f-4c41-b147-94639d8499b4</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dds;dlg;fbx;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Assets\IBL">
+      <UniqueIdentifier>{c9b46cc2-d108-40ef-bf67-ee5422cdab3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\BrokenCube">
+      <UniqueIdentifier>{cdc961f1-896d-4928-9b33-a445c7c765e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Sphere">
+      <UniqueIdentifier>{f4da0233-e5c3-4de4-908b-c57383fb245a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="..\Common\DeviceResourcesPC.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\RenderTexture.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\StepTimer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\DirectXTKTest.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="..\Common\DeviceResourcesPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\MainPC.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\RenderTexture.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\Common\settings.manifest">
+      <Filter>Assets</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Atrium_diffuseIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="Atrium_specularIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="Garage_diffuseIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="Garage_specularIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="SunSubMixer_diffuseIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="SunSubMixer_specularIBL.dds">
+      <Filter>Assets\IBL</Filter>
+    </Image>
+    <Image Include="BrokenCube_baseColor.png">
+      <Filter>Assets\BrokenCube</Filter>
+    </Image>
+    <Image Include="BrokenCube_emissive.png">
+      <Filter>Assets\BrokenCube</Filter>
+    </Image>
+    <Image Include="BrokenCube_normal.png">
+      <Filter>Assets\BrokenCube</Filter>
+    </Image>
+    <Image Include="BrokenCube_occlusionRoughnessMetallic.png">
+      <Filter>Assets\BrokenCube</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_baseColor.png">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_emissive.png">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_normal.png">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="Sphere2Mat_occlusionRoughnessMetallic.png">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="SphereMat_baseColor.png">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="SphereMat_normal.png">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+    <Image Include="SphereMat_occlusionRoughnessMetallic.png">
+      <Filter>Assets\Sphere</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="comic.spritefont">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="BrokenCube.vbo">
+      <Filter>Assets\BrokenCube</Filter>
+    </None>
+  </ItemGroup>
+</Project>
