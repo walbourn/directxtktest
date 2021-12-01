@@ -113,6 +113,8 @@ static_assert(std::is_nothrow_move_assignable<GraphicsMemory>::value, "Move Assi
 static_assert(std::is_nothrow_move_constructible<PrimitiveBatch<VertexPositionColor>>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<PrimitiveBatch<VertexPositionColor>>::value, "Move Assign.");
 
+#pragma warning(disable : 4061)
+
 //--------------------------------------------------------------------------------------
 
 // Constructor.
@@ -176,6 +178,25 @@ void Game::Initialize(
 
     m_deviceResources->CreateDeviceResources();
     CreateDeviceDependentResources();
+
+#ifdef _DEBUG
+    switch (m_deviceResources->GetDeviceFeatureLevel())
+    {
+    case D3D_FEATURE_LEVEL_9_1: OutputDebugStringA("INFO: Direct3D Hardware Feature level 9.1\n"); break;
+    case D3D_FEATURE_LEVEL_9_2: OutputDebugStringA("INFO: Direct3D Hardware Feature level 9.2\n"); break;
+    case D3D_FEATURE_LEVEL_9_3: OutputDebugStringA("INFO: Direct3D Hardware Feature level 9.3\n"); break;
+    case D3D_FEATURE_LEVEL_10_0: OutputDebugStringA("INFO: Direct3D Hardware Feature level 10.0\n"); break;
+    case D3D_FEATURE_LEVEL_10_1: OutputDebugStringA("INFO: Direct3D Hardware Feature level 10.1\n"); break;
+    case D3D_FEATURE_LEVEL_11_0: OutputDebugStringA("INFO: Direct3D Hardware Feature level 11.0\n"); break;
+    case D3D_FEATURE_LEVEL_11_1: OutputDebugStringA("INFO: Direct3D Hardware Feature level 11.1\n"); break;
+    case D3D_FEATURE_LEVEL_12_0: OutputDebugStringA("INFO: Direct3D Hardware Feature level 12.0\n"); break;
+    case D3D_FEATURE_LEVEL_12_1: OutputDebugStringA("INFO: Direct3D Hardware Feature level 12.1\n"); break;
+#if defined(NTDDI_WIN10_FE)
+    case D3D_FEATURE_LEVEL_12_2: OutputDebugStringA("INFO: Direct3D Hardware Feature level 12.2\n"); break;
+#endif
+    default: OutputDebugStringA("INFO: Direct3D Hardware Feature level **UNKNOWN**\n");
+    }
+#endif
 
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
