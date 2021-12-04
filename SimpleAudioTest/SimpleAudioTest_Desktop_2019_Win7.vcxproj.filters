@@ -61,6 +61,12 @@
       <Filter>Assets</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="..\StreamingAudioTest\WaveBankADPCM4Kn.xwb">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\StreamingAudioTest\WaveBankxWMA4Kn.xwb">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\BasicAudioTest\Alarm01.wav">
