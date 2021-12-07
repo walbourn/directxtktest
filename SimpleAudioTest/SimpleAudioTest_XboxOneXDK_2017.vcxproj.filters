@@ -85,6 +85,15 @@
     <None Include="..\StreamingAudioTest\WaveBankxWMA.xwb">
       <Filter>Assets</Filter>
     </None>
+    <None Include="..\StreamingAudioTest\WaveBankADPCM4Kn.xwb">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\StreamingAudioTest\WaveBankXMA2_4Kn.xwb">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\StreamingAudioTest\WaveBankxWMA4Kn.xwb">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\BasicAudioTest\Alarm01.wav">

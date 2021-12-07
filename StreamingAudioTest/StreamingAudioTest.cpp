@@ -31,6 +31,9 @@
 
 #include <stdio.h>
 
+// Test Advanced Format (4Kn) streaming wave banks vs. DVD (2048) sector aligned
+#define TEST_4KN
+
 #define TEST_PCM
 #define TEST_ADPCM
 
@@ -189,8 +192,24 @@ int __cdecl main()
 
 #ifdef TEST_PCM
     { // PCM WaveBank
+
+#ifdef TEST_4KN
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"WaveBank4Kn.xwb");
+        printf("\n\nINFO: Loaded wavebank4kn.xwb\n");
+        if (!wb->IsAdvancedFormat())
+        {
+            printf("\n\nERROR: Not a 4096 aligned wavebank!");
+            return 1;
+        }
+#else
         auto wb = std::make_unique<WaveBank>(audEngine.get(), L"WaveBank.xwb");
         printf("\n\nINFO: Loaded wavebank.xwb\n");
+        if (wb->IsAdvancedFormat())
+        {
+            printf("\n\nERROR: Not a 2048 aligned wavebank!");
+            return 1;
+        }
+#endif
 
         char buff[64] = {};
         auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
@@ -548,8 +567,23 @@ int __cdecl main()
 #ifdef TEST_ADPCM
     {
         // ADPCM WaveBank
+#ifdef TEST_4KN
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"WaveBankADPCM4Kn.xwb");
+        printf("\n\nINFO: Loaded WaveBankADPCM4Kn.xwb\n");
+        if (!wb->IsAdvancedFormat())
+        {
+            printf("\n\nERROR: Not a 4096 aligned wavebank!");
+            return 1;
+        }
+#else
         auto wb = std::make_unique<WaveBank>(audEngine.get(), L"WaveBankADPCM.xwb");
         printf("\n\nINFO: Loaded WaveBankADPCM.xwb\n");
+        if (wb->IsAdvancedFormat())
+        {
+            printf("\n\nERROR: Not a 2048 aligned wavebank!");
+            return 1;
+        }
+#endif
 
         char buff[64] = {};
         auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
@@ -672,8 +706,23 @@ int __cdecl main()
 #ifdef TEST_XWMA
     {
         // xWMA WaveBank
+#ifdef TEST_4KN
+        auto wb = std::make_unique<WaveBank>(audEngine.get(), L"WaveBankxWMA4Kn.xwb");
+        printf("\n\nINFO: Loaded WaveBankxWMA4Kn.xwb\n");
+        if (!wb->IsAdvancedFormat())
+        {
+            printf("\n\nERROR: Not a 4096 aligned wavebank!");
+            return 1;
+        }
+#else
         auto wb = std::make_unique<WaveBank>(audEngine.get(), L"WaveBankxWMA.xwb");
         printf("\n\nINFO: Loaded WaveBankxWMA.xwb\n");
+        if (wb->IsAdvancedFormat())
+        {
+            printf("\n\nERROR: Not a 2048 aligned wavebank!");
+            return 1;
+        }
+#endif
 
         char buff[64] = {};
         auto wfx = reinterpret_cast<WAVEFORMATEX*>(&buff);
