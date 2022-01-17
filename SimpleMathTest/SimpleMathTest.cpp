@@ -4067,6 +4067,12 @@ int TestM()
     VerifyNearEqual(Matrix::CreateFromYawPitchRoll(XM_PIDIV2, 0, 0), Matrix(0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1));
     VerifyNearEqual(Matrix::CreateFromYawPitchRoll(0, 0, XM_PIDIV2), Matrix(0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
 
+    VerifyNearEqual(Matrix::CreateFromYawPitchRoll(Vector3(XM_PIDIV2, 0, 0)), Matrix(1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1));
+    VerifyNearEqual(Matrix::CreateFromYawPitchRoll(Vector3(0, XM_PIDIV2, 0)), Matrix(0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1));
+    VerifyNearEqual(Matrix::CreateFromYawPitchRoll(Vector3(0, 0, XM_PIDIV2)), Matrix(0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
+
+    // TODO - ToEuler
+
     VerifyEqual(Matrix::CreateShadow(Vector3(0, -1, 0), Plane(0, -1, 0, 0)), Matrix(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
     VerifyEqual(Matrix::CreateReflection(Plane(0, 1, 0, 0)), Matrix(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
 
@@ -4639,7 +4645,17 @@ int TestQ()
     VerifyEqual(a.Dot(b), 70.f);
 
     VerifyNearEqual(Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), XM_PIDIV2), Quaternion(0.000000f, 0.707107f, 0.000000f, 0.707107f));
+
     VerifyNearEqual(Quaternion::CreateFromYawPitchRoll(0, XM_PIDIV2, 0), Quaternion(0.707107f, 0.000000f, 0.000000f, 0.707107f));
+    VerifyNearEqual(Quaternion::CreateFromYawPitchRoll(XM_PIDIV2, 0, 0), Quaternion(0.000000f, 0.707107f, 0.000000f, 0.707107f));
+    VerifyNearEqual(Quaternion::CreateFromYawPitchRoll(0, 0, XM_PIDIV2), Quaternion(0.000000f, 0.000000f, 0.707107f, 0.707107f));
+
+    VerifyNearEqual(Quaternion::CreateFromYawPitchRoll(Vector3(XM_PIDIV2, 0, 0)), Quaternion(0.707107f, 0.000000f, 0.000000f, 0.707107f));
+    VerifyNearEqual(Quaternion::CreateFromYawPitchRoll(Vector3(0, XM_PIDIV2, 0)), Quaternion(0.000000f, 0.707107f, 0.000000f, 0.707107f));
+    VerifyNearEqual(Quaternion::CreateFromYawPitchRoll(Vector3(0, 0, XM_PIDIV2)), Quaternion(0.000000f, 0.000000f, 0.707107f, 0.707107f));
+
+    // TODO - ToEuler
+
     VerifyNearEqual(Quaternion::CreateFromRotationMatrix(Matrix::CreateFromYawPitchRoll(0, XM_PIDIV2, 0)), Quaternion(0.707107f, 0.000000f, 0.000000f, 0.707107f));
 
     Quaternion::Lerp(Quaternion(0.707107f, 0, 0, 0.707107f), Quaternion(0, 0.707107f, 0, 0.707107f), 0.25f, c);
