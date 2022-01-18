@@ -4081,6 +4081,44 @@ int TestM()
         VerifyNearEqual(mrotz.ToEuler(), Vector3(0, 0, XM_PIDIV2));
     }
 
+    {
+        constexpr float inc = XM_PIDIV4 / 2.f;
+        for (float y = -XM_2PI; y < XM_2PI; y += inc)
+        {
+            for (float p = -XM_2PI; p < XM_2PI; p += inc)
+            {
+                for (float r = -XM_2PI; r < XM_2PI; r += inc)
+                {
+                    Matrix checkm = Matrix::CreateRotationZ(r) * Matrix::CreateRotationX(p) * Matrix::CreateRotationY(y);
+
+                    auto m = Matrix::CreateFromYawPitchRoll(y, p, r);
+                    VerifyNearEqual(m, checkm);
+
+                    Vector3 angles(p, y, r);
+                    VerifyNearEqual(Matrix::CreateFromYawPitchRoll(angles), checkm);
+
+                    Vector3 ev = m.ToEuler();
+                    if (!XMVector3NearEqual(ev, angles, VEPSILON))
+                    {
+                        // Check for equivalent rotation
+                        XMMATRIX check = checkm;
+                        XMMATRIX m2 = XMMatrixRotationZ(ev.z) * XMMatrixRotationX(ev.x) * XMMatrixRotationY(ev.y);
+
+                        if (!XMVector4NearEqual(m2.r[0], check.r[0], VEPSILON2)
+                            || !XMVector4NearEqual(m2.r[1], check.r[1], VEPSILON2)
+                            || !XMVector4NearEqual(m2.r[2], check.r[2], VEPSILON2)
+                            || !XMVector4NearEqual(m2.r[3], check.r[3], VEPSILON2))
+                        {
+                            printf("ERROR: %s:%d: %f %f %f (expecting %f %f %f)\n", __FUNCTION__, __LINE__,
+                                ev.x, ev.y, ev.z, p, y, r);
+                            success = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     VerifyEqual(Matrix::CreateShadow(Vector3(0, -1, 0), Plane(0, -1, 0, 0)), Matrix(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
     VerifyEqual(Matrix::CreateReflection(Plane(0, 1, 0, 0)), Matrix(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
 
@@ -4670,6 +4708,47 @@ int TestQ()
         VerifyNearEqual(qrotx.ToEuler(), Vector3(XM_PIDIV2, 0, 0));
         VerifyNearEqual(qroty.ToEuler(), Vector3(0, XM_PIDIV2, 0));
         VerifyNearEqual(qrotz.ToEuler(), Vector3(0, 0, XM_PIDIV2));
+
+        {
+            constexpr float inc = XM_PIDIV4 / 2.f;
+            for (float y = -XM_2PI; y < XM_2PI; y += inc)
+            {
+                for (float p = -XM_2PI; p < XM_2PI; p += inc)
+                {
+                    for (float r = -XM_2PI; r < XM_2PI; r += inc)
+                    {
+                        auto qx = Quaternion(cosf(p / 2.f), 0.f, 0.f, sinf(p / 2.f));
+                        auto qy = Quaternion(0.f, cosf(y / 2.f), 0.f, -sinf(y / 2.f));
+                        auto qz = Quaternion(0.f, 0.f, cosf(r / 2.f), -sinf(r / 2.f));
+                        Quaternion checkq = qz * qx * qy;
+
+                        auto q = Quaternion::CreateFromYawPitchRoll(y, p, r);
+                        VerifyNearEqual(q, checkq);
+
+                        Vector3 angles(p, y, r);
+                        VerifyNearEqual(Quaternion::CreateFromYawPitchRoll(angles), checkq);
+
+                        Vector3 ev = q.ToEuler();
+                        if (!XMVector3NearEqual(ev, angles, VEPSILON))
+                        {
+                            // Check for equivalent rotation
+                            qx = Quaternion(cosf(ev.x / 2.f), 0.f, 0.f, sinf(ev.x / 2.f));
+                            qy = Quaternion(0.f, cosf(ev.y / 2.f), 0.f, -sinf(ev.y / 2.f));
+                            qz = Quaternion(0.f, 0.f, cosf(ev.z / 2.f), -sinf(ev.z / 2.f));
+                            Quaternion q2 = qz * qx * qy;
+
+                            float dot = fabsf(q2.Dot(checkq));
+                            if (!XMScalarNearEqual(dot, 1.f, EPSILON2))
+                            {
+                                printf("ERROR: %s:%d: %f %f %f (expecting %f %f %f)\n", __FUNCTION__, __LINE__,
+                                    ev.x, ev.y, ev.z, p, y, r);
+                                success = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     VerifyNearEqual(Quaternion::CreateFromRotationMatrix(Matrix::CreateFromYawPitchRoll(0, XM_PIDIV2, 0)), Quaternion(0.707107f, 0.000000f, 0.000000f, 0.707107f));
