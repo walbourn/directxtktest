@@ -4779,6 +4779,11 @@ int TestQ()
     VerifyNearEqual(Quaternion(0, 0.707107f, 0, 0.707107f) * Quaternion(0.707107f, 0, 0, 0.707107f), Quaternion(0.5f, 0.5f, 0.5f, 0.5f));
     VerifyNearEqual(Quaternion(0.5f, 0.5f, 0.5f, 0.5f) / Quaternion(0.707107f, 0, 0, 0.707107f), Quaternion(0, 0.707107f, 0, 0.707107f));
 
+    // TODO - RotateTowards
+    // TODO - FromToRotation
+    // TODO - LookRotation
+    // TODO - Angle
+
     return (success) ? 0 : 1;
 }
 
