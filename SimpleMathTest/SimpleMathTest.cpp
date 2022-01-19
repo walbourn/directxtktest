@@ -4690,12 +4690,14 @@ int TestQ()
 
     VerifyEqual(a.Dot(b), 70.f);
 
-    VerifyNearEqual(Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), XM_PIDIV2), Quaternion(0.000000f, 0.707107f, 0.000000f, 0.707107f));
-
     {
         constexpr Quaternion qrotx(0.707107f, 0.000000f, 0.000000f, 0.707107f);
         constexpr Quaternion qroty(0.000000f, 0.707107f, 0.000000f, 0.707107f);
         constexpr Quaternion qrotz(0.000000f, 0.000000f, 0.707107f, 0.707107f);
+
+        VerifyNearEqual(Quaternion::CreateFromAxisAngle(Vector3(1, 0, 0), XM_PIDIV2), qrotx);
+        VerifyNearEqual(Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), XM_PIDIV2), qroty);
+        VerifyNearEqual(Quaternion::CreateFromAxisAngle(Vector3(0, 0, 1), XM_PIDIV2), qrotz);
 
         VerifyNearEqual(Quaternion::CreateFromYawPitchRoll(0, XM_PIDIV2, 0), qrotx);
         VerifyNearEqual(Quaternion::CreateFromYawPitchRoll(XM_PIDIV2, 0, 0), qroty);
@@ -4708,6 +4710,31 @@ int TestQ()
         VerifyNearEqual(qrotx.ToEuler(), Vector3(XM_PIDIV2, 0, 0));
         VerifyNearEqual(qroty.ToEuler(), Vector3(0, XM_PIDIV2, 0));
         VerifyNearEqual(qrotz.ToEuler(), Vector3(0, 0, XM_PIDIV2));
+
+        VerifyNearEqual(Quaternion::CreateFromRotationMatrix(Matrix::CreateFromYawPitchRoll(0, XM_PIDIV2, 0)), qrotx);
+        VerifyNearEqual(Quaternion::CreateFromRotationMatrix(Matrix::CreateFromYawPitchRoll(XM_PIDIV2, 0, 0)), qroty);
+        VerifyNearEqual(Quaternion::CreateFromRotationMatrix(Matrix::CreateFromYawPitchRoll(0, 0, XM_PIDIV2)), qrotz);
+
+        float angle = Quaternion::Angle(Quaternion::Identity, qrotx);
+        if (!XMScalarNearEqual(angle, XM_PIDIV2, EPSILON))
+        {
+            printf("ERROR: Angle I,X %f\n", angle);
+            success = false;
+        }
+
+         angle = Quaternion::Angle(qrotx, qroty);
+        if (!XMScalarNearEqual(angle, XM_2PI / 3.f, EPSILON))
+        {
+            printf("ERROR: Angle X,Y %f\n", angle);
+            success = false;
+        }
+
+        angle = Quaternion::Angle(qrotx, qrotx);
+        if (!XMScalarNearEqual(angle, 0.f, EPSILON))
+        {
+            printf("ERROR: Angle X,X %f\n", angle);
+            success = false;
+        }
 
         {
             constexpr float inc = XM_PIDIV4 / 2.f;
@@ -4751,8 +4778,6 @@ int TestQ()
         }
     }
 
-    VerifyNearEqual(Quaternion::CreateFromRotationMatrix(Matrix::CreateFromYawPitchRoll(0, XM_PIDIV2, 0)), Quaternion(0.707107f, 0.000000f, 0.000000f, 0.707107f));
-
     Quaternion::Lerp(Quaternion(0.707107f, 0, 0, 0.707107f), Quaternion(0, 0.707107f, 0, 0.707107f), 0.25f, c);
     VerifyNearEqual(c, Quaternion(0.588348f, 0.196116f, 0.000000f, 0.784465f));
 
@@ -4782,7 +4807,6 @@ int TestQ()
     // TODO - RotateTowards
     // TODO - FromToRotation
     // TODO - LookRotation
-    // TODO - Angle
 
     return (success) ? 0 : 1;
 }
