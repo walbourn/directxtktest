@@ -4827,10 +4827,31 @@ int TestQ()
 
         qrotx.RotateTowards(qrotz, XM_2PI, q);
         VerifyNearEqual(q, qrotz);
-    }
 
-    // TODO - FromToRotation
-    // TODO - LookRotation
+        Quaternion::FromToRotation(Vector3::Forward, Vector3::Forward, q);
+        VerifyNearEqual(q, Quaternion::Identity);
+
+        Quaternion::FromToRotation(Vector3::Forward, Vector3::Backward, q);
+        VerifyNearEqual(q, Quaternion::CreateFromAxisAngle(Vector3::Down, XM_PI));
+
+        Quaternion::FromToRotation(Vector3::Right, Vector3::Left, q);
+        VerifyNearEqual(q, Quaternion::CreateFromAxisAngle(Vector3::Backward, XM_PI));
+
+        Quaternion::FromToRotation(Vector3::Forward, Vector3::Up, q);
+        VerifyNearEqual(q, qrotx);
+
+        Quaternion::LookRotation(Vector3::Forward, Vector3::Forward, q);
+        VerifyNearEqual(q, Quaternion::Identity);
+
+        Quaternion::LookRotation(Vector3::Forward, Vector3::Up, q);
+        VerifyNearEqual(q, Quaternion::Identity);
+
+        Quaternion::LookRotation(Vector3::Up, Vector3::Right, q);
+        VerifyNearEqual(q, Quaternion(0.5f, 0.f, -0.707107f, 0.5f));
+
+        Quaternion::LookRotation(Vector3::Right, Vector3::Backward, q);
+        VerifyNearEqual(q, Quaternion(0.5f, -0.5f, 0.5f, 0.5f));
+   }
 
     return (success) ? 0 : 1;
 }
