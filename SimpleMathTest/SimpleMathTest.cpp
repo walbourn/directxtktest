@@ -274,8 +274,8 @@ int TestRect()
 
         if (loc.x != float(smallRect.x)
             || loc.y != float(smallRect.y)
-            || ctr.x != (float(smallRect.x) + float(smallRect.width / 2.f))
-            || ctr.y != (float(smallRect.y) + float(smallRect.height / 2.f)))
+            || ctr.x != (float(smallRect.x) + float(smallRect.width / 2))
+            || ctr.y != (float(smallRect.y) + float(smallRect.height / 2)))
         {
             printf("ERROR: Location/Center small\n");
             success = false;
@@ -286,8 +286,8 @@ int TestRect()
 
         if (loc.x != float(bigRect.x)
             || loc.y != float(bigRect.y)
-            || ctr.x != (float(bigRect.x) + float(bigRect.width / 2.f))
-            || ctr.y != (float(bigRect.y) + float(bigRect.height / 2.f)))
+            || ctr.x != (float(bigRect.x) + float(bigRect.width / 2))
+            || ctr.y != (float(bigRect.y) + float(bigRect.height / 2)))
         {
             printf("ERROR: Location/Center big\n");
             success = false;
@@ -4814,7 +4814,7 @@ int TestQ()
         VerifyNearEqual(q, qrotx);
 
         qrotx.RotateTowards(qroty, XM_PIDIV4, q);
-        VerifyNearEqual(q, Quaternion(0.497051775, 0.f, 0.312459797f, 0.809511602f));
+        VerifyNearEqual(q, Quaternion(0.497051775f, 0.f, 0.312459797f, 0.809511602f));
 
         qrotx.RotateTowards(qroty, XM_PIDIV2, q);
         VerifyNearEqual(q, Quaternion(0.211324900f, 0.f, 0.577350438f, 0.788675308f));

@@ -1,13 +1,12 @@
-﻿# DirectX Tool Kit for DirectX 11 Header Inclusion Test
-#
-# Copyright (c) Microsoft Corporation.
+﻿# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-#
-# http://go.microsoft.com/fwlink/?LinkID=615561
 
 cmake_minimum_required (VERSION 3.11)
 
-project (headertest LANGUAGES CXX)
+project (headertest
+  DESCRIPTION "DirectX Tool Kit for DirectX 11 Header Inclusion Test"
+  HOMEPAGE_URL "http://go.microsoft.com/fwlink/?LinkID=615561"
+  LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

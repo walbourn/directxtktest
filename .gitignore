@@ -27,3 +27,4 @@ Release
 /ipch
 /AppPackages
 SCREENSHOT.*
+CMakeUserPresets.json
