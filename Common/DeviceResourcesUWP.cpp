@@ -868,7 +868,8 @@ void DeviceResources::UpdateColorSpace()
     m_colorSpace = colorSpace;
 
     UINT colorSpaceSupport = 0;
-    if (SUCCEEDED(m_swapChain->CheckColorSpaceSupport(colorSpace, &colorSpaceSupport))
+    if (m_swapChain
+        && SUCCEEDED(m_swapChain->CheckColorSpaceSupport(colorSpace, &colorSpaceSupport))
         && (colorSpaceSupport & DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG_PRESENT))
     {
         ThrowIfFailed(m_swapChain->SetColorSpace1(colorSpace));
