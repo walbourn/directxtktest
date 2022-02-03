@@ -54,12 +54,19 @@ public:
     void OnDeactivated();
     void OnSuspending();
     void OnResuming();
+
 #ifdef PC
     void OnWindowMoved();
 #endif
+
+#if defined(PC) || defined(UWP)
+    void OnDisplayChange();
+#endif
+
 #ifndef XBOX
     void OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation);
 #endif
+
 #ifdef UWP
     void ValidateDevice();
 #endif

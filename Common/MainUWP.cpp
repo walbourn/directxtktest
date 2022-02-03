@@ -345,6 +345,7 @@ protected:
     void OnDisplayContentsInvalidated(DisplayInformation^ sender, Object^ args)
     {
         m_game->ValidateDevice();
+        m_game->OnDisplayChange();
     }
 
 private:

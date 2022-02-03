@@ -601,6 +601,13 @@ void Game::OnWindowMoved()
 }
 #endif
 
+#if defined(PC) || defined(UWP)
+void Game::OnDisplayChange()
+{
+    m_deviceResources->UpdateColorSpace();
+}
+#endif
+
 #ifndef XBOX
 void Game::OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation)
 {

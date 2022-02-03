@@ -529,8 +529,7 @@ void DeviceResources::Present()
 
         if (!m_dxgiFactory->IsCurrent())
         {
-            // Output information is cached on the DXGI Factory. If it is stale we need to create a new factory.
-            CreateFactory();
+            UpdateColorSpace();
         }
     }
 }
@@ -642,6 +641,15 @@ void DeviceResources::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
 // Sets the color space for the swap chain in order to handle HDR output.
 void DeviceResources::UpdateColorSpace()
 {
+    if (!m_dxgiFactory)
+        return;
+
+    if (!m_dxgiFactory->IsCurrent())
+    {
+        // Output information is cached on the DXGI Factory. If it is stale we need to create a new factory.
+        CreateFactory();
+    }
+
 #ifdef __dxgi1_4_h__
     DXGI_COLOR_SPACE_TYPE colorSpace = DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709;
 
