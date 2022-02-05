@@ -44,6 +44,7 @@ namespace DX
         void HandleDeviceLost();
         void RegisterDeviceNotify(IDeviceNotify* deviceNotify) noexcept { m_deviceNotify = deviceNotify; }
         void Present();
+        void UpdateColorSpace();
         void Suspend() noexcept {}
         void Resume() noexcept {}
 
@@ -106,7 +107,6 @@ namespace DX
     private:
         void CreateFactory();
         void GetHardwareAdapter(IDXGIAdapter1** ppAdapter);
-        void UpdateColorSpace();
 
         // Direct3D objects.
         Microsoft::WRL::ComPtr<IDXGIFactory2>               m_dxgiFactory;

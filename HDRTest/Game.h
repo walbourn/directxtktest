@@ -60,6 +60,10 @@ public:
     void OnWindowMoved();
 #endif
 
+#if defined(PC) || defined(UWP)
+    void OnDisplayChange();
+#endif
+
 #ifndef XBOX
     void OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation);
 #endif
