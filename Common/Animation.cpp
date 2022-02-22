@@ -82,15 +82,15 @@ HRESULT AnimationSDKMESH::Load(_In_z_ const wchar_t* fileName)
     if (!inFile)
         return E_FAIL;
 
-    std::streampos len = inFile.tellg();
+    const std::streampos len = inFile.tellg();
     if (!inFile)
         return E_FAIL;
 
-    if (len < sizeof(SDKANIMATION_FILE_HEADER))
-        return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
-
     if (len > UINT32_MAX)
         return HRESULT_FROM_WIN32(ERROR_FILE_TOO_LARGE);
+
+    if (static_cast<size_t>(len) < sizeof(SDKANIMATION_FILE_HEADER))
+        return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
 
     std::unique_ptr<uint8_t[]> blob(new (std::nothrow) uint8_t[size_t(len)]);
     if (!blob)
@@ -159,7 +159,7 @@ bool AnimationSDKMESH::Bind(const Model& model)
         MultiByteToWideChar(CP_UTF8, 0, frameData[j].FrameName, -1, frameName, MAX_FRAME_NAME);
 
         size_t count = 0;
-        for (const auto it : model.bones)
+        for (const auto& it : model.bones)
         {
             if (_wcsicmp(frameName, it.name.c_str()) == 0)
             {
@@ -179,7 +179,7 @@ bool AnimationSDKMESH::Bind(const Model& model)
 
 void AnimationSDKMESH::Update(float delta)
 {
-    m_animTime += delta;
+    m_animTime += static_cast<double>(delta);
 }
 
 _Use_decl_annotations_
@@ -209,7 +209,7 @@ void AnimationSDKMESH::Apply(
     assert(header->Version == SDKMESH_FILE_VERSION);
 
     // Determine animation time
-    auto tick = static_cast<uint32_t>(static_cast<float>(header->AnimationFPS) * m_animTime);
+    auto tick = static_cast<uint32_t>(static_cast<double>(header->AnimationFPS) * m_animTime);
     tick %= header->NumAnimationKeys;
 
     // Compute local bone transforms
@@ -296,7 +296,7 @@ HRESULT AnimationCMO::Load(const wchar_t* fileName, size_t offset, const wchar_t
     if (!inFile)
         return E_FAIL;
 
-    std::streampos len = inFile.tellg();
+    const std::streampos len = inFile.tellg();
     if (!inFile)
         return E_FAIL;
 
@@ -309,10 +309,10 @@ HRESULT AnimationCMO::Load(const wchar_t* fileName, size_t offset, const wchar_t
 
     auto remaining = len - static_cast<std::streamoff>(offset);
 
-    if (remaining < sizeof(uint32_t))
+    auto dataSize = static_cast<size_t>(remaining);
+    if (dataSize < sizeof(uint32_t))
         return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
 
-    auto dataSize = static_cast<size_t>(remaining);
     std::unique_ptr<uint8_t[]> blob(new (std::nothrow) uint8_t[dataSize]);
     if (!blob)
         return E_OUTOFMEMORY;
