@@ -95,9 +95,7 @@ void Game::Initialize(
     m_deviceResources->SetWindow(window);
 #ifdef COREWINDOW
     m_keyboard->SetWindow(reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(window));
-#if _XDK_VER >= 0x42D907D1
     m_mouse->SetWindow(reinterpret_cast<ABI::Windows::UI::Core::ICoreWindow*>(window));
-#endif
 #endif
 #elif defined(UWP)
     m_deviceResources->SetWindow(window, width, height, rotation);
