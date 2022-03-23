@@ -4,8 +4,8 @@
 
 #pragma once
 
-#if _XDK_VER < 0x295A04AA /* XDK Edition: 160300 */
-#error This code requires the March 2016 XDK or later
+#if _XDK_VER < 0x3F6803F3 /* XDK Edition 170600 */
+#error This code requires the June 2017 XDK or later
 #endif
 
 namespace DX

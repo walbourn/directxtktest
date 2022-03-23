@@ -92,11 +92,6 @@ void DeviceResources::CreateDeviceResources()
             OutputDebugStringA("INFO: Swapchain using 1080p (1920 x 1080) on Xbox One or Xbox One S\n");
 #endif
         }
-#else
-        m_options &= ~c_Enable4K_UHD;
-#ifdef _DEBUG
-        OutputDebugStringA("WARNING: Hardware detection not supported on this XDK edition; Swapchain using 1080p (1920 x 1080)\n");
-#endif
     }
 }
 
