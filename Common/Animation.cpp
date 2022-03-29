@@ -24,8 +24,8 @@ namespace
 {
 #pragma pack(push,8)
 
-    static constexpr uint32_t SDKMESH_FILE_VERSION = 101;
-    static constexpr uint32_t MAX_FRAME_NAME = 100;
+    constexpr uint32_t SDKMESH_FILE_VERSION = 101;
+    constexpr uint32_t MAX_FRAME_NAME = 100;
 
     struct SDKANIMATION_FILE_HEADER
     {
