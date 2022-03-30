@@ -11,14 +11,14 @@
 #include "pch.h"
 #include "Game.h"
 
-#ifdef GAMEINPUT
-#include <GameInput.h>
-#endif
+#include "FindMedia.h"
 
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
-#if defined(COREWINDOW) || defined(WGI)
+#ifdef USING_GAMEINPUT
+#include <GameInput.h>
+#elif defined(USING_WINDOWS_GAMING_INPUT)
 #include <Windows.UI.Core.h>
 #endif
 
@@ -113,7 +113,7 @@ void Game::Initialize(
     }
 #endif
 
-#ifdef GAMEINPUT
+#ifdef USING_GAMEINPUT
 
     m_ctrlChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     if (!m_ctrlChanged.IsValid())
@@ -123,7 +123,7 @@ void Game::Initialize(
 
     m_gamePad->RegisterEvents(m_ctrlChanged.Get());
 
-#elif defined(COREWINDOW)
+#elif defined(USING_WINDOWS_GAMING_INPUT) || defined(_XBOX_ONE)
 
     m_ctrlChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     m_userChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
@@ -163,14 +163,14 @@ void Game::Update(DX::StepTimer const&)
 {
     m_state.connected = false;
 
-#ifdef GAMEINPUT
+#ifdef USING_GAMEINPUT
 
     if (WaitForSingleObject(m_ctrlChanged.Get(), 0) == WAIT_OBJECT_0)
     {
         OutputDebugStringA("EVENT: Controller changed\n");
     }
 
-#elif defined(COREWINDOW)
+#elif defined(USING_WINDOWS_GAMING_INPUT) || defined(_XBOX_ONE)
 
     HANDLE events[2] = { m_ctrlChanged.Get(), m_userChanged.Get() };
     switch (WaitForMultipleObjects(static_cast<DWORD>(std::size(events)), events, FALSE, 0))
@@ -200,7 +200,7 @@ void Game::Update(DX::StepTimer const&)
 
                 if (caps.IsConnected())
                 {
-#ifdef GAMEINPUT
+#ifdef USING_GAMEINPUT
                     char idstr[128] = {};
                     for (size_t l = 0; l < APP_LOCAL_DEVICE_ID_SIZE; ++l)
                     {
@@ -232,7 +232,7 @@ void Game::Update(DX::StepTimer const&)
                             }
                         }
                     }
-#elif defined(WGI)
+#elif defined(USING_WINDOWS_GAMING_INPUT)
                     if (!caps.id.empty())
                     {
                         using namespace Microsoft::WRL;
@@ -653,9 +653,12 @@ void Game::CreateDeviceDependentResources()
 
     m_spriteBatch = std::make_unique<SpriteBatch>(context);
 
-    m_comicFont = std::make_unique<SpriteFont>(device, L"comic.spritefont");
+    wchar_t strFilePath[MAX_PATH] = {};
+    DX::FindMediaFile(strFilePath, MAX_PATH, L"comic.spritefont");
+    m_comicFont = std::make_unique<SpriteFont>(device, strFilePath);
 
-    m_ctrlFont = std::make_unique<SpriteFont>(device, L"xboxController.spritefont");
+    DX::FindMediaFile(strFilePath, MAX_PATH, L"xboxController.spritefont");
+    m_ctrlFont = std::make_unique<SpriteFont>(device, strFilePath);
 
     {
         static const uint32_t s_pixel = 0xffffffff;
