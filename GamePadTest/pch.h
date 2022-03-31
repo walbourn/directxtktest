@@ -10,6 +10,10 @@
 
 #include <winapifamily.h>
 
+#ifdef _GAMING_DESKTOP
+#define _WIN32_WINNT 0x0A00
+#endif
+
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #include <xdk.h>
 #elif !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)

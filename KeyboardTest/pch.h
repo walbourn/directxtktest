@@ -14,6 +14,10 @@
 
 #include <winapifamily.h>
 
+#ifdef _GAMING_DESKTOP
+#define _WIN32_WINNT 0x0A00
+#endif
+
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #include <xdk.h>
 #elif !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP) 
@@ -60,6 +64,10 @@
 #include <dxgi1_6.h>
 #else
 #include <d3d11_1.h>
+
+#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#include <dxgi1_6.h>
+#endif
 #endif
 
 #ifdef _DEBUG

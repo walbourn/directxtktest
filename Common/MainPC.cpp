@@ -11,6 +11,11 @@
 #include <shellapi.h>
 #pragma warning(pop)
 
+#ifdef _GAMING_DESKTOP
+#include <XGameRuntimeInit.h>
+#include <XGameErr.h>
+#endif
+
 using namespace DirectX;
 
 #ifdef __clang__
@@ -51,14 +56,25 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/) && !defined(_GAMING_DESKTOP)
     Microsoft::WRL::Wrappers::RoInitializeWrapper initialize(RO_INIT_MULTITHREADED);
     if (FAILED(initialize))
         return 1;
 #else
-    HRESULT hr = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
-    if (FAILED(hr))
+    if (FAILED(CoInitializeEx(nullptr, COINITBASE_MULTITHREADED)))
         return 1;
+#endif
+
+#ifdef _GAMING_DESKTOP
+    HRESULT hr = XGameRuntimeInitialize();
+    if (FAILED(hr))
+    {
+        if (hr == E_GAMERUNTIME_DLL_NOT_FOUND || hr == E_GAMERUNTIME_VERSION_MISMATCH)
+        {
+            std::ignore = MessageBoxW(nullptr, L"Game Runtime is not installed on this system or needs updating (Microsoft GDK).", L"D3D11Test", MB_ICONERROR | MB_OK);
+        }
+        return 1;
+    }
 #endif
 
     ParseCommandLine(lpCmdLine);
@@ -135,7 +151,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     UnregisterDeviceNotification(g_hNewAudio);
 #endif
 
+#ifdef _GAMING_DESKTOP
+    XGameRuntimeUninitialize();
+#endif
+
+#if (_WIN32_WINNT < 0x0A00 /*_WIN32_WINNT_WIN10*/) || defined(_GAMING_DESKTOP)
     CoUninitialize();
+#endif
 
     return static_cast<int>(msg.wParam);
 }

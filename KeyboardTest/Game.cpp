@@ -12,6 +12,8 @@
 #include "pch.h"
 #include "Game.h"
 
+#include "FindMedia.h"
+
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
@@ -637,7 +639,9 @@ void Game::CreateDeviceDependentResources()
 
     m_spriteBatch = std::make_unique<SpriteBatch>(context);
 
-    m_comicFont = std::make_unique<SpriteFont>(device, L"comic.spritefont");
+    wchar_t strFilePath[MAX_PATH] = {};
+    DX::FindMediaFile(strFilePath, MAX_PATH, L"comic.spritefont");
+    m_comicFont = std::make_unique<SpriteFont>(device, strFilePath);
 
     m_room = GeometricPrimitive::CreateBox(context, XMFLOAT3(ROOM_BOUNDS[0], ROOM_BOUNDS[1], ROOM_BOUNDS[2]), false, true);
 
@@ -647,7 +651,8 @@ void Game::CreateDeviceDependentResources()
     bool forceSRGB = false;
 #endif
 
-    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"texture.dds", 0,
+    DX::FindMediaFile(strFilePath, MAX_PATH, L"texture.dds");
+    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, strFilePath, 0,
         D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
         forceSRGB, nullptr, m_roomTex.GetAddressOf()));
 }
