@@ -4,6 +4,8 @@
     <ClCompile Include="SimpleMathTest.cpp" />
     <ClCompile Include="SimpleMathTestD3D11.cpp" />
     <ClCompile Include="SimpleMathTestD3D12.cpp" />
+    <ClCompile Include="SimpleMathTestCPP17.cpp" />
+    <ClCompile Include="SimpleMathTestCPP20.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SimpleMathTest.h" />
