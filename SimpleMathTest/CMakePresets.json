@@ -17,7 +17,7 @@
         "value": "x64",
         "strategy": "external"
       },
-      "cacheVariables": { "DXMATH_ARCHITECTURE": "x64" },
+      "cacheVariables": { "DIRECTX_ARCH": "x64" },
       "hidden": true
     },
     {
@@ -26,7 +26,7 @@
         "value": "x86",
         "strategy": "external"
       },
-      "cacheVariables": { "DXMATH_ARCHITECTURE": "x86" },
+      "cacheVariables": { "DIRECTX_ARCH": "x86" },
       "hidden": true
     },
     {
@@ -35,7 +35,7 @@
         "value": "arm",
         "strategy": "external"
       },
-      "cacheVariables": { "DXMATH_ARCHITECTURE": "arm" },
+      "cacheVariables": { "DIRECTX_ARCH": "arm" },
       "hidden": true
     },
     {
@@ -44,7 +44,7 @@
         "value": "arm64",
         "strategy": "external"
       },
-      "cacheVariables": { "DXMATH_ARCHITECTURE": "arm64" },
+      "cacheVariables": { "DIRECTX_ARCH": "arm64" },
       "hidden": true
     },
 
@@ -101,6 +101,28 @@
         "value": "host=x64",
         "strategy": "external"
       }
+    },
+    {
+      "name": "GNUC",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "g++.exe"
+      },
+      "toolset": {
+        "value": "host=x64",
+        "strategy": "external"
+      }
+    },
+
+    {
+      "name": "VCPKG",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "type": "FILEPATH"
+        }
+      },
+      "hidden": true
     },
 
     { "name": "x64-Debug"    , "description": "MSVC for x64 (Debug) - SSE/SSE2", "inherits": [ "base", "x64", "Debug", "MSVC" ] },
@@ -164,6 +186,11 @@
     { "name": "x86-Debug-NI-Clang"    , "description": "Clang/LLVM for x86 (Debug) - no intrinsics", "inherits": [ "base", "x86", "Debug", "NI", "Clang" ], "environment": { "CXXFLAGS": "-m32" } },
     { "name": "x86-Release-NI-Clang"  , "description": "Clang/LLVM for x86 (Release) - no intrinsics", "inherits": [ "base", "x86", "Release", "NI", "Clang" ], "environment": { "CXXFLAGS": "-m32" } },
     { "name": "arm64-Debug-NI-Clang"  , "description": "Clang/LLVM for AArch64 (Debug) - no intrinsics", "inherits": [ "base", "ARM64", "Debug", "NI", "Clang" ], "environment": { "CXXFLAGS": "--target=arm64-pc-windows-msvc" } },
-    { "name": "arm64-Release-NI-Clang", "description": "Clang/LLVM for AArch64 (Release) - no intrinsics", "inherits": [ "base", "ARM64", "Release", "NI", "Clang" ], "environment": { "CXXFLAGS": "--target=arm64-pc-windows-msvc" } }
+    { "name": "arm64-Release-NI-Clang", "description": "Clang/LLVM for AArch64 (Release) - no intrinsics", "inherits": [ "base", "ARM64", "Release", "NI", "Clang" ], "environment": { "CXXFLAGS": "--target=arm64-pc-windows-msvc" } },
+
+    { "name": "x64-Debug-MinGW"  , "description": "MinG-W64 (Debug)", "inherits": [ "base", "x64", "Debug", "GNUC", "VCPKG" ], "environment": { "PATH": "$penv{PATH};c:/mingw64/bin" } },
+    { "name": "x64-Release-MinGW", "description": "MinG-W64 (Release)", "inherits": [ "base", "x64", "Release", "GNUC", "VCPKG" ], "environment": { "PATH": "$penv{PATH};c:/mingw64/bin" } },
+    { "name": "x86-Debug-MinGW"  , "description": "MinG-W32 (Debug)", "inherits": [ "base", "x86", "Debug", "GNUC", "VCPKG" ], "environment": { "PATH": "$penv{PATH};c:/mingw32/bin" } },
+    { "name": "x86-Release-MinGW", "description": "MinG-W32 (Release)", "inherits": [ "base", "x86", "Release", "GNUC", "VCPKG" ], "environment": { "PATH": "$penv{PATH};c:/mingw32/bin" } }
   ]
 }

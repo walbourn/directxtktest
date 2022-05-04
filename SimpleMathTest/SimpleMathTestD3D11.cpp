@@ -8,7 +8,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
+#define NOMINMAX 1
 #define NODRAWTEXT
 #define NOGDI
 #define NOMCX
@@ -23,6 +23,39 @@
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
+
+#ifdef __MINGW32__
+struct CD3D11_VIEWPORT : public D3D11_VIEWPORT
+{
+    CD3D11_VIEWPORT() = default;
+    explicit CD3D11_VIEWPORT( const D3D11_VIEWPORT& o ) :
+        D3D11_VIEWPORT( o )
+    {}
+    explicit CD3D11_VIEWPORT(
+        FLOAT topLeftX,
+        FLOAT topLeftY,
+        FLOAT width,
+        FLOAT height,
+        FLOAT minDepth = 0.f /*D3D11_MIN_DEPTH*/,
+        FLOAT maxDepth = 1.f /*D3D11_MAX_DEPTH*/)
+    {
+        TopLeftX = topLeftX;
+        TopLeftY = topLeftY;
+        Width = width;
+        Height = height;
+        MinDepth = minDepth;
+        MaxDepth = maxDepth;
+    }
+};
+
+inline bool operator==( const D3D11_RECT& l, const D3D11_RECT& r )
+{
+    return l.left == r.left && l.top == r.top &&
+        l.right == r.right && l.bottom == r.bottom;
+}
+inline bool operator!=( const D3D11_RECT& l, const D3D11_RECT& r )
+{ return !( l == r ); }
+#endif // __MINGW32_
 
 int TestD3D11()
 {

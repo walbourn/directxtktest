@@ -8,7 +8,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
+#define NOMINMAX 1
 #define NODRAWTEXT
 #define NOGDI
 #define NOMCX
@@ -16,15 +16,41 @@
 #define NOHELP
 #pragma warning(pop)
 
+#ifdef __MINGW32__
+#include <unknwn.h>
+#endif
+
+#ifdef USING_DIRECTX_HEADERS
+#include <directx/d3d12.h>
+#else
 #include <d3d12.h>
+#endif
+
 #include "SimpleMath.h"
 
 #define D3DX12_NO_STATE_OBJECT_HELPERS
 #define D3DX12_NO_CHECK_FEATURE_SUPPORT_CLASS
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#pragma clang diagnostic ignored "-Wtautological-type-limit-compare"
+#endif
+
 #pragma warning(push)
 #pragma warning(disable : 26495)
+
+#ifdef USING_DIRECTX_HEADERS
+#include <directx/d3dx12.h>
+#else
 #include "d3dx12.h"
+#endif
+
 #pragma warning(pop)
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #include "SimpleMathTest.h"
 
