@@ -121,9 +121,9 @@ static_assert(std::is_nothrow_move_assignable<PrimitiveBatch<VertexPositionColor
 Game::Game() noexcept(false)
 {
 #ifdef GAMMA_CORRECT_RENDERING
-    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+    constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 #else
-    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 #endif
 
 #ifdef XBOX
@@ -507,7 +507,7 @@ namespace
 }
 
 template<class T>
-inline bool TestVertexType()
+inline bool TestVertexType(_In_ ID3D11Device *device, _In_ IEffect* effect)
 {
     static_assert(T::InputElementCount > 0, "element count must be non-zero");
     static_assert(T::InputElementCount <= 32 /* D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT */, "element count is too large");
@@ -523,6 +523,11 @@ inline bool TestVertexType()
             return false;
     }
 
+    ComPtr<ID3D11InputLayout> inputLayout;
+    HRESULT hr = CreateInputLayoutFromEffect<T>(device, effect, inputLayout.GetAddressOf());
+    if (FAILED(hr))
+        return false;
+
     return true;
 }
 
@@ -530,72 +535,6 @@ void Game::UnitTests()
 {
     bool success = true;
     OutputDebugStringA("*********** UINT TESTS BEGIN ***************\n");
-
-    if (!TestVertexType<VertexPosition>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPosition tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionColor>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionColor tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionTexture>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionTexture tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionDualTexture>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionDualTexture tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionNormal>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionNormal tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionColorTexture>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionColorTexture tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionNormalColor>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionNormalColor tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionNormalTexture>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionNormalTexture tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionNormalColorTexture>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionNormalColorTexture tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionNormalTangentColorTexture>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionNormalTangentColorTexture tests\n");
-        success = false;
-    }
-
-    if (!TestVertexType<VertexPositionNormalTangentColorTextureSkinning>())
-    {
-        OutputDebugStringA("ERROR: Failed VertexPositionNormalTangentColorTextureSkinning tests\n");
-        success = false;
-    }
 
     std::random_device rd;
     std::default_random_engine generator(rd());
@@ -813,6 +752,122 @@ void Game::UnitTests()
         }
     }
 
+    // CommonStates.h
+    if (m_states->Opaque() == nullptr
+        || m_states->AlphaBlend() == nullptr
+        || m_states->Additive() == nullptr
+        || m_states->NonPremultiplied() == nullptr)
+    {
+        OutputDebugStringA("ERROR: Failed CommonStates blend state tests\n");
+        success = false;
+    }
+
+    if (m_states->DepthNone() == nullptr
+        || m_states->DepthDefault() == nullptr
+        || m_states->DepthRead() == nullptr
+        || m_states->DepthReverseZ() == nullptr
+        || m_states->DepthReadReverseZ() == nullptr)
+    {
+        OutputDebugStringA("ERROR: Failed CommonStates depth/stencil state tests\n");
+        success = false;
+    }
+
+    if (m_states->CullNone() == nullptr
+        || m_states->CullClockwise() == nullptr
+        || m_states->CullCounterClockwise() == nullptr
+        || m_states->Wireframe() == nullptr)
+    {
+        OutputDebugStringA("ERROR: Failed CommonStates rasterizer state tests\n");
+        success = false;
+    }
+
+    if (m_states->PointWrap() == nullptr
+        || m_states->PointClamp() == nullptr
+        || m_states->LinearWrap() == nullptr
+        || m_states->LinearClamp() == nullptr
+        || m_states->AnisotropicWrap() == nullptr
+        || m_states->AnisotropicClamp() == nullptr)
+    {
+        OutputDebugStringA("ERROR: Failed CommonStates sampler state tests\n");
+        success = false;
+    }
+
+    // VertexTypes.h
+    {
+        auto effect = std::make_unique<BasicEffect>(device);
+
+        if (!TestVertexType<VertexPosition>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPosition tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionColor>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionColor tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionTexture>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionTexture tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionDualTexture>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionDualTexture tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionNormal>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionNormal tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionColorTexture>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionColorTexture tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionNormalColor>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionNormalColor tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionNormalTexture>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionNormalTexture tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionNormalColorTexture>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionNormalColorTexture tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionNormalTangentColorTexture>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionNormalTangentColorTexture tests\n");
+            success = false;
+        }
+
+        if (!TestVertexType<VertexPositionNormalTangentColorTextureSkinning>(device, effect.get()))
+        {
+            OutputDebugStringA("ERROR: Failed VertexPositionNormalTangentColorTextureSkinning tests\n");
+            success = false;
+        }
+    }
+
     OutputDebugStringA(success ? "Passed\n" : "Failed\n");
     OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
+
+    if (!success)
+    {
+        throw std::runtime_error("Unit Tests Failed");
+    }
 }
