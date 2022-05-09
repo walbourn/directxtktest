@@ -1563,4 +1563,9 @@ void Game::UnitTests(bool success)
 
     OutputDebugStringA(success ? "Passed\n" : "Failed\n");
     OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
+
+    if (!success)
+    {
+        throw std::runtime_error("Unit Tests Failed");
+    }
 }
