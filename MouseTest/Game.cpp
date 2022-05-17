@@ -50,9 +50,9 @@ Game::Game() noexcept(false) :
     m_cameraPos = START_POSITION.v;
 
 #ifdef GAMMA_CORRECT_RENDERING
-    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+    constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 #else
-    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 #endif
 
 #ifdef XBOX
@@ -113,6 +113,14 @@ void Game::Initialize(
     m_mouse->SetMode(Mouse::MODE_RELATIVE);
 #endif
 
+#ifdef USING_COREWINDOW
+    OutputDebugStringA("INFO: Using CoreWindow\n");
+#elif defined(USING_GAMEINPUT)
+    OutputDebugStringA("INFO: Using GameInput\n");
+#else
+    OutputDebugStringA("INFO: Using Win32 messages\n");
+#endif
+
     // Singleton test
     {
         bool thrown = false;
@@ -171,7 +179,7 @@ void Game::Update(DX::StepTimer const&)
 
     if (m_keyboardButtons.IsKeyPressed(Keyboard::Space))
     {
-        bool isvisible = m_mouse->IsVisible();
+        const bool isvisible = m_mouse->IsVisible();
         m_mouse->SetVisible(!isvisible);
 
         OutputDebugStringA(m_mouse->IsVisible() ? "INFO: Mouse cursor is visible\n" : "INFO: Mouse cursor NOT visible\n");
@@ -201,7 +209,7 @@ void Game::Update(DX::StepTimer const&)
     if (mouse.positionMode == Mouse::MODE_RELATIVE)
     {
         const SimpleMath::Vector4 ROTATION_GAIN(0.004f, 0.004f, 0.f, 0.f);
-        XMVECTOR delta = SimpleMath::Vector4(float(mouse.x), float(mouse.y), 0.f, 0.f) * ROTATION_GAIN;
+        const XMVECTOR delta = SimpleMath::Vector4(float(mouse.x), float(mouse.y), 0.f, 0.f) * ROTATION_GAIN;
 
         m_pitch -= XMVectorGetY(delta);
         m_yaw -= XMVectorGetX(delta);
@@ -291,20 +299,20 @@ void Game::Render()
     yellow.v = Colors::Yellow;
 #endif
 
-    float y = sinf(m_pitch);        // vertical
-    float r = cosf(m_pitch);        // in the plane
-    float z = r*cosf(m_yaw);        // fwd-back
-    float x = r*sinf(m_yaw);        // left-right
+    const float y = sinf(m_pitch);      // vertical
+    const float r = cosf(m_pitch);      // in the plane
+    const float z = r * cosf(m_yaw);    // fwd-back
+    const float x = r * sinf(m_yaw);    // left-right
 
-    XMVECTOR lookAt = XMVectorAdd( m_cameraPos, XMVectorSet(x, y, z, 0.f));
+    XMVECTOR lookAt = XMVectorAdd(m_cameraPos, XMVectorSet(x, y, z, 0.f));
 
-    XMMATRIX view = XMMatrixLookAtRH( m_cameraPos, lookAt, Vector3::Up);
+    XMMATRIX view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
 
     m_room->Draw(Matrix::Identity, view, m_proj, Colors::White, m_roomTex.Get());
 
-    XMVECTOR xsize = m_comicFont->MeasureString(L"X");
+    const XMVECTOR xsize = m_comicFont->MeasureString(L"X");
 
-    float height = XMVectorGetY(xsize);
+    const float height = XMVectorGetY(xsize);
 
     m_spriteBatch->Begin();
 
@@ -375,7 +383,7 @@ void Game::Clear()
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
     // Set the viewport.
-    auto viewport = m_deviceResources->GetScreenViewport();
+    auto const viewport = m_deviceResources->GetScreenViewport();
     context->RSSetViewports(1, &viewport);
 }
 #pragma endregion
@@ -407,7 +415,7 @@ void Game::OnResuming()
 #ifdef PC
 void Game::OnWindowMoved()
 {
-    auto r = m_deviceResources->GetOutputSize();
+    auto const r = m_deviceResources->GetOutputSize();
     m_deviceResources->WindowSizeChanged(r.right, r.bottom);
 }
 #endif
@@ -504,10 +512,10 @@ void Game::CreateWindowSizeDependentResources()
     }
 #endif
 
-    auto size = m_deviceResources->GetOutputSize();
+    auto const size = m_deviceResources->GetOutputSize();
     m_proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(70.f), float(size.right) / float(size.bottom), 0.01f, 100.f);
 
-    auto viewPort = m_deviceResources->GetScreenViewport();
+    auto const viewPort = m_deviceResources->GetScreenViewport();
     m_spriteBatch->SetViewport(viewPort);
 
 #ifdef UWP

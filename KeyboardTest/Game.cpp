@@ -47,9 +47,9 @@ Game::Game() noexcept(false) :
     m_cameraPos = START_POSITION.v;
 
 #ifdef GAMMA_CORRECT_RENDERING
-    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+    constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 #else
-    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 #endif
 
 #ifdef XBOX
@@ -99,6 +99,14 @@ void Game::Initialize(
 #else
     UNREFERENCED_PARAMETER(rotation);
     m_deviceResources->SetWindow(window, width, height);
+#endif
+
+#ifdef USING_COREWINDOW
+    OutputDebugStringA("INFO: Using CoreWindow\n");
+#elif defined(USING_GAMEINPUT)
+    OutputDebugStringA("INFO: Using GameInput\n");
+#else
+    OutputDebugStringA("INFO: Using Win32 messages\n");
 #endif
 
     // Singleton test
@@ -266,7 +274,7 @@ void Game::Update(DX::StepTimer const&)
         }
         else if (m_tracker.IsKeyReleased(static_cast<DirectX::Keyboard::Keys>(vk)))
         {
-            swprintf_s(m_lastStrBuff, L"F%d was pressed", vk - VK_F1 + 1);
+            swprintf_s(m_lastStrBuff, L"F%d was released", vk - VK_F1 + 1);
             m_lastStr = m_lastStrBuff;
         }
     }
@@ -323,7 +331,7 @@ void Game::Update(DX::StepTimer const&)
 
     m_cameraPos += move;
 
-    Vector3 halfBound = (Vector3(ROOM_BOUNDS.v) / Vector3(2.f) ) - Vector3(0.1f, 0.1f, 0.1f);
+    const Vector3 halfBound = (Vector3(ROOM_BOUNDS.v) / Vector3(2.f)) - Vector3(0.1f, 0.1f, 0.1f);
 
     m_cameraPos = Vector3::Min(m_cameraPos, halfBound);
     m_cameraPos = Vector3::Max(m_cameraPos, -halfBound);
@@ -359,16 +367,16 @@ void Game::Render()
     yellow.v = Colors::Yellow;
 #endif
 
-    XMVECTOR lookAt = XMVectorAdd(m_cameraPos, Vector3::Backward);
+    const XMVECTOR lookAt = XMVectorAdd(m_cameraPos, Vector3::Backward);
 
-    XMMATRIX view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
+    const XMMATRIX view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
 
     m_room->Draw(Matrix::Identity, view, m_proj, Colors::White, m_roomTex.Get());
 
-    XMVECTOR xsize = m_comicFont->MeasureString(L"X");
+    const XMVECTOR xsize = m_comicFont->MeasureString(L"X");
 
-    float width = XMVectorGetX(xsize);
-    float height = XMVectorGetY(xsize);
+    const float width = XMVectorGetX(xsize);
+    const float height = XMVectorGetY(xsize);
 
     m_spriteBatch->Begin();
 
@@ -551,7 +559,7 @@ void Game::Clear()
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
     // Set the viewport.
-    auto viewport = m_deviceResources->GetScreenViewport();
+    auto const viewport = m_deviceResources->GetScreenViewport();
     context->RSSetViewports(1, &viewport);
 }
 #pragma endregion
@@ -582,7 +590,7 @@ void Game::OnResuming()
 #ifdef PC
 void Game::OnWindowMoved()
 {
-    auto r = m_deviceResources->GetOutputSize();
+    auto const r = m_deviceResources->GetOutputSize();
     m_deviceResources->WindowSizeChanged(r.right, r.bottom);
 }
 #endif
@@ -660,10 +668,10 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    auto size = m_deviceResources->GetOutputSize();
+    auto const size = m_deviceResources->GetOutputSize();
     m_proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(70.f), float(size.right) / float(size.bottom), 0.01f, 100.f);
 
-    auto viewPort = m_deviceResources->GetScreenViewport();
+    auto const viewPort = m_deviceResources->GetScreenViewport();
     m_spriteBatch->SetViewport(viewPort);
 
 #ifdef UWP

@@ -20,6 +20,8 @@
 #include <GameInput.h>
 #elif defined(USING_WINDOWS_GAMING_INPUT)
 #include <Windows.UI.Core.h>
+#else
+#include <xinput.h>
 #endif
 
 extern void ExitGame() noexcept;
@@ -40,9 +42,9 @@ Game::Game() noexcept(false) :
     m_lastStr(nullptr)
 {
 #ifdef GAMMA_CORRECT_RENDERING
-    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+    constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 #else
-    const DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 #endif
 
     // 2D only rendering
@@ -115,6 +117,8 @@ void Game::Initialize(
 
 #ifdef USING_GAMEINPUT
 
+    OutputDebugStringA("INFO: Using GameInput\n");
+
     m_ctrlChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     if (!m_ctrlChanged.IsValid())
     {
@@ -125,6 +129,12 @@ void Game::Initialize(
 
 #elif defined(USING_WINDOWS_GAMING_INPUT) || defined(_XBOX_ONE)
 
+#ifdef _XBOX_ONE
+    OutputDebugStringA("INFO: Using Windows::Xbox::Input\n");
+#else
+    OutputDebugStringA("INFO: Using Windows.Gaming.Input\n");
+#endif
+
     m_ctrlChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     m_userChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     if (!m_ctrlChanged.IsValid() || !m_userChanged.IsValid())
@@ -132,11 +142,15 @@ void Game::Initialize(
         throw std::system_error(std::error_code(static_cast<int>(GetLastError()), std::system_category()), "CreateEvent");
     }
 
-    m_gamePad->RegisterEvents( m_ctrlChanged.Get(), m_userChanged.Get() );
+    m_gamePad->RegisterEvents(m_ctrlChanged.Get(), m_userChanged.Get());
+
+#else
+
+    OutputDebugStringA("INFO: Using XInput (" XINPUT_DLL_A ")\n");
 
 #endif
 
-    m_found.reset(new bool[GamePad::MAX_PLAYER_COUNT] );
+    m_found.reset(new bool[GamePad::MAX_PLAYER_COUNT]);
     memset(m_found.get(), 0, sizeof(bool) * GamePad::MAX_PLAYER_COUNT);
 
     m_deviceResources->CreateDeviceResources();
@@ -437,7 +451,7 @@ void Game::Render()
 
     for (int j = 0; j < std::min(GamePad::MAX_PLAYER_COUNT, 4); ++j)
     {
-        XMVECTOR color = m_found[size_t(j)] ? Colors::White : Colors::DimGray;
+        const XMVECTOR color = m_found[size_t(j)] ? Colors::White : Colors::DimGray;
         m_ctrlFont->DrawString(m_spriteBatch.get(), L"$", XMFLOAT2(800.f, float(50 + j * 150)), color);
     }
 
@@ -507,7 +521,7 @@ void Game::Render()
     m_ctrlFont->DrawString(m_spriteBatch.get(), L"-", XMFLOAT2(10, 10), m_state.IsLeftShoulderPressed() ? Colors::White : Colors::DimGray, 0, XMFLOAT2(0, 0), 0.5f);
 
     // Sticks
-    RECT src = { 0, 0, 1, 1 };
+    const RECT src = { 0, 0, 1, 1 };
 
     RECT rc;
     rc.top = 500;
@@ -555,7 +569,7 @@ void Game::Clear()
     auto context = m_deviceResources->GetD3DDeviceContext();
     auto renderTarget = m_deviceResources->GetRenderTargetView();
 
-    XMVECTORF32 color;
+    XMVECTORF32 color = {};
 #ifdef GAMMA_CORRECT_RENDERING
     color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
 #else
@@ -565,7 +579,7 @@ void Game::Clear()
     context->OMSetRenderTargets(1, &renderTarget, nullptr);
 
     // Set the viewport.
-    auto viewport = m_deviceResources->GetScreenViewport();
+    auto const viewport = m_deviceResources->GetScreenViewport();
     context->RSSetViewports(1, &viewport);
 }
 #pragma endregion
@@ -596,7 +610,7 @@ void Game::OnResuming()
 #ifdef PC
 void Game::OnWindowMoved()
 {
-    auto r = m_deviceResources->GetOutputSize();
+    auto const r = m_deviceResources->GetOutputSize();
     m_deviceResources->WindowSizeChanged(r.right, r.bottom);
 }
 #endif
@@ -663,7 +677,7 @@ void Game::CreateDeviceDependentResources()
     {
         static const uint32_t s_pixel = 0xffffffff;
 
-        D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+        const D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
 
         D3D11_TEXTURE2D_DESC desc = {};
         desc.Width = desc.Height = desc.MipLevels = desc.ArraySize = 1;
@@ -687,7 +701,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    auto viewPort = m_deviceResources->GetScreenViewport();
+    auto const viewPort = m_deviceResources->GetScreenViewport();
     m_spriteBatch->SetViewport(viewPort);
 
 #ifdef XBOX

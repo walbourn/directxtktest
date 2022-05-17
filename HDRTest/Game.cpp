@@ -70,9 +70,9 @@ Game::Game() noexcept(false) :
     m_hdr10Rotation(ToneMapPostProcess::HDTV_to_UHDTV)
 {
 #if defined(TEST_HDR_LINEAR) && !defined(XBOX)
-    const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    constexpr DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 #else
-    const DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
+    constexpr DXGI_FORMAT c_DisplayFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
 #endif
 
 #ifdef XBOX
@@ -209,8 +209,8 @@ void Game::Render()
 
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    auto vp = m_deviceResources->GetOutputSize();
-    auto safeRect = Viewport::ComputeTitleSafeArea(UINT(vp.right - vp.left), UINT(vp.bottom - vp.top));
+    auto const vp = m_deviceResources->GetOutputSize();
+    auto const safeRect = Viewport::ComputeTitleSafeArea(UINT(vp.right - vp.left), UINT(vp.bottom - vp.top));
 
     long w = safeRect.right - safeRect.left;
     long h = safeRect.bottom - safeRect.top;
@@ -415,7 +415,7 @@ void Game::Clear()
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
     // Set the viewport.
-    auto viewport = m_deviceResources->GetScreenViewport();
+    auto const viewport = m_deviceResources->GetScreenViewport();
     context->RSSetViewports(1, &viewport);
 }
 #pragma endregion
@@ -449,7 +449,7 @@ void Game::OnResuming()
 #ifdef PC
 void Game::OnWindowMoved()
 {
-    auto r = m_deviceResources->GetOutputSize();
+    auto const r = m_deviceResources->GetOutputSize();
     m_deviceResources->WindowSizeChanged(r.right, r.bottom);
 }
 #endif
@@ -553,7 +553,7 @@ void Game::CreateWindowSizeDependentResources()
 {
     static const XMVECTORF32 cameraPosition = { { { 0.f, 0.f, 7.f, 0.f } } };
 
-    auto size = m_deviceResources->GetOutputSize();
+    auto const size = m_deviceResources->GetOutputSize();
     float aspect = (float)size.right / (float)size.bottom;
 
 #ifdef LH_COORDS

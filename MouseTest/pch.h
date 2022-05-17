@@ -104,6 +104,7 @@
 #include "CommonStates.h"
 #include "DDSTextureLoader.h"
 #include "DirectXHelpers.h"
+#include "GamePad.h"
 #include "GeometricPrimitive.h"
 #include "GraphicsMemory.h"
 #include "ScreenGrab.h"
