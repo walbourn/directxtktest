@@ -63,7 +63,7 @@ Game::Game() noexcept(false) :
 #elif defined(UWP)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
         c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3,
-        DX::DeviceResources::c_Enable4K_Xbox
+        DX::DeviceResources::c_Enable4K_Xbox | DX::DeviceResources::c_EnableQHD_Xbox
         );
 #else
     m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat);
@@ -674,7 +674,21 @@ void Game::CreateWindowSizeDependentResources()
     auto const viewPort = m_deviceResources->GetScreenViewport();
     m_spriteBatch->SetViewport(viewPort);
 
-#ifdef UWP
+#ifdef XBOX
+    if (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_Enable4K_UHD)
+    {
+        // Scale sprite batch rendering when running 4k
+        static const D3D11_VIEWPORT s_vp1080 = { 0.f, 0.f, 1920.f, 1080.f, D3D11_MIN_DEPTH, D3D11_MAX_DEPTH };
+        m_spriteBatch->SetViewport(s_vp1080);
+    }
+#elif defined(UWP)
+    if (m_deviceResources->GetDeviceOptions() & (DX::DeviceResources::c_Enable4K_Xbox | DX::DeviceResources::c_EnableQHD_Xbox))
+    {
+        // Scale sprite batch rendering when running 4k or 1440p
+        static const D3D11_VIEWPORT s_vp1080 = { 0.f, 0.f, 1920.f, 1080.f, D3D11_MIN_DEPTH, D3D11_MAX_DEPTH };
+        m_spriteBatch->SetViewport(s_vp1080);
+    }
+
     m_spriteBatch->SetRotation(m_deviceResources->GetRotation());
 #endif
 }

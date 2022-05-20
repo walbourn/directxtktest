@@ -20,9 +20,10 @@ namespace DX
     class DeviceResources
     {
     public:
-        static constexpr unsigned int c_AllowTearing  = 0x1;
-        static constexpr unsigned int c_EnableHDR     = 0x2;
-        static constexpr unsigned int c_Enable4K_Xbox = 0x4;
+        static constexpr unsigned int c_AllowTearing   = 0x1;
+        static constexpr unsigned int c_EnableHDR      = 0x2;
+        static constexpr unsigned int c_Enable4K_Xbox  = 0x4;
+        static constexpr unsigned int c_EnableQHD_Xbox = 0x8;
 
         DeviceResources(DXGI_FORMAT backBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM,
                         DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT,

@@ -229,7 +229,7 @@ Game::Game() noexcept(false) :
 #elif defined(UWP)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
         c_RenderFormat, DXGI_FORMAT_UNKNOWN, 2, D3D_FEATURE_LEVEL_9_3,
-        DX::DeviceResources::c_Enable4K_Xbox
+        DX::DeviceResources::c_EnableQHD_Xbox
         );
 #else
     m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat, DXGI_FORMAT_UNKNOWN);

@@ -131,55 +131,78 @@ DeviceResources::DeviceResources(
         "GetGamingDeviceModelInformation",
         0))
     {
+        #ifndef NTDDI_WIN10_NI
+        #pragma warning(disable : 4063)
+        #define GAMING_DEVICE_DEVICE_ID_XBOX_SERIES_S static_cast<GAMING_DEVICE_DEVICE_ID>(0x1D27FABB)
+        #define GAMING_DEVICE_DEVICE_ID_XBOX_SERIES_X static_cast<GAMING_DEVICE_DEVICE_ID>(0x2F7A3DFF)
+        #define GAMING_DEVICE_DEVICE_ID_XBOX_SERIES_X_DEVKIT static_cast<GAMING_DEVICE_DEVICE_ID>(0xDE8A5661)
+        #endif
+
         GAMING_DEVICE_MODEL_INFORMATION info = {};
         GetGamingDeviceModelInformation(&info);
 
         if (info.vendorId == GAMING_DEVICE_VENDOR_ID_MICROSOFT)
         {
-#ifdef _DEBUG
+
+        #ifdef _DEBUG
             switch (info.deviceId)
             {
             case GAMING_DEVICE_DEVICE_ID_XBOX_ONE: OutputDebugStringA("INFO: Running on Xbox One\n"); break;
             case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_S: OutputDebugStringA("INFO: Running on Xbox One S\n"); break;
             case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_X: OutputDebugStringA("INFO: Running on Xbox One X\n"); break;
             case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_X_DEVKIT: OutputDebugStringA("INFO: Running on Xbox One X (DevKit)\n"); break;
-            default: break;
+            case GAMING_DEVICE_DEVICE_ID_XBOX_SERIES_S: OutputDebugStringA("INFO: Running on Xbox Series S\n"); break;
+            case GAMING_DEVICE_DEVICE_ID_XBOX_SERIES_X: OutputDebugStringA("INFO: Running on Xbox Series X\n"); break;
+            case GAMING_DEVICE_DEVICE_ID_XBOX_SERIES_X_DEVKIT: OutputDebugStringA("INFO: Running on Xbox Series X|S (DevKit)\n"); break;
+            default: OutputDebugStringA("INFO: Unknown Microsoft gaming device\n"); break;
             }
-#endif
+        #endif
 
             switch (info.deviceId)
             {
             case GAMING_DEVICE_DEVICE_ID_XBOX_ONE:
             case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_S:
+                m_options &= ~(c_Enable4K_Xbox | c_EnableQHD_Xbox);
+                break;
+
+            case GAMING_DEVICE_DEVICE_ID_XBOX_SERIES_S:
                 m_options &= ~c_Enable4K_Xbox;
-#ifdef _DEBUG
-                OutputDebugStringA("INFO: Swapchain using 1080p (1920 x 1080) on Xbox One or Xbox One S\n");
-#endif
                 break;
 
             case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_X:
             case GAMING_DEVICE_DEVICE_ID_XBOX_ONE_X_DEVKIT:
-#ifdef _DEBUG
-                if (m_options & c_Enable4K_Xbox)
-                {
-                    OutputDebugStringA("INFO: Swapchain using 4k (3840 x 2160) on Xbox One X\n");
-                }
-#endif
+            case GAMING_DEVICE_DEVICE_ID_XBOX_SERIES_X:
+            case GAMING_DEVICE_DEVICE_ID_XBOX_SERIES_X_DEVKIT:
                 break;
 
             default:
-                m_options &= ~c_Enable4K_Xbox;
+                m_options &= ~(c_Enable4K_Xbox | c_EnableQHD_Xbox);
                 break;
             }
+
+        #ifdef _DEBUG
+            if (m_options & c_Enable4K_Xbox)
+            {
+                OutputDebugStringA("INFO: Swapchain using 4k (3840 x 2160) on Xbox\n");
+            }
+            else if (m_options & c_EnableQHD_Xbox)
+            {
+                OutputDebugStringA("INFO: Swapchain using 1440p (2560 x 1440) on Xbox\n");
+            }
+            else
+            {
+                OutputDebugStringA("INFO: Swapchain using 1080p (1920 x 1080) on Xbox\n");
+            }
+        #endif
         }
         else
         {
-            m_options &= ~c_Enable4K_Xbox;
+            m_options &= ~(c_Enable4K_Xbox | c_EnableQHD_Xbox);
         }
     }
     else
     {
-        m_options &= ~c_Enable4K_Xbox;
+        m_options &= ~(c_Enable4K_Xbox | c_EnableQHD_Xbox);
     }
 }
 
@@ -523,6 +546,12 @@ void DeviceResources::SetWindow(IUnknown* window, int width, int height, DXGI_MO
         // If we are using a 4k swapchain, we hardcode the value
         width = 3840;
         height = 2160;
+    }
+    else if (m_options & c_EnableQHD_Xbox)
+    {
+        // If we are using a 1440p swapchain, we hardcode the value
+        width = 2560;
+        height = 1440;
     }
 
     m_outputSize.left = m_outputSize.top = 0;

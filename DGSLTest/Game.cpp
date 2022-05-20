@@ -75,7 +75,7 @@ Game::Game() noexcept(false)
 #else
         c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2, D3D_FEATURE_LEVEL_10_0,
 #endif
-        DX::DeviceResources::c_Enable4K_Xbox
+        DX::DeviceResources::c_Enable4K_Xbox | DX::DeviceResources::c_EnableQHD_Xbox
         );
 #elif defined(FEATURE_LEVEL_9_X)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
