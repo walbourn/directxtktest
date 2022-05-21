@@ -20,7 +20,7 @@
 #include <GameInput.h>
 #elif defined(USING_WINDOWS_GAMING_INPUT)
 #include <Windows.UI.Core.h>
-#else
+#elif !defined(_XBOX_ONE)
 #include <xinput.h>
 #endif
 
