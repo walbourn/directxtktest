@@ -755,7 +755,7 @@ void Game::Render()
         assert(j == m_instanceCount);
 
         MapGuard map(context, m_instancedVB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0);
-        memcpy(map.pData, m_instanceTransforms.get(), j * sizeof(XMFLOAT3X4));
+        map.copy<XMFLOAT3X4>(m_instanceTransforms.get(), j);
     }
 
     Clear();
