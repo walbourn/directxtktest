@@ -633,9 +633,9 @@ void Game::CreateDeviceDependentResources()
 
 #ifdef GAMMA_CORRECT_RENDERING
     m_fxFactory->EnableForceSRGB(true);
-    bool forceSRGB = true;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
 #else
-    bool forceSRGB = false;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_DEFAULT;
 #endif
 
 #ifndef NORMALMAPS
@@ -667,13 +667,13 @@ void Game::CreateDeviceDependentResources()
 
         // Load test textures
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"default.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_defaultTex.ReleaseAndGetAddressOf()));
 
     m_effect->SetTexture(m_defaultTex.Get());
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"cubemap.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB, 
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_cubemap.ReleaseAndGetAddressOf()));
 
     m_effect->SetEnvironmentMap(m_cubemap.Get());

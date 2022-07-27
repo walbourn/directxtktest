@@ -377,7 +377,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         ComPtr<ID3D11Resource> tex;
         if (usedds)
         {
-            hr = DirectX::CreateDDSTextureFromFileEx(device.Get(), pConv.szSrc, 0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0, false, tex.GetAddressOf(), nullptr, nullptr);
+            hr = DirectX::CreateDDSTextureFromFileEx(device.Get(), pConv.szSrc, 0,
+                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0,
+                DirectX::DDS_LOADER_DEFAULT, tex.GetAddressOf(), nullptr, nullptr);
             if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
             {
                 wprintf(L"ERROR: DDSTexture file not not found:\n%ls\n", pConv.szSrc);

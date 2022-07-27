@@ -479,15 +479,15 @@ void Game::CreateDeviceDependentResources()
     m_room = GeometricPrimitive::CreateBox(context, XMFLOAT3(ROOM_BOUNDS[0], ROOM_BOUNDS[1], ROOM_BOUNDS[2]), false, true);
 
 #ifdef GAMMA_CORRECT_RENDERING
-    bool forceSRGB = true;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
 #else
-    bool forceSRGB = false;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_DEFAULT;
 #endif
 
     DX::FindMediaFile(strFilePath, MAX_PATH, L"texture.dds");
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, strFilePath, 0,
         D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
-        forceSRGB, nullptr, m_roomTex.GetAddressOf()));
+        loadFlags, nullptr, m_roomTex.GetAddressOf()));
 
     DX::FindMediaFile(strFilePath, MAX_PATH, L"arrow.png");
     DX::ThrowIfFailed(CreateWICTextureFromFile(device, strFilePath, nullptr, m_cursor.GetAddressOf()));
