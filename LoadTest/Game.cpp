@@ -686,7 +686,7 @@ void Game::CreateDeviceDependentResources()
 
         ComPtr<ID3D11Resource> res;
         DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"earth_A2B10G10R10.dds",
-            0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, true,
+            0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, DDS_LOADER_FORCE_SRGB,
             res.GetAddressOf(), m_earth2.ReleaseAndGetAddressOf(), &alphaMode));
 
         if (alphaMode != DDS_ALPHA_MODE_UNKNOWN)
@@ -746,7 +746,7 @@ void Game::CreateDeviceDependentResources()
             ComPtr<ID3D11Resource> res;
             ComPtr<ID3D11ShaderResourceView> srv;
             DX::ThrowIfFailed(CreateDDSTextureFromMemoryEx(device, blob.data(), blob.size(),
-                0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, true,
+                0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, DDS_LOADER_FORCE_SRGB,
                 res.GetAddressOf(), srv.ReleaseAndGetAddressOf(), &alphaMode));
 
             if (alphaMode != DDS_ALPHA_MODE_UNKNOWN)
@@ -803,7 +803,7 @@ void Game::CreateDeviceDependentResources()
 
         ComPtr<ID3D11Resource> res;
         DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"dx5_logo.dds",
-            0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, true,
+            0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, DDS_LOADER_FORCE_SRGB,
             res.GetAddressOf(), m_dxlogo2.ReleaseAndGetAddressOf(), &alphaMode));
 
         if (alphaMode != DDS_ALPHA_MODE_UNKNOWN)
@@ -1328,6 +1328,27 @@ void Game::UnitTests(bool success)
     }
 
     // sRGB test
+    {
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> tex;
+
+        DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds",
+            0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, DDS_LOADER_IGNORE_SRGB,
+            res.GetAddressOf(), tex.GetAddressOf()));
+
+        if (!ValidateDesc(tex.Get(), D3D_SRV_DIMENSION_TEXTURE1D, DXGI_FORMAT_R8G8B8A8_UNORM, 1))
+        {
+            OutputDebugStringA("FAILED: io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds srv desc unexpected for IGNORE_SRGB\n");
+            success = false;
+        }
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE1D, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 32))
+        {
+            OutputDebugStringA("FAILED: io_R8G8B8A8_UNORM_SRGB_SRV_DIMENSION_TEXTURE1D_MipOff.dds res desc unexpected for IGNORE_SRGB\n");
+            success = false;
+        }
+    }
+
     {
         ComPtr<ID3D11Resource> res;
         ComPtr<ID3D11ShaderResourceView> tex;

@@ -906,38 +906,40 @@ void Game::CreateDeviceDependentResources()
     m_states = std::make_unique<CommonStates>(device);
 
 #ifdef GAMMA_CORRECT_RENDERING
-    bool forceSRGB = true;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
+    WIC_LOADER_FLAGS wicLoadFlags = WIC_LOADER_FORCE_SRGB;
 #else
-    bool forceSRGB = false;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_DEFAULT;
+    WIC_LOADER_FLAGS wicLoadFlags = WIC_LOADER_DEFAULT;
 #endif
 
     // Load textures.
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"cat.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_cat.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"opaqueCat.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_opaqueCat.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"cubemap.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_cubemap.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"spheremap.bmp",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB ? WIC_LOADER_FORCE_SRGB : WIC_LOADER_DEFAULT,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, wicLoadFlags,
         nullptr, m_envball.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"dualparabola.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_envdual.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"overlay.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_overlay.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"spnza_bricks_a.DDS",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_brickDiffuse.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"spnza_bricks_a_normal.DDS",

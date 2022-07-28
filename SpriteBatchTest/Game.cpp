@@ -379,26 +379,26 @@ void Game::CreateDeviceDependentResources()
     m_spriteBatch = std::make_unique<SpriteBatch>(context);
 
 #ifdef GAMMA_CORRECT_RENDERING
-    bool forceSRGB = true;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
 #else
-    bool forceSRGB = false;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_DEFAULT;
 #endif
 
     // Load textures.
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"cat.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_cat.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"a.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_letterA.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"b.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_letterB.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"c.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_letterC.ReleaseAndGetAddressOf()));
 }
 

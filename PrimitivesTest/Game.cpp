@@ -509,25 +509,24 @@ void Game::CreateDeviceDependentResources()
     m_states = std::make_unique<CommonStates>(device);
 
 #ifdef GAMMA_CORRECT_RENDERING
-    bool forceSRGB = true;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
 #else
-    bool forceSRGB = false;
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_DEFAULT;
 #endif
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"cat.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_cat.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"dx5_logo.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_dxlogo.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"reftexture.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRGB,
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_reftxt.ReleaseAndGetAddressOf()));
 
-    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"normalMap.dds",
-        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false,
+    DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"normalMap.dds",
         nullptr, m_normalMap.ReleaseAndGetAddressOf()));
 
 #ifdef LH_COORDS
