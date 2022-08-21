@@ -108,13 +108,13 @@ Game::Game() noexcept(false) :
 #endif
 
     // Set up 3D positional audio structures
-    m_listener.pCone = const_cast<X3DAUDIO_CONE*>(&Listener_DirectionalCone);
+    m_listener.SetCone(Listener_DirectionalCone);
 
     m_emitter.SetPosition(XMFLOAT3(10.f, 0.f, 0.f));
     m_emitter.pLFECurve = const_cast<X3DAUDIO_DISTANCE_CURVE*>(&Emitter_LFE_Curve);
     m_emitter.pReverbCurve = const_cast<X3DAUDIO_DISTANCE_CURVE*>(&Emitter_Reverb_Curve);
     m_emitter.CurveDistanceScaler = 14.f;
-    m_emitter.pCone = const_cast<X3DAUDIO_CONE*>(&Emitter_DirectionalCone);
+    m_emitter.SetCone(Emitter_DirectionalCone);
 }
 
 Game::~Game()
