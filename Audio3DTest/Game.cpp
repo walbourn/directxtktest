@@ -24,6 +24,9 @@
 // Build with Reverb enabled or not
 #define USE_REVERB
 
+// Build with custom emitter curves
+//#define USE_CUSTOM_CURVES
+
 extern void ExitGame() noexcept;
 
 using namespace DirectX;
@@ -37,11 +40,13 @@ namespace
 
     constexpr X3DAUDIO_CONE Emitter_DirectionalCone = { 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f };
 
+#ifdef USE_CUSTOM_CURVES
     constexpr X3DAUDIO_DISTANCE_CURVE_POINT Emitter_LFE_CurvePoints[3] = { { 0.0f, 1.0f }, { 0.25f, 0.0f}, { 1.0f, 0.0f } };
     constexpr X3DAUDIO_DISTANCE_CURVE       Emitter_LFE_Curve = { (X3DAUDIO_DISTANCE_CURVE_POINT*) &Emitter_LFE_CurvePoints[0], 3 };
 
     constexpr X3DAUDIO_DISTANCE_CURVE_POINT Emitter_Reverb_CurvePoints[3] = { { 0.0f, 0.5f}, { 0.75f, 1.0f }, { 1.0f, 0.0f } };
     constexpr X3DAUDIO_DISTANCE_CURVE       Emitter_Reverb_Curve = { (X3DAUDIO_DISTANCE_CURVE_POINT*) &Emitter_Reverb_CurvePoints[0], 3 };
+#endif
 
     void SetDeviceString(_In_ AudioEngine* engine, _Out_writes_(maxsize) wchar_t* deviceStr, size_t maxsize)
     {
@@ -111,8 +116,13 @@ Game::Game() noexcept(false) :
     m_listener.SetCone(Listener_DirectionalCone);
 
     m_emitter.SetPosition(XMFLOAT3(10.f, 0.f, 0.f));
+
+#ifdef USE_CUSTOM_CURVES
     m_emitter.pLFECurve = const_cast<X3DAUDIO_DISTANCE_CURVE*>(&Emitter_LFE_Curve);
     m_emitter.pReverbCurve = const_cast<X3DAUDIO_DISTANCE_CURVE*>(&Emitter_Reverb_Curve);
+#else
+    m_emitter.EnableDefaultCurves();
+#endif
     m_emitter.CurveDistanceScaler = 14.f;
     m_emitter.SetCone(Emitter_DirectionalCone);
 }
