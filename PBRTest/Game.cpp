@@ -769,10 +769,8 @@ void Game::Clear()
 // Message handlers
 void Game::OnActivated()
 {
-}
-
-void Game::OnDeactivated()
-{
+    m_gamePadButtons.Reset();
+    m_keyboardButtons.Reset();
 }
 
 void Game::OnSuspending()

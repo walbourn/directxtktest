@@ -49,8 +49,8 @@ public:
 #endif
 
     // Messages
-    void OnActivated();
-    void OnDeactivated();
+    void OnActivated() {}
+    void OnDeactivated() {}
     void OnSuspending();
     void OnResuming();
 

@@ -52,7 +52,7 @@ public:
 
     // Messages
     void OnActivated();
-    void OnDeactivated();
+    void OnDeactivated() {}
     void OnSuspending();
     void OnResuming();
 

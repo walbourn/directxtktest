@@ -588,10 +588,7 @@ void Game::Clear()
 // Message handlers
 void Game::OnActivated()
 {
-}
-
-void Game::OnDeactivated()
-{
+    m_tracker.Reset();
 }
 
 void Game::OnSuspending()

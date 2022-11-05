@@ -827,14 +827,6 @@ void Game::Clear()
 
 #pragma region Message Handlers
 // Message handlers
-void Game::OnActivated()
-{
-}
-
-void Game::OnDeactivated()
-{
-}
-
 void Game::OnSuspending()
 {
     m_deviceResources->Suspend();

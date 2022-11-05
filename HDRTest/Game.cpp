@@ -428,10 +428,6 @@ void Game::OnActivated()
     m_gamePadButtons.Reset();
 }
 
-void Game::OnDeactivated()
-{
-}
-
 void Game::OnSuspending()
 {
     m_deviceResources->Suspend();
