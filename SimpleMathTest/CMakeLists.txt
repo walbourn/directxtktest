@@ -1,7 +1,7 @@
 ﻿# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-cmake_minimum_required (VERSION 3.13)
+cmake_minimum_required (VERSION 3.20)
 
 project (simplemathtest
   DESCRIPTION "DirectX Tool Kit Simple Math Test Suite"
@@ -56,67 +56,54 @@ if(NOT ${DIRECTX_ARCH} MATCHES "^arm")
     set(ARCH_AVX2  $<$<CXX_COMPILER_ID:MSVC>:/arch:AVX2> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-mavx2 -mfma -mf16c>)
 endif()
 
-if(MSVC)
-    # Use max Warning Level 
-    string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-    string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-    string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+if(MSVC AND BUILD_FOR_ONECORE)
+    message("INFO: Building for OneCore (Windows 10)")
 
-    # Not using typeid or dynamic_cast, so disable RTTI to save binary size
-    string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-    string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-    string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+    # Locate Visual Studio (needed for VC Runtime DLLs)
+    if (NOT DEFINED VCInstallDir AND DEFINED ENV{VCINSTALLDIR})
+        set(VCInstallDir $ENV{VCINSTALLDIR})
+    endif()
 
-    # General settings for all MSVC-like targets
-    if (BUILD_FOR_ONECORE)
-        message("INFO: Building for OneCore (Windows 10)")
+    if (NOT DEFINED VCInstallDir)
+        set(VS_EDITIONS "Community" "Professional" "Enterprise" "Preview" "BuildTools")
+        foreach(vsedition IN LISTS VS_EDITIONS)
+            set(VCInstallDir "$ENV{ProgramFiles\(x86\)}/Microsoft Visual Studio/2019/${vsedition}/VC")
+            if(EXISTS ${VCInstallDir})
+                break()
+            endif()
+        endforeach()
 
-        # Locate Visual Studio (needed for VC Runtime DLLs)
-        if (NOT DEFINED VCInstallDir AND DEFINED ENV{VCINSTALLDIR})
-            set(VCInstallDir $ENV{VCINSTALLDIR})
-        endif()
-
-        if (NOT DEFINED VCInstallDir)
-            set(VS_EDITIONS "Community" "Professional" "Enterprise" "Preview" "BuildTools")
+        if (NOT EXISTS ${VCInstallDir})
             foreach(vsedition IN LISTS VS_EDITIONS)
-                set(VCInstallDir "$ENV{ProgramFiles\(x86\)}/Microsoft Visual Studio/2019/${vsedition}/VC")
+                set(VCInstallDir "$ENV{ProgramFiles}/Microsoft Visual Studio/2022/${vsedition}/VC")
                 if(EXISTS ${VCInstallDir})
                     break()
                 endif()
             endforeach()
-
-            if (NOT EXISTS ${VCInstallDir})
-                foreach(vsedition IN LISTS VS_EDITIONS)
-                    set(VCInstallDir "$ENV{ProgramFiles}/Microsoft Visual Studio/2022/${vsedition}/VC")
-                    if(EXISTS ${VCInstallDir})
-                        break()
-                    endif()
-                endforeach()
-            endif()
         endif()
-
-        if(EXISTS ${VCInstallDir})
-            message("VCInstallDir = ${VCInstallDir}")
-        else()
-            message(FATAL_ERROR "ERROR: Failed to locate Visual Studio 2019 or 2022 install")
-        endif()
-
-        # Find VC toolset/runtime versions
-        file(STRINGS "${VCInstallDir}/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt" VCToolsVersion)
-        message("VCToolsVersion = ${VCToolsVersion}")
-
-        # Don't link with kernel32.lib, etc.
-        set(CMAKE_CXX_STANDARD_LIBRARIES "")
-        set(CMAKE_CXX_STANDARD_LIBRARIES_INIT "")
-
-        # Need to link with "onecore" versions of Visual C++ libraries
-        set(VC_OneCore_LibPath "${VCInstallDir}/Tools/MSVC/${VCToolsVersion}/lib/onecore/${DIRECTX_ARCH}")
-        if(NOT EXISTS ${VC_OneCore_LibPath}/msvcrt.lib)
-            message(FATAL_ERROR "ERROR: Cannot locate msvcrt.lib for the Visual C++ toolset (${VCToolsVersion})")
-        endif()
-
-        list(APPEND DXMATH_DEFS "_WIN32_WINNT=0x0A00")
     endif()
+
+    if(EXISTS ${VCInstallDir})
+        message("VCInstallDir = ${VCInstallDir}")
+    else()
+        message(FATAL_ERROR "ERROR: Failed to locate Visual Studio 2019 or 2022 install")
+    endif()
+
+    # Find VC toolset/runtime versions
+    file(STRINGS "${VCInstallDir}/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt" VCToolsVersion)
+    message("VCToolsVersion = ${VCToolsVersion}")
+
+    # Don't link with kernel32.lib, etc.
+    set(CMAKE_CXX_STANDARD_LIBRARIES "")
+    set(CMAKE_CXX_STANDARD_LIBRARIES_INIT "")
+
+    # Need to link with "onecore" versions of Visual C++ libraries
+    set(VC_OneCore_LibPath "${VCInstallDir}/Tools/MSVC/${VCToolsVersion}/lib/onecore/${DIRECTX_ARCH}")
+    if(NOT EXISTS ${VC_OneCore_LibPath}/msvcrt.lib)
+        message(FATAL_ERROR "ERROR: Cannot locate msvcrt.lib for the Visual C++ toolset (${VCToolsVersion})")
+    endif()
+
+    list(APPEND DXMATH_DEFS "_WIN32_WINNT=0x0A00")
 endif()
 
 add_executable(${PROJECT_NAME}
@@ -134,7 +121,7 @@ if (MINGW OR (NOT WIN32) OR VCPKG_TOOLCHAIN)
 endif()
 
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /fp:fast)
+    target_compile_options(${PROJECT_NAME} PRIVATE /Wall /GR- /fp:fast)
 endif()
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
