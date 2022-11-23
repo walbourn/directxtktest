@@ -15,9 +15,12 @@ endif()
 set(TEST_EXES headertest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/HeaderTest)
 
-# TODO: fuzzloaders
+# fuzzloaders
+list(APPEND TEST_EXES fuzzloaders)
+add_executable(fuzzloaders fuzzloaders/fuzzloaders.cpp)
+target_include_directories(fuzzloaders PRIVATE ../Audio)
 
-# d3d11test
+# D3D11
 list(APPEND TEST_EXES d3d11test)
 add_executable(d3d11test WIN32
     D3D11Test/Game.cpp
@@ -31,32 +34,96 @@ add_executable(d3d11test WIN32
     )
 target_include_directories(d3d11test PRIVATE ./D3D11Test)
 target_precompile_headers(d3d11test PRIVATE D3D11Test/pch.h)
-add_test(NAME "d3d11" COMMAND d3d11test -ctest WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+add_test(NAME "d3d11" COMMAND d3d11test -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/D3D11Test)
 set_tests_properties(d3d11 PROPERTIES TIMEOUT 30)
 
-# TODO: AnimTest
-# TODO: DGSLTest
-# TODO: EffectTEst
-# TODO: HDRTest
+# EFFECTS
+list(APPEND TEST_EXES effectstest)
+add_executable(effectstest WIN32
+    EffectsTest/Game.cpp
+    EffectsTest/Game.h
+    EffectsTest/pch.h
+    Common/MainPC.cpp
+    Common/DeviceResourcesPC.cpp
+    Common/DeviceResourcesPC.h
+    Common/StepTimer.h
+    Common/DirectXTKTest.h
+    )
+target_include_directories(effectstest PRIVATE ../Src ./EffectsTest)
+target_precompile_headers(effectstest PRIVATE EffectsTest/pch.h)
+add_test(NAME "effects" COMMAND effectstest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/EffectsTest)
+set_tests_properties(effects PROPERTIES TIMEOUT 60)
+
+# PRIMITIVE BATCH
+list(APPEND TEST_EXES primitivestest)
+add_executable(primitivestest WIN32
+    PrimitivesTest/Game.cpp
+    PrimitivesTest/Game.h
+    PrimitivesTest/pch.h
+    Common/MainPC.cpp
+    Common/DeviceResourcesPC.cpp
+    Common/DeviceResourcesPC.h
+    Common/StepTimer.h
+    Common/DirectXTKTest.h
+    )
+target_include_directories(primitivestest PRIVATE ./PrimitivesTest)
+target_precompile_headers(primitivestest PRIVATE PrimitivesTest/pch.h)
+add_test(NAME "primitiveBatch" COMMAND primitivestest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PrimitivesTest)
+set_tests_properties(primitiveBatch PROPERTIES TIMEOUT 60)
+
+# SPRITE BATCH
+list(APPEND TEST_EXES spritebatchtest)
+add_executable(spritebatchtest WIN32
+    SpriteBatchTest/Game.cpp
+    SpriteBatchTest/Game.h
+    SpriteBatchTest/pch.h
+    Common/MainPC.cpp
+    Common/DeviceResourcesPC.cpp
+    Common/DeviceResourcesPC.h
+    Common/StepTimer.h
+    Common/DirectXTKTest.h
+    )
+target_include_directories(spritebatchtest PRIVATE ./SpriteBatchTest)
+target_precompile_headers(spritebatchtest PRIVATE SpriteBatchTest/pch.h)
+add_test(NAME "spriteBatch" COMMAND spritebatchtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SpriteBatchTest)
+set_tests_properties(spriteBatch PROPERTIES TIMEOUT 60)
+
+# SPRITE FONT
+list(APPEND TEST_EXES spritefonttest)
+add_executable(spritefonttest WIN32
+    SpriteFontTest/Game.cpp
+    SpriteFontTest/Game.h
+    SpriteFontTest/pch.h
+    Common/MainPC.cpp
+    Common/DeviceResourcesPC.cpp
+    Common/DeviceResourcesPC.h
+    Common/StepTimer.h
+    Common/DirectXTKTest.h
+    )
+target_include_directories(spritefonttest PRIVATE ./SpriteFontTest)
+target_precompile_headers(spritefonttest PRIVATE SpriteFontTest/pch.h)
+add_test(NAME "spriteFont" COMMAND spritefonttest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SpriteFontTest)
+set_tests_properties(spriteFont PROPERTIES TIMEOUT 60)
+
 # TODO: LoadTest
 # TODO: ModelTest
-# TODO: PBRModelTest
-# TODO: PBRTest
-# TODO: PostProcessTest
-# TODO: PrimitivesTest
 # TODO: ShaderTest
-# TODO: SpriteBatchTest
-# TODO: SpriteFontTest
+# TODO: AnimTest
+# TODO: DGSLTest
+# TODO: HDRTest
+# TODO: PBRTest
+# TODO: PBRModelTest
+# TODO: PostProcessTest
 
-# simplemathtest
+# MATH
 list(APPEND TEST_EXES simplemathtest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/SimpleMathTest)
 add_test(NAME "simplemath" COMMAND simplemathtest)
 set_tests_properties(simplemath PROPERTIES TIMEOUT 10)
 
-# TODO: Audio3DTest
 # TODO: BasicAudioTest
 # TODO: DynamicAudioTest
+# TODO: Audio3DTest
 # TODO: StreamingAudioTest
 # TODO: SimpleAudioTest
 
@@ -66,7 +133,7 @@ set_tests_properties(simplemath PROPERTIES TIMEOUT 10)
 
 message("INFO: Enabled tests: ${TEST_EXES}")
 foreach(t IN LISTS TEST_EXES)
-  target_include_directories(d3d11test PRIVATE ./Common)
+  target_include_directories(${t} PRIVATE ./Common)
   target_link_libraries(${t} PRIVATE DirectXTK dxgi.lib d3d11.lib)
 endforeach()
 

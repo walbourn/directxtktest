@@ -121,7 +121,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
         if (g_testTimer)
         {
-            SetTimer(hwnd, 1, 5000, nullptr);
+            SetTimer(hwnd, 1, c_testTimeout, nullptr);
         }
 
 #ifdef _DBT_H

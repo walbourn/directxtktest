@@ -14,6 +14,8 @@
 #include "StepTimer.h"
 #include "TextConsole.h"
 
+constexpr uint32_t c_testTimeout = 5000;
+
 #ifdef USING_XAUDIO2_9
 #define TEST_XWMA
 #endif

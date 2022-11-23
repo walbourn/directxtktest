@@ -15,6 +15,8 @@
 
 #include "RenderTexture.h"
 
+constexpr uint32_t c_testTimeout = 5000;
+
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
 class Game
