@@ -57,14 +57,10 @@
 #else
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
 #include <d3d11_3.h>
-#include <dxgi1_6.h>
 #else
 #include <d3d11_1.h>
-
-#if (_WIN32_WINNT >= 0x0A00 /*_WIN32_WINNT_WIN10*/)
+#endif
 #include <dxgi1_6.h>
-#endif
-#endif
 
 #ifdef _DEBUG
 #include <dxgidebug.h>
