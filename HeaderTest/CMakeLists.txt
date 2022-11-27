@@ -9,8 +9,7 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
   message(FATAL_ERROR "DirectX Tool Kit Test Suite should be built by the main CMakeLists")
 endif()
 
-add_executable(headertest
-    audiotest.cpp
+set(SOURCE_FILES
     bufferhelperstest.cpp
     commonstatestest.cpp
     ddstextureloadertest.cpp
@@ -30,9 +29,19 @@ add_executable(headertest
     spritebatchtest.cpp
     spritefonttest.cpp
     vertextypestest.cpp
-    wictextureloadertest.cpp
-    )
+    wictextureloadertest.cpp)
+
+if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
+  set(SOURCE_FILES ${SOURCE_FILES} audiotest.cpp)
+else()
+  target_compile_definitions(headertest PRIVATE NO_AUDIO)
+endif()
+
+add_executable(headertest ${SOURCE_FILES})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(headertest PRIVATE /wd4061 /wd4365 /wd4514 /wd4668 /wd4820 /wd5039)
+endif()
+if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
+    target_compile_options(headertest PRIVATE "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-language-extension-token" "-Wno-missing-prototypes")
 endif()

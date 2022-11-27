@@ -13,12 +13,16 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
 set(TEST_EXES headertest)
+set(XAUDIO_TESTS headertest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/HeaderTest)
 
 # fuzzloaders
-list(APPEND TEST_EXES fuzzloaders)
-add_executable(fuzzloaders fuzzloaders/fuzzloaders.cpp)
-target_include_directories(fuzzloaders PRIVATE ../Audio)
+if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
+  list(APPEND TEST_EXES fuzzloaders)
+  list(APPEND XAUDIO_TESTS fuzzloaders)
+  add_executable(fuzzloaders fuzzloaders/fuzzloaders.cpp)
+  target_include_directories(fuzzloaders PRIVATE ../Audio)
+endif()
 
 # D3D11
 list(APPEND TEST_EXES d3d11test)
@@ -33,7 +37,9 @@ add_executable(d3d11test WIN32
     Common/DirectXTKTest.h
     )
 target_include_directories(d3d11test PRIVATE ./D3D11Test)
-target_precompile_headers(d3d11test PRIVATE D3D11Test/pch.h)
+if (NOT MINGW)
+  target_precompile_headers(d3d11test PRIVATE D3D11Test/pch.h)
+endif()
 add_test(NAME "d3d11" COMMAND d3d11test -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/D3D11Test)
 set_tests_properties(d3d11 PROPERTIES TIMEOUT 30)
 
@@ -49,8 +55,10 @@ add_executable(effectstest WIN32
     Common/StepTimer.h
     Common/DirectXTKTest.h
     )
-target_include_directories(effectstest PRIVATE ../Src ./EffectsTest)
-target_precompile_headers(effectstest PRIVATE EffectsTest/pch.h)
+target_include_directories(effectstest PRIVATE ./EffectsTest ../Src)
+if (NOT MINGW)
+  target_precompile_headers(effectstest PRIVATE EffectsTest/pch.h)
+endif()
 add_test(NAME "effects" COMMAND effectstest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/EffectsTest)
 set_tests_properties(effects PROPERTIES TIMEOUT 60)
 
@@ -67,7 +75,9 @@ add_executable(primitivestest WIN32
     Common/DirectXTKTest.h
     )
 target_include_directories(primitivestest PRIVATE ./PrimitivesTest)
-target_precompile_headers(primitivestest PRIVATE PrimitivesTest/pch.h)
+if (NOT MINGW)
+  target_precompile_headers(primitivestest PRIVATE PrimitivesTest/pch.h)
+endif()
 add_test(NAME "primitiveBatch" COMMAND primitivestest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PrimitivesTest)
 set_tests_properties(primitiveBatch PROPERTIES TIMEOUT 60)
 
@@ -84,7 +94,9 @@ add_executable(spritebatchtest WIN32
     Common/DirectXTKTest.h
     )
 target_include_directories(spritebatchtest PRIVATE ./SpriteBatchTest)
-target_precompile_headers(spritebatchtest PRIVATE SpriteBatchTest/pch.h)
+if (NOT MINGW)
+  target_precompile_headers(spritebatchtest PRIVATE SpriteBatchTest/pch.h)
+endif()
 add_test(NAME "spriteBatch" COMMAND spritebatchtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SpriteBatchTest)
 set_tests_properties(spriteBatch PROPERTIES TIMEOUT 60)
 
@@ -101,7 +113,9 @@ add_executable(spritefonttest WIN32
     Common/DirectXTKTest.h
     )
 target_include_directories(spritefonttest PRIVATE ./SpriteFontTest)
-target_precompile_headers(spritefonttest PRIVATE SpriteFontTest/pch.h)
+if (NOT MINGW)
+  target_precompile_headers(spritefonttest PRIVATE SpriteFontTest/pch.h)
+endif()
 add_test(NAME "spriteFont" COMMAND spritefonttest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SpriteFontTest)
 set_tests_properties(spriteFont PROPERTIES TIMEOUT 60)
 
@@ -121,6 +135,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/SimpleMathTest)
 add_test(NAME "simplemath" COMMAND simplemathtest)
 set_tests_properties(simplemath PROPERTIES TIMEOUT 10)
 
+# if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
 # TODO: BasicAudioTest
 # TODO: DynamicAudioTest
 # TODO: Audio3DTest
@@ -141,6 +156,12 @@ if (MINGW OR (NOT WIN32) OR VCPKG_TOOLCHAIN)
     foreach(t IN LISTS TEST_EXES)
       target_link_libraries(${t} PRIVATE Microsoft::DirectXMath)
     endforeach()
+    if (BUILD_XAUDIO_WIN7)
+      foreach(t IN LISTS XAUDIO_TESTS)
+        target_compile_definitions(${t} PRIVATE USING_XAUDIO2_REDIST)
+        target_link_libraries(${t} PRIVATE Microsoft::XAudio2Redist)
+      endforeach()
+    endif()
 endif()
 
 if (MSVC)
@@ -181,6 +202,14 @@ if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
     target_compile_options(headertest PRIVATE -Wall -Wpedantic -Wextra)
     foreach(t IN LISTS TEST_EXES)
       target_compile_options(${t} PRIVATE "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-language-extension-token")
+    endforeach()
+endif()
+if(MINGW)
+    foreach(t IN LISTS TEST_EXES)
+      target_compile_options(${t} PRIVATE -Wno-ignored-attributes)
+      target_compile_definitions(${t} PRIVATE $<IF:$<CONFIG:DEBUG>,_DEBUG,NDEBUG>)
+      target_link_options(${t} PRIVATE -municode)
+      target_link_libraries(${t} PRIVATE xinput.lib)
     endforeach()
 endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")

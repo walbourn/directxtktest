@@ -372,7 +372,7 @@ void Game::Render()
 
     m_spriteBatch->Begin(SpriteSortMode_Deferred, nullptr, nullptr, nullptr, m_scissorState.Get(), [&]()
     {
-        CD3D11_RECT r(640, 20, 740, 38);
+        D3D11_RECT r = { 640, 20, 740, 38 };
         context->RSSetScissorRects(1, &r);
     });
 
