@@ -121,7 +121,7 @@ if (MINGW OR (NOT WIN32) OR VCPKG_TOOLCHAIN)
 endif()
 
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /Wall /GR- /fp:fast)
+    target_compile_options(${PROJECT_NAME} PRIVATE /Wall /GR /fp:fast)
 endif()
 
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
