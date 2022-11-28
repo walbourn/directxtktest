@@ -357,7 +357,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
       endforeach()
     endif()
 
-    if ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.27) AND (NOT ((${DIRECTX_ARCH} MATCHES "^arm"))))
+    if ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.27) AND (NOT (${DIRECTX_ARCH} MATCHES "^arm")))
       foreach(t IN LISTS TEST_EXES)
         target_link_options(${t} PRIVATE /CETCOMPAT)
       endforeach()
