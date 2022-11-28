@@ -139,7 +139,7 @@ if (NOT MINGW)
   target_precompile_headers(modeltest PRIVATE ModelTest/pch.h)
 endif()
 add_test(NAME "models" COMMAND modeltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ModelTest)
-set_tests_properties(models PROPERTIES TIMEOUT 30)
+set_tests_properties(models PROPERTIES TIMEOUT 60)
 
 # SHADER TEST
 list(APPEND TEST_EXES shadertest)
@@ -156,14 +156,107 @@ if (NOT MINGW)
   target_precompile_headers(shadertest PRIVATE ShaderTest/pch.h)
 endif()
 add_test(NAME "shaders" COMMAND shadertest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ShaderTest)
-set_tests_properties(shaders PROPERTIES TIMEOUT 30)
+set_tests_properties(shaders PROPERTIES TIMEOUT 40)
 
-# TODO: AnimTest
-# TODO: DGSLTest
-# TODO: HDRTest
-# TODO: PBRTest
-# TODO: PBRModelTest
-# TODO: PostProcessTest
+# ANIMATION TEST
+list(APPEND TEST_EXES animtest)
+add_executable(animtest WIN32
+    AnimTest/Game.cpp
+    AnimTest/Game.h
+    AnimTest/pch.h
+    Common/Animation.cpp
+    Common/Animation.h
+    ${D3D_COMMON_FILES}
+    )
+target_include_directories(animtest PRIVATE ./AnimTest)
+if (NOT MINGW)
+  target_precompile_headers(animtest PRIVATE AnimTest/pch.h)
+endif()
+add_test(NAME "animation" COMMAND animtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/AnimTest)
+set_tests_properties(animation PROPERTIES TIMEOUT 40)
+
+# DGSL TEST
+list(APPEND TEST_EXES dgsltest)
+add_executable(dgsltest WIN32
+    DGSLTest/Game.cpp
+    DGSLTest/Game.h
+    DGSLTest/pch.h
+    ${D3D_COMMON_FILES}
+    )
+target_include_directories(dgsltest PRIVATE ./DGSLTest)
+if (NOT MINGW)
+  target_precompile_headers(dgsltest PRIVATE DGSLTest/pch.h)
+endif()
+add_test(NAME "dgslShaders" COMMAND dgsltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/DGSLTest)
+set_tests_properties(dgslShaders PROPERTIES TIMEOUT 40)
+
+# HDR TEST
+list(APPEND TEST_EXES hdrtest)
+add_executable(hdrtest WIN32
+    HDRTest/Game.cpp
+    HDRTest/Game.h
+    HDRTest/pch.h
+    Common/RenderTexture.cpp
+    Common/RenderTexture.h
+    ${D3D_COMMON_FILES}
+    )
+target_include_directories(hdrtest PRIVATE ./HDRTest)
+if (NOT MINGW)
+  target_precompile_headers(hdrtest PRIVATE HDRTest/pch.h)
+endif()
+add_test(NAME "hdr" COMMAND hdrtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/HDRTest)
+set_tests_properties(hdr PROPERTIES TIMEOUT 40)
+
+# PBR TEST
+list(APPEND TEST_EXES pbrtest)
+add_executable(pbrtest WIN32
+    PBRTest/Game.cpp
+    PBRTest/Game.h
+    PBRTest/pch.h
+    Common/RenderTexture.cpp
+    Common/RenderTexture.h
+    ${D3D_COMMON_FILES}
+    )
+target_include_directories(pbrtest PRIVATE ./PBRTest ../Src)
+if (NOT MINGW)
+  target_precompile_headers(pbrtest PRIVATE PBRTest/pch.h)
+endif()
+add_test(NAME "pbrShaders" COMMAND pbrtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PBRTest)
+set_tests_properties(pbrShaders PROPERTIES TIMEOUT 40)
+
+# PBR MODEL TEST
+list(APPEND TEST_EXES pbrmodeltest)
+add_executable(pbrmodeltest WIN32
+    PBRModelTest/Game.cpp
+    PBRModelTest/Game.h
+    PBRModelTest/pch.h
+    Common/Animation.cpp
+    Common/Animation.h
+    Common/RenderTexture.cpp
+    Common/RenderTexture.h
+    ${D3D_COMMON_FILES}
+    )
+target_include_directories(pbrmodeltest PRIVATE ./PBRModelTest)
+if (NOT MINGW)
+  target_precompile_headers(pbrmodeltest PRIVATE PBRModelTest/pch.h)
+endif()
+add_test(NAME "modelsPBR" COMMAND pbrmodeltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PBRModelTest)
+set_tests_properties(modelsPBR PROPERTIES TIMEOUT 60)
+
+# POST-PROCESSING TEST
+list(APPEND TEST_EXES postprocesstest)
+add_executable(postprocesstest WIN32
+    PostProcessTest/Game.cpp
+    PostProcessTest/Game.h
+    PostProcessTest/pch.h
+    ${D3D_COMMON_FILES}
+    )
+target_include_directories(postprocesstest PRIVATE ./PostProcessTest)
+if (NOT MINGW)
+  target_precompile_headers(postprocesstest PRIVATE PostProcessTest/pch.h)
+endif()
+add_test(NAME "postProcess" COMMAND postprocesstest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PostProcessTest)
+set_tests_properties(postProcess PROPERTIES TIMEOUT 180)
 
 # MATH
 list(APPEND TEST_EXES simplemathtest)
