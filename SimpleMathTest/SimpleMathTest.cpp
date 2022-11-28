@@ -1802,7 +1802,7 @@ int TestV2()
         {
             Vector2 result = Vector2::TransformNormal(points[j], m);
             v = buff[j];
-            if (!XMVector2NearEqual(v, result, VEPSILON))
+            if (!XMVector2NearEqual(v, result, VEPSILON2))
             {
                 printf("ERROR: transnormarr %zu - %f %f ... %f %f \n", j, v.x, v.y, result.x, result.y);
                 success = false;
@@ -2629,7 +2629,7 @@ int TestV3()
         Vector4 vec4;
         Vector4 result4(12.191987f, 21.533493f, 32.616024f, 1.f);
         Vector3::Transform(vec, m, vec4);
-        if (!XMVector4NearEqual(vec4, result4, VEPSILON))
+        if (!XMVector4NearEqual(vec4, result4, VEPSILON2))
         {
             printf("ERROR: transmat(3) %f %f %f %f... %f %f %f %f\n", vec4.x, vec4.y, vec4.z, vec4.w, result4.x, result4.y, result4.z, result4.w);
             success = false;
@@ -2705,7 +2705,7 @@ int TestV3()
         {
             Vector3 result = Vector3::Transform(points[j], m);
             v = buff[j];
-            if (!XMVector3NearEqual(v, result, VEPSILON))
+            if (!XMVector3NearEqual(v, result, VEPSILON2))
             {
                 printf("ERROR: transarr %zu - %f %f %f ... %f %f %f\n", j, v.x, v.y, v.z, result.x, result.y, result.z);
                 success = false;
