@@ -57,44 +57,6 @@ namespace
             }
         }
     }
-
-    void DumpMatrices(
-        size_t nbones,
-        _In_reads_(nbones) const XMMATRIX* boneTransforms,
-        _In_z_ const char* name)
-    {
-        char buff[128] = {};
-        if (!nbones || !boneTransforms)
-        {
-            sprintf_s(buff, "ERROR: %s is missing bone transforms!\n", name);
-            OutputDebugStringA(buff);
-        }
-        else
-        {
-            sprintf_s(buff, "%s: transforms for %zu bones\n", name, nbones);
-            OutputDebugStringA(buff);
-
-            for (size_t j = 0; j < nbones; ++j)
-            {
-                auto m = reinterpret_cast<const XMFLOAT4X4*>(&boneTransforms[j]);
-                sprintf_s(buff, "\t[%zu]\t[%f %f %f %f]\n",
-                    j, m->_11, m->_12, m->_13, m->_14);
-                OutputDebugStringA(buff);
-
-                sprintf_s(buff, "\t\t[%f %f %f %f]\n",
-                    m->_21, m->_22, m->_23, m->_24);
-                OutputDebugStringA(buff);
-
-                sprintf_s(buff, "\t\t[%f %f %f %f]\n",
-                    m->_31, m->_32, m->_33, m->_34);
-                OutputDebugStringA(buff);
-
-                sprintf_s(buff, "\t\t[%f %f %f %f]\n",
-                    m->_41, m->_42, m->_43, m->_44);
-                OutputDebugStringA(buff);
-            }
-        }
-    }
 }
 
 Game::Game() noexcept(false)
