@@ -5755,7 +5755,7 @@ static struct Test
     { "std::less", TestL },
 };
 
-int wmain()
+int __cdecl wmain()
 {
 #ifdef _MSC_VER
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
