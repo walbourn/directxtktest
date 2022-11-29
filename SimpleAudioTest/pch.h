@@ -12,6 +12,9 @@
 // Use the C++ standard templated min/max
 #define NOMINMAX
 
+// Make sure math.h defines M_PI
+#define _USE_MATH_DEFINES
+
 #include <winapifamily.h>
 
 #if defined(_XBOX_ONE) && defined(_TITLE)

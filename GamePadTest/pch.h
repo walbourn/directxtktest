@@ -51,7 +51,7 @@
 #include <Windows.h>
 #endif
 
-#include <wrl.h>
+#include <wrl/client.h>
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #include <d3d11_x.h>
@@ -133,6 +133,42 @@ namespace DX
         }
     }
 }
+
+#ifdef __MINGW32__
+namespace Microsoft
+{
+    namespace WRL
+    {
+        namespace Wrappers
+        {
+            class Event
+            {
+            public:
+                Event() noexcept : m_handle{} {}
+                explicit Event(HANDLE h) noexcept : m_handle{ h } {}
+                ~Event() { if (m_handle) { ::CloseHandle(m_handle); m_handle = nullptr; } }
+
+                void Attach(HANDLE h) noexcept
+                {
+                    if (h != m_handle)
+                    {
+                        if (m_handle) ::CloseHandle(m_handle);
+                        m_handle = h;
+                    }
+                }
+
+                bool IsValid() const { return m_handle != nullptr; }
+                HANDLE Get() const { return m_handle; }
+
+            private:
+                HANDLE m_handle;
+            };
+        }
+    }
+}
+#else
+#include <wrl/event.h>
+#endif
 
 // Enable off by default warnings to improve code conformance
 #pragma warning(default : 4061 4062 4191 4242 4263 4264 4265 4266 4289 4302 4365 4746 4826 4841 4987 5029 5038 5042)
