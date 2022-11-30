@@ -33,11 +33,13 @@ set(SOURCE_FILES
 
 if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
   set(SOURCE_FILES ${SOURCE_FILES} audiotest.cpp)
+  set(DEFS AUDIO)
 else()
-  target_compile_definitions(headertest PRIVATE NO_AUDIO)
+  set(DEFS NO_AUDIO)
 endif()
 
 add_executable(headertest ${SOURCE_FILES})
+target_compile_definitions(headertest PRIVATE ${DEFS})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(headertest PRIVATE /wd4061 /wd4365 /wd4514 /wd4668 /wd4820 /wd5039)
