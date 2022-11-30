@@ -51,7 +51,11 @@
 #include <Windows.h>
 #endif
 
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#include <wrl.h>
+#else
 #include <wrl/client.h>
+#endif
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #include <d3d11_x.h>
