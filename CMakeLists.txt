@@ -278,7 +278,7 @@ if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
         list(APPEND XAUDIO_TESTS dynamicaudiotest)
         add_executable(dynamicaudiotest DynamicAudioTest/DynamicAudioTest.cpp)
         add_test(NAME "dynamicAudio" COMMAND dynamicaudiotest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/DynamicAudioTest)
-        set_tests_properties(dynamicAudio PROPERTIES TIMEOUT 120)
+        set_tests_properties(dynamicAudio PROPERTIES TIMEOUT 270)
     endif()
 
     # STREAMING AUDIO
@@ -286,7 +286,7 @@ if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
     list(APPEND XAUDIO_TESTS streamingaudiotest)
     add_executable(streamingaudiotest StreamingAudioTest/StreamingAudioTest.cpp)
     add_test(NAME "streamingAudio" COMMAND streamingaudiotest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/StreamingAudioTest)
-    set_tests_properties(streamingAudio PROPERTIES TIMEOUT 420)
+    set_tests_properties(streamingAudio PROPERTIES TIMEOUT 800)
 
     # 3D AUDIO
     list(APPEND TEST_EXES audio3dtest)
