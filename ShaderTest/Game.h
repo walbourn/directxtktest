@@ -15,6 +15,8 @@
 
 #include "RenderTexture.h"
 
+constexpr uint32_t c_testTimeout = 10000;
+
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
 class Game
@@ -125,6 +127,8 @@ private:
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool showCompressed)
         {
+            using namespace DirectX;
+
             T::SetMatrices(world, view, projection);
 
             auto ibasic = dynamic_cast<BasicEffect*>(this);
@@ -184,6 +188,8 @@ private:
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool showCompressed)
         {
+            using namespace DirectX;
+
             T::SetMatrices(world, view, projection);
 
             auto inmap = dynamic_cast<NormalMapEffect*>(this);

@@ -28,6 +28,7 @@ using namespace DirectX;
 namespace
 {
     std::unique_ptr<Game> g_game;
+    bool g_testTimer = false;
 
 #ifdef WM_DEVICECHANGE
     HDEVNOTIFY g_hNewAudio;
@@ -49,12 +50,13 @@ extern "C"
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
 
     if (!XMVerifyCPUSupport())
         return 1;
 
+#ifdef _MSC_VER
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 
 #ifdef USING_WINDOWS_GAMING_INPUT
     Microsoft::WRL::Wrappers::RoInitializeWrapper initialize(RO_INIT_MULTITHREADED);
@@ -118,6 +120,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         GetClientRect(hwnd, &rc);
 
         g_game->Initialize(hwnd, rc.right - rc.left, rc.bottom - rc.top, DXGI_MODE_ROTATION_IDENTITY);
+
+        if (g_testTimer)
+        {
+            SetTimer(hwnd, 1, c_testTimeout, nullptr);
+        }
 
 #ifdef _DBT_H
         DEV_BROADCAST_DEVICEINTERFACE filter = {};
@@ -396,6 +403,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // A menu is active and the user presses a key that does not correspond
         // to any mnemonic or accelerator key. Ignore so we don't produce an error beep.
         return MAKELRESULT(0, MNC_CLOSE);
+
+    case WM_TIMER:
+        if (g_testTimer)
+        {
+            ExitGame();
+        }
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);
@@ -420,30 +433,30 @@ void ParseCommandLine(_In_ LPWSTR lpCmdLine)
             if (*pValue)
                 *pValue++ = 0;
 
-            if (!_wcsicmp(pArg, L"forcewarp"))
+            if (_wcsicmp(pArg, L"ctest") == 0)
+            {
+                g_testTimer = true;
+            }
+            else if (_wcsicmp(pArg, L"forcewarp") == 0)
             {
                 DX::DeviceResources::DebugForceWarp(true);
             }
-
-            if (!_wcsicmp(pArg, L"minpower"))
+            else if (_wcsicmp(pArg, L"minpower") == 0)
             {
                 DX::DeviceResources::DebugPreferMinimumPower(true);
             }
-
-            if (!_wcsicmp(pArg, L"adapter"))
+            else if (_wcsicmp(pArg, L"adapter") == 0)
             {
                 if (pValue && *pValue != 0)
                 {
                     DX::DeviceResources::DebugSetAdapter(_wtoi(pValue));
                 }
             }
-
         }
     }
 
     LocalFree(argv);
 }
-
 
 // Exit helper
 void ExitGame() noexcept

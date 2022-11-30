@@ -191,7 +191,7 @@ void Game::Initialize(
     case D3D_FEATURE_LEVEL_11_1: OutputDebugStringA("INFO: Direct3D Hardware Feature level 11.1\n"); break;
     case D3D_FEATURE_LEVEL_12_0: OutputDebugStringA("INFO: Direct3D Hardware Feature level 12.0\n"); break;
     case D3D_FEATURE_LEVEL_12_1: OutputDebugStringA("INFO: Direct3D Hardware Feature level 12.1\n"); break;
-#if defined(NTDDI_WIN10_FE)
+#if defined(NTDDI_WIN10_FE) && !defined(__MINGW32__)
     case D3D_FEATURE_LEVEL_12_2: OutputDebugStringA("INFO: Direct3D Hardware Feature level 12.2\n"); break;
 #endif
     default: OutputDebugStringA("INFO: Direct3D Hardware Feature level **UNKNOWN**\n");

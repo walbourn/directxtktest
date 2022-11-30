@@ -144,7 +144,7 @@ void Game::Initialize(
 
     m_gamePad->RegisterEvents(m_ctrlChanged.Get(), m_userChanged.Get());
 
-#else
+#elif !defined(__MINGW32__)
 
     OutputDebugStringA("INFO: Using XInput (" XINPUT_DLL_A ")\n");
 

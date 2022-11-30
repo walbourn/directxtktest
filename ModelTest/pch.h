@@ -57,10 +57,10 @@
 #else
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) 
 #include <d3d11_3.h>
-#include <dxgi1_6.h>
 #else
 #include <d3d11_1.h>
 #endif
+#include <dxgi1_6.h>
 
 #ifdef _DEBUG
 #include <dxgidebug.h>
@@ -112,7 +112,7 @@ namespace DX
     public:
         com_exception(HRESULT hr) noexcept : result(hr) {}
 
-        const char* what() const override
+        const char* what() const noexcept override
         {
             static char s_str[64] = {};
             sprintf_s(s_str, "Failure with HRESULT of %08X", static_cast<int>(result));

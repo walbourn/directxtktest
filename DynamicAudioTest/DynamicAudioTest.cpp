@@ -213,7 +213,7 @@ namespace
 //--------------------------------------------------------------------------------------
 // Entry point to the program
 //--------------------------------------------------------------------------------------
-int __cdecl main()
+int __cdecl wmain()
 {
     if (!XMVerifyCPUSupport())
     {
@@ -221,7 +221,9 @@ int __cdecl main()
         return 1;
     }
 
+#ifdef _MSC_VER
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 
     //
     // Initialize XAudio2
