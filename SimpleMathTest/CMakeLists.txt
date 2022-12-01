@@ -109,8 +109,7 @@ endif()
 add_executable(${PROJECT_NAME}
     SimpleMathTest.cpp
     SimpleMathTestD3D11.cpp
-    SimpleMathTestD3D12.cpp
-    ../../Src/SimpleMath.cpp)
+    SimpleMathTestD3D12.cpp)
 
 if (MINGW OR (NOT WIN32) OR VCPKG_TOOLCHAIN)
     message("INFO: Using VCPKG for DirectX-Headers and DirectXMath.")
