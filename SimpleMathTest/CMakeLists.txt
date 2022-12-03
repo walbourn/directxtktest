@@ -38,13 +38,11 @@ elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Aa][Rr][Mm]64$")
     set(DIRECTX_ARCH arm64)
 endif()
 
-set(DXMATH_DEFS "$<IF:$<CONFIG:DEBUG>,_DEBUG,NDEBUG>")
-
 if (BUILD_NO_INTRINSICS)
     message("Building with compiler intrinsics disabled (_XM_NO_INTRINSICS_)")
-    list(APPEND DXMATH_DEFS _XM_NO_INTRINSICS_)
+    set(DXMATH_DEFS _XM_NO_INTRINSICS_)
 elseif (BUILD_DISABLE_SVML)
-    list(APPEND DXMATH_DEFS _XM_DISABLE_INTEL_SVML_)
+    set(DXMATH_DEFS _XM_DISABLE_INTEL_SVML_)
 endif()
 
 if(NOT ${DIRECTX_ARCH} MATCHES "^arm")
@@ -108,54 +106,33 @@ if(MSVC AND BUILD_FOR_ONECORE)
     list(APPEND DXMATH_DEFS "_WIN32_WINNT=0x0A00")
 endif()
 
+set(TEST_INCLUDE_DIR ./)
+
 set(TEST_SOURCES
     SimpleMathTest.cpp
     SimpleMathTestD3D12.cpp
     )
 
-set(TEST_INCLUDE_DIR ./)
-
 if (WIN32)
-    list(APPEND DXMATH_DEFS "TEST_D3D11")
     set(TEST_SOURCES ${TEST_SOURCES} SimpleMathTestD3D11.cpp)
+    list(APPEND DXMATH_DEFS "TEST_D3D11")
 endif()
 
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
     if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../Inc/SimpleMath.h")
-        message("INFO: Using SimpleMath from DirectX Tool Kit.")
-        set(TEST_SOURCES ${TEST_SOURCES} ../../Inc/SimpleMath.h ../../Inc/SimpleMath.inl ../../Src/SimpleMath.cpp)
-        set(TEST_INCLUDE_DIR ${TEST_INCLUDE_DIR} ../../Inc)
+        if(WIN32)
+            set(TEST_SOURCES ${TEST_SOURCES} ../../Inc/SimpleMath.h ../../Inc/SimpleMath.inl ../../Src/SimpleMath.cpp)
+            set(TEST_INCLUDE_DIR ${TEST_INCLUDE_DIR} ../../Inc)
+        else()
+          configure_file(SimpleMathStandalone.in pch.h COPYONLY)
+          configure_file(../../Inc/SimpleMath.h SimpleMath.h COPYONLY)
+          configure_file(../../Inc/SimpleMath.inl SimpleMath.inl COPYONLY)
+          configure_file(../../Src/SimpleMath.cpp SimpleMath.cpp COPYONLY)
+          set(TEST_SOURCES ${TEST_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/SimpleMath.h ${CMAKE_CURRENT_BINARY_DIR}/SimpleMath.inl ${CMAKE_CURRENT_BINARY_DIR}/SimpleMath.cpp)
+          set(TEST_INCLUDE_DIR  ${TEST_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+        endif()
    else()
-        message("INFO: Using SimpleMath standalone from GitHub.")
-
-        include(FetchContent)
-        FetchContent_Declare(
-            simplemathhpp
-            URL https://raw.githubusercontent.com/microsoft/DirectXTK/main/Inc/SimpleMath.h
-            URL_HASH SHA256=e67b7c05a444b0f571e42e3fdc509e9d04a17f57c67e5f5751f7519ec68add0c
-            DOWNLOAD_NO_EXTRACT ON
-        )
-        FetchContent_Declare(
-            simplemathinl
-            URL https://raw.githubusercontent.com/microsoft/DirectXTK/main/Inc/SimpleMath.inl
-            URL_HASH SHA256=cfcba37fc5e03f532f586ada84c7a0baf566c865b85e75d82b885114982e4765
-            DOWNLOAD_NO_EXTRACT ON
-        )
-        FetchContent_Declare(
-            simplemathcpp
-            URL https://raw.githubusercontent.com/microsoft/DirectXTK/main/Src/SimpleMath.cpp
-            URL_HASH SHA256=c148cd0c84ff8c972b02e8c92bb5e86a03d74e7817604b66efe8cdf7952d6edd
-            DOWNLOAD_NO_EXTRACT ON
-        )
-        FetchContent_MakeAvailable(simplemathhpp simplemathinl simplemathcpp)
-
-        set(TEST_SOURCES ${TEST_SOURCES}
-            ${simplemathhpp_SOURCE_DIR}/SimpleMath.h
-            ${simplemathinl_SOURCE_DIR}/SimpleMath.inl
-            ${simplemathcpp_SOURCE_DIR}/SimpleMath.cpp)
-
-        configure_file(SimpleMathStandalone.in pch.h COPYONLY)
-        set(TEST_INCLUDE_DIR ${TEST_INCLUDE_DIR} ${simplemathhpp_SOURCE_DIR} ${simplemathinl_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+        message(FATAL_ERROR "ERROR: SimpleMath must be 'above' this project")
    endif()
 endif()
 
@@ -175,19 +152,36 @@ endif()
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /Wall /GR /fp:fast)
+else()
+    add_compile_definitions(PRIVATE $<IF:$<CONFIG:DEBUG>,_DEBUG,NDEBUG>)
 endif()
 
-if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-    set(WarningsEXE "-Wpedantic" "-Wextra" "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-language-extension-token" "-Wno-reserved-id-macro"
-                    "-Wno-missing-prototypes" "-Wno-missing-variable-declarations"
-                    "-Wno-double-promotion" "-Wno-unused-variable" "-Wno-float-equal")
-    target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsEXE})
+if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        "-Wpedantic" "-Wextra" "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-language-extension-token" "-Wno-reserved-id-macro"
+        "-Wno-missing-prototypes" "-Wno-missing-variable-declarations"
+        "-Wno-double-promotion" "-Wno-unused-variable" "-Wno-float-equal")
+elseif( CMAKE_CXX_COMPILER_ID MATCHES "GCC" )
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        "-Wno-reserved-id-macro" "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic"
+        "-Wno-gnu-anonymous-struct" "-Wno-ignored-attributes" "-Wno-global-constructors" "-Wno-missing-variable-declarations"
+        "-Wno-nested-anon-types")
 elseif( MINGW )
     target_link_options(${PROJECT_NAME} PRIVATE -municode)
-elseif ( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
+elseif( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
     target_compile_options(${PROJECT_NAME} PRIVATE /permissive- /Zc:__cplusplus)
 
-    set(WarningsEXE "/wd4061" "/wd4365" "/wd4514" "/wd4571" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045" "/wd5262" "/wd5264")
+    set(WarningsEXE "/wd4061" "/wd4365" "/wd4514" "/wd4571" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045")
+
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.26)
+        list(APPEND WarningsEXE "/wd5105")
+        target_compile_options(${PROJECT_NAME} PRIVATE /Zc:preprocessor)
+    endif()
+
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.34)
+        list(APPEND WarningsEXE "/wd5262" "/wd5264")
+    endif()
+
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsEXE})
 endif()
 

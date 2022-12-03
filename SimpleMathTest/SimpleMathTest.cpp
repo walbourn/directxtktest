@@ -16,6 +16,10 @@
 #define NOHELP
 #pragma warning(pop)
 
+#ifndef _WIN32
+#include "pch.h"
+#endif
+
 #include "SimpleMath.h"
 
 #include "SimpleMathTest.h"
@@ -1015,7 +1019,7 @@ int TestV2()
     }
 
     v *= v1;
-    if ( v != Vector2(4,10) )   
+    if ( v != Vector2(4,10) )
     {
         printf("ERROR: *= %f %f ... 4 10\n", v.x, v.y );
         success = false;
@@ -1130,7 +1134,7 @@ int TestV2()
             success = false;
         }
     }
-    
+
     // Min
     {
         Vector2 a(-1.f, 4.f);
@@ -1177,7 +1181,7 @@ int TestV2()
     {
         Vector2 a(1.f, 2.f);
         Vector2 b(3.f, 4.f);
-        
+
         Vector2 result(2.f, 3.f);
         v = Vector2::Lerp(a, b, 0.5f);
         if (v != result)
@@ -2076,7 +2080,7 @@ int TestV3()
             success = false;
         }
     }
-    
+
     // Min
     {
         Vector3 a(-1.f, 4.f, -3.f);
@@ -3674,7 +3678,7 @@ int TestV4()
         };
 
         auto buff = std::make_unique<Vector4[]>(std::size(points));
-        
+
         Vector4::Transform( &points[0], std::size(points), m, buff.get() );
 
         for (size_t j = 0; j < std::size(points); ++j)
@@ -3979,7 +3983,7 @@ int TestM()
 
     b /= 2;
     VerifyEqual(b, Matrix(4, 2, -1, 6, 16, 6, -1, 14, 28, 10, -1, 22, 40, 14, -1, 30));
-    
+
     b /= Matrix(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2);
     VerifyEqual(b, Matrix(2, 1, -0.5f, 3, 8, 3, -0.5f, 7, 14, 5, -0.5f, 11, 20, 7, -0.5f, 15));
 
@@ -4032,10 +4036,10 @@ int TestM()
     VerifyEqual(c.Determinant(), -2.f);
 
     VerifyEqual(Matrix::Identity, Matrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
-    
+
     VerifyEqual(Matrix::CreateTranslation(23, 42, 666), Matrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 23, 42, 666, 1));
     VerifyEqual(Matrix::CreateTranslation(Vector3(23, 42, 666)), Matrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 23, 42, 666, 1));
-    
+
     VerifyEqual(Matrix::CreateScale(23), Matrix(23, 0, 0, 0, 0, 23, 0, 0, 0, 0, 23, 0, 0, 0, 0, 1));
     VerifyEqual(Matrix::CreateScale(23, 42, 666), Matrix(23, 0, 0, 0, 0, 42, 0, 0, 0, 0, 666, 0, 0, 0, 0, 1));
     VerifyEqual(Matrix::CreateScale(Vector3(23, 42, 666)), Matrix(23, 0, 0, 0, 0, 42, 0, 0, 0, 0, 666, 0, 0, 0, 0, 1));
@@ -4119,7 +4123,7 @@ int TestM()
     VerifyEqual(Matrix::CreateReflection(Plane(0, 1, 0, 0)), Matrix(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
 
     VerifyEqual(Matrix::Lerp(a, c, 0.25f), Matrix(1, 1.5f, 2.25f, 3, 3.75f, 4.5f, 5.75f, 6, 6.75f, 7.75f, 8.25f, 9, 15.5f, 21, 11.25f, 12.25f));
-    
+
     Matrix::Lerp(a, c, 0.25f, b);
     VerifyEqual(b, Matrix(1, 1.5f, 2.25f, 3, 3.75f, 4.5f, 5.75f, 6, 6.75f, 7.75f, 8.25f, 9, 15.5f, 21, 11.25f, 12.25f));
 
@@ -4414,7 +4418,7 @@ int TestP()
 
     Plane a(1, 2, 3, 4);
     Plane b(Vector3(5, 6, 7), 8);
-    
+
     VerifyEqual(a.x, 1.f);
     VerifyEqual(a.y, 2.f);
     VerifyEqual(a.z, 3.f);
@@ -4557,7 +4561,7 @@ int TestQ()
 
     Quaternion a(1, 2, 3, 4);
     Quaternion b(Vector3(5, 6, 7), 8);
-    
+
     VerifyEqual(a.x, 1.f);
     VerifyEqual(a.y, 2.f);
     VerifyEqual(a.z, 3.f);
@@ -4680,7 +4684,7 @@ int TestQ()
 
     a.Conjugate(c);
     VerifyEqual(c, Quaternion(-1, -2, -3, 4));
-    
+
     Quaternion(1, 0, 0, 1).Inverse(c);
     VerifyEqual(c, Quaternion(-0.5f, 0, 0, 0.5f));
 
@@ -4796,7 +4800,7 @@ int TestQ()
     VerifyEqual(Quaternion(1, 2, 3, 4) - Quaternion(5, 6, 7, 8), Quaternion(-4, -4, -4, -4));
     VerifyEqual(Quaternion(1, 2, 3, 4) * 3, Quaternion(3, 6, 9, 12));
     VerifyEqual(3 * Quaternion(1, 2, 3, 4), Quaternion(3, 6, 9, 12));
-    
+
     VerifyNearEqual(Quaternion(0, 0.707107f, 0, 0.707107f) * Quaternion(0.707107f, 0, 0, 0.707107f), Quaternion(0.5f, 0.5f, 0.5f, 0.5f));
     VerifyNearEqual(Quaternion(0.5f, 0.5f, 0.5f, 0.5f) / Quaternion(0.707107f, 0, 0, 0.707107f), Quaternion(0, 0.707107f, 0, 0.707107f));
 
@@ -4868,7 +4872,7 @@ int TestC()
 
     Color a(1, 2, 3);
     Color b(4, 5, 6, 7);
-    
+
     VerifyEqual(a.x, 1.f);
     VerifyEqual(a.y, 2.f);
     VerifyEqual(a.z, 3.f);
@@ -4989,7 +4993,7 @@ int TestC()
 
     VerifyEqual(+a, Color(1, 2, 3, 1));
     VerifyEqual(-a, Color(-1, -2, -3, -1));
-    
+
     VerifyEqual(a.R(), 1.f);
     VerifyEqual(a.G(), 2.f);
     VerifyEqual(a.B(), 3.f);
@@ -4997,7 +5001,7 @@ int TestC()
 
     VerifyEqual(Color(PackedVector::XMCOLOR(0x12345678)).BGRA().c, 0x12345678u);
     VerifyEqual(Color(PackedVector::XMUBYTEN4(0x12345678)).RGBA().v, 0x12345678u);
-    
+
     VerifyEqual(b.ToVector3(), Vector3(4, 5, 6));
     VerifyEqual(b.ToVector4(), Vector4(4, 5, 6, 7));
 
@@ -5428,6 +5432,7 @@ int TestVP()
         }
     }
 
+#if defined(__dxgi1_2_h__) || defined(__d3d11_x_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
     {
         RECT rct = Viewport::ComputeDisplayArea(DXGI_SCALING_NONE, 640, 480, 1024, 1024);
         if (rct.left != 0
@@ -5549,6 +5554,7 @@ int TestVP()
             success = false;
         }
     }
+#endif
 
     {
         RECT rct = Viewport::ComputeTitleSafeArea(0, 0);
@@ -5741,8 +5747,8 @@ static struct Test
 {
     const char *    name;
     TestFN          func;
-} g_Tests[] = 
-{ 
+} g_Tests[] =
+{
     { "Rectangle", TestRect },
     { "Vector2", TestV2 },
     { "Vector3", TestV3 },
@@ -5760,7 +5766,11 @@ static struct Test
     { "std::less", TestL },
 };
 
+#ifdef _WIN32
 int __cdecl wmain()
+#else
+int main()
+#endif
 {
 #ifdef _MSC_VER
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);

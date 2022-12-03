@@ -16,8 +16,17 @@
 #define NOHELP
 #pragma warning(pop)
 
+#ifndef _WIN32
+#include "pch.h"
+#endif
+
 #ifdef __MINGW32__
 #include <unknwn.h>
+#endif
+
+#ifndef _WIN32
+#include <directx/dxgiformat.h>
+#include <wsl/winadapter.h>
 #endif
 
 #ifdef USING_DIRECTX_HEADERS

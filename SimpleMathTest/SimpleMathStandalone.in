@@ -1,2 +1,19 @@
 #pragma once
 
+#ifndef _WIN32
+// Workarounds to avoid conflicts between sal.h and GCC runtime headers
+#include <algorithm>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <cinttypes>
+#include <cstring>
+#include <functional>
+#include <iterator>
+#include <utility>
+
+#include <mm_malloc.h>
+
+#include <sal.h>
+#include <wsl/winadapter.h>
+#endif
