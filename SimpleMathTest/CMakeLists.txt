@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 3.20)
 
 project (simplemathtest
   DESCRIPTION "DirectX Tool Kit Simple Math Test Suite"
-  HOMEPAGE_URL "http://go.microsoft.com/fwlink/?LinkId=248929"
+  HOMEPAGE_URL "https://github.com/walbourn/directxtktest/wiki"
   LANGUAGES CXX)
 
 option(BUILD_FOR_ONECORE   "Build for OneCore (Windows 10/Windows 11)" OFF)
@@ -14,7 +14,7 @@ option(BUILD_AVX2_TEST     "Build for /arch:AVX2" OFF)
 option(BUILD_DISABLE_SVML  "Disable use of SVML (VS 2019)" OFF)
 option(BUILD_NO_INTRINSICS "Disable use of compiler intrinsics" OFF)
 
-if (MINGW)
+if (MINGW OR (NOT WIN32))
    set(BUILD_FOR_ONECORE OFF)
 endif()
 
@@ -38,11 +38,13 @@ elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Aa][Rr][Mm]64$")
     set(DIRECTX_ARCH arm64)
 endif()
 
+set(DXMATH_DEFS "$<IF:$<CONFIG:DEBUG>,_DEBUG,NDEBUG>")
+
 if (BUILD_NO_INTRINSICS)
     message("Building with compiler intrinsics disabled (_XM_NO_INTRINSICS_)")
-    set(DXMATH_DEFS _XM_NO_INTRINSICS_)
+    list(APPEND DXMATH_DEFS _XM_NO_INTRINSICS_)
 elseif (BUILD_DISABLE_SVML)
-    set(DXMATH_DEFS _XM_DISABLE_INTEL_SVML_)
+    list(APPEND DXMATH_DEFS _XM_DISABLE_INTEL_SVML_)
 endif()
 
 if(NOT ${DIRECTX_ARCH} MATCHES "^arm")
@@ -106,10 +108,62 @@ if(MSVC AND BUILD_FOR_ONECORE)
     list(APPEND DXMATH_DEFS "_WIN32_WINNT=0x0A00")
 endif()
 
-add_executable(${PROJECT_NAME}
+set(TEST_SOURCES
     SimpleMathTest.cpp
-    SimpleMathTestD3D11.cpp
-    SimpleMathTestD3D12.cpp)
+    SimpleMathTestD3D12.cpp
+    )
+
+set(TEST_INCLUDE_DIR ./)
+
+if (WIN32)
+    list(APPEND DXMATH_DEFS "TEST_D3D11")
+    set(TEST_SOURCES ${TEST_SOURCES} SimpleMathTestD3D11.cpp)
+endif()
+
+if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+    if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../Inc/SimpleMath.h")
+        message("INFO: Using SimpleMath from DirectX Tool Kit.")
+        set(TEST_SOURCES ${TEST_SOURCES} ../../Inc/SimpleMath.h ../../Inc/SimpleMath.inl ../../Src/SimpleMath.cpp)
+        set(TEST_INCLUDE_DIR ${TEST_INCLUDE_DIR} ../../Inc)
+   else()
+        message("INFO: Using SimpleMath standalone from GitHub.")
+
+        include(FetchContent)
+        FetchContent_Declare(
+            simplemathhpp
+            URL https://raw.githubusercontent.com/microsoft/DirectXTK/main/Inc/SimpleMath.h
+            URL_HASH SHA256=e67b7c05a444b0f571e42e3fdc509e9d04a17f57c67e5f5751f7519ec68add0c
+            DOWNLOAD_NO_EXTRACT ON
+        )
+        FetchContent_Declare(
+            simplemathinl
+            URL https://raw.githubusercontent.com/microsoft/DirectXTK/main/Inc/SimpleMath.inl
+            URL_HASH SHA256=cfcba37fc5e03f532f586ada84c7a0baf566c865b85e75d82b885114982e4765
+            DOWNLOAD_NO_EXTRACT ON
+        )
+        FetchContent_Declare(
+            simplemathcpp
+            URL https://raw.githubusercontent.com/microsoft/DirectXTK/main/Src/SimpleMath.cpp
+            URL_HASH SHA256=c148cd0c84ff8c972b02e8c92bb5e86a03d74e7817604b66efe8cdf7952d6edd
+            DOWNLOAD_NO_EXTRACT ON
+        )
+        FetchContent_MakeAvailable(simplemathhpp simplemathinl simplemathcpp)
+
+        set(TEST_SOURCES ${TEST_SOURCES}
+            ${simplemathhpp_SOURCE_DIR}/SimpleMath.h
+            ${simplemathinl_SOURCE_DIR}/SimpleMath.inl
+            ${simplemathcpp_SOURCE_DIR}/SimpleMath.cpp)
+
+        configure_file(SimpleMathStandalone.in pch.h COPYONLY)
+        set(TEST_INCLUDE_DIR ${TEST_INCLUDE_DIR} ${simplemathhpp_SOURCE_DIR} ${simplemathinl_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+   endif()
+endif()
+
+add_executable(${PROJECT_NAME} ${TEST_SOURCES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${TEST_INCLUDE_DIR})
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${DXMATH_DEFS})
 
 if (MINGW OR (NOT WIN32) OR VCPKG_TOOLCHAIN)
     message("INFO: Using VCPKG for DirectX-Headers and DirectXMath.")
@@ -128,17 +182,14 @@ if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
                     "-Wno-missing-prototypes" "-Wno-missing-variable-declarations"
                     "-Wno-double-promotion" "-Wno-unused-variable" "-Wno-float-equal")
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsEXE})
-endif()
-if ( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
+elseif( MINGW )
+    target_link_options(${PROJECT_NAME} PRIVATE -municode)
+elseif ( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
     target_compile_options(${PROJECT_NAME} PRIVATE /permissive- /Zc:__cplusplus)
 
-    set(WarningsEXE "/wd4061" "/wd4365" "/wd4514" "/wd4571" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045")
+    set(WarningsEXE "/wd4061" "/wd4365" "/wd4514" "/wd4571" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045" "/wd5262" "/wd5264")
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsEXE})
 endif()
-
-target_include_directories(${PROJECT_NAME} PUBLIC ../../inc)
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE ${DXMATH_DEFS})
 
 if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE)

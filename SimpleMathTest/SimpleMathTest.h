@@ -13,8 +13,7 @@
 
 #include <DirectXColors.h>
 
-#include <stdio.h>
-
+#include <cstdio>
 #include <functional>
 #include <iterator>
 #include <map>
