@@ -45,6 +45,7 @@ if (NOT MINGW)
   target_precompile_headers(d3d11test PRIVATE D3D11Test/pch.h)
 endif()
 add_test(NAME "d3d11" COMMAND d3d11test -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/D3D11Test)
+set_tests_properties(d3d11 PROPERTIES LABELS "Graphics")
 set_tests_properties(d3d11 PROPERTIES TIMEOUT 30)
 
 # EFFECTS
@@ -60,6 +61,7 @@ if (NOT MINGW)
   target_precompile_headers(effectstest PRIVATE EffectsTest/pch.h)
 endif()
 add_test(NAME "effects" COMMAND effectstest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/EffectsTest)
+set_tests_properties(effects PROPERTIES LABELS "Graphics")
 set_tests_properties(effects PROPERTIES TIMEOUT 60)
 
 # PRIMITIVE BATCH
@@ -75,6 +77,7 @@ if (NOT MINGW)
   target_precompile_headers(primitivestest PRIVATE PrimitivesTest/pch.h)
 endif()
 add_test(NAME "primitiveBatch" COMMAND primitivestest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PrimitivesTest)
+set_tests_properties(primitiveBatch PROPERTIES LABELS "Graphics")
 set_tests_properties(primitiveBatch PROPERTIES TIMEOUT 60)
 
 # SPRITE BATCH
@@ -90,6 +93,7 @@ if (NOT MINGW)
   target_precompile_headers(spritebatchtest PRIVATE SpriteBatchTest/pch.h)
 endif()
 add_test(NAME "spriteBatch" COMMAND spritebatchtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SpriteBatchTest)
+set_tests_properties(spriteBatch PROPERTIES LABELS "Graphics")
 set_tests_properties(spriteBatch PROPERTIES TIMEOUT 60)
 
 # SPRITE FONT
@@ -105,6 +109,7 @@ if (NOT MINGW)
   target_precompile_headers(spritefonttest PRIVATE SpriteFontTest/pch.h)
 endif()
 add_test(NAME "spriteFont" COMMAND spritefonttest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SpriteFontTest)
+set_tests_properties(spriteFont PROPERTIES LABELS "Graphics")
 set_tests_properties(spriteFont PROPERTIES TIMEOUT 60)
 
 # DDS/WIC TEXTURE LOADER
@@ -121,6 +126,7 @@ if (NOT MINGW)
   target_precompile_headers(loadtest PRIVATE LoadTest/pch.h)
 endif()
 add_test(NAME "loaders" COMMAND loadtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LoadTest)
+set_tests_properties(loaders PROPERTIES LABELS "Graphics")
 set_tests_properties(loaders PROPERTIES TIMEOUT 30)
 
 # MODEL
@@ -139,6 +145,7 @@ if (NOT MINGW)
   target_precompile_headers(modeltest PRIVATE ModelTest/pch.h)
 endif()
 add_test(NAME "models" COMMAND modeltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ModelTest)
+set_tests_properties(models PROPERTIES LABELS "Graphics")
 set_tests_properties(models PROPERTIES TIMEOUT 60)
 
 # SHADER VALIDATION
@@ -156,6 +163,7 @@ if (NOT MINGW)
   target_precompile_headers(shadertest PRIVATE ShaderTest/pch.h)
 endif()
 add_test(NAME "shaders" COMMAND shadertest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ShaderTest)
+set_tests_properties(shaders PROPERTIES LABELS "Graphics")
 set_tests_properties(shaders PROPERTIES TIMEOUT 40)
 
 # ANIMATION
@@ -173,6 +181,7 @@ if (NOT MINGW)
   target_precompile_headers(animtest PRIVATE AnimTest/pch.h)
 endif()
 add_test(NAME "animation" COMMAND animtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/AnimTest)
+set_tests_properties(animation PROPERTIES LABELS "Graphics")
 set_tests_properties(animation PROPERTIES TIMEOUT 40)
 
 # DGSL
@@ -188,6 +197,7 @@ if (NOT MINGW)
   target_precompile_headers(dgsltest PRIVATE DGSLTest/pch.h)
 endif()
 add_test(NAME "dgslShaders" COMMAND dgsltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/DGSLTest)
+set_tests_properties(dgslShaders PROPERTIES LABELS "Graphics")
 set_tests_properties(dgslShaders PROPERTIES TIMEOUT 40)
 
 # HDR
@@ -205,6 +215,7 @@ if (NOT MINGW)
   target_precompile_headers(hdrtest PRIVATE HDRTest/pch.h)
 endif()
 add_test(NAME "hdr" COMMAND hdrtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/HDRTest)
+set_tests_properties(hdr PROPERTIES LABELS "Graphics")
 set_tests_properties(hdr PROPERTIES TIMEOUT 40)
 
 # PBR
@@ -222,6 +233,7 @@ if (NOT MINGW)
   target_precompile_headers(pbrtest PRIVATE PBRTest/pch.h)
 endif()
 add_test(NAME "pbrShaders" COMMAND pbrtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PBRTest)
+set_tests_properties(pbrShaders PROPERTIES LABELS "Graphics")
 set_tests_properties(pbrShaders PROPERTIES TIMEOUT 40)
 
 # PBR MODEL
@@ -241,6 +253,7 @@ if (NOT MINGW)
   target_precompile_headers(pbrmodeltest PRIVATE PBRModelTest/pch.h)
 endif()
 add_test(NAME "modelsPBR" COMMAND pbrmodeltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PBRModelTest)
+set_tests_properties(modelsPBR PROPERTIES LABELS "Graphics")
 set_tests_properties(modelsPBR PROPERTIES TIMEOUT 60)
 
 # POST-PROCESSING
@@ -256,12 +269,14 @@ if (NOT MINGW)
   target_precompile_headers(postprocesstest PRIVATE PostProcessTest/pch.h)
 endif()
 add_test(NAME "postProcess" COMMAND postprocesstest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PostProcessTest)
+set_tests_properties(postProcess PROPERTIES LABELS "Graphics")
 set_tests_properties(postProcess PROPERTIES TIMEOUT 180)
 
 # MATH
 list(APPEND TEST_EXES simplemathtest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/SimpleMathTest)
 add_test(NAME "simplemath" COMMAND simplemathtest)
+set_tests_properties(simplemath PROPERTIES LABELS "Math")
 set_tests_properties(simplemath PROPERTIES TIMEOUT 10)
 
 if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
@@ -270,6 +285,7 @@ if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
     list(APPEND XAUDIO_TESTS basicaudiotest)
     add_executable(basicaudiotest BasicAudioTest/BasicAudioTest.cpp)
     add_test(NAME "basicAudio" COMMAND basicaudiotest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/BasicAudioTest)
+    set_tests_properties(basicAudio PROPERTIES LABELS "Audio")
     set_tests_properties(basicAudio PROPERTIES TIMEOUT 800)
 
     # DYNAMIC AUDIO (Media Foundation streaming)
@@ -278,6 +294,7 @@ if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
         list(APPEND XAUDIO_TESTS dynamicaudiotest)
         add_executable(dynamicaudiotest DynamicAudioTest/DynamicAudioTest.cpp)
         add_test(NAME "dynamicAudio" COMMAND dynamicaudiotest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/DynamicAudioTest)
+        set_tests_properties(dynamicAudio PROPERTIES LABELS "Audio")
         set_tests_properties(dynamicAudio PROPERTIES TIMEOUT 270)
     endif()
 
@@ -286,6 +303,7 @@ if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
     list(APPEND XAUDIO_TESTS streamingaudiotest)
     add_executable(streamingaudiotest StreamingAudioTest/StreamingAudioTest.cpp)
     add_test(NAME "streamingAudio" COMMAND streamingaudiotest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/StreamingAudioTest)
+    set_tests_properties(streamingAudio PROPERTIES LABELS "Audio")
     set_tests_properties(streamingAudio PROPERTIES TIMEOUT 800)
 
     # 3D AUDIO
@@ -302,6 +320,7 @@ if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
       target_precompile_headers(audio3dtest PRIVATE Audio3DTest/pch.h)
     endif()
     add_test(NAME "positionalAudio" COMMAND audio3dtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Audio3DTest)
+    set_tests_properties(positionalAudio PROPERTIES LABELS "Audio")
     set_tests_properties(positionalAudio PROPERTIES TIMEOUT 40)
 
     # SIMPLE AUDIO
@@ -320,6 +339,7 @@ if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
       target_precompile_headers(simpleaudiotest PRIVATE SimpleAudioTest/pch.h)
     endif()
     add_test(NAME "simpleAudio" COMMAND simpleaudiotest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SimpleAudioTest)
+    set_tests_properties(simpleAudio PROPERTIES LABELS "Audio")
     set_tests_properties(simpleAudio PROPERTIES TIMEOUT 30)
 endif()
 
@@ -336,6 +356,7 @@ if (NOT MINGW)
   target_precompile_headers(gamepadtest PRIVATE GamePadTest/pch.h)
 endif()
 add_test(NAME "gamepadInput" COMMAND gamepadtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/GamePadTest)
+set_tests_properties(gamepadInput PROPERTIES LABELS "Input")
 set_tests_properties(gamepadInput PROPERTIES TIMEOUT 30)
 
 # INPUT: KEYBOARD
@@ -351,6 +372,7 @@ if (NOT MINGW)
   target_precompile_headers(keyboardtest PRIVATE KeyboardTest/pch.h)
 endif()
 add_test(NAME "keyboardInput" COMMAND keyboardtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/KeyboardTest)
+set_tests_properties(keyboardInput PROPERTIES LABELS "Input")
 set_tests_properties(keyboardInput PROPERTIES TIMEOUT 30)
 
 # INPUT: MOUSE
@@ -366,6 +388,7 @@ if (NOT MINGW)
   target_precompile_headers(mousetest PRIVATE MouseTest/pch.h)
 endif()
 add_test(NAME "mouseInput" COMMAND mousetest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/MouseTest)
+set_tests_properties(mouseInput PROPERTIES LABELS "Input")
 set_tests_properties(mouseInput PROPERTIES TIMEOUT 30)
 
 message("INFO: Enabled tests: ${TEST_EXES}")
