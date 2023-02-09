@@ -142,11 +142,22 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${TEST_INCLUDE_DIR})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${DXMATH_DEFS})
 
-if (MINGW OR (NOT WIN32) OR VCPKG_TOOLCHAIN)
-    message("INFO: Using VCPKG for DirectX-Headers and DirectXMath.")
-    find_package(directx-headers CONFIG REQUIRED)
+if(MINGW OR (NOT WIN32))
     find_package(directxmath CONFIG REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::DirectX-Headers Microsoft::DirectXMath)
+    find_package(directx-headers CONFIG REQUIRED)
+else()
+    find_package(directxmath CONFIG QUIET)
+    find_package(directx-headers CONFIG QUIET)
+endif()
+
+if(directxmath_FOUND)
+    message(STATUS "Using DirectXMath package")
+    target_link_libraries(${PROJECT_NAME} PUBLIC Microsoft::DirectXMath)
+endif()
+
+if(directx-headers_FOUND)
+    message(STATUS "Using DirectX-Headers package")
+    target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::DirectX-Headers)
     target_compile_definitions(${PROJECT_NAME} PRIVATE USING_DIRECTX_HEADERS)
 endif()
 

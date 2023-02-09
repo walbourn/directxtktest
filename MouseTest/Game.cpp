@@ -17,6 +17,9 @@
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
+// Remove call to Mouse::EndOfInputFrame by definining this.
+//#define RELY_ON_AUTO_RESET
+
 // Enable to test using always relative mode and not using absolute
 //#define TEST_LOCKED_RELATIVE
 
@@ -162,6 +165,10 @@ void Game::Tick()
     {
         Update(m_timer);
     });
+
+#ifndef RELY_ON_AUTO_RESET
+    m_mouse->EndOfInputFrame();
+#endif
 
     Render();
 }
