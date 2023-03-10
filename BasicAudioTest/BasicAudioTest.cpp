@@ -273,7 +273,7 @@ int __cdecl wmain()
         default:                        speakerConfig = "(unknown)"; break;
         }
 
-        printf("\tOutput format rate %lu, channels %u, %s (%08lX)\n", output.Format.nSamplesPerSec, output.Format.nChannels, speakerConfig, output.dwChannelMask );
+        printf("\tOutput format rate %lu, %u-bit, channels %u, %s (%08lX)\n", output.Format.nSamplesPerSec, output.Format.wBitsPerSample, output.Format.nChannels, speakerConfig, output.dwChannelMask );
     }
 
     if ( !audEngine->IsAudioDevicePresent() )
