@@ -106,7 +106,9 @@ namespace
             default:                        speakerConfig = "(unknown)"; break;
             }
 
-            swprintf_s(deviceStr, maxsize, L"Output format rate %u, channels %u, %hs (%08X)", wfx.Format.nSamplesPerSec, wfx.Format.nChannels, speakerConfig, wfx.dwChannelMask);
+            swprintf_s(deviceStr, maxsize, L"Output format rate %u, %u-bit, channels %u, %hs (%08X)",
+                wfx.Format.nSamplesPerSec, wfx.Format.wBitsPerSample, wfx.Format.nChannels,
+                speakerConfig, wfx.dwChannelMask);
         }
         else
         {
