@@ -223,11 +223,10 @@ int __cdecl wmain()
                 return 1;
             }
 
-            if ( output.Format.nChannels != testwfx.nChannels
-                 || output.Format.nSamplesPerSec != testwfx.nSamplesPerSec )
+            if ( audEngine->GetOutputChannels() != testwfx.nChannels
+                 || audEngine->GetOutputSampleRate() != static_cast<int>(testwfx.nSamplesPerSec) )
             {
-                printf("ERROR: Output format rate %lu, channels %u was not expected\n", output.Format.nSamplesPerSec, output.Format.nChannels );
-                dump_wfx( reinterpret_cast<const WAVEFORMATEX*>( &output ) );
+                printf("ERROR: Output format rate %lu, channels %d was not expected\n", audEngine->GetOutputChannels(), audEngine->GetOutputSampleRate());
                 return 1;
             }
 
