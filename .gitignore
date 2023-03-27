@@ -28,4 +28,5 @@ Release
 /ipch
 /AppPackages
 SCREENSHOT.*
+toolscripts/xwbtool/out
 CMakeUserPresets.json
