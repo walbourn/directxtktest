@@ -4,6 +4,7 @@ setlocal
 
 set TARGETEXE=..\..\..\xwbtool\Bin\Desktop_2019\Win32\Debug\xwbtool.exe
 REM set TARGETEXE=..\..\..\xwbtool\Bin\Desktop_2019\Win32\Release\xwbtool.exe
+REM set TARGETEXE=D:\vcpkg\installed\arm64-windows\tools\directxtk\xwbtool.exe
 set SPEC=*
 
 call onetime.cmd
