@@ -46,7 +46,7 @@ elseif (BUILD_DISABLE_SVML)
 endif()
 
 if(NOT ${DIRECTX_ARCH} MATCHES "^arm")
-    if (${CMAKE_SIZEOF_VOID_P} EQUAL "4")
+    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(ARCH_SSE2 $<$<CXX_COMPILER_ID:MSVC>:/arch:SSE2> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-msse2>)
     else()
         set(ARCH_SSE2 $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-msse2>)
