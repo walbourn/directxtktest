@@ -226,7 +226,7 @@ int __cdecl wmain()
             if ( audEngine->GetOutputChannels() != testwfx.nChannels
                  || audEngine->GetOutputSampleRate() != static_cast<int>(testwfx.nSamplesPerSec) )
             {
-                printf("ERROR: Output format rate %lu, channels %d was not expected\n", audEngine->GetOutputChannels(), audEngine->GetOutputSampleRate());
+                printf("ERROR: Output format rate %u, channels %d was not expected\n", audEngine->GetOutputChannels(), audEngine->GetOutputSampleRate());
                 return 1;
             }
 
