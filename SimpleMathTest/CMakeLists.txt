@@ -172,6 +172,9 @@ if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
         "-Wpedantic" "-Wextra" "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-language-extension-token" "-Wno-reserved-id-macro"
         "-Wno-missing-prototypes" "-Wno-missing-variable-declarations"
         "-Wno-double-promotion" "-Wno-unused-variable" "-Wno-float-equal")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16.0)
+      target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-unsafe-buffer-usage")
+    endif()
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "GCC" )
     target_compile_options(${PROJECT_NAME} PRIVATE
         "-Wno-reserved-id-macro" "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic"
