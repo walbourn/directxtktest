@@ -571,12 +571,14 @@ void Game::UnitTests()
 
     bool success = true;
 
+#ifndef NO_WCHAR_T
     // GetDefaultCharacterTest
     if (m_comicFont->GetDefaultCharacter() != 0)
     {
         OutputDebugStringA("FAILED: GetDefaultCharacter\n");
         success = false;
     }
+#endif
 
     // ContainsCharacter tests
     if (m_comicFont->ContainsCharacter(27)
@@ -606,11 +608,13 @@ void Game::UnitTests()
 
     // DefaultCharacter tests
     m_comicFont->SetDefaultCharacter('-');
+#ifndef NO_WCHAR_T
     if (m_comicFont->GetDefaultCharacter() != '-')
     {
         OutputDebugStringA("FAILED: Get/SetDefaultCharacter\n");
         success = false;
     }
+#endif
 
     // Linespacing tests
     float s = m_ctrlFont->GetLineSpacing();

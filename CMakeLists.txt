@@ -17,7 +17,7 @@ set(XAUDIO_TESTS headertest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/HeaderTest)
 
 # fuzzloaders
-if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
+if((BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7) AND (NOT NO_WCHAR_T))
   list(APPEND TEST_EXES fuzzloaders)
   list(APPEND XAUDIO_TESTS fuzzloaders)
   add_executable(fuzzloaders fuzzloaders/fuzzloaders.cpp)
@@ -107,6 +107,9 @@ add_executable(spritefonttest WIN32
 target_include_directories(spritefonttest PRIVATE ./SpriteFontTest)
 if (NOT MINGW)
   target_precompile_headers(spritefonttest PRIVATE SpriteFontTest/pch.h)
+endif()
+if (NO_WCHAR_T)
+  target_compile_definitions(spritefonttest PRIVATE NO_WCHAR_T)
 endif()
 add_test(NAME "spriteFont" COMMAND spritefonttest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SpriteFontTest)
 set_tests_properties(spriteFont PROPERTIES LABELS "Graphics")
