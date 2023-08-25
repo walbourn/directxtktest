@@ -473,7 +473,9 @@ endif()
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
     target_compile_options(headertest PRIVATE -Wall -Wpedantic -Wextra)
     foreach(t IN LISTS TEST_EXES)
-      target_compile_options(${t} PRIVATE "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-language-extension-token")
+      target_compile_options(${t} PRIVATE
+          "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-language-extension-token"
+          "-Wno-reserved-id-macro")
     endforeach()
 elseif(MINGW)
     foreach(t IN LISTS TEST_EXES)
