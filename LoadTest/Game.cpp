@@ -1574,6 +1574,23 @@ void Game::UnitTests(bool success)
         }
     }
 
+    // WIC RGBA32 + AUTOGEN
+    {
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> srv;
+        DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, context, L"pentagon.tiff",
+            0,
+            D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0,
+            WIC_LOADER_FORCE_RGBA32,
+            res.GetAddressOf(), srv.GetAddressOf()));
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM, 11, 1024, 1024))
+        {
+            OutputDebugStringA("FAILED: pentagon.tiff res desc autogen+rgba32 unexpected\n");
+            success = false;
+        }
+    }
+
     OutputDebugStringA(success ? "Passed\n" : "Failed\n");
     OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
 
