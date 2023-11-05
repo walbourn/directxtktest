@@ -14,7 +14,7 @@ option(BUILD_AVX2_TEST     "Build for /arch:AVX2" OFF)
 option(BUILD_DISABLE_SVML  "Disable use of SVML (VS 2019)" OFF)
 option(BUILD_NO_INTRINSICS "Disable use of compiler intrinsics" OFF)
 
-if (MINGW OR (NOT WIN32))
+if(MINGW OR (NOT WIN32))
    set(BUILD_FOR_ONECORE OFF)
 endif()
 
@@ -162,7 +162,24 @@ if(directx-headers_FOUND)
 endif()
 
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /Wall /GR /fp:fast)
+    target_compile_options(${PROJECT_NAME} PRIVATE /Wall /GR /fp:fast "$<$<NOT:$<CONFIG:DEBUG>>:/guard:cf>")
+    target_link_options(${PROJECT_NAME} PRIVATE /DYNAMICBASE /NXCOMPAT /INCREMENTAL:NO)
+
+    if((CMAKE_SIZEOF_VOID_P EQUAL 4) AND (NOT (${DIRECTX_ARCH} MATCHES "^arm")))
+        target_link_options(${PROJECT_NAME} PRIVATE /SAFESEH)
+    endif()
+
+    if((MSVC_VERSION GREATER_EQUAL 1924)
+        AND ((NOT (CMAKE_CXX_COMPILER_ID MATCHES "Clang")) OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16.0)))
+        target_compile_options(${PROJECT_NAME} PRIVATE /ZH:SHA_256)
+    endif()
+
+    if((MSVC_VERSION GREATER_EQUAL 1928)
+        AND (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        AND ((NOT (CMAKE_CXX_COMPILER_ID MATCHES "Clang")) OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)))
+          target_compile_options(${PROJECT_NAME} PRIVATE "$<$<NOT:$<CONFIG:DEBUG>>:/guard:ehcont>")
+          target_link_options(${PROJECT_NAME} PRIVATE "$<$<NOT:$<CONFIG:DEBUG>>:/guard:ehcont>")
+    endif()
 else()
     add_compile_definitions(PRIVATE $<IF:$<CONFIG:DEBUG>,_DEBUG,NDEBUG>)
 endif()
@@ -183,7 +200,7 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GCC" )
 elseif( MINGW )
     target_link_options(${PROJECT_NAME} PRIVATE -municode)
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
-    target_compile_options(${PROJECT_NAME} PRIVATE /permissive- /Zc:__cplusplus)
+    target_compile_options(${PROJECT_NAME} PRIVATE /permissive- /JMC- /Zc:__cplusplus /Zc:inline)
 
     set(WarningsEXE "/wd4061" "/wd4365" "/wd4514" "/wd4571" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045")
 
@@ -197,6 +214,10 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
     endif()
 
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsEXE})
+
+    if((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.27) AND (NOT ((${DIRECTX_ARCH} MATCHES "^arm"))))
+        target_link_options(${PROJECT_NAME} PRIVATE /CETCOMPAT)
+    endif()
 endif()
 
 if(WIN32)
