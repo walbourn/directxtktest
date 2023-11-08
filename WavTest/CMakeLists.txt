@@ -1,10 +1,10 @@
-﻿# Copyright (c) Microsoft Corporation.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 cmake_minimum_required (VERSION 3.20)
 
-project (fuzzloaders
-  DESCRIPTION "DirectX Tool Kit File Fuzzer"
+project (wavtest
+  DESCRIPTION "DirectX Tool Kit for DX11 Audio File I/O Test"
   HOMEPAGE_URL "https://github.com/walbourn/directxtktest/wiki"
   LANGUAGES CXX)
 
@@ -32,25 +32,17 @@ elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Aa][Rr][Mm]64$")
     set(DIRECTX_ARCH arm64)
 endif()
 
-add_executable(${PROJECT_NAME} fuzzloaders.cpp)
+add_executable(${PROJECT_NAME}
+  WavTest.cpp
+  wav.cpp
+  xwb.cpp
+  ../../Audio/WAVFileReader.h
+  ../../Audio/WaveBankReader.h
+  )
 
-target_include_directories(${PROJECT_NAME} PRIVATE ../../Audio)
+target_include_directories(${PROJECT_NAME} PRIVATE ../../Audio ../../Src)
 
-if(BUILD_FUZZING)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE FUZZING_BUILD_MODE)
-endif()
-
-if(MINGW)
-    find_package(directxmath CONFIG REQUIRED)
-else()
-    find_package(directxmath CONFIG QUIET)
-endif()
-
-target_link_libraries(${PROJECT_NAME} PRIVATE DirectXTK bcrypt.lib d3d11.lib)
-
-if(directxmath_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC Microsoft::DirectXMath)
-endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE DirectXTK bcrypt.lib)
 
 if (BUILD_XAUDIO_WIN7 AND xaudio2redist_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC Microsoft::XAudio2Redist)
@@ -72,7 +64,6 @@ if(MSVC)
 
   if((MSVC_VERSION GREATER_EQUAL 1928)
     AND (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    AND NOT ENABLE_OPENEXR_SUPPORT
     AND ((NOT (CMAKE_CXX_COMPILER_ID MATCHES "Clang")) OR (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)))
       target_compile_options(${PROJECT_NAME} PRIVATE "$<$<NOT:$<CONFIG:DEBUG>>:/guard:ehcont>")
       target_link_options(${PROJECT_NAME} PRIVATE "$<$<NOT:$<CONFIG:DEBUG>>:/guard:ehcont>")

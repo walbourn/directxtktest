@@ -16,8 +16,16 @@ set(TEST_EXES headertest)
 set(XAUDIO_TESTS headertest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/HeaderTest)
 
-# fuzzloaders
 if((BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7) AND (NOT NO_WCHAR_T))
+  # wavtest
+  list(APPEND TEST_EXES wavtest)
+  list(APPEND XAUDIO_TESTS wavtest)
+  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/WavTest)
+  add_test(NAME "wavtest" COMMAND wavtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+  set_tests_properties(wavtest PROPERTIES LABELS "Audio")
+  set_tests_properties(wavtest PROPERTIES TIMEOUT 10)
+
+  # fuzzloaders
   list(APPEND TEST_EXES fuzzloaders)
   list(APPEND XAUDIO_TESTS fuzzloaders)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/fuzzloaders)
