@@ -88,7 +88,7 @@ int __cdecl wmain()
 #include <bcrypt.h>
 
 #ifndef NT_SUCCESS
-#define NT_SUCCESS(Status)          (((NTSTATUS)(Status)) >= 0)
+#define NT_SUCCESS(Status)          ((Status) >= 0)
 #endif
 
 struct bcrypthandle_closer { void operator()(BCRYPT_HASH_HANDLE h) { BCryptDestroyHash(h); } };
@@ -107,7 +107,7 @@ HRESULT MD5Checksum( _In_reads_(dataSize) const uint8_t *data, size_t dataSize, 
     NTSTATUS status;
 
     // Ensure have the MD5 algorithm ready
-    static BCRYPT_ALG_HANDLE s_algid = 0;
+    static BCRYPT_ALG_HANDLE s_algid = nullptr;
     if ( !s_algid )
     {
         status = BCryptOpenAlgorithmProvider( &s_algid, BCRYPT_MD5_ALGORITHM, MS_PRIMITIVE_PROVIDER,  0 );

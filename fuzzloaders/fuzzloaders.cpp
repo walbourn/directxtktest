@@ -47,9 +47,11 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
+#ifdef FUZZING_BUILD_MODE
     struct handle_closer { void operator()(HANDLE h) { if (h) CloseHandle(h); } };
 
     using ScopedHandle = std::unique_ptr<void, handle_closer>;
+#endif
 
     inline HANDLE safe_handle(HANDLE h) { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
 
