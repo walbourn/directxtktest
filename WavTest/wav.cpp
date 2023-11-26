@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // wav.cpp
-//  
+//
 // Copyright (c) Microsoft Corporation.
 //-------------------------------------------------------------------------------------
 
@@ -63,6 +63,7 @@ namespace
         { WAVE_FAIL_CASE, 0, 0, 0, 0, 0, L"WavTest\\crash-2fa7e302c14e1801282c6377c5c1db0c37393210.wav", {} },
         { WAVE_FAIL_CASE, 0, 0, 0, 0, 0, L"WavTest\\crash-3917a73fa8d28811c1fd16b106844a3b0c2f8860.wav", {} },
         { WAVE_FAIL_CASE, 0, 0, 0, 0, 0, L"WavTest\\crash-6dbfd0730b2b3e39ffb0f13b4518e28543df5c8a.wav", {} },
+        { WAVE_FAIL_CASE, 0, 0, 0, 0, 0, L"WavTest\\crash-16ddb25a6080f6f5a40e30d521b8e5b476ab8c10.wav", {} },
     };
 
 #define printdigest(str,digest) printf( "%s:\n0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x\n", str, \
@@ -127,7 +128,7 @@ namespace
 extern HRESULT MD5Checksum( _In_reads_(dataSize) const uint8_t *data, size_t dataSize, _Out_bytecap_x_(16) uint8_t *digest );
 
 //-------------------------------------------------------------------------------------
-// 
+//
 bool Test01()
 {
     bool success = true;
