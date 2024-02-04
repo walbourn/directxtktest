@@ -150,7 +150,7 @@ namespace
                     break;
             }
         }
-            
+
         // Process directories
         if (recursive)
         {
@@ -305,6 +305,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                     wprintf(L"-dds, -wav, -wic, and -xwb are mutually exclusive options\n");
                     return 1;
                 }
+                break;
+
+            default:
                 break;
             }
         }
