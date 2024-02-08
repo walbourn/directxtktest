@@ -51,16 +51,16 @@ namespace
 
     struct TestVertex
     {
-        TestVertex(FXMVECTOR position, FXMVECTOR normal, FXMVECTOR textureCoordinate)
+        TestVertex(FXMVECTOR iposition, FXMVECTOR inormal, FXMVECTOR itextureCoordinate)
         {
-            XMStoreFloat3(&this->position, position);
-            XMStoreFloat3(&this->normal, normal);
-            XMStoreFloat2(&this->textureCoordinate, textureCoordinate);
-            XMStoreFloat2(&this->textureCoordinate2, XMVectorScale(textureCoordinate, 3));
+            XMStoreFloat3(&this->position, iposition);
+            XMStoreFloat3(&this->normal, inormal);
+            XMStoreFloat2(&this->textureCoordinate, itextureCoordinate);
+            XMStoreFloat2(&this->textureCoordinate2, XMVectorScale(itextureCoordinate, 3));
             XMStoreUByte4(&this->blendIndices, XMVectorSet(0, 1, 2, 3));
 
-            float u = XMVectorGetX(textureCoordinate) - 0.5f;
-            float v = XMVectorGetY(textureCoordinate) - 0.5f;
+            float u = XMVectorGetX(itextureCoordinate) - 0.5f;
+            float v = XMVectorGetY(itextureCoordinate) - 0.5f;
 
             float d = 1 - sqrt(u * u + v * v) * 2;
 
