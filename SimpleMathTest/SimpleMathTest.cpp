@@ -5779,7 +5779,7 @@ int main()
     size_t npass = 0;
     bool success = true;
 
-    printf("*** SimpleMathTest (using DirectXMath version %03u)\n", DIRECTX_MATH_VERSION);
+    printf("*** SimpleMathTest (using DirectXMath version %03d)\n", DIRECTX_MATH_VERSION);
 
     if (!XMVerifyCPUSupport())
     {
