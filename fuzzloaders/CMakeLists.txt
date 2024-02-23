@@ -63,7 +63,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     if(BUILD_FUZZING
        AND (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.32))
-          target_compile_options(${PROJECT_NAME} PRIVATE ${ASAN_SWITCHES})
+          target_compile_options(${PROJECT_NAME} PRIVATE /fsanitize=fuzzer ${ASAN_SWITCHES})
           target_link_libraries(${PROJECT_NAME} PRIVATE ${ASAN_LIBS})
           target_link_options(${PROJECT_NAME} PRIVATE /IGNORE:4291)
     endif()
