@@ -102,28 +102,28 @@
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Bin\Windows10_2019\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Bin\Windows10_2022\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <Link>
@@ -263,7 +263,7 @@
     <Image Include="texture.dds" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DirectXTK_Windows10_2019.vcxproj">
+    <ProjectReference Include="..\..\DirectXTK_Windows10_2022.vcxproj">
       <Project>{f4776924-619c-42c7-88b2-82c947ccc9e7}</Project>
     </ProjectReference>
   </ItemGroup>
