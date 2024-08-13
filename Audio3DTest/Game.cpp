@@ -374,6 +374,9 @@ void Game::AudioRender()
         }
     }
 
+    assert(m_listener.IsValid());
+    assert(m_emitter.IsValid());
+
 #ifdef LH_COORDS
     m_effect->Apply3D(m_listener, m_emitter, false);
 #else
