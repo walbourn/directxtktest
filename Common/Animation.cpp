@@ -339,7 +339,7 @@ HRESULT AnimationCMO::Load(const wchar_t* fileName, size_t offset, const wchar_t
         if (dataSize < usedSize)
             return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
 
-        auto name = reinterpret_cast<const wchar_t*>(blob.get() + usedSize);
+        auto name = reinterpret_cast<const wchar_t*>(blob.get() + usedSize); // [CodeQL.SM02986]: The cast here is intentional.
 
         usedSize += sizeof(wchar_t) * (*nName);
         if (dataSize < usedSize)
