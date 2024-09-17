@@ -401,7 +401,7 @@ add_test(NAME "mouseInput" COMMAND mousetest -ctest WORKING_DIRECTORY ${CMAKE_CU
 set_tests_properties(mouseInput PROPERTIES LABELS "Input")
 set_tests_properties(mouseInput PROPERTIES TIMEOUT 30)
 
-message("INFO: Enabled tests: ${TEST_EXES}")
+message(STATUS "Enabled tests: ${TEST_EXES}")
 foreach(t IN LISTS TEST_EXES)
   target_include_directories(${t} PRIVATE ./Common)
   target_link_libraries(${t} PRIVATE DirectXTK dxgi.lib d3d11.lib)
