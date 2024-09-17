@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // xwb.cpp
-//  
+//
 // Copyright (c) Microsoft Corporation.
 //-------------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ namespace
 extern HRESULT MD5Checksum( _In_reads_(dataSize) const uint8_t *data, size_t dataSize, _Out_bytecap_x_(16) uint8_t *digest );
 
 //-------------------------------------------------------------------------------------
-// 
+//
 bool Test02()
 {
     bool success = true;
@@ -137,7 +137,12 @@ bool Test02()
                     HANDLE async = wb->GetAsyncHandle();
 
                     OVERLAPPED request = {};
-                    request.hEvent = CreateEventEx(nullptr, nullptr, 0, EVENT_MODIFY_STATE | SYNCHRONIZE);
+                    request.hEvent = CreateEventExW(nullptr, nullptr, 0, EVENT_MODIFY_STATE | SYNCHRONIZE);
+                    if (!request.hEvent)
+                    {
+                        printf( "Fatal error: CreateEventEx failed (HRESULT %08X)\n", HRESULT_FROM_WIN32(GetLastError()) );
+                        return false;
+                    }
                     request.Offset = metadata.offsetBytes;
 
                     bool pass = true;
@@ -213,7 +218,7 @@ bool Test02()
                     printf( "Failed get wave data for entry 0 (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
                 }
                 else
-                {                
+                {
                     uint8_t digest[16];
                     hr = MD5Checksum( wavData, audioBytes, digest );
                     if ( FAILED(hr) )

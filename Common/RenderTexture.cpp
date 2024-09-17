@@ -50,7 +50,7 @@ void RenderTexture::SetDevice(_In_ ID3D11Device* device)
         {
 #ifdef _DEBUG
             char buff[128] = {};
-            sprintf_s(buff, "RenderTexture: Device does not support the requested format (%u)!\n", m_format);
+            sprintf_s(buff, "RenderTexture: Device does not support the requested format (%d)!\n", m_format);
             OutputDebugStringA(buff);
 #endif
             throw std::runtime_error("RenderTexture");
