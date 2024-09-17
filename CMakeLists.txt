@@ -479,6 +479,12 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
       set_target_properties(${t} PROPERTIES CXX_STANDARD 14)
     endforeach()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    if(ENABLE_CODE_ANALYSIS)
+      foreach(t IN LISTS TEST_EXES)
+        target_compile_options(${t} PRIVATE /analyze /WX)
+      endforeach()
+    endif()
+
     if(BUILD_FUZZING
        AND (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.32))
         foreach(t IN LISTS TEST_EXES)
