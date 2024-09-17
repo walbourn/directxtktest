@@ -19,7 +19,14 @@
 #ifdef USING_GAMEINPUT
 #include <GameInput.h>
 #elif defined(USING_WINDOWS_GAMING_INPUT)
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4619 6553)
+#endif
 #include <Windows.UI.Core.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #elif !defined(_XBOX_ONE)
 #include <xinput.h>
 #endif
