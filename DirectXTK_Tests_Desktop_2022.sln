@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 16.0.29613.14
+VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_Desktop_2022", "..\DirectXTK_Desktop_2022.vcxproj", "{E0B52AE7-E160-4D32-BF3F-910B785E5A8E}"
 EndProject
@@ -50,8 +49,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Input", "Input", "{47AFCC01-4A23-47CA-B8C5-5850F3B8841D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Math", "Math", "{A851C40B-4A25-49F1-B551-63E53949F0CA}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fuzzloaders_Desktop_2022", "fuzzloaders\fuzzloaders_Desktop_2022.vcxproj", "{65A50BAD-23BA-426B-9D72-2BD06F31F13B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostProcessTest_Desktop_2022", "PostProcessTest\PostProcessTest_Desktop_2022.vcxproj", "{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}"
 EndProject
@@ -334,18 +331,6 @@ Global
 		{C3281769-B603-4C38-A765-29F9EA00C84E}.Release|x64.Build.0 = Release|x64
 		{C3281769-B603-4C38-A765-29F9EA00C84E}.Release|x86.ActiveCfg = Release|Win32
 		{C3281769-B603-4C38-A765-29F9EA00C84E}.Release|x86.Build.0 = Release|Win32
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Debug|x64.ActiveCfg = Debug|x64
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Debug|x64.Build.0 = Debug|x64
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Debug|x86.ActiveCfg = Debug|Win32
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Debug|x86.Build.0 = Debug|Win32
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Release|x64.ActiveCfg = Release|x64
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Release|x64.Build.0 = Release|x64
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Release|x86.ActiveCfg = Release|Win32
-		{65A50BAD-23BA-426B-9D72-2BD06F31F13B}.Release|x86.Build.0 = Release|Win32
 		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{8C932F60-6BDF-4FAC-9E08-53B6CA85BCB3}.Debug|x64.ActiveCfg = Debug|x64

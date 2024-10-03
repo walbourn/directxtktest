@@ -12,9 +12,11 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
   message(FATAL_ERROR "DirectX Tool Kit Fuzz Tester should be built by the main CMakeLists")
 endif()
 
-add_executable(${PROJECT_NAME} fuzzloaders.cpp)
+add_executable(${PROJECT_NAME}
+    fuzzloaders.cpp
+    ../../XWBTool/CmdLineHelpers.h)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ../../Audio)
+target_include_directories(${PROJECT_NAME} PRIVATE ../../Audio ../../XWBTool)
 
 if(BUILD_FUZZING)
     target_compile_definitions(${PROJECT_NAME} PRIVATE FUZZING_BUILD_MODE)
@@ -26,7 +28,7 @@ else()
     find_package(directxmath CONFIG QUIET)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE DirectXTK bcrypt.lib d3d11.lib)
+target_link_libraries(${PROJECT_NAME} PRIVATE DirectXTK bcrypt.lib d3d11.lib version.lib)
 
 if(directxmath_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC Microsoft::DirectXMath)
