@@ -19,7 +19,7 @@
 
 using namespace DirectX;
 
-static_assert(sizeof(VertexPositionNormalTexture) == sizeof(WaveFrontReader<uint16_t>::Vertex), "vertex size mismatch");
+static_assert(sizeof(VertexPositionNormalTexture) == sizeof(DX::WaveFrontReader<uint16_t>::Vertex), "vertex size mismatch");
 
 namespace
 {
@@ -85,7 +85,7 @@ std::unique_ptr<Model> CreateModelFromOBJ(
     if (!InitOnceExecuteOnce(&g_InitOnce, InitializeDecl, nullptr, nullptr))
         throw std::system_error(std::error_code(static_cast<int>(GetLastError()), std::system_category()), "InitOnceExecuteOnce");
 
-    auto obj = std::make_unique<WaveFrontReader<uint16_t>>();
+    auto obj = std::make_unique<DX::WaveFrontReader<uint16_t>>();
 
     if (FAILED(obj->Load(szFileName)))
     {
