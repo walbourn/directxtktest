@@ -1,0 +1,29 @@
+@echo off
+setlocal
+REM Copyright (c) Microsoft Corporation.
+REM Licensed under the MIT License.
+
+where /Q Microsoft.CodeCoverage.Console.exe
+@if errorlevel 1 goto notool
+
+set "FILES="
+
+for %%1 in (wavtest d3d11test effectstest primitivestest spritebatchtest spritefonttest loadtest modeltest shadertest animtest dgsltest hdrtest pbrtest pbrmodeltest postprocesstest simplemathtest basicaudiotest dynamicaudiotest streamingaudiotest audio3dtest simpleaudiotest gamepadtest keyboardtest mousetest) do (Microsoft.CodeCoverage.Console instrument --settings coverage.config .\%%1.exe
+Microsoft.CodeCoverage.Console collect .\%%1.exe
+@if errorlevel 1 goto failure
+call set "FILES=%%FILES%% output_%%1.coverage"
+move output.coverage output_%%1.coverage)
+
+Microsoft.CodeCoverage.Console merge %FILES%
+@if errorlevel 1 goto failure
+
+echo Open output.coverage using the Visual Studio IDE to view it.
+exit /b 0
+
+:failure
+echo *** Microsoft.CodeCoverage.Console failed
+exit /b 1
+
+:notool
+ECHO Code-coverage using MSVC requires Microsoft.CodeCoverage.Console in Visual Studio Enterprise
+exit /b 1
