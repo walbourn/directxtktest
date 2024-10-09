@@ -11,7 +11,7 @@ cd /d %BINDIR%
 
 set "FILES="
 
-for %%1 in (d3d11test effectstest primitivestest spritebatchtest spritefonttest loadtest modeltest shadertest animtest dgsltest hdrtest pbrtest pbrmodeltest postprocesstest simplemathtest) do (Microsoft.CodeCoverage.Console instrument --settings coverage.config .\%%1.exe
+for %%1 in (basicaudiotest dynamicaudiotest streamingaudiotest audio3dtest simpleaudiotest) do (Microsoft.CodeCoverage.Console instrument --settings coverage-audio.config .\%%1.exe
 pushd ..\..\..\..\Tests\%%1
 @if errorlevel 1 goto pushfail
 Microsoft.CodeCoverage.Console collect %BINDIR%\%%1.exe -ctest
@@ -19,6 +19,15 @@ Microsoft.CodeCoverage.Console collect %BINDIR%\%%1.exe -ctest
 call set "FILES=%%FILES%% output_%%1.coverage"
 move output.coverage %BINDIR%\output_%%1.coverage
 popd)
+
+REM wavtest
+Microsoft.CodeCoverage.Console instrument --settings coverage.config wavtest.exe
+pushd ..\..\..\..\Tests
+Microsoft.CodeCoverage.Console collect %BINDIR%\wavtest.exe
+@if errorlevel 1 goto failure
+call set "FILES=%%FILES%% output_wavtest.coverage"
+move output.coverage %BINDIR%\output_wavtest.coverage
+popd
 
 Microsoft.CodeCoverage.Console merge %FILES%
 @if errorlevel 1 goto failure

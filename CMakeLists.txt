@@ -522,5 +522,13 @@ if(ENABLE_CODE_COVERAGE)
   if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/MSVCCodeCov.cmd.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MSVCCodeCov.cmd COPYONLY)
     configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/coverage.config.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/coverage.config COPYONLY)
+
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/MSVCCodeCovInput.cmd.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MSVCCodeCovInput.cmd COPYONLY)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/coverage-input.config.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/coverage-input.config COPYONLY)
+
+    if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
+      configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/MSVCCodeCovAudio.cmd.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MSVCCodeCovAudio.cmd COPYONLY)
+      configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/coverage-audio.config.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/coverage-audio.config COPYONLY)
+    endif()
   endif()
 endif()

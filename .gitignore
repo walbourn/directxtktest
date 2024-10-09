@@ -17,6 +17,7 @@
 *.ilk
 *.VC.db
 .vs
+*.coverage
 Thumbs.db
 Bin
 out
