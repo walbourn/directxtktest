@@ -32,6 +32,19 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
+#ifdef GAMMA_CORRECT_RENDERING
+    // Linear colors for DirectXMath were not added until v3.17 in the Windows SDK (22621)
+    const XMVECTORF32 c_clearColor = { { { 0.015996292f, 0.258182913f, 0.015996292f, 1.f } } };
+    const XMVECTORF32 c_clearColor2 = { { { 0.417885154f, 0.686685443f, 0.791298151f, 1.f } } };
+    const XMVECTORF32 c_clearColor4 = { { { 0.127437726f, 0.300543845f, 0.846873462f, 1.f } } };
+    const XMVECTORF32 c_clearColor8 = { { { 0.009721218f, 0.009721218f, 0.162029430f, 1.f } } };
+#else
+    const XMVECTORF32 c_clearColor = Colors::ForestGreen;
+    const XMVECTORF32 c_clearColor2 = Colors::LightBlue;
+    const XMVECTORF32 c_clearColor4 = Colors::CornflowerBlue;
+    const XMVECTORF32 c_clearColor8 = Colors::MidnightBlue;
+#endif
+
     constexpr float ADVANCE_TIME = 1.f;
     constexpr float INTERACTIVE_TIME = 10.f;
 }
@@ -466,42 +479,23 @@ void Game::Clear()
     case State::MSAA2X:
         renderTarget = m_msaaHelper2->GetMSAARenderTargetView();
         depthStencil = m_msaaHelper2->GetMSAADepthStencilView();
-
-    #ifdef GAMMA_CORRECT_RENDERING
-        color.v = XMColorSRGBToRGB(Colors::LightBlue);
-    #else
-        color.v = Colors::LightBlue;
-    #endif
+        color.v = c_clearColor2.v;
         break;
 
     case State::MSAA4X:
         renderTarget = m_msaaHelper4->GetMSAARenderTargetView();
         depthStencil = m_msaaHelper4->GetMSAADepthStencilView();
-
-    #ifdef GAMMA_CORRECT_RENDERING
-        color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
-    #else
-        color.v = Colors::CornflowerBlue;
-    #endif
+        color.v = c_clearColor4.v;
         break;
 
     case State::MSAA8X:
         renderTarget = m_msaaHelper8->GetMSAARenderTargetView();
         depthStencil = m_msaaHelper8->GetMSAADepthStencilView();
-
-    #ifdef GAMMA_CORRECT_RENDERING
-        color.v = XMColorSRGBToRGB(Colors::MidnightBlue);
-    #else
-        color.v = Colors::MidnightBlue;
-    #endif
+        color.v = c_clearColor8.v;
         break;
 
     default:
-    #ifdef GAMMA_CORRECT_RENDERING
-        color.v = XMColorSRGBToRGB(Colors::ForestGreen);
-    #else
-        color.v = Colors::ForestGreen;
-    #endif
+        color.v = c_clearColor.v;
         break;
     }
 
