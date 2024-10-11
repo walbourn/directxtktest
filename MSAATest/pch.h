@@ -57,6 +57,8 @@
 #else
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
 #include <d3d11_3.h>
+
+#include <wrl.h>
 #else
 #include <d3d11_1.h>
 #endif
