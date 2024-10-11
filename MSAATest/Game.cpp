@@ -236,6 +236,9 @@ void Game::Render()
 
     context->IASetInputLayout(m_inputLayout.Get());
 
+    auto linear = m_states->LinearClamp();
+    context->PSSetSamplers(0, 1, &linear);
+
     m_batch->Begin();
 
     {

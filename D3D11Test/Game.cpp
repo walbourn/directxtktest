@@ -824,7 +824,7 @@ void Game::UnitTests()
 
         if (!TestVertexType<VertexPositionColorTexture>(device, effect.get()))
         {
-            OutputDebugStringA("ERROR: Failed VertexPositionColorVertexPositionColorTexture tests\n");
+            OutputDebugStringA("ERROR: Failed VertexPositionColorTexture tests\n");
             success = false;
         }
 
