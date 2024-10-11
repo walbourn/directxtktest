@@ -19,19 +19,25 @@
 // Build for LH vs. RH coords
 #define LH_COORDS
 
-namespace
-{
-    constexpr float row0 = 2.f;
-    constexpr float row1 = 0.f;
-    constexpr float row2 = -2.f;
-}
-
 extern void ExitGame() noexcept;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
-
 using Microsoft::WRL::ComPtr;
+
+namespace
+{
+#ifdef GAMMA_CORRECT_RENDERING
+    // Linear colors for DirectXMath were not added until v3.17 in the Windows SDK (22621)
+    const XMVECTORF32 c_clearColor = { { { 0.127437726f, 0.300543845f, 0.846873462f, 1.f } } };
+#else
+    const XMVECTORF32 c_clearColor = Colors::CornflowerBlue;
+#endif
+
+    constexpr float row0 = 2.f;
+    constexpr float row1 = 0.f;
+    constexpr float row2 = -2.f;
+}
 
 extern std::unique_ptr<Model> CreateModelFromOBJ(
     _In_ ID3D11Device* d3dDevice,
@@ -342,12 +348,6 @@ void Game::Render()
     });
 
         // Fog settings
-#ifdef GAMMA_CORRECT_RENDERING
-    XMVECTORF32 fogColor;
-    fogColor.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
-#else
-    XMVECTOR fogColor = Colors::CornflowerBlue;
-#endif
     m_cup->UpdateEffects([&](IEffect* effect)
     {
         auto lights = dynamic_cast<IEffectLights*>(effect);
@@ -360,7 +360,7 @@ void Game::Render()
             fog->SetFogEnabled(true);
             fog->SetFogStart(fogstart);
             fog->SetFogEnd(fogend);
-            fog->SetFogColor(fogColor);
+            fog->SetFogColor(c_clearColor);
         }
     });
     local = XMMatrixTranslation(-4.f, row0, cos(time) * 2.f);
@@ -529,13 +529,7 @@ void Game::Clear()
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     auto depthStencil = m_deviceResources->GetDepthStencilView();
 
-    XMVECTORF32 color;
-#ifdef GAMMA_CORRECT_RENDERING
-    color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
-#else
-    color.v = Colors::CornflowerBlue;
-#endif
-    context->ClearRenderTargetView(renderTarget, color);
+    context->ClearRenderTargetView(renderTarget, c_clearColor);
     context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 

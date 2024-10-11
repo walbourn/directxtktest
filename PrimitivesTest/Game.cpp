@@ -29,6 +29,13 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
+#ifdef GAMMA_CORRECT_RENDERING
+    // Linear colors for DirectXMath were not added until v3.17 in the Windows SDK (22621)
+    const XMVECTORF32 c_clearColor = { { { 0.127437726f, 0.300543845f, 0.846873462f, 1.f } } };
+#else
+    const XMVECTORF32 c_clearColor = Colors::CornflowerBlue;
+#endif
+
     constexpr float rowtop = 4.f;
     constexpr float row0 = 2.7f;
     constexpr float row1 = 1.f;
@@ -254,6 +261,7 @@ void Game::Render()
 
     XMVECTORF32 red, green, blue, yellow, cyan, magenta, cornflower, lime, gray;
 #ifdef GAMMA_CORRECT_RENDERING
+    // Linear colors for DirectXMath were not added until v3.17 in the Windows SDK (22621)
     red.v = XMColorSRGBToRGB(Colors::Red);
     green.v = XMColorSRGBToRGB(Colors::Green);
     blue.v = XMColorSRGBToRGB(Colors::Blue);
@@ -403,20 +411,13 @@ void Game::Clear()
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     auto depthStencil = m_deviceResources->GetDepthStencilView();
 
-    XMVECTORF32 color;
-#ifdef GAMMA_CORRECT_RENDERING
-    color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
-#else
-    color.v = Colors::CornflowerBlue;
-#endif
-
 #ifdef REVERSEZ
     constexpr float c_zclear = 0.f;
 #else
     constexpr float c_zclear = 1.f;
 #endif
 
-    context->ClearRenderTargetView(renderTarget, color);
+    context->ClearRenderTargetView(renderTarget, c_clearColor);
     context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, c_zclear, 0);
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 

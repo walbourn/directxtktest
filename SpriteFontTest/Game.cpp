@@ -22,19 +22,25 @@
 
 #pragma warning(disable : 4061)
 
-namespace
-{
-    constexpr float SWAP_TIME = 3.f;
-
-    constexpr float EPSILON = 0.000001f;
-}
-
 extern void ExitGame() noexcept;
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
-
 using Microsoft::WRL::ComPtr;
+
+namespace
+{
+#ifdef GAMMA_CORRECT_RENDERING
+    // Linear colors for DirectXMath were not added until v3.17 in the Windows SDK (22621)
+    const XMVECTORF32 c_clearColor = { { { 0.127437726f, 0.300543845f, 0.846873462f, 1.f } } };
+#else
+    const XMVECTORF32 c_clearColor = Colors::CornflowerBlue;
+#endif
+
+    constexpr float SWAP_TIME = 3.f;
+
+    constexpr float EPSILON = 0.000001f;
+}
 
 static_assert(std::is_nothrow_move_constructible<SpriteFont>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<SpriteFont>::value, "Move Assign.");
@@ -395,13 +401,7 @@ void Game::Clear()
     auto context = m_deviceResources->GetD3DDeviceContext();
     auto renderTarget = m_deviceResources->GetRenderTargetView();
 
-    XMVECTORF32 color;
-#ifdef GAMMA_CORRECT_RENDERING
-    color.v = XMColorSRGBToRGB(Colors::CornflowerBlue);
-#else
-    color.v = Colors::CornflowerBlue;
-#endif
-    context->ClearRenderTargetView(renderTarget, color);
+    context->ClearRenderTargetView(renderTarget, c_clearColor);
     context->OMSetRenderTargets(1, &renderTarget, nullptr);
 
     // Set the viewport.
