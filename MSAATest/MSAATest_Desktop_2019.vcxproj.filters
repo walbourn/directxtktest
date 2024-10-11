@@ -26,6 +26,9 @@
     <ClInclude Include="MSAAHelper.h" />
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{85208aa0-ae5c-4005-b06b-d6f2e696c5a5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Common">
       <UniqueIdentifier>{7380c774-f498-47b7-948a-44d2ced4caab}</UniqueIdentifier>
     </Filter>
@@ -34,5 +37,10 @@
     <Manifest Include="..\Common\settings.manifest">
       <Filter>Common</Filter>
     </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="reftexture.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>
