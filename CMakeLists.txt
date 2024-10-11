@@ -55,6 +55,24 @@ add_test(NAME "d3d11" COMMAND d3d11test -ctest WORKING_DIRECTORY ${CMAKE_CURRENT
 set_tests_properties(d3d11 PROPERTIES LABELS "Graphics")
 set_tests_properties(d3d11 PROPERTIES TIMEOUT 30)
 
+# MSAA
+list(APPEND TEST_EXES msaatest)
+add_executable(msaatest WIN32
+    MSAATest/Game.cpp
+    MSAATest/Game.h
+    MSAATest/pch.h
+    MSAATest/MSAAHelper.cpp
+    MSAATest/MSAAHelper.h
+    ${D3D_COMMON_FILES}
+    )
+target_include_directories(msaatest PRIVATE ./MSAATest ../Src)
+if(NOT MINGW)
+  target_precompile_headers(msaatest PRIVATE MSAATest/pch.h)
+endif()
+add_test(NAME "msaa" COMMAND msaatest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/MSAATest)
+set_tests_properties(msaa PROPERTIES LABELS "Graphics")
+set_tests_properties(msaa PROPERTIES TIMEOUT 60)
+
 # EFFECTS
 list(APPEND TEST_EXES effectstest)
 add_executable(effectstest WIN32

@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------
 // File: Game.h
 //
-// Developer unit test for basic Direct3D 11 support
+// Developer unit test for DirectXTK MSAATest
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -12,6 +12,7 @@
 
 #include "DirectXTKTest.h"
 #include "StepTimer.h"
+#include "MSAAHelper.h"
 
 constexpr uint32_t c_testTimeout = 5000;
 
@@ -73,7 +74,7 @@ public:
 
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
-    const wchar_t* GetAppName() const { return L"D3D11Test (DirectX 11)"; }
+    const wchar_t* GetAppName() const { return L"MSAATest (DirectX 11)"; }
     bool RequestHDRMode() const { return m_deviceResources ? (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_EnableHDR) != 0 : false; }
 
 private:
@@ -86,21 +87,22 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 
-    void UnitTests();
-
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
     // Rendering loop timer.
-    DX::StepTimer                                   m_timer;
+    DX::StepTimer                           m_timer;
 
     // Input devices.
     std::unique_ptr<DirectX::GamePad>       m_gamePad;
     std::unique_ptr<DirectX::Keyboard>      m_keyboard;
 
+    DirectX::GamePad::ButtonStateTracker    m_gamePadButtons;
+    DirectX::Keyboard::KeyboardStateTracker m_keyboardButtons;
+
     // DirectXTK Test Objects
 #ifdef XBOX
-    std::unique_ptr<DirectX::GraphicsMemory>        m_graphicsMemory;
+    std::unique_ptr<DirectX::GraphicsMemory> m_graphicsMemory;
 #endif
 
     std::unique_ptr<DirectX::BasicEffect>           m_effect;
@@ -108,6 +110,27 @@ private:
 
     std::unique_ptr<DirectX::CommonStates>          m_states;
 
-    using Vertex = DirectX::VertexPositionColor;
+    using Vertex = DirectX::VertexPositionTexture;
     std::unique_ptr<DirectX::PrimitiveBatch<Vertex>> m_batch;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState>    m_rstate;
+
+    // MSAA resources
+    std::unique_ptr<DX::MSAAHelper>         m_msaaHelper2;
+    std::unique_ptr<DX::MSAAHelper>         m_msaaHelper4;
+    std::unique_ptr<DX::MSAAHelper>         m_msaaHelper8;
+
+    enum State
+    {
+        NOMSAA,
+        MSAA2X,
+        MSAA4X,
+        MSAA8X,
+        COUNT,
+    };
+
+    int     m_state;
+    uint64_t m_frame;
+    float    m_delay;
 };
