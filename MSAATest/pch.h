@@ -57,6 +57,8 @@
 #else
 #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
 #include <d3d11_3.h>
+
+#include <wrl.h>
 #else
 #include <d3d11_1.h>
 #endif
@@ -85,11 +87,21 @@
 #include <system_error>
 #include <tuple>
 
+#include "CommonStates.h"
+#include "DDSTextureLoader.h"
+#include "DirectXHelpers.h"
+#include "Effects.h"
 #include "GamePad.h"
 #include "GraphicsMemory.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "PrimitiveBatch.h"
+#include "ScreenGrab.h"
 #include "SimpleMath.h"
+#include "VertexTypes.h"
+
+#include <wincodec.h>
+
 
 namespace DX
 {

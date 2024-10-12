@@ -11,7 +11,7 @@ cd /d %BINDIR%
 
 set "FILES="
 
-for %%1 in (d3d11test effectstest primitivestest spritebatchtest spritefonttest loadtest modeltest shadertest animtest dgsltest hdrtest pbrtest pbrmodeltest postprocesstest simplemathtest) do (Microsoft.CodeCoverage.Console instrument --settings coverage.config .\%%1.exe
+for %%1 in (d3d11test msaatest effectstest primitivestest spritebatchtest spritefonttest loadtest modeltest shadertest animtest dgsltest hdrtest pbrtest pbrmodeltest postprocesstest simplemathtest) do (Microsoft.CodeCoverage.Console instrument --settings coverage.config .\%%1.exe
 pushd ..\..\..\..\Tests\%%1
 @if errorlevel 1 goto pushfail
 Microsoft.CodeCoverage.Console collect %BINDIR%\%%1.exe -ctest

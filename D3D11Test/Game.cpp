@@ -295,7 +295,7 @@ void Game::Render()
 
     // Point
     {
-        VertexPositionColor points[]
+        Vertex points[]
         {
             { Vector3(-0.75f, -0.75f, 0.5f), red },
             { Vector3(-0.75f, -0.5f,  0.5f), green },
@@ -311,7 +311,7 @@ void Game::Render()
 
     // Lines
     {
-        VertexPositionColor lines[] =
+        Vertex lines[] =
         {
             { Vector3(-0.75f, -0.85f, 0.5f), red },{ Vector3(0.75f, -0.85f, 0.5f), dred },
             { Vector3(-0.75f, -0.90f, 0.5f), green },{ Vector3(0.75f, -0.90f, 0.5f), dgreen },
@@ -325,16 +325,16 @@ void Game::Render()
 
     // Triangle
     {
-        VertexPositionColor v1(Vector3(0.f, 0.5f, 0.5f), red);
-        VertexPositionColor v2(Vector3(0.5f, -0.5f, 0.5f), green);
-        VertexPositionColor v3(Vector3(-0.5f, -0.5f, 0.5f), blue);
+        Vertex v1(Vector3(0.f, 0.5f, 0.5f), red);
+        Vertex v2(Vector3(0.5f, -0.5f, 0.5f), green);
+        Vertex v3(Vector3(-0.5f, -0.5f, 0.5f), blue);
 
         m_batch->DrawTriangle(v1, v2, v3);
     }
 
     // Quads
     {
-        VertexPositionColor quad[] =
+        Vertex quad[] =
         {
             { Vector3(0.75f, 0.75f, 0.5), gray },
             { Vector3(0.95f, 0.75f, 0.5), gray },
@@ -448,12 +448,12 @@ void Game::CreateDeviceDependentResources()
     m_effect->SetVertexColorEnabled(true);
 
     DX::ThrowIfFailed(
-        CreateInputLayoutFromEffect<VertexPositionColor>(device, m_effect.get(), m_inputLayout.ReleaseAndGetAddressOf())
+        CreateInputLayoutFromEffect<Vertex>(device, m_effect.get(), m_inputLayout.ReleaseAndGetAddressOf())
     );
 
     m_states = std::make_unique<CommonStates>(device);
 
-    m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
+    m_batch = std::make_unique<PrimitiveBatch<Vertex>>(context);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
