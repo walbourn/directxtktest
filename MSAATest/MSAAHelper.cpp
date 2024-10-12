@@ -79,6 +79,7 @@ void MSAAHelper::SetDevice(_In_ ID3D11Device* device)
         }
     }
 
+    if (m_depthBufferFormat != DXGI_FORMAT_UNKNOWN)
     {
         UINT formatSupport = 0;
         if (FAILED(device->CheckFormatSupport(m_depthBufferFormat, &formatSupport)))
