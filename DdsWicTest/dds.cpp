@@ -903,6 +903,7 @@ bool Test01(_In_ ID3D11Device* pDevice)
         DDS_LOADER_FLAGS flags = DDS_LOADER_DEFAULT;
         if (g_TestMedia[index].format == DXGI_FORMAT_YUY2)
         {
+            // Miplevels are not supported for this format for the null device.
             flags |= DDS_LOADER_IGNORE_MIPS;
         }
 
