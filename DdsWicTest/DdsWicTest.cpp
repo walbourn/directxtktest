@@ -1,8 +1,7 @@
 //-------------------------------------------------------------------------------------
-// WavTest.cpp
+// DdsWicTest.cpp
 //
 // Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
 //-------------------------------------------------------------------------------------
 
 #pragma warning(push)
@@ -18,6 +17,9 @@
 
 #include <Windows.h>
 
+#include <d3d11_1.h>
+#include <wrl/client.h>
+
 #include <cstdint>
 #include <cstdio>
 #include <iterator>
@@ -26,7 +28,7 @@
 //-------------------------------------------------------------------------------------
 // Types and globals
 
-using TestFN = bool (*)();
+using TestFN = bool (*)(ID3D11Device* pDevice);
 
 struct TestInfo
 {
@@ -34,18 +36,47 @@ struct TestInfo
     TestFN func;
 };
 
-extern bool Test01();
-extern bool Test02();
+extern bool Test01(_In_ ID3D11Device* pDevice);
+extern bool Test02(_In_ ID3D11Device* pDevice);
 
 TestInfo g_Tests[] =
 {
-    { "WAVFileReader", Test01 },
-    { "WaveBankReader", Test02 },
+    { "DDSTextureLoader", Test01 },
+    { "WICTextureLoader", Test02 },
 };
 
+using Microsoft::WRL::ComPtr;
+
+namespace
+{
+    HRESULT CreateDevice(_Outptr_ ID3D11Device** pDevice)
+    {
+        if (!pDevice)
+            return E_INVALIDARG;
+
+        *pDevice = nullptr;
+
+        const D3D_FEATURE_LEVEL featureLevels[] =
+        {
+            D3D_FEATURE_LEVEL_11_0,
+        };
+
+        UINT createDeviceFlags = 0;
+    #ifdef _DEBUG
+        createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+    #endif
+
+        D3D_FEATURE_LEVEL fl;
+        HRESULT hr = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_NULL,
+            nullptr, createDeviceFlags, featureLevels, static_cast<UINT>(std::size(featureLevels)),
+            D3D11_SDK_VERSION, pDevice, &fl, nullptr);
+
+        return hr;
+    }
+}
 
 //-------------------------------------------------------------------------------------
-bool RunTests()
+bool RunTests(_In_ ID3D11Device* pDevice)
 {
     size_t nPass = 0;
     size_t nFail = 0;
@@ -54,7 +85,7 @@ bool RunTests()
     {
         printf("%s: ", g_Tests[i].name );
 
-        if ( g_Tests[i].func() )
+        if ( g_Tests[i].func(pDevice) )
         {
             ++nPass;
             printf("PASS\n");
@@ -76,10 +107,25 @@ bool RunTests()
 int __cdecl wmain()
 {
     printf("**************************************************************\n");
-    printf("*** WavTest\n" );
+    printf("*** DdsWicTest\n" );
     printf("**************************************************************\n");
 
-    if ( !RunTests() )
+    HRESULT hr = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed to initialize COM (%08X)\n", static_cast<unsigned int>(hr));
+        return -1;
+    }
+
+    ComPtr<ID3D11Device> d3dDevice;
+    hr = CreateDevice(d3dDevice.GetAddressOf());
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed to create required Direct3D device (%08X)\n", static_cast<unsigned int>(hr));
+        return -1;
+    }
+
+    if ( !RunTests(d3dDevice.Get()) )
         return -1;
 
     return 0;

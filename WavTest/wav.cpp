@@ -2,6 +2,7 @@
 // wav.cpp
 //
 // Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 //-------------------------------------------------------------------------------------
 
 #pragma warning(push)

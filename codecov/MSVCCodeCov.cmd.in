@@ -20,6 +20,15 @@ call set "FILES=%%FILES%% output_%%1.coverage"
 move output.coverage %BINDIR%\output_%%1.coverage
 popd)
 
+REM ddswictest
+Microsoft.CodeCoverage.Console instrument --settings coverage.config ddswictest.exe
+pushd ..\..\..\..\Tests
+Microsoft.CodeCoverage.Console collect %BINDIR%\ddswictest.exe
+@if errorlevel 1 goto failure
+call set "FILES=%%FILES%% output_ddswictest.coverage"
+move output.coverage %BINDIR%\output_ddswictest.coverage
+popd
+
 Microsoft.CodeCoverage.Console merge %FILES%
 @if errorlevel 1 goto failure
 
