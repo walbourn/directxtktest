@@ -21,7 +21,9 @@
 #include "DDSTextureLoader.h"
 
 #include <cstdio>
+#include <cstdint>
 #include <cwchar>
+#include <memory>
 #include <stdexcept>
 
 using namespace DirectX;
@@ -781,14 +783,92 @@ namespace
     {
         printf("%ux%ux%u mips %u format %u miscflag %08X\n", desc.Width, desc.Height, desc.Depth, desc.MipLevels, desc.Format, desc.MiscFlags);
     }
+
+    bool IsMetadataCorrect(_In_ ID3D11Texture1D* tex, const D3D11_TEXTURE1D_DESC& expected, const wchar_t* szPath)
+    {
+        D3D11_TEXTURE1D_DESC desc = {};
+        tex->GetDesc(&desc);
+
+        if (desc.Width != expected.Width
+            || desc.MipLevels != expected.MipLevels
+            || desc.ArraySize != expected.ArraySize
+            || desc.Format != expected.Format
+            || desc.MiscFlags != expected.MiscFlags)
+        {
+            printf( "ERROR: Unexpected resource metadata\n%ls\n", szPath );
+            printdesc(desc);
+            printf("...\n");
+            printdesc(expected);
+            return false;
+        }
+        else
+        {
+            // TODO: md5?
+            return true;
+        }
+    }
+
+    bool IsMetadataCorrect(_In_ ID3D11Texture2D* tex, const D3D11_TEXTURE2D_DESC& expected, const wchar_t* szPath)
+    {
+        D3D11_TEXTURE2D_DESC desc = {};
+        tex->GetDesc(&desc);
+
+        if (desc.Width != expected.Width
+            || desc.Height != expected.Height
+            || desc.MipLevels != expected.MipLevels
+            || desc.ArraySize != expected.ArraySize
+            || desc.Format != expected.Format
+            || desc.MiscFlags != expected.MiscFlags)
+        {
+            printf( "ERROR: Unexpected resource metadata\n%ls\n", szPath );
+            printdesc(desc);
+            printf("...\n");
+            printdesc(expected);
+            return false;
+        }
+        else
+        {
+            // TODO: md5?
+            return true;
+        }
+    }
+
+    bool IsMetadataCorrect(_In_ ID3D11Texture3D* tex, const D3D11_TEXTURE3D_DESC& expected, const wchar_t* szPath)
+    {
+        D3D11_TEXTURE3D_DESC desc = {};
+        tex->GetDesc(&desc);
+
+        if (desc.Width != expected.Width
+            || desc.Height != expected.Height
+            || desc.Depth != expected.Depth
+            || desc.MipLevels != expected.MipLevels
+            || desc.Format != expected.Format
+            || desc.MiscFlags != expected.MiscFlags)
+        {
+            printf( "ERROR: Unexpected resource metadata\n%ls\n", szPath );
+            printdesc(desc);
+            printf("...\n");
+            printdesc(expected);
+            return false;
+        }
+        else
+        {
+            // TODO: md5?
+            return true;
+        }
+    }
 }
 
 //-------------------------------------------------------------------------------------
 
 extern HRESULT MD5Checksum( _In_reads_(dataSize) const uint8_t *data, size_t dataSize, _Out_bytecap_x_(16) uint8_t *digest );
 
+using Blob = std::unique_ptr<uint8_t[]>;
+
+extern HRESULT LoadBlobFromFile(_In_z_ const wchar_t *szFile, Blob &blob, size_t &blobSize);
+
 //-------------------------------------------------------------------------------------
-//
+// CreateDDSTextureFromFileEx
 bool Test01(_In_ ID3D11Device* pDevice)
 {
     bool success = true;
@@ -866,32 +946,20 @@ bool Test01(_In_ ID3D11Device* pDevice)
                     hr = res.As(&tex);
                     if (SUCCEEDED(hr))
                     {
-                        D3D11_TEXTURE1D_DESC desc = {};
-                        tex->GetDesc(&desc);
+                        const D3D11_TEXTURE1D_DESC expected = {
+                            g_TestMedia[index].width,
+                            g_TestMedia[index].mipLevels,
+                            g_TestMedia[index].depthOrArray,
+                            g_TestMedia[index].format,
+                            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
 
-                        if (desc.Width != g_TestMedia[index].width
-                            || desc.MipLevels != g_TestMedia[index].mipLevels
-                            || desc.ArraySize != g_TestMedia[index].depthOrArray
-                            || desc.Format != g_TestMedia[index].format
-                            || desc.MiscFlags != g_TestMedia[index].miscFlags)
+                        if (IsMetadataCorrect(tex.Get(), expected, szPath))
                         {
-                            success = false;
-                            printf( "ERROR: Unexpected resource metadata\n%ls\n", szPath );
-                            printdesc(desc);
-                            printf("...\n");
-
-                            const D3D11_TEXTURE1D_DESC expected = {
-                                g_TestMedia[index].width,
-                                g_TestMedia[index].mipLevels,
-                                g_TestMedia[index].depthOrArray,
-                                g_TestMedia[index].format,
-                                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
-                            printdesc(expected);
+                            pass = true;
                         }
                         else
                         {
-                            // TODO: md5?
-                            pass = true;
+                            success = false;
                         }
                     }
 
@@ -909,33 +977,20 @@ bool Test01(_In_ ID3D11Device* pDevice)
                     hr = res.As(&tex);
                     if (SUCCEEDED(hr))
                     {
-                        D3D11_TEXTURE2D_DESC desc = {};
-                        tex->GetDesc(&desc);
+                        const D3D11_TEXTURE2D_DESC expected = {
+                            g_TestMedia[index].width, g_TestMedia[index].height,
+                            g_TestMedia[index].mipLevels,
+                            g_TestMedia[index].depthOrArray,
+                            g_TestMedia[index].format, {},
+                            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
 
-                        if (desc.Width != g_TestMedia[index].width
-                            || desc.Height != g_TestMedia[index].height
-                            || desc.MipLevels != g_TestMedia[index].mipLevels
-                            || desc.ArraySize != g_TestMedia[index].depthOrArray
-                            || desc.Format != g_TestMedia[index].format
-                            || desc.MiscFlags != g_TestMedia[index].miscFlags)
+                        if (IsMetadataCorrect(tex.Get(), expected, szPath))
                         {
-                            success = false;
-                            printf( "ERROR: Unexpected resource metadata\n%ls\n", szPath );
-                            printdesc(desc);
-                            printf("...\n");
-
-                            const D3D11_TEXTURE2D_DESC expected = {
-                                g_TestMedia[index].width, g_TestMedia[index].height,
-                                g_TestMedia[index].mipLevels,
-                                g_TestMedia[index].depthOrArray,
-                                g_TestMedia[index].format, {},
-                                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
-                            printdesc(expected);
+                            pass = true;
                         }
                         else
                         {
-                            // TODO: md5?
-                            pass = true;
+                            success = false;
                         }
                     }
 
@@ -953,33 +1008,20 @@ bool Test01(_In_ ID3D11Device* pDevice)
                     hr = res.As(&tex);
                     if (SUCCEEDED(hr))
                     {
-                        D3D11_TEXTURE3D_DESC desc = {};
-                        tex->GetDesc(&desc);
+                        const D3D11_TEXTURE3D_DESC expected = {
+                            g_TestMedia[index].width, g_TestMedia[index].height,
+                            g_TestMedia[index].depthOrArray,
+                            g_TestMedia[index].mipLevels,
+                            g_TestMedia[index].format,
+                            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
 
-                        if (desc.Width != g_TestMedia[index].width
-                            || desc.Height != g_TestMedia[index].height
-                            || desc.Depth != g_TestMedia[index].depthOrArray
-                            || desc.MipLevels != g_TestMedia[index].mipLevels
-                            || desc.Format != g_TestMedia[index].format
-                            || desc.MiscFlags != g_TestMedia[index].miscFlags)
+                        if (IsMetadataCorrect(tex.Get(), expected, szPath))
                         {
-                            success = false;
-                            printf( "ERROR: Unexpected resource metadata\n%ls\n", szPath );
-                            printdesc(desc);
-                            printf("...\n");
-
-                            const D3D11_TEXTURE3D_DESC expected = {
-                                g_TestMedia[index].width, g_TestMedia[index].height,
-                                g_TestMedia[index].depthOrArray,
-                                g_TestMedia[index].mipLevels,
-                                g_TestMedia[index].format,
-                                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
-                            printdesc(expected);
+                            pass = true;
                         }
                         else
                         {
-                            // TODO: md5?
-                            pass = true;
+                            success = false;
                         }
                     }
 
@@ -1007,6 +1049,200 @@ bool Test01(_In_ ID3D11Device* pDevice)
     if (skipped)
     {
         printf("\nSkipped DIRECTX_TEX_MEDIA cases...\n");
+    }
+
+    printf("%zu files tested, %zu files passed ", ncount, npass );
+
+    return success;
+}
+
+
+//-------------------------------------------------------------------------------------
+// CreateDDSTextureFromMemoryEx
+bool Test02(_In_ ID3D11Device* pDevice)
+{
+    bool success = true;
+
+    size_t ncount = 0;
+    size_t npass = 0;
+
+    for( size_t index=0; index < std::size(g_TestMedia); ++index )
+    {
+        wchar_t szPath[MAX_PATH] = {};
+        DWORD ret = ExpandEnvironmentStringsW(g_TestMedia[index].fname, szPath, MAX_PATH);
+        if ( !ret || ret > MAX_PATH )
+        {
+            printf( "ERROR: ExpandEnvironmentStrings FAILED\n" );
+            return false;
+        }
+
+#ifdef _DEBUG
+        OutputDebugString(szPath);
+        OutputDebugStringA("\n");
+#endif
+
+        Blob blob;
+        size_t blobSize;
+        HRESULT hr = LoadBlobFromFile(szPath, blob, blobSize);
+        if (FAILED(hr))
+        {
+            if (((hr == HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND)) || (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND)))
+                && wcsstr(g_TestMedia[index].fname, DXTEX_MEDIA_PATH) != nullptr)
+            {
+                // DIRECTX_TEX_MEDIA test cases are optional
+                continue;
+            }
+
+            success = false;
+            printf( "ERROR: Failed loading dds from file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+        }
+        else
+        {
+            ComPtr<ID3D11Resource> res;
+            DDS_ALPHA_MODE alpha = DDS_ALPHA_MODE_UNKNOWN;
+            hr = CreateDDSTextureFromMemoryEx(
+                pDevice,
+                blob.get(),
+                blobSize,
+                0,
+                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+                DDS_LOADER_DEFAULT,
+                res.GetAddressOf(), nullptr, &alpha);
+            if ( FAILED(hr) )
+            {
+                success = false;
+                printf( "ERROR: Failed loading dds from memory (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+            }
+            else if (!res.Get())
+            {
+                success = false;
+                printf( "ERROR: Failed to return resource (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+            }
+            else if (alpha != g_TestMedia[index].alphaMode)
+            {
+                success = false;
+                printf( "ERROR: Failed to return expected alpha mode (%u...%u):\n%ls\n", alpha, g_TestMedia[index].alphaMode, szPath );
+            }
+            else
+            {
+                bool pass = false;
+
+                D3D11_RESOURCE_DIMENSION dimension = D3D11_RESOURCE_DIMENSION_UNKNOWN;
+                res->GetType(&dimension);
+
+                if (dimension != g_TestMedia[index].dimension)
+                {
+                    success = false;
+                    printf( "ERROR: Unexpected resource dimension (%u..%u)\n%ls\n", dimension, g_TestMedia[index].dimension, szPath );
+                }
+
+                switch(dimension)
+                {
+                case D3D11_RESOURCE_DIMENSION_TEXTURE1D:
+                    {
+                        ComPtr<ID3D11Texture1D> tex;
+                        hr = res.As(&tex);
+                        if (SUCCEEDED(hr))
+                        {
+                            const D3D11_TEXTURE1D_DESC expected = {
+                                g_TestMedia[index].width,
+                                g_TestMedia[index].mipLevels,
+                                g_TestMedia[index].depthOrArray,
+                                g_TestMedia[index].format,
+                                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
+
+                            if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                            {
+                                pass = true;
+                            }
+                            else
+                            {
+                                success = false;
+                            }
+                        }
+
+                        if (FAILED(hr))
+                        {
+                            success = false;
+                            printf( "ERROR: Failed to obtain 1D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                        }
+                    }
+                    break;
+
+                case D3D11_RESOURCE_DIMENSION_TEXTURE2D:
+                    {
+                        ComPtr<ID3D11Texture2D> tex;
+                        hr = res.As(&tex);
+                        if (SUCCEEDED(hr))
+                        {
+                            const D3D11_TEXTURE2D_DESC expected = {
+                                g_TestMedia[index].width, g_TestMedia[index].height,
+                                g_TestMedia[index].mipLevels,
+                                g_TestMedia[index].depthOrArray,
+                                g_TestMedia[index].format, {},
+                                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
+
+                            if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                            {
+                                pass = true;
+                            }
+                            else
+                            {
+                                success = false;
+                            }
+                        }
+
+                        if (FAILED(hr))
+                        {
+                            success = false;
+                            printf( "ERROR: Failed to obtain 2D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                        }
+                    }
+                    break;
+
+                case D3D11_RESOURCE_DIMENSION_TEXTURE3D:
+                    {
+                        ComPtr<ID3D11Texture3D> tex;
+                        hr = res.As(&tex);
+                        if (SUCCEEDED(hr))
+                        {
+                            const D3D11_TEXTURE3D_DESC expected = {
+                                g_TestMedia[index].width, g_TestMedia[index].height,
+                                g_TestMedia[index].depthOrArray,
+                                g_TestMedia[index].mipLevels,
+                                g_TestMedia[index].format,
+                                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
+
+                            if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                            {
+                                pass = true;
+                            }
+                            else
+                            {
+                                success = false;
+                            }
+                        }
+
+                        if (FAILED(hr))
+                        {
+                            success = false;
+                            printf( "ERROR: Failed to obtain 3D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                        }
+                    }
+                    break;
+
+                default:
+                    success = false;
+                    printf( "ERROR: Unknown resource dimension %u\n%ls\n", dimension, szPath );
+                    break;
+                }
+
+                if (pass)
+                    ++npass;
+            }
+        }
+
+        ++ncount;
     }
 
     printf("%zu files tested, %zu files passed ", ncount, npass );
