@@ -20,6 +20,7 @@
 #include <d3d11_1.h>
 #include <wrl/client.h>
 
+#include <cassert>
 #include <cstdint>
 #include <cstdio>
 #include <iterator>
@@ -38,11 +39,15 @@ struct TestInfo
 
 extern bool Test01(_In_ ID3D11Device* pDevice);
 extern bool Test02(_In_ ID3D11Device* pDevice);
+extern bool Test03(_In_ ID3D11Device* pDevice);
+extern bool Test04(_In_ ID3D11Device* pDevice);
 
 TestInfo g_Tests[] =
 {
-    { "DDSTextureLoader", Test01 },
-    { "WICTextureLoader", Test02 },
+    { "DDSTextureLoader (File)", Test01 },
+    { "DDSTextureLoader (Memory)", Test02 },
+    { "WICTextureLoader (File)", Test03 },
+    { "WICTextureLoader (Memory)", Test04 },
 };
 
 using Microsoft::WRL::ComPtr;
@@ -199,6 +204,79 @@ HRESULT MD5Checksum( _In_reads_(dataSize) const uint8_t *data, size_t dataSize, 
     OutputDebugStringA( buff );
     OutputDebugStringA("\n");
 #endif
+
+    return S_OK;
+}
+
+
+//-------------------------------------------------------------------------------------
+using Blob = std::unique_ptr<uint8_t[]>;
+
+namespace
+{
+    struct handle_closer { void operator()(HANDLE h) noexcept { assert(h != INVALID_HANDLE_VALUE); if (h) CloseHandle(h); } };
+
+    using ScopedHandle = std::unique_ptr<void, handle_closer>;
+
+    inline HANDLE safe_handle(HANDLE h) noexcept { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
+}
+
+HRESULT LoadBlobFromFile(_In_z_ const wchar_t* szFile, Blob& blob, size_t& blobSize)
+{
+    if (!szFile)
+        return E_INVALIDARG;
+
+    blob.reset();
+    blobSize = 0;
+
+    ScopedHandle hFile(safe_handle(CreateFile(
+        szFile,
+        GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+        FILE_FLAG_SEQUENTIAL_SCAN, nullptr)));
+    if (!hFile)
+    {
+        return HRESULT_FROM_WIN32( GetLastError() );
+    }
+
+    // Get the file size
+    LARGE_INTEGER fileSize = {};
+    if (!GetFileSizeEx( hFile.get(), &fileSize))
+    {
+        return HRESULT_FROM_WIN32(GetLastError());
+    }
+
+    // File is too big for 32-bit allocation, so reject read (4 GB should be plenty large enough for our test images)
+    if (fileSize.HighPart > 0)
+    {
+        return HRESULT_FROM_WIN32(ERROR_FILE_TOO_LARGE);
+    }
+
+    // Need at least 1 byte of data
+    if (!fileSize.LowPart)
+    {
+        return E_FAIL;
+    }
+
+    // Create blob memory
+    blob = std::make_unique<uint8_t[]>(fileSize.LowPart);
+    blobSize = fileSize.LowPart;
+
+    // Load entire file into blob memory
+    DWORD bytesRead = 0;
+    if (!ReadFile(hFile.get(), blob.get(), static_cast<DWORD>(blobSize), &bytesRead, nullptr) )
+    {
+        blob.reset();
+        blobSize = 0;
+        return HRESULT_FROM_WIN32( GetLastError() );
+    }
+
+    // Verify we got the whole blob loaded
+    if ( bytesRead != blobSize )
+    {
+        blob.reset();
+        blobSize = 0;
+        return E_FAIL;
+    }
 
     return S_OK;
 }

@@ -1236,6 +1236,47 @@ void Game::UnitTests(bool success)
         }
     }
 
+    // SkipMips
+    {
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> tex;
+
+        DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"world8192.dds",
+            res.GetAddressOf(), tex.GetAddressOf()));
+
+        if (!ValidateDesc(tex.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_BC1_UNORM, 14, 1))
+        {
+            OutputDebugStringA("FAILED: world8192.dds srv desc unexpected\n");
+            success = false;
+        }
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_BC1_UNORM, 14, 8192, 4096, 1))
+        {
+            OutputDebugStringA("FAILED: world8192.dds res desc unexpected\n");
+            success = false;
+        }
+    }
+
+    {
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> tex;
+
+        DX::ThrowIfFailed(CreateDDSTextureFromFile(device, L"world8192.dds",
+            res.GetAddressOf(), tex.GetAddressOf(), 2048));
+
+        if (!ValidateDesc(tex.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_BC1_UNORM, 12, 1))
+        {
+            OutputDebugStringA("FAILED: world8192.dds skipmips srv desc unexpected\n");
+            success = false;
+        }
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_BC1_UNORM, 12, 2048, 1024, 1))
+        {
+            OutputDebugStringA("FAILED: world8192.dds skipmips res desc unexpected\n");
+            success = false;
+        }
+    }
+
     // Autogen 1D texture
     {
         ComPtr<ID3D11Resource> res;

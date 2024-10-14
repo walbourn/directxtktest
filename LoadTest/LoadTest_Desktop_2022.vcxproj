@@ -199,6 +199,7 @@
     <Image Include="text.tif" />
     <Image Include="tree02S_pmalpha.dds" />
     <Image Include="win95.bmp" />
+    <Image Include="World8192.dds" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\DeviceResourcesPC.cpp" />

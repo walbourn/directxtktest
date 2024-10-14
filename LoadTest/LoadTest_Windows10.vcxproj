@@ -284,6 +284,7 @@
     <Image Include="text.tif" />
     <Image Include="tree02S_pmalpha.dds" />
     <Image Include="win95.bmp" />
+    <Image Include="World8192.dds" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DirectXTK_Windows10_2022.vcxproj">

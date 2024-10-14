@@ -99,5 +99,8 @@
     <Image Include="text.tif">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="World8192.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>
