@@ -1277,6 +1277,29 @@ void Game::UnitTests(bool success)
         }
     }
 
+    // Ignore mips
+    {
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> tex;
+
+        DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"world8192.dds",
+            0,
+            D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, DDS_LOADER_IGNORE_MIPS,
+            res.GetAddressOf(), tex.GetAddressOf()));
+
+        if (!ValidateDesc(tex.Get(), D3D_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_BC1_UNORM, 1, 1))
+        {
+            OutputDebugStringA("FAILED: world8192.dds srv desc unexpected\n");
+            success = false;
+        }
+
+        if (!ValidateDesc(res.Get(), D3D11_RESOURCE_DIMENSION_TEXTURE2D, DXGI_FORMAT_BC1_UNORM, 1, 8192, 4096, 1))
+        {
+            OutputDebugStringA("FAILED: world8192.dds res desc unexpected\n");
+            success = false;
+        }
+    }
+
     // Autogen 1D texture
     {
         ComPtr<ID3D11Resource> res;

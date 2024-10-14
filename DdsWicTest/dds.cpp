@@ -766,6 +766,7 @@ namespace
 #endif
 
         // YUV test images
+        { 200, 200, 1, 1, DXGI_FORMAT_YUY2, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"lenaYUY2.dds", {} },
         { 1280, 1024, 1, 1, DXGI_FORMAT_YUY2, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"testpatternYUY2.dds", {} },
 
         #ifdef _M_X64
@@ -899,6 +900,12 @@ bool Test01(_In_ ID3D11Device* pDevice)
         OutputDebugStringA("\n");
 #endif
 
+        DDS_LOADER_FLAGS flags = DDS_LOADER_DEFAULT;
+        if (g_TestMedia[index].format == DXGI_FORMAT_YUY2)
+        {
+            flags |= DDS_LOADER_IGNORE_MIPS;
+        }
+
         ComPtr<ID3D11Resource> res;
         DDS_ALPHA_MODE alpha = DDS_ALPHA_MODE_UNKNOWN;
         HRESULT hr = CreateDDSTextureFromFileEx(
@@ -906,7 +913,7 @@ bool Test01(_In_ ID3D11Device* pDevice)
             szPath,
             0,
             D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
-            DDS_LOADER_DEFAULT,
+            flags,
             res.GetAddressOf(), nullptr, &alpha);
         if ( FAILED(hr) )
         {
@@ -1104,6 +1111,12 @@ bool Test02(_In_ ID3D11Device* pDevice)
         }
         else
         {
+            DDS_LOADER_FLAGS flags = DDS_LOADER_DEFAULT;
+            if (g_TestMedia[index].format == DXGI_FORMAT_YUY2)
+            {
+                flags |= DDS_LOADER_IGNORE_MIPS;
+            }
+
             ComPtr<ID3D11Resource> res;
             DDS_ALPHA_MODE alpha = DDS_ALPHA_MODE_UNKNOWN;
             hr = CreateDDSTextureFromMemoryEx(
@@ -1112,7 +1125,7 @@ bool Test02(_In_ ID3D11Device* pDevice)
                 blobSize,
                 0,
                 D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
-                DDS_LOADER_DEFAULT,
+                flags,
                 res.GetAddressOf(), nullptr, &alpha);
             if ( FAILED(hr) )
             {
