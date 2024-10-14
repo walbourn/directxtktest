@@ -42,7 +42,7 @@ extern bool Test02(_In_ ID3D11Device* pDevice);
 TestInfo g_Tests[] =
 {
     { "DDSTextureLoader", Test01 },
-//    { "WICTextureLoader", Test02 },
+    { "WICTextureLoader", Test02 },
 };
 
 using Microsoft::WRL::ComPtr;
@@ -110,8 +110,15 @@ int __cdecl wmain()
     printf("*** DdsWicTest\n" );
     printf("**************************************************************\n");
 
+    HRESULT hr = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed to initialize COM (%08X)\n", static_cast<unsigned int>(hr));
+        return -1;
+    }
+
     ComPtr<ID3D11Device> d3dDevice;
-    HRESULT hr = CreateDevice(d3dDevice.GetAddressOf());
+    hr = CreateDevice(d3dDevice.GetAddressOf());
     if (FAILED(hr))
     {
         printf("ERROR: Failed to create required Direct3D device (%08X)\n", static_cast<unsigned int>(hr));

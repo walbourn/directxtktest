@@ -19,7 +19,7 @@ endif()
 add_executable(${PROJECT_NAME}
   DdsWicTest.cpp
   dds.cpp
-#  wic.cpp
+  wic.cpp
   )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXTK bcrypt.lib d3d11.lib)
