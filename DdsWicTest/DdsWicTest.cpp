@@ -41,6 +41,8 @@ extern bool Test01(_In_ ID3D11Device* pDevice);
 extern bool Test02(_In_ ID3D11Device* pDevice);
 extern bool Test03(_In_ ID3D11Device* pDevice);
 extern bool Test04(_In_ ID3D11Device* pDevice);
+extern bool Test05(_In_ ID3D11Device* pDevice);
+extern bool Test06(_In_ ID3D11Device* pDevice);
 
 TestInfo g_Tests[] =
 {
@@ -48,6 +50,8 @@ TestInfo g_Tests[] =
     { "DDSTextureLoader (Memory)", Test02 },
     { "WICTextureLoader (File)", Test03 },
     { "WICTextureLoader (Memory)", Test04 },
+    { "ScreenGrab (DDS)", Test05 },
+    { "ScreenGrab (WIC)", Test06 },
 };
 
 using Microsoft::WRL::ComPtr;

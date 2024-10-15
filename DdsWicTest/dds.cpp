@@ -19,6 +19,7 @@
 #include <wrl/client.h>
 
 #include "DDSTextureLoader.h"
+#include "ScreenGrab.h"
 
 #include <cstdio>
 #include <cstdint>
@@ -1263,6 +1264,148 @@ bool Test02(_In_ ID3D11Device* pDevice)
 
                 if (pass)
                     ++npass;
+            }
+        }
+
+        ++ncount;
+    }
+
+    printf("%zu files tested, %zu files passed ", ncount, npass );
+
+    return success;
+}
+
+
+//-------------------------------------------------------------------------------------
+// SaveDDSTextureToFile
+bool Test05(_In_ ID3D11Device* pDevice)
+{
+    bool success = true;
+
+    size_t ncount = 0;
+    size_t npass = 0;
+
+    ComPtr<ID3D11DeviceContext> context;
+    pDevice->GetImmediateContext(context.GetAddressOf());
+
+    for( size_t index=0; index < std::size(g_TestMedia); ++index )
+    {
+        if (g_TestMedia[index].dimension != D3D11_RESOURCE_DIMENSION_TEXTURE2D)
+        {
+            // ScreenGrab only supports 2D textures
+            continue;
+        }
+
+        wchar_t szPath[MAX_PATH] = {};
+        DWORD ret = ExpandEnvironmentStringsW(g_TestMedia[index].fname, szPath, MAX_PATH);
+        if ( !ret || ret > MAX_PATH )
+        {
+            printf( "ERROR: ExpandEnvironmentStrings FAILED\n" );
+            return false;
+        }
+
+#ifdef _DEBUG
+        OutputDebugString(szPath);
+        OutputDebugStringA("\n");
+#endif
+
+        DDS_LOADER_FLAGS flags = DDS_LOADER_DEFAULT;
+        if (g_TestMedia[index].format == DXGI_FORMAT_YUY2)
+        {
+            // Miplevels are not supported for this format for the null device.
+            flags |= DDS_LOADER_IGNORE_MIPS;
+        }
+
+        ComPtr<ID3D11Resource> res;
+        HRESULT hr = CreateDDSTextureFromFileEx(
+            pDevice,
+            szPath,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            flags,
+            res.GetAddressOf(), nullptr, nullptr);
+        if ( FAILED(hr) )
+        {
+            success = false;
+            printf( "ERROR: Failed loading dds from file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+        }
+        else if (!res.Get())
+        {
+            success = false;
+            printf( "ERROR: Failed to return resource (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+        }
+        else
+        {
+            D3D11_RESOURCE_DIMENSION dimension = D3D11_RESOURCE_DIMENSION_UNKNOWN;
+            res->GetType(&dimension);
+
+            if (dimension != D3D11_RESOURCE_DIMENSION_TEXTURE2D)
+            {
+                success = false;
+                printf( "ERROR: Unexpected resource dimension (%u..3)\n%ls\n", dimension, szPath );
+                continue;
+            }
+
+            wchar_t tempFileName[MAX_PATH] = {};
+            wchar_t tempPath[MAX_PATH] = {};
+
+            if (!GetTempPathW(MAX_PATH, tempPath))
+            {
+                success = false;
+                printf("ERROR: Getting temp path failed (%08X)\n", HRESULT_FROM_WIN32(GetLastError()));
+                continue;
+            }
+
+            if (!GetTempFileNameW(tempPath, L"screenGrab", 0, tempFileName))
+            {
+                success = false;
+                printf("ERROR: Getting temp file failed (%08X)\n", HRESULT_FROM_WIN32(GetLastError()));
+                continue;
+            }
+
+            hr = SaveDDSTextureToFile(context.Get(), res.Get(), tempFileName);
+            if (FAILED(hr))
+            {
+                success = false;
+                printf( "ERROR: Failed saving dds to file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+            }
+            else
+            {
+                ComPtr<ID3D11Resource> res2;
+                hr = CreateDDSTextureFromFile(pDevice, tempFileName, res2.GetAddressOf(), nullptr);
+                if (FAILED(hr))
+                {
+                    success = false;
+                    printf( "ERROR: Failed reading dds from temp (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), tempFileName );
+                }
+                else
+                {
+                    ComPtr<ID3D11Texture2D> tex;
+                    hr = res2.As(&tex);
+                    if (SUCCEEDED(hr))
+                    {
+                        const D3D11_TEXTURE2D_DESC expected = {
+                            g_TestMedia[index].width, g_TestMedia[index].height,
+                            1,
+                            1,
+                            g_TestMedia[index].format, {},
+                            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0 };
+
+                        if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                        {
+                            ++npass;
+                        }
+                        else
+                        {
+                            success = false;
+                        }
+                    }
+                    else
+                    {
+                        success = false;
+                        printf( "ERROR: Failed to obtain 2D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                    }
+                }
             }
         }
 

@@ -16,15 +16,20 @@
 #pragma warning(pop)
 
 #include <Windows.h>
+
 #include <wrl/client.h>
 
 #include "WICTextureLoader.h"
+#include "ScreenGrab.h"
+#include "DDSTextureLoader.h"
 
 #include <cstdio>
 #include <cstdint>
 #include <cwchar>
 #include <memory>
 #include <stdexcept>
+
+#include <wincodec.h>
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -325,6 +330,87 @@ namespace
         #endif
     };
 
+    struct SaveMedia
+    {
+        const wchar_t *fname;
+        DXGI_FORMAT reloadFormat[4];
+    };
+
+    struct Container
+    {
+        GUID guid;
+        const wchar_t* ext;
+    };
+
+    Container s_ContainerGUID[4] =
+    {
+        { GUID_ContainerFormatBmp, L"bmp" },
+        { GUID_ContainerFormatPng, L"png" },
+        { GUID_ContainerFormatJpeg, L"jpg" },
+        { GUID_ContainerFormatTiff, L"tif" },
+    };
+
+    const SaveMedia g_SaveMedia[] =
+    {
+        // Width | Height | Filename | ReloadFormat (BMP, PNG, JPG, TIF)
+        { L"AnimTest\\default.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"AnimTest\\head_diff.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"AnimTest\\jacket_diff.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"AnimTest\\pants_diff.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"AnimTest\\upBody_diff.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+
+        { L"DGSLTest\\_USERS_CHUCKW.WINGROUP_DESKTOP_VS 3D STARTER KIT_STARTERKIT_ASSETS_CUBEUVIMAGE.PNG.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB } },
+        { L"DGSLTest\\_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__01.png.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB } },
+        { L"DGSLTest\\_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__03.png.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB } },
+        { L"DGSLTest\\_Users_Shaun_Desktop_Transfer_Model Generation_CMO_Ships_StarFire_25ab10e8-621a-47d4-a63d-f65a00bc1549__texture__04.png.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB } },
+
+        { L"EffectsTest\\cat.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"EffectsTest\\cubemap.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"EffectsTest\\dualparabola.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"EffectsTest\\opaqueCat.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"EffectsTest\\overlay.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+
+        { L"LoadTest\\dx5_logo_autogen.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"LoadTest\\earth_A2B10G10R10.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"LoadTest\\tree02S_pmalpha.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+
+        { L"ModelTest\\smoothMap.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"ModelTest\\Tiny_skin.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+
+        { L"PrimitivesTest\\normalMap.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"PrimitivesTest\\reftexture.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+
+        { L"SpriteBatchTest\\a.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"SpriteBatchTest\\b.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { L"SpriteBatchTest\\c.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+
+        // DirectXTex test corpus (optional)
+        { DXTEX_MEDIA_PATH L"test8888.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { DXTEX_MEDIA_PATH L"alphaedge.dds",{ DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM } },
+
+        { DXTEX_MEDIA_PATH L"windowslogo_X8R8G8B8.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { DXTEX_MEDIA_PATH L"windowslogo_r16f.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM } },
+        { DXTEX_MEDIA_PATH L"windowslogo_r32f.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM } },
+        { DXTEX_MEDIA_PATH L"windowslogo_rgba16.dds", { DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM } },
+        { DXTEX_MEDIA_PATH L"windowslogo_rgba16f.dds", { DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM } },
+        { DXTEX_MEDIA_PATH L"windowslogo_rgba32f.dds", { DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM } },
+        { DXTEX_MEDIA_PATH L"windowslogo_R5G6B5.dds", { DXGI_FORMAT_B5G6R5_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { DXTEX_MEDIA_PATH L"windowslogo_rgb565.dds", { DXGI_FORMAT_B5G6R5_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+        { DXTEX_MEDIA_PATH L"windowslogo_A1R5G5B5.dds", { DXGI_FORMAT_B5G5R5A1_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+
+        // Luminance
+        { DXTEX_MEDIA_PATH L"windowslogo_L8.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM } },
+        { DXTEX_MEDIA_PATH L"windowslogo_L16.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_UNORM } },
+
+        // HDR formats
+        { DXTEX_MEDIA_PATH L"SnowPano_4k_Ref.DDS", { DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM } },
+        { DXTEX_MEDIA_PATH L"yucca.dds", { DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM } },
+
+        // Normal maps
+        { DXTEX_MEDIA_PATH L"normals.dds", { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM } },
+    };
+
+
     void printdesc(const D3D11_TEXTURE2D_DESC & desc)
     {
         // For WIC, MipLevels=ArraySize=1 and MiscFlags=0
@@ -570,6 +656,162 @@ bool Test04(_In_ ID3D11Device* pDevice)
                 if (pass)
                     ++npass;
             }
+        }
+
+        ++ncount;
+    }
+
+    printf("%zu files tested, %zu files passed ", ncount, npass );
+
+    return success;
+}
+
+
+//-------------------------------------------------------------------------------------
+// SaveWICTextureToFile
+bool Test06(_In_ ID3D11Device* pDevice)
+{
+    bool success = true;
+
+    size_t ncount = 0;
+    size_t npass = 0;
+
+    ComPtr<ID3D11DeviceContext> context;
+    pDevice->GetImmediateContext(context.GetAddressOf());
+
+    for( size_t index=0; index < std::size(g_SaveMedia); ++index )
+    {
+        wchar_t szPath[MAX_PATH] = {};
+        DWORD ret = ExpandEnvironmentStringsW(g_SaveMedia[index].fname, szPath, MAX_PATH);
+        if ( !ret || ret > MAX_PATH )
+        {
+            printf( "ERROR: ExpandEnvironmentStrings FAILED\n" );
+            return false;
+        }
+
+#ifdef _DEBUG
+        OutputDebugString(szPath);
+        OutputDebugStringA("\n");
+#endif
+
+        ComPtr<ID3D11Resource> res;
+        HRESULT hr = CreateDDSTextureFromFileEx(
+            pDevice,
+            szPath,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            DDS_LOADER_IGNORE_MIPS, // ScreenGrab only saves 1 image
+            res.GetAddressOf(), nullptr, nullptr);
+        if ( FAILED(hr) )
+        {
+            success = false;
+            printf( "ERROR: Failed loading dds from file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+        }
+        else if (!res.Get())
+        {
+            success = false;
+            printf( "ERROR: Failed to return resource (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+        }
+        else
+        {
+            D3D11_RESOURCE_DIMENSION dimension = D3D11_RESOURCE_DIMENSION_UNKNOWN;
+            res->GetType(&dimension);
+
+            if (dimension != D3D11_RESOURCE_DIMENSION_TEXTURE2D)
+            {
+                // ScreenGrab only supports 2D textures
+                success = false;
+                printf( "ERROR: Unexpected resource dimension (%u..3)\n%ls\n", dimension, szPath );
+                continue;
+            }
+
+            bool pass = false;
+
+            D3D11_TEXTURE2D_DESC expected = {};
+            ComPtr<ID3D11Texture2D> tex;
+            hr = res.As(&tex);
+            if (SUCCEEDED(hr))
+            {
+                tex->GetDesc(&expected);
+
+                expected.ArraySize = 1;
+                expected.MipLevels = 1;
+                expected.MiscFlags = 0;
+            }
+
+
+            for(size_t container = 0; container < std::size(s_ContainerGUID); ++container)
+            {
+                if (g_SaveMedia[index].reloadFormat[container] == DXGI_FORMAT_UNKNOWN)
+                {
+                    // Skipping container
+                    continue;
+                }
+
+                wchar_t tempFileName[MAX_PATH] = {};
+                wchar_t tempPath[MAX_PATH] = {};
+
+                if (!GetTempPathW(MAX_PATH, tempPath))
+                {
+                    success = false;
+                    printf("ERROR: Getting temp path failed (%08X)\n", HRESULT_FROM_WIN32(GetLastError()));
+                    continue;
+                }
+
+                if (!GetTempFileNameW(tempPath, L"screenGrabWic", static_cast<UINT>(container), tempFileName))
+                {
+                    success = false;
+                    printf("ERROR: Getting temp file failed (%08X)\n", HRESULT_FROM_WIN32(GetLastError()));
+                    continue;
+                }
+
+                hr = SaveWICTextureToFile(context.Get(), res.Get(), s_ContainerGUID[container].guid, tempFileName);
+                if (FAILED(hr))
+                {
+                    success = false;
+                    printf( "ERROR: Failed saving wic to file %ls (HRESULT %08X):\n%ls\n", s_ContainerGUID[container].ext, static_cast<unsigned int>(hr), szPath );
+                }
+                else
+                {
+                    ComPtr<ID3D11Resource> res2;
+                    hr = CreateWICTextureFromFile(pDevice, tempFileName, res2.GetAddressOf(), nullptr);
+                    if (FAILED(hr))
+                    {
+                        success = false;
+                        printf( "ERROR: Failed reading wic from temp %ls (HRESULT %08X):\n%ls\n", s_ContainerGUID[container].ext, static_cast<unsigned int>(hr), tempFileName );
+                    }
+                    else
+                    {
+                        ComPtr<ID3D11Texture2D> tex2;
+                        hr = res2.As(&tex2);
+                        if (SUCCEEDED(hr))
+                        {
+                            D3D11_TEXTURE2D_DESC expected2 = expected;
+                            if (g_SaveMedia[index].reloadFormat[container] != DXGI_FORMAT_UNKNOWN)
+                            {
+                                expected2.Format = g_SaveMedia[index].reloadFormat[container];
+                            }
+                            if (IsMetadataCorrect(tex2.Get(), expected2, szPath))
+                            {
+                                pass = true;
+                            }
+                            else
+                            {
+                                success = false;
+                                printf("  -- %ls %ls\n", s_ContainerGUID[container].ext, tempFileName);
+                            }
+                        }
+                        else
+                        {
+                            success = false;
+                            printf( "ERROR: Failed to obtain 2D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                        }
+                    }
+                }
+            }
+
+            if(pass)
+                ++npass;
         }
 
         ++ncount;
