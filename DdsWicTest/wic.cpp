@@ -787,10 +787,7 @@ bool Test06(_In_ ID3D11Device* pDevice)
                         if (SUCCEEDED(hr))
                         {
                             D3D11_TEXTURE2D_DESC expected2 = expected;
-                            if (g_SaveMedia[index].reloadFormat[container] != DXGI_FORMAT_UNKNOWN)
-                            {
-                                expected2.Format = g_SaveMedia[index].reloadFormat[container];
-                            }
+                            expected2.Format = g_SaveMedia[index].reloadFormat[container];
                             if (IsMetadataCorrect(tex2.Get(), expected2, szPath))
                             {
                                 pass = true;
