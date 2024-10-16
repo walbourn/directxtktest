@@ -141,7 +141,7 @@ bool Test02()
                     request.hEvent = CreateEventExW(nullptr, nullptr, 0, EVENT_MODIFY_STATE | SYNCHRONIZE);
                     if (!request.hEvent)
                     {
-                        printf( "Fatal error: CreateEventEx failed (HRESULT %08X)\n", HRESULT_FROM_WIN32(GetLastError()) );
+                        printf("Fatal error: CreateEventEx failed (HRESULT %08X)\n", static_cast<unsigned int>(HRESULT_FROM_WIN32(GetLastError())));
                         return false;
                     }
                     request.Offset = metadata.offsetBytes;

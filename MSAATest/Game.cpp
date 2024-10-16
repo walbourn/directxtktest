@@ -279,23 +279,18 @@ void Game::Render()
     m_batch->End();
 
     // Resolve the frame.
-    unsigned int sampleCount = 1;
-
     switch (m_state)
     {
     case State::MSAA2X:
         m_msaaHelper2->Resolve(context, m_deviceResources->GetRenderTarget());
-        sampleCount = m_msaaHelper2->GetSampleCount();
         break;
 
     case State::MSAA4X:
         m_msaaHelper4->Resolve(context, m_deviceResources->GetRenderTarget());
-        sampleCount = m_msaaHelper4->GetSampleCount();
         break;
 
     case State::MSAA8X:
         m_msaaHelper8->Resolve(context, m_deviceResources->GetRenderTarget());
-        sampleCount = m_msaaHelper8->GetSampleCount();
         break;
 
     default:
@@ -414,7 +409,7 @@ void Game::Render()
         DX::ThrowIfFailed(SaveWICTextureToFile(context, backBufferTex, GUID_ContainerFormatTiff, sstif, nullptr,
             [&](IPropertyBag2* props)
             {
-                PROPBAG2 options[2] = { 0, 0 };
+                PROPBAG2 options[2] = {};
                 options[0].pstrName = const_cast<LPWSTR>(L"CompressionQuality");
                 options[1].pstrName = const_cast<LPWSTR>(L"TiffCompressionMethod");
 
