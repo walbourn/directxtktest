@@ -29,5 +29,6 @@ Release
 /ipch
 /AppPackages
 SCREENSHOT.*
+toolscripts/makespritefont/out
 toolscripts/xwbtool/out
 CMakeUserPresets.json
