@@ -284,25 +284,25 @@ void Game::Update(DX::StepTimer const&)
                             DX::ThrowIfFailed(user->get_Type(&userType));
 
                             char buff[1024] = {};
-                            sprintf_s(buff, "Player %d -> connected (type %d, %04X/%04X, id \"%ls\" (user found))\n", j, caps.gamepadType, caps.vid, caps.pid, caps.id.c_str());
+                            sprintf_s(buff, "Player %d -> connected (type %u, %04X/%04X, id \"%ls\" (user found))\n", j, caps.gamepadType, caps.vid, caps.pid, caps.id.c_str());
                             OutputDebugStringA(buff);
                         }
                         else
                         {
                             char buff[1024] = {};
-                            sprintf_s(buff, "Player %d -> connected (type %d, %04X/%04X, id \"%ls\" (user fail %08X))\n", j, caps.gamepadType, caps.vid, caps.pid, caps.id.c_str(), static_cast<unsigned int>(hr));
+                            sprintf_s(buff, "Player %d -> connected (type %u, %04X/%04X, id \"%ls\" (user fail %08X))\n", j, caps.gamepadType, caps.vid, caps.pid, caps.id.c_str(), static_cast<unsigned int>(hr));
                             OutputDebugStringA(buff);
                         }
                     }
                     else
                     {
                         char buff[64] = {};
-                        sprintf_s(buff, "Player %d -> connected (type %d, %04X/%04X, id is empty!)\n", j, caps.gamepadType, caps.vid, caps.pid);
+                        sprintf_s(buff, "Player %d -> connected (type %u, %04X/%04X, id is empty!)\n", j, caps.gamepadType, caps.vid, caps.pid);
                         OutputDebugStringA(buff);
                     }
 #else
                     char buff[64] = {};
-                    sprintf_s(buff, "Player %d -> connected (type %d, %04X/%04X, id %llu)\n", j, caps.gamepadType, caps.vid, caps.pid, caps.id);
+                    sprintf_s(buff, "Player %d -> connected (type %u, %04X/%04X, id %llu)\n", j, caps.gamepadType, caps.vid, caps.pid, caps.id);
                     OutputDebugStringA(buff);
 #endif
                 }

@@ -414,7 +414,7 @@ namespace
     void printdesc(const D3D11_TEXTURE2D_DESC & desc)
     {
         // For WIC, MipLevels=ArraySize=1 and MiscFlags=0
-        printf("%ux%u format %u\n", desc.Width, desc.Height, desc.Format);
+        printf("%ux%u format %d\n", desc.Width, desc.Height, desc.Format);
     }
 
     bool IsMetadataCorrect(_In_ ID3D11Texture2D* tex, const D3D11_TEXTURE2D_DESC& expected, const wchar_t* szPath)
@@ -510,7 +510,7 @@ bool Test03(_In_ ID3D11Device* pDevice)
             if (dimension != D3D11_RESOURCE_DIMENSION_TEXTURE2D)
             {
                 success = false;
-                printf( "ERROR: Unexpected resource dimension (%u..3)\n%ls\n", dimension, szPath );
+                printf( "ERROR: Unexpected resource dimension (%d..3)\n%ls\n", dimension, szPath );
             }
 
             ComPtr<ID3D11Texture2D> tex;
@@ -623,7 +623,7 @@ bool Test04(_In_ ID3D11Device* pDevice)
                 if (dimension != D3D11_RESOURCE_DIMENSION_TEXTURE2D)
                 {
                     success = false;
-                    printf( "ERROR: Unexpected resource dimension (%u..3)\n%ls\n", dimension, szPath );
+                    printf( "ERROR: Unexpected resource dimension (%d..3)\n%ls\n", dimension, szPath );
                 }
 
                 ComPtr<ID3D11Texture2D> tex;
@@ -721,7 +721,7 @@ bool Test06(_In_ ID3D11Device* pDevice)
             {
                 // ScreenGrab only supports 2D textures
                 success = false;
-                printf( "ERROR: Unexpected resource dimension (%u..3)\n%ls\n", dimension, szPath );
+                printf( "ERROR: Unexpected resource dimension (%d..3)\n%ls\n", dimension, szPath );
                 continue;
             }
 

@@ -783,17 +783,17 @@ namespace
 
     void printdesc(const D3D11_TEXTURE1D_DESC & desc)
     {
-        printf("%u mips %u array %u format %u miscflag %08X\n", desc.Width, desc.MipLevels, desc.ArraySize, desc.Format, desc.MiscFlags);
+        printf("%u mips %u array %u format %d miscflag %08X\n", desc.Width, desc.MipLevels, desc.ArraySize, desc.Format, desc.MiscFlags);
     }
 
     void printdesc(const D3D11_TEXTURE2D_DESC & desc)
     {
-        printf("%ux%u mips %u array %u format %u miscflag %08X\n", desc.Width, desc.Height, desc.MipLevels, desc.ArraySize, desc.Format, desc.MiscFlags);
+        printf("%ux%u mips %u array %u format %d miscflag %08X\n", desc.Width, desc.Height, desc.MipLevels, desc.ArraySize, desc.Format, desc.MiscFlags);
     }
 
     void printdesc(const D3D11_TEXTURE3D_DESC & desc)
     {
-        printf("%ux%ux%u mips %u format %u miscflag %08X\n", desc.Width, desc.Height, desc.Depth, desc.MipLevels, desc.Format, desc.MiscFlags);
+        printf("%ux%ux%u mips %u format %d miscflag %08X\n", desc.Width, desc.Height, desc.Depth, desc.MipLevels, desc.Format, desc.MiscFlags);
     }
 
     bool IsMetadataCorrect(_In_ ID3D11Texture1D* tex, const D3D11_TEXTURE1D_DESC& expected, const wchar_t* szPath)
@@ -954,7 +954,7 @@ bool Test01(_In_ ID3D11Device* pDevice)
             if (dimension != g_TestMedia[index].dimension)
             {
                 success = false;
-                printf( "ERROR: Unexpected resource dimension (%u..%u)\n%ls\n", dimension, g_TestMedia[index].dimension, szPath );
+                printf( "ERROR: Unexpected resource dimension (%d..%d)\n%ls\n", dimension, g_TestMedia[index].dimension, szPath );
             }
 
             switch(dimension)
@@ -1054,7 +1054,7 @@ bool Test01(_In_ ID3D11Device* pDevice)
 
             default:
                 success = false;
-                printf( "ERROR: Unknown resource dimension %u\n%ls\n", dimension, szPath );
+                printf( "ERROR: Unknown resource dimension %d\n%ls\n", dimension, szPath );
                 break;
             }
 
@@ -1158,7 +1158,7 @@ bool Test02(_In_ ID3D11Device* pDevice)
                 if (dimension != g_TestMedia[index].dimension)
                 {
                     success = false;
-                    printf( "ERROR: Unexpected resource dimension (%u..%u)\n%ls\n", dimension, g_TestMedia[index].dimension, szPath );
+                    printf( "ERROR: Unexpected resource dimension (%d..%d)\n%ls\n", dimension, g_TestMedia[index].dimension, szPath );
                 }
 
                 switch(dimension)
@@ -1258,7 +1258,7 @@ bool Test02(_In_ ID3D11Device* pDevice)
 
                 default:
                     success = false;
-                    printf( "ERROR: Unknown resource dimension %u\n%ls\n", dimension, szPath );
+                    printf( "ERROR: Unknown resource dimension %d\n%ls\n", dimension, szPath );
                     break;
                 }
 
@@ -1342,7 +1342,7 @@ bool Test05(_In_ ID3D11Device* pDevice)
             if (dimension != D3D11_RESOURCE_DIMENSION_TEXTURE2D)
             {
                 success = false;
-                printf( "ERROR: Unexpected resource dimension (%u..3)\n%ls\n", dimension, szPath );
+                printf( "ERROR: Unexpected resource dimension (%d..3)\n%ls\n", dimension, szPath );
                 continue;
             }
 
