@@ -89,6 +89,8 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 
+    void UnitTests();
+
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 

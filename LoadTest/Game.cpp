@@ -645,7 +645,7 @@ void Game::CreateDeviceDependentResources()
 
     // View textures
     bool success = true;
-    OutputDebugStringA("*********** UINT TESTS BEGIN ***************\n");
+    OutputDebugStringA("*********** UNIT TESTS BEGIN ***************\n");
 
     // Earth
     {

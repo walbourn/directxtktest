@@ -530,7 +530,7 @@ inline bool TestVertexType(_In_ ID3D11Device *device, _In_ IEffect* effect)
 void Game::UnitTests()
 {
     bool success = true;
-    OutputDebugStringA("*********** UINT TESTS BEGIN ***************\n");
+    OutputDebugStringA("*********** UNIT TESTS BEGIN ***************\n");
 
     std::random_device rd;
     std::default_random_engine generator(rd());

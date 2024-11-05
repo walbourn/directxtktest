@@ -34,6 +34,20 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
+// AudioListener
+static_assert(std::is_nothrow_default_constructible<AudioListener>::value, "Default Ctor.");
+static_assert(std::is_nothrow_copy_constructible<AudioListener>::value, "Copy Ctor.");
+static_assert(std::is_copy_assignable<AudioListener>::value, "Copy Assign.");
+static_assert(std::is_nothrow_move_constructible<AudioListener>::value, "Move Ctor.");
+static_assert(std::is_move_assignable<AudioListener>::value, "Move Assign.");
+
+// AudioEmitter
+static_assert(std::is_nothrow_default_constructible<AudioEmitter>::value, "Default Ctor.");
+static_assert(std::is_nothrow_copy_constructible<AudioEmitter>::value, "Copy Ctor.");
+static_assert(std::is_copy_assignable<AudioEmitter>::value, "Copy Assign.");
+static_assert(std::is_nothrow_move_constructible<AudioEmitter>::value, "Move Ctor.");
+static_assert(std::is_move_assignable<AudioEmitter>::value, "Move Assign.");
+
 namespace
 {
 #ifdef GAMMA_CORRECT_RENDERING
@@ -215,6 +229,8 @@ void Game::Initialize(
 
     // Set to the proper setup for this sound
     m_emitter.EnableDefaultMultiChannel(m_effect->GetChannelCount());
+
+    UnitTests();
 }
 
 #pragma region Frame Update
@@ -542,6 +558,337 @@ void Game::CreateWindowSizeDependentResources()
         m_projection *= orient;
     }
 #endif
+}
+
+void Game::UnitTests()
+{
+    bool success = true;
+    OutputDebugStringA("*********** UNIT TESTS BEGIN ***************\n");
+
+    // AudioListener
+    {
+        const XMVECTORF32 c_val = { { { 4.f, 5.f, 6.f } } };
+        const XMVECTORF32 c_forward = { { { 10.f, 11.f, 12.f } } };
+        const XMVECTORF32 c_top = { { { 13.f, 14.f, 15.f } } };
+
+        const AudioListener def;
+        if (!def.IsValid()
+            || def.OrientFront.x != 0.f
+            || def.OrientFront.y != 0.f
+            || def.OrientFront.z != -1.f
+            || def.OrientTop.x != 0.f
+            || def.OrientTop.y != 1.f
+            || def.OrientTop.z != 0.f
+            || def.Position.x != 0.f
+            || def.Position.y != 0.f
+            || def.Position.z != 0.f
+            || def.Velocity.x != 0.f
+            || def.Velocity.y != 0.f
+            || def.Velocity.z != 0.f
+            || def.pCone != nullptr)
+        {
+            OutputDebugStringA("ERROR: Failed default listener tests\n");
+            success = false;
+        }
+
+        AudioListener test = def;
+        test.SetPosition(Vector3(1.f, 2.f, 3.f));
+
+        AudioListener test2 = def;
+        test2.SetPosition(c_val.v);
+
+        if (!test.IsValid() || !test2.IsValid()
+            || test.Position.x != 1.f
+            || test.Position.y != 2.f
+            || test.Position.z != 3.f
+            || test2.Position.x != 4.f
+            || test2.Position.y != 5.f
+            || test2.Position.z != 6.f)
+        {
+            OutputDebugStringA("ERROR: Failed listener position tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.SetVelocity(Vector3(1.f, 2.f, 3.f));
+
+        test2 = def;
+        test2.SetVelocity(c_val.v);
+
+        if (!test.IsValid() || !test2.IsValid()
+            || test.Velocity.x != 1.f
+            || test.Velocity.y != 2.f
+            || test.Velocity.z != 3.f
+            || test2.Velocity.x != 4.f
+            || test2.Velocity.y != 5.f
+            || test2.Velocity.z != 6.f)
+        {
+            OutputDebugStringA("ERROR: Failed listener velocity tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.SetOrientation(Vector3(10.f, 11.f, 12.f), Vector3(13.f, 14.f, 15.f));
+
+        test2 = def;
+        test2.SetOrientation(c_forward, c_top);
+
+        if (!test.IsValid() || !test2.IsValid()
+            || test.OrientFront.x != 10.f
+            || test.OrientFront.y != 11.f
+            || test.OrientFront.z != 12.f
+            || test.OrientTop.x !=  13.f
+            || test.OrientTop.y != 14.f
+            || test.OrientTop.z != 15.f
+            || test2.OrientFront.x != 10.f
+            || test2.OrientFront.y != 11.f
+            || test2.OrientFront.z != 12.f
+            || test2.OrientTop.x !=  13.f
+            || test2.OrientTop.y != 14.f
+            || test2.OrientTop.z != 15.f)
+        {
+            OutputDebugStringA("ERROR: Failed listener orientation tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.SetCone(Listener_DirectionalCone);
+
+        test2 = def;
+        test2.SetCone(Listener_DirectionalCone);
+        test2.SetOmnidirectional();
+
+        if (!test.IsValid() || !test2.IsValid()
+            || test.pCone == nullptr
+            || test2.pCone != nullptr)
+        {
+            OutputDebugStringA("ERROR: Failed listener cone tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.OrientFront.z = NAN;
+
+        test2 = def;
+        test2.Position.x = NAN;
+
+        AudioListener test3 = def;
+        test3.Velocity.y = NAN;
+        if (test.IsValid() || test2.IsValid() || test3.IsValid())
+        {
+            OutputDebugStringA("ERROR: Failed listener isvalid tests\n");
+            success = false;
+        }
+    }
+
+    // AudioEmitter
+    {
+        const XMVECTORF32 c_val = { { { 4.f, 5.f, 6.f } } };
+        const XMVECTORF32 c_forward = { { { 10.f, 11.f, 12.f } } };
+        const XMVECTORF32 c_top = { { { 13.f, 14.f, 15.f } } };
+
+        const AudioEmitter def;
+        if (!def.IsValid()
+            || def.pCone != nullptr
+            || def.OrientFront.x != 0.f
+            || def.OrientFront.y != 0.f
+            || def.OrientFront.z != -1.f
+            || def.OrientTop.x != 0.f
+            || def.OrientTop.y != 1.f
+            || def.OrientTop.z != 0.f
+            || def.Position.x != 0.f
+            || def.Position.y != 0.f
+            || def.Position.z != 0.f
+            || def.Velocity.x != 0.f
+            || def.Velocity.y != 0.f
+            || def.Velocity.z != 0.f
+            || def.InnerRadius != 0.f
+            || def.InnerRadiusAngle == 0.f
+            || def.ChannelCount != 1
+            || def.ChannelRadius != 1.f
+            || def.pChannelAzimuths == nullptr
+            || def.pVolumeCurve != nullptr
+            || def.pLFECurve != nullptr
+            || def.pLPFDirectCurve != nullptr
+            || def.pLPFReverbCurve != nullptr
+            || def.pReverbCurve != nullptr
+            || def.CurveDistanceScaler != 1.f
+            || def.DopplerScaler != 1.f)
+        {
+            OutputDebugStringA("ERROR: Failed default emitter tests\n");
+            success = false;
+        }
+
+        AudioEmitter test = def;
+        test.SetPosition(Vector3(1.f, 2.f, 3.f));
+
+        AudioEmitter test2 = def;
+        test2.SetPosition(c_val.v);
+
+        if (!test.IsValid() || !test2.IsValid()
+            || test.Position.x != 1.f
+            || test.Position.y != 2.f
+            || test.Position.z != 3.f
+            || test2.Position.x != 4.f
+            || test2.Position.y != 5.f
+            || test2.Position.z != 6.f)
+        {
+            OutputDebugStringA("ERROR: Failed emitter position tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.SetVelocity(Vector3(1.f, 2.f, 3.f));
+
+        test2 = def;
+        test2.SetVelocity(c_val.v);
+
+        if (!test.IsValid() || !test2.IsValid()
+            || test.Velocity.x != 1.f
+            || test.Velocity.y != 2.f
+            || test.Velocity.z != 3.f
+            || test2.Velocity.x != 4.f
+            || test2.Velocity.y != 5.f
+            || test2.Velocity.z != 6.f)
+        {
+            OutputDebugStringA("ERROR: Failed emitter velocity tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.SetOrientation(Vector3(10.f, 11.f, 12.f), Vector3(13.f, 14.f, 15.f));
+
+        test2 = def;
+        test2.SetOrientation(c_forward, c_top);
+
+        if (!test.IsValid() || !test2.IsValid()
+            || test.OrientFront.x != 10.f
+            || test.OrientFront.y != 11.f
+            || test.OrientFront.z != 12.f
+            || test.OrientTop.x !=  13.f
+            || test.OrientTop.y != 14.f
+            || test.OrientTop.z != 15.f
+            || test2.OrientFront.x != 10.f
+            || test2.OrientFront.y != 11.f
+            || test2.OrientFront.z != 12.f
+            || test2.OrientTop.x !=  13.f
+            || test2.OrientTop.y != 14.f
+            || test2.OrientTop.z != 15.f)
+        {
+            OutputDebugStringA("ERROR: Failed emitter orientation tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.SetCone(Emitter_DirectionalCone);
+
+        test2 = def;
+        test2.SetCone(Emitter_DirectionalCone);
+        test2.SetOmnidirectional();
+
+        if (!test.IsValid() || !test2.IsValid()
+            || test.pCone == nullptr
+            || test2.pCone != nullptr)
+        {
+            OutputDebugStringA("ERROR: Failed emitter cone tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.EnableDefaultCurves();
+
+        test2 = def;
+        test2.EnableInverseSquareCurves();
+
+        AudioEmitter test3 = def;
+        test3.EnableLinearCurves();
+
+        if (!test.IsValid() || !test2.IsValid() || !test3.IsValid()
+            || test.pVolumeCurve == nullptr
+            || test2.pVolumeCurve != nullptr
+            || test3.pVolumeCurve == nullptr
+            || test.pLFECurve == nullptr
+            || test2.pLFECurve != nullptr
+            || test3.pLFECurve == nullptr
+            || test.pLPFDirectCurve != nullptr
+            || test2.pLPFDirectCurve != nullptr
+            || test3.pLPFDirectCurve != nullptr
+            || test.pLPFReverbCurve != nullptr
+            || test2.pLPFReverbCurve != nullptr
+            || test3.pLPFReverbCurve != nullptr
+            || test.pReverbCurve != nullptr
+            || test2.pReverbCurve != nullptr
+            || test3.pReverbCurve != nullptr)
+        {
+            OutputDebugStringA("ERROR: Failed emitter curves tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.OrientFront.z = NAN;
+
+        test2 = def;
+        test2.Position.x = NAN;
+
+        test3 = def;
+        test3.Velocity.y = NAN;
+        if (test.IsValid() || test2.IsValid() || test3.IsValid())
+        {
+            OutputDebugStringA("ERROR: Failed emitter isvalid A tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.ChannelCount = 0;
+
+        test2 = def;
+        test2.ChannelCount = XAUDIO2_MAX_AUDIO_CHANNELS;
+
+        test3 = def;
+        test3.ChannelCount = XAUDIO2_MAX_AUDIO_CHANNELS * 2;
+        if (test.IsValid() || !test2.IsValid() || test3.IsValid())
+        {
+            OutputDebugStringA("ERROR: Failed emitter isvalid B tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.InnerRadius = NAN;
+
+        test2 = def;
+        test2.InnerRadiusAngle = NAN;
+
+        test3 = def;
+        test3.ChannelCount = 4;
+        test3.pChannelAzimuths = nullptr;
+        if (test.IsValid() || test2.IsValid() || test3.IsValid())
+        {
+            OutputDebugStringA("ERROR: Failed emitter isvalid C tests\n");
+            success = false;
+        }
+
+        test = def;
+        test.ChannelRadius = NAN;
+
+        test2 = def;
+        test2.CurveDistanceScaler = NAN;
+
+        test3 = def;
+        test3.DopplerScaler = NAN;
+        if (test.IsValid() || test2.IsValid() || test3.IsValid())
+        {
+            OutputDebugStringA("ERROR: Failed emitter isvalid D tests\n");
+            success = false;
+        }
+    }
+
+    OutputDebugStringA(success ? "Passed\n" : "Failed\n");
+    OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
+
+    if (!success)
+    {
+        throw std::runtime_error("Unit Tests Failed");
+    }
 }
 
 #ifdef LOSTDEVICE
