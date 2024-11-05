@@ -560,6 +560,12 @@ void Game::CreateWindowSizeDependentResources()
 #endif
 }
 
+namespace DirectX
+{
+    // Internal function to validate
+    uint32_t GetDefaultChannelMask(int channels) noexcept;
+}
+
 void Game::UnitTests()
 {
     bool success = true;
@@ -879,6 +885,32 @@ void Game::UnitTests()
         {
             OutputDebugStringA("ERROR: Failed emitter isvalid D tests\n");
             success = false;
+        }
+    }
+
+    // GetDefaultChannelMask
+    {
+        for (int j = 0; j < 16; ++j)
+        {
+            uint32_t mask = GetDefaultChannelMask(j);
+            if (j == 0 || j > 8)
+            {
+                if (mask != 0)
+                {
+                    OutputDebugStringA("ERROR: Failed def channel mask A tests\n");
+                    success = false;
+                    break;
+                }
+            }
+            else
+            {
+                if (mask == 0)
+                {
+                    OutputDebugStringA("ERROR: Failed def channel mask B tests\n");
+                    success = false;
+                    break;
+                }
+            }
         }
     }
 

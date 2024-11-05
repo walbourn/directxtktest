@@ -205,7 +205,7 @@ int __cdecl wmain()
     {
         printf("\nTrying specific device and format\n\t\"%ls\"\n", enumList[0].description.c_str() );
 
-        WAVEFORMATEX testwfx;
+        WAVEFORMATEX testwfx{};
         testwfx.wFormatTag = WAVE_FORMAT_PCM;
         testwfx.nChannels = 1;
         testwfx.nSamplesPerSec = 22100;

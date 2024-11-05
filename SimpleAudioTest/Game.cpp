@@ -484,6 +484,8 @@ void Game::Initialize(
         dump_wfx(m_console.get(), m_wbstreamXMA->GetFormat(WB_STREAM_ENTRY, wfx, 64));
     }
 #endif // XMA2
+
+    UnitTests();
 }
 
 #pragma region Frame Update
@@ -1024,6 +1026,134 @@ void Game::CreateWindowSizeDependentResources()
 #ifdef UWP
     m_spriteBatch->SetRotation(m_deviceResources->GetRotation());
 #endif
+}
+
+namespace DirectX
+{
+    // Internal function to validate
+    bool IsValid(_In_ const WAVEFORMATEX* wfx) noexcept;
+}
+
+void Game::UnitTests()
+{
+    bool success = true;
+    OutputDebugStringA("*********** UNIT TESTS BEGIN ***************\n");
+
+    // PCM
+    {
+        WAVEFORMATEX testwfx{};
+        testwfx.wFormatTag = WAVE_FORMAT_PCM;
+        testwfx.nChannels = 1;
+        testwfx.nSamplesPerSec = 22100;
+
+        WAVEFORMATEX testwfx2 = testwfx;
+        testwfx2.wBitsPerSample = 8;
+        testwfx2.nBlockAlign = 1;
+        testwfx2.nAvgBytesPerSec = testwfx2.nSamplesPerSec * testwfx2.nBlockAlign;
+
+        WAVEFORMATEX testwfx3 = testwfx;
+        testwfx3.wBitsPerSample = 178;
+
+        if (IsValid(nullptr) || IsValid(&testwfx) || !IsValid(&testwfx2) || IsValid(&testwfx3))
+        {
+            OutputDebugStringA("ERROR: Failed waveformat valid A tests\n");
+            success = false;
+        }
+
+        testwfx2 = testwfx;
+        testwfx2.nChannels = XAUDIO2_MAX_AUDIO_CHANNELS  * 2;
+        testwfx2.wBitsPerSample = 8;
+        testwfx2.nBlockAlign = 1;
+        testwfx2.nAvgBytesPerSec = testwfx2.nSamplesPerSec * testwfx2.nBlockAlign;
+
+        testwfx3 = testwfx;
+        testwfx3.nChannels = 2;
+        testwfx3.nSamplesPerSec = XAUDIO2_MAX_SAMPLE_RATE * 2;
+        testwfx3.wBitsPerSample = 8;
+        testwfx3.nBlockAlign = 1;
+        testwfx3.nAvgBytesPerSec = testwfx2.nSamplesPerSec * testwfx2.nBlockAlign;
+
+        if (IsValid(&testwfx2) || IsValid(&testwfx3))
+        {
+            OutputDebugStringA("ERROR: Failed waveformat valid B tests\n");
+            success = false;
+        }
+    }
+
+    // ADPCM
+    {
+        const ADPCMCOEFSET s_coefs[7] = { { 256, 0 }, { 512, -256 } , { 0, 0 } , { 192, 64 } , { 240, 0 }, { 460, -208 }, { 392, -232 } };
+
+        uint8_t bytes[sizeof(ADPCMEWAVEFORMAT) + 32] = {};
+        auto testwfx = reinterpret_cast<ADPCMWAVEFORMAT*>(bytes);
+
+        uint8_t bytes2[sizeof(ADPCMEWAVEFORMAT) + 32] = {};
+        auto testwfx2 = reinterpret_cast<ADPCMWAVEFORMAT*>(bytes2);
+
+        uint8_t bytes3[sizeof(ADPCMEWAVEFORMAT) + 32] = {};
+        auto testwfx3 = reinterpret_cast<ADPCMWAVEFORMAT*>(bytes3);
+
+        testwfx->wfx.wFormatTag = WAVE_FORMAT_ADPCM;
+        testwfx->wfx.nChannels = 1;
+        testwfx->wfx.nSamplesPerSec = 22100;
+        testwfx->wfx.wBitsPerSample = 4;
+        testwfx->wfx.cbSize = 32;
+        testwfx->wNumCoef = 7;
+        memcpy(testwfx->aCoef, s_coefs, sizeof(s_coefs));
+        testwfx->wSamplesPerBlock = 16;
+        testwfx->wfx.nBlockAlign = static_cast<WORD>(7 * testwfx->wfx.nChannels
+            + (testwfx->wSamplesPerBlock - 2) * 4 * testwfx->wfx.nChannels / 8);
+        testwfx->wfx.nAvgBytesPerSec = static_cast<DWORD>(testwfx->wfx.nBlockAlign * testwfx->wfx.nSamplesPerSec / testwfx->wSamplesPerBlock);
+
+        memcpy(bytes2, bytes, sizeof(bytes));
+        testwfx2->wfx.nChannels = 4;
+
+        memcpy(bytes3, bytes, sizeof(bytes));
+        testwfx3->wfx.wBitsPerSample = 23;
+
+        if (!IsValid(reinterpret_cast<const WAVEFORMATEX*>(testwfx))
+            || IsValid(reinterpret_cast<const WAVEFORMATEX*>(testwfx2))
+            || IsValid(reinterpret_cast<const WAVEFORMATEX*>(testwfx3)))
+        {
+            OutputDebugStringA("ERROR: Failed waveformat valid C tests\n");
+            success = false;
+        }
+    }
+
+    // Float PCM
+    {
+        PCMWAVEFORMAT testwfx{};
+        testwfx.wf.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
+        testwfx.wBitsPerSample = 32;
+        testwfx.wf.nChannels = 2;
+        testwfx.wf.nSamplesPerSec = 22100;
+        testwfx.wf.nBlockAlign = static_cast<WORD>(testwfx.wf.nChannels * 4);
+        testwfx.wf.nAvgBytesPerSec = testwfx.wf.nBlockAlign * testwfx.wf.nSamplesPerSec;
+
+        PCMWAVEFORMAT testwfx2 = testwfx;
+        testwfx2.wBitsPerSample = 16;
+
+        PCMWAVEFORMAT testwfx3 = testwfx;
+        testwfx3.wf.nBlockAlign = 16;
+
+        if (!IsValid(reinterpret_cast<const WAVEFORMATEX*>(&testwfx))
+            || IsValid(reinterpret_cast<const WAVEFORMATEX*>(&testwfx2))
+            || IsValid(reinterpret_cast<const WAVEFORMATEX*>(&testwfx3)))
+        {
+            OutputDebugStringA("ERROR: Failed waveformat valid D tests\n");
+            success = false;
+        }
+    }
+
+    // TODO - WAVE_FORMAT_EXTENSIBLE
+
+    OutputDebugStringA(success ? "Passed\n" : "Failed\n");
+    OutputDebugStringA("***********  UNIT TESTS END  ***************\n");
+
+    if (!success)
+    {
+        throw std::runtime_error("Unit Tests Failed");
+    }
 }
 
 #ifdef LOSTDEVICE
