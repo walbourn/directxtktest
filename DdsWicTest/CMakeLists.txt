@@ -13,7 +13,7 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
 if(NOT DEFINED ENV{DIRECTXTEX_TEX_PATH})
-  message(WARING "This test makes use of the DIRECTXTEX_TEX_PATH environment variable to find additional media.")
+  message(STATUS "This test makes use of the DIRECTXTEX_TEX_PATH environment variable to find additional media.")
 endif()
 
 add_executable(${PROJECT_NAME}

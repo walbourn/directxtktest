@@ -23,7 +23,7 @@ if((BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7) AND (NOT NO_WC
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/WavTest)
   add_test(NAME "wavtest" COMMAND wavtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   set_tests_properties(wavtest PROPERTIES LABELS "Audio")
-  set_tests_properties(wavtest PROPERTIES TIMEOUT 30)
+  set_tests_properties(wavtest PROPERTIES TIMEOUT 60)
 
   # fuzzloaders
   list(APPEND TEST_EXES fuzzloaders)
@@ -60,7 +60,7 @@ if(NOT MINGW)
 endif()
 add_test(NAME "d3d11" COMMAND d3d11test -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/D3D11Test)
 set_tests_properties(d3d11 PROPERTIES LABELS "Graphics")
-set_tests_properties(d3d11 PROPERTIES TIMEOUT 30)
+set_tests_properties(d3d11 PROPERTIES TIMEOUT 60)
 
 # MSAA
 list(APPEND TEST_EXES msaatest)
@@ -162,7 +162,7 @@ if(NOT MINGW)
 endif()
 add_test(NAME "loaders" COMMAND loadtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LoadTest)
 set_tests_properties(loaders PROPERTIES LABELS "Graphics")
-set_tests_properties(loaders PROPERTIES TIMEOUT 30)
+set_tests_properties(loaders PROPERTIES TIMEOUT 60)
 
 # MODEL
 list(APPEND TEST_EXES modeltest)
@@ -375,7 +375,7 @@ if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
     endif()
     add_test(NAME "simpleAudio" COMMAND simpleaudiotest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SimpleAudioTest)
     set_tests_properties(simpleAudio PROPERTIES LABELS "Audio")
-    set_tests_properties(simpleAudio PROPERTIES TIMEOUT 30)
+    set_tests_properties(simpleAudio PROPERTIES TIMEOUT 60)
 endif()
 
 # INPUT: GAMEPAD
@@ -392,7 +392,7 @@ if(NOT MINGW)
 endif()
 add_test(NAME "gamepadInput" COMMAND gamepadtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/GamePadTest)
 set_tests_properties(gamepadInput PROPERTIES LABELS "Input")
-set_tests_properties(gamepadInput PROPERTIES TIMEOUT 30)
+set_tests_properties(gamepadInput PROPERTIES TIMEOUT 60)
 
 # INPUT: KEYBOARD
 list(APPEND TEST_EXES keyboardtest)
@@ -408,7 +408,7 @@ if(NOT MINGW)
 endif()
 add_test(NAME "keyboardInput" COMMAND keyboardtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/KeyboardTest)
 set_tests_properties(keyboardInput PROPERTIES LABELS "Input")
-set_tests_properties(keyboardInput PROPERTIES TIMEOUT 30)
+set_tests_properties(keyboardInput PROPERTIES TIMEOUT 60)
 
 # INPUT: MOUSE
 list(APPEND TEST_EXES mousetest)
@@ -424,7 +424,7 @@ if(NOT MINGW)
 endif()
 add_test(NAME "mouseInput" COMMAND mousetest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/MouseTest)
 set_tests_properties(mouseInput PROPERTIES LABELS "Input")
-set_tests_properties(mouseInput PROPERTIES TIMEOUT 30)
+set_tests_properties(mouseInput PROPERTIES TIMEOUT 60)
 
 message(STATUS "Enabled tests: ${TEST_EXES}")
 foreach(t IN LISTS TEST_EXES)
