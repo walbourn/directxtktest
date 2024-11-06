@@ -1031,7 +1031,7 @@ void Game::CreateWindowSizeDependentResources()
 namespace DirectX
 {
     // Internal function to validate
-    bool IsValid(_In_ const WAVEFORMATEX* wfx) noexcept;
+    bool __cdecl IsValid(_In_ const WAVEFORMATEX* wfx) noexcept;
 }
 
 void Game::UnitTests()
