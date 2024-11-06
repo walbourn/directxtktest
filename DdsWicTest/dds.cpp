@@ -770,6 +770,11 @@ namespace
     { 32, 32, 1, 6, 6, DXGI_FORMAT_R8_UNORM, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"io_R8_UNORM_SRV_DIMENSION_TEXTURECube_MipOn.DDS", { 0x00,0x4b,0xbd,0x33,0xa5,0x60,0xf5,0xe8,0x40,0xd3,0xa2,0xe2,0x16,0x50,0x63,0x34 } },
 #endif
 
+        // Depth/stencil images
+        { 1280, 720, 1, 1, DXGI_FORMAT_D16_UNORM, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"depthimageD16.dds", {} },
+        { 1280, 720, 1, 1, DXGI_FORMAT_R24_UNORM_X8_TYPELESS, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"depthimageD24.dds", {} },
+        { 1280, 720, 1, 1, DXGI_FORMAT_D32_FLOAT, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"depthimageD32.dds", {} },
+
         // YUV test images
         { 200, 200, 1, 1, DXGI_FORMAT_YUY2, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"lenaYUY2.dds", {} },
         { 1280, 1024, 1, 1, DXGI_FORMAT_YUY2, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"testpatternYUY2.dds", {} },
@@ -1293,6 +1298,14 @@ bool Test05(_In_ ID3D11Device* pDevice)
         if (g_TestMedia[index].dimension != D3D11_RESOURCE_DIMENSION_TEXTURE2D)
         {
             // ScreenGrab only supports 2D textures
+            continue;
+        }
+
+        if (g_TestMedia[index].format == DXGI_FORMAT_D16_UNORM
+            || g_TestMedia[index].format == DXGI_FORMAT_R24_UNORM_X8_TYPELESS
+            || g_TestMedia[index].format == DXGI_FORMAT_D32_FLOAT)
+        {
+            // Skip depth formats
             continue;
         }
 
