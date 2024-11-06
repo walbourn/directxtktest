@@ -1084,13 +1084,13 @@ void Game::UnitTests()
     {
         const ADPCMCOEFSET s_coefs[7] = { { 256, 0 }, { 512, -256 } , { 0, 0 } , { 192, 64 } , { 240, 0 }, { 460, -208 }, { 392, -232 } };
 
-        uint8_t bytes[sizeof(ADPCMEWAVEFORMAT) + 32] = {};
+        uint8_t bytes[sizeof(ADPCMWAVEFORMAT) + 32] = {};
         auto testwfx = reinterpret_cast<ADPCMWAVEFORMAT*>(bytes);
 
-        uint8_t bytes2[sizeof(ADPCMEWAVEFORMAT) + 32] = {};
+        uint8_t bytes2[sizeof(ADPCMWAVEFORMAT) + 32] = {};
         auto testwfx2 = reinterpret_cast<ADPCMWAVEFORMAT*>(bytes2);
 
-        uint8_t bytes3[sizeof(ADPCMEWAVEFORMAT) + 32] = {};
+        uint8_t bytes3[sizeof(ADPCMWAVEFORMAT) + 32] = {};
         auto testwfx3 = reinterpret_cast<ADPCMWAVEFORMAT*>(bytes3);
 
         testwfx->wfx.wFormatTag = WAVE_FORMAT_ADPCM;
