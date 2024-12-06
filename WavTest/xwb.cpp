@@ -167,12 +167,7 @@ bool Test02()
                         std::ignore = WaitForSingleObject(request.hEvent, INFINITE);
 
                         DWORD cb = 0;
-                        #if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
-                            const BOOL result = GetOverlappedResultEx(async, &request, &cb, 0, FALSE);
-                        #else
-                            const BOOL result = GetOverlappedResult(async, &request, &cb, FALSE);
-                        #endif
-
+                        const BOOL result = GetOverlappedResultEx(async, &request, &cb, 0, FALSE);
                         if (!result)
                         {
                             success = false;
