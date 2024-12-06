@@ -150,15 +150,11 @@ namespace
 
         HRESULT hr;
         ComPtr<IMFAttributes> attr;
-#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
         hr = MFCreateAttributes(attr.GetAddressOf(), 2);
         if (FAILED(hr))
             return hr;
 
         hr = attr->SetUINT32(MF_LOW_LATENCY, TRUE);
-#else
-        hr = MFCreateAttributes(attr.GetAddressOf(), 1);
-#endif
         if (FAILED(hr))
             return hr;
 

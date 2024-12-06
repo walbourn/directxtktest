@@ -34,7 +34,7 @@ set(SOURCE_FILES
     vertextypestest.cpp
     wictextureloadertest.cpp)
 
-if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
+if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST)
   set(SOURCE_FILES ${SOURCE_FILES} audiotest.cpp)
   set(DEFS AUDIO)
 else()

@@ -24,7 +24,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ../../Audio ../../Src)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXTK bcrypt.lib)
 
-if(BUILD_XAUDIO_WIN7 AND xaudio2redist_FOUND)
+if(xaudio2redist_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC Microsoft::XAudio2Redist)
     target_compile_definitions(${PROJECT_NAME} PUBLIC USING_XAUDIO2_REDIST)
 endif()

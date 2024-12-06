@@ -319,10 +319,8 @@ namespace
         { 2048, 1024, DXGI_FORMAT_R16G16B16A16_UNORM, DXTEX_MEDIA_PATH L"SnowPano_4k_Ref.TIF", {} }, // 48bppRGB
 
         // WIC2
-        #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/) || defined(_WIN7_PLATFORM_UPDATE)
         { 1024, 1024, DXGI_FORMAT_R32G32B32_FLOAT, DXTEX_MEDIA_PATH L"ramps_vdm_rel.TIF", {} },
         { 768, 512, DXGI_FORMAT_R32G32B32_FLOAT, DXTEX_MEDIA_PATH L"96bpp_RGB_FP.TIF", {} },
-        #endif
 
         #ifdef _M_X64
         // Very large images
