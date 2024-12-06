@@ -16,7 +16,7 @@ set(TEST_EXES headertest)
 set(XAUDIO_TESTS headertest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/HeaderTest)
 
-if((BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7) AND (NOT NO_WCHAR_T))
+if((BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST) AND (NOT NO_WCHAR_T))
   # wavtest
   list(APPEND TEST_EXES wavtest)
   list(APPEND XAUDIO_TESTS wavtest)
@@ -314,7 +314,7 @@ add_test(NAME "simplemath" COMMAND simplemathtest)
 set_tests_properties(simplemath PROPERTIES LABELS "Math")
 set_tests_properties(simplemath PROPERTIES TIMEOUT 10)
 
-if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
+if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST)
     # BASIC AUDIO
     list(APPEND TEST_EXES basicaudiotest)
     list(APPEND XAUDIO_TESTS basicaudiotest)
@@ -438,8 +438,7 @@ if(directxmath_FOUND)
     endforeach()
 endif()
 
-if(xaudio2redist_FOUND
-   AND BUILD_XAUDIO_WIN7)
+if(xaudio2redist_FOUND)
     foreach(t IN LISTS XAUDIO_TESTS)
       target_link_libraries(${t} PRIVATE Microsoft::XAudio2Redist)
       target_compile_definitions(${t} PRIVATE USING_XAUDIO2_REDIST)
@@ -550,7 +549,7 @@ if(ENABLE_CODE_COVERAGE)
     configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/MSVCCodeCovInput.cmd.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MSVCCodeCovInput.cmd COPYONLY)
     configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/coverage-input.config.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/coverage-input.config COPYONLY)
 
-    if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_WIN7)
+    if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST)
       configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/MSVCCodeCovAudio.cmd.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MSVCCodeCovAudio.cmd COPYONLY)
       configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/coverage-audio.config.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/coverage-audio.config COPYONLY)
     endif()
