@@ -477,7 +477,7 @@ endif()
 
 if(MINGW)
     foreach(t IN LISTS TEST_EXES)
-      target_link_libraries(${t} PRIVATE "$<IF:$<STREQUAL:${WINVER},0x0601>,xinput9_1_0.lib,xinput1_4.lib>")
+      target_link_libraries(${t} PRIVATE "$<IF:$<STREQUAL:${WINVER},0x0603>,xinput9_1_0.lib,xinput1_4.lib>")
     endforeach()
     foreach(t IN LISTS XAUDIO_TESTS)
       target_link_libraries(${t} PRIVATE ksguid.lib)
