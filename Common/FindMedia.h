@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <cstring>
 #include <stdexcept>
+#include <tuple>
 
 
 namespace DX
@@ -28,7 +29,7 @@ namespace DX
 
         // Check CWD for quick out
         wcscpy_s(strDestPath, size_t(cchDest), strFilename);
-        if (GetFileAttributesW(strDestPath) != 0xFFFFFFFF)
+        if (GetFileAttributesW(strDestPath) != INVALID_FILE_ATTRIBUTES)
             return;
 
         // Search CWD with folder names
@@ -56,7 +57,7 @@ namespace DX
         for (const wchar_t* const * searchFolder = searchFolders; *searchFolder != 0; ++searchFolder)
         {
             swprintf_s(strFullFileName, MAX_PATH, L"%ls\\%ls", *searchFolder, strFilename);
-            if (GetFileAttributesW(strFullFileName) != 0xFFFFFFFF)
+            if (GetFileAttributesW(strFullFileName) != INVALID_FILE_ATTRIBUTES)
             {
                 wcscpy_s(strDestPath, size_t(cchDest), strFullFileName);
                 return;
@@ -81,7 +82,7 @@ namespace DX
         while (strFilePart && *strFilePart != '\0')
         {
             swprintf_s(strFullFileName, MAX_PATH, L"%ls\\%ls", strFullPath, strLeafName);
-            if (GetFileAttributesW(strFullFileName) != 0xFFFFFFFF)
+            if (GetFileAttributesW(strFullFileName) != INVALID_FILE_ATTRIBUTES)
             {
                 wcscpy_s(strDestPath, size_t(cchDest), strFullFileName);
                 return;
@@ -90,7 +91,7 @@ namespace DX
             for (const wchar_t* const * searchFolder = searchFolders; *searchFolder != 0; ++searchFolder)
             {
                 swprintf_s(strFullFileName, MAX_PATH, L"%ls\\%ls\\%ls", strFullPath, *searchFolder, strLeafName);
-                if (GetFileAttributesW(strFullFileName) != 0xFFFFFFFF)
+                if (GetFileAttributesW(strFullFileName) != INVALID_FILE_ATTRIBUTES)
                 {
                     wcscpy_s(strDestPath, size_t(cchDest), strFullFileName);
                     return;
