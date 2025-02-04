@@ -620,9 +620,9 @@ void Game::Render()
     }
 
     // Draw UI.
-    auto const size = m_deviceResources->GetOutputSize();
+    const auto size = m_deviceResources->GetOutputSize();
 
-    auto const safeRect = Viewport::ComputeTitleSafeArea(UINT(size.right), UINT(size.bottom));
+    const auto safeRect = Viewport::ComputeTitleSafeArea(UINT(size.right), UINT(size.bottom));
 
     m_spriteBatch->Begin();
     m_font->DrawString(m_spriteBatch.get(), descstr, XMFLOAT2(float(safeRect.left), float(safeRect.bottom - m_font->GetLineSpacing())));
@@ -657,7 +657,7 @@ void Game::Clear()
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
     // Set the viewport.
-    auto const viewport = m_deviceResources->GetScreenViewport();
+    const auto viewport = m_deviceResources->GetScreenViewport();
     context->RSSetViewports(1, &viewport);
 
     m_spriteBatch->SetViewport(viewport);
@@ -689,7 +689,7 @@ void Game::OnResuming()
 #ifdef PC
 void Game::OnWindowMoved()
 {
-    auto const r = m_deviceResources->GetOutputSize();
+    const auto r = m_deviceResources->GetOutputSize();
     m_deviceResources->WindowSizeChanged(r.right, r.bottom);
 }
 #endif
@@ -778,7 +778,7 @@ void Game::CreateDeviceDependentResources()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    auto const size = m_deviceResources->GetOutputSize();
+    const auto size = m_deviceResources->GetOutputSize();
 
     auto width = UINT(size.right - size.left);
     auto height = UINT(size.bottom - size.top);
@@ -868,7 +868,7 @@ void Game::ShaderTest()
 
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    auto const viewport = m_deviceResources->GetScreenViewport();
+    const auto viewport = m_deviceResources->GetScreenViewport();
     context->RSSetViewports(1, &viewport);
 
     auto renderTarget = m_sceneRT.Get();
@@ -909,7 +909,7 @@ void Game::ShaderTest()
     ComPtr<ID3D11Texture2D> tex;
     ComPtr<ID3D11RenderTargetView> rtv;
     {
-        auto const size = m_deviceResources->GetOutputSize();
+        const auto size = m_deviceResources->GetOutputSize();
 
         UINT width = UINT(size.right - size.left);
         UINT height = UINT(size.bottom - size.top);

@@ -137,7 +137,7 @@ void TextConsole::Format(const wchar_t* strFormat, ...)
     va_list argList;
     va_start(argList, strFormat);
 
-    auto const len = size_t(_vscwprintf(strFormat, argList) + 1);
+    const auto len = size_t(_vscwprintf(strFormat, argList) + 1);
 
     if (m_tempBuffer.size() < len)
         m_tempBuffer.resize(len);
