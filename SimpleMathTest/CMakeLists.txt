@@ -109,14 +109,16 @@ endif()
 
 set(TEST_INCLUDE_DIR ./)
 
-set(TEST_SOURCES
-    SimpleMathTest.cpp
-    SimpleMathTestD3D12.cpp
-    )
+set(TEST_SOURCES SimpleMathTest.cpp)
 
 if(WIN32)
     set(TEST_SOURCES ${TEST_SOURCES} SimpleMathTestD3D11.cpp)
     list(APPEND DXMATH_DEFS "TEST_D3D11")
+endif()
+
+if(NOT BUILD_SHARED_LIBS)
+    set(TEST_SOURCES ${TEST_SOURCES} SimpleMathTestD3D12.cpp)
+    list(APPEND DXMATH_DEFS "TEST_D3D12")
 endif()
 
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")

@@ -5739,7 +5739,9 @@ int TestL()
 extern int TestD3D11();
 #endif
 
+#ifdef TEST_D3D12
 extern int TestD3D12();
+#endif
 
 typedef int (*TestFN)();
 
@@ -5762,7 +5764,9 @@ static struct Test
 #ifdef TEST_D3D11
     { "D3D11", TestD3D11 },
 #endif
+#ifdef TEST_D3D12
     { "D3D12", TestD3D12 },
+#endif
     { "std::less", TestL },
 };
 
