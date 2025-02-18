@@ -95,7 +95,7 @@ if(NOT MINGW)
   target_precompile_headers(effectstest PRIVATE EffectsTest/pch.h)
 endif()
 add_test(NAME "effects" COMMAND effectstest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/EffectsTest)
-set_tests_properties(effects PROPERTIES LABELS "Graphics")
+set_tests_properties(effects PROPERTIES LABELS "Graphics;HLSL")
 set_tests_properties(effects PROPERTIES TIMEOUT 60)
 
 # PRIMITIVE BATCH
@@ -127,7 +127,7 @@ if(NOT MINGW)
   target_precompile_headers(spritebatchtest PRIVATE SpriteBatchTest/pch.h)
 endif()
 add_test(NAME "spriteBatch" COMMAND spritebatchtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SpriteBatchTest)
-set_tests_properties(spriteBatch PROPERTIES LABELS "Graphics")
+set_tests_properties(spriteBatch PROPERTIES LABELS "Graphics;Sprites")
 set_tests_properties(spriteBatch PROPERTIES TIMEOUT 60)
 
 # SPRITE FONT
@@ -146,7 +146,7 @@ if(NO_WCHAR_T)
   target_compile_definitions(spritefonttest PRIVATE NO_WCHAR_T)
 endif()
 add_test(NAME "spriteFont" COMMAND spritefonttest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SpriteFontTest)
-set_tests_properties(spriteFont PROPERTIES LABELS "Graphics")
+set_tests_properties(spriteFont PROPERTIES LABELS "Graphics;Sprites")
 set_tests_properties(spriteFont PROPERTIES TIMEOUT 60)
 
 # DDS/WIC TEXTURE LOADER
@@ -163,7 +163,7 @@ if(NOT MINGW)
   target_precompile_headers(loadtest PRIVATE LoadTest/pch.h)
 endif()
 add_test(NAME "loaders" COMMAND loadtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LoadTest)
-set_tests_properties(loaders PROPERTIES LABELS "Graphics")
+set_tests_properties(loaders PROPERTIES LABELS "Graphics;ImageFormats")
 set_tests_properties(loaders PROPERTIES TIMEOUT 60)
 
 # MODEL
@@ -182,7 +182,7 @@ if(NOT MINGW)
   target_precompile_headers(modeltest PRIVATE ModelTest/pch.h)
 endif()
 add_test(NAME "models" COMMAND modeltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ModelTest)
-set_tests_properties(models PROPERTIES LABELS "Graphics")
+set_tests_properties(models PROPERTIES LABELS "Graphics;Models")
 set_tests_properties(models PROPERTIES TIMEOUT 60)
 
 # SHADER VALIDATION
@@ -200,7 +200,7 @@ if(NOT MINGW)
   target_precompile_headers(shadertest PRIVATE ShaderTest/pch.h)
 endif()
 add_test(NAME "shaders" COMMAND shadertest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ShaderTest)
-set_tests_properties(shaders PROPERTIES LABELS "Graphics")
+set_tests_properties(shaders PROPERTIES LABELS "Graphics;HLSL")
 set_tests_properties(shaders PROPERTIES TIMEOUT 40)
 
 # ANIMATION
@@ -218,7 +218,7 @@ if(NOT MINGW)
   target_precompile_headers(animtest PRIVATE AnimTest/pch.h)
 endif()
 add_test(NAME "animation" COMMAND animtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/AnimTest)
-set_tests_properties(animation PROPERTIES LABELS "Graphics")
+set_tests_properties(animation PROPERTIES LABELS "Graphics;Models")
 set_tests_properties(animation PROPERTIES TIMEOUT 40)
 
 # DGSL
@@ -234,7 +234,7 @@ if(NOT MINGW)
   target_precompile_headers(dgsltest PRIVATE DGSLTest/pch.h)
 endif()
 add_test(NAME "dgslShaders" COMMAND dgsltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/DGSLTest)
-set_tests_properties(dgslShaders PROPERTIES LABELS "Graphics")
+set_tests_properties(dgslShaders PROPERTIES LABELS "Graphics;HLSL")
 set_tests_properties(dgslShaders PROPERTIES TIMEOUT 40)
 
 # HDR
@@ -270,7 +270,7 @@ if(NOT MINGW)
   target_precompile_headers(pbrtest PRIVATE PBRTest/pch.h)
 endif()
 add_test(NAME "pbrShaders" COMMAND pbrtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PBRTest)
-set_tests_properties(pbrShaders PROPERTIES LABELS "Graphics")
+set_tests_properties(pbrShaders PROPERTIES LABELS "Graphics;HLSL")
 set_tests_properties(pbrShaders PROPERTIES TIMEOUT 40)
 
 # PBR MODEL
@@ -290,7 +290,7 @@ if(NOT MINGW)
   target_precompile_headers(pbrmodeltest PRIVATE PBRModelTest/pch.h)
 endif()
 add_test(NAME "modelsPBR" COMMAND pbrmodeltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PBRModelTest)
-set_tests_properties(modelsPBR PROPERTIES LABELS "Graphics")
+set_tests_properties(modelsPBR PROPERTIES LABELS "Graphics;Models")
 set_tests_properties(modelsPBR PROPERTIES TIMEOUT 60)
 
 # POST-PROCESSING

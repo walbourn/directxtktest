@@ -18,7 +18,7 @@
 extern void ExitGame() noexcept;
 
 using namespace DirectX;
-using namespace DirectX::PackedVector; 
+using namespace DirectX::PackedVector;
 using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
@@ -947,7 +947,7 @@ void Game::Render()
             {
                 for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
                 {
-                    (*it)->SetBoneTransforms(bones, 4);
+                    (*it)->effect.SetBoneTransforms(bones, 4);
                     (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
                     context->DrawIndexed(m_indexCount, 0, 0);
 
