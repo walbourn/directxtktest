@@ -114,60 +114,62 @@ private:
 #endif
 
     template<typename T>
-    class EffectWithDecl : public T
+    class EffectWithDecl
     {
     public:
         EffectWithDecl(ID3D11Device* device, std::function<void(T*)> setEffectParameters)
-            : T(device)
+            : effect(device)
         {
-            setEffectParameters(this);
+            setEffectParameters(&effect);
 
-            CreateTestInputLayout(device, this, &inputLayout, &compressedInputLayout, nullptr, nullptr);
+            CreateTestInputLayout(device, &effect, &inputLayout, &compressedInputLayout, nullptr, nullptr);
         }
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool showCompressed)
         {
             using namespace DirectX;
 
-            T::SetMatrices(world, view, projection);
+            effect.SetMatrices(world, view, projection);
 
-            auto ibasic = dynamic_cast<BasicEffect*>(this);
+            auto ibasic = dynamic_cast<BasicEffect*>(&effect);
             if (ibasic)
                 ibasic->SetBiasedVertexNormals(showCompressed);
 
-            auto ienvmap = dynamic_cast<EnvironmentMapEffect*>(this);
+            auto ienvmap = dynamic_cast<EnvironmentMapEffect*>(&effect);
             if (ienvmap)
                 ienvmap->SetBiasedVertexNormals(showCompressed);
 
-            auto inmap = dynamic_cast<NormalMapEffect*>(this);
+            auto inmap = dynamic_cast<NormalMapEffect*>(&effect);
             if (inmap)
             {
                 inmap->SetBiasedVertexNormals(showCompressed);
                 inmap->SetInstancingEnabled(false);
             }
 
-            auto ipbr = dynamic_cast<PBREffect*>(this);
+            auto ipbr = dynamic_cast<PBREffect*>(&effect);
             if (ipbr)
             {
                 ipbr->SetBiasedVertexNormals(showCompressed);
                 ipbr->SetInstancingEnabled(false);
             }
 
-            auto iskin = dynamic_cast<SkinnedEffect*>(this);
+            auto iskin = dynamic_cast<SkinnedEffect*>(&effect);
             if (iskin)
                 iskin->SetBiasedVertexNormals(showCompressed);
 
-            auto idbg = dynamic_cast<DebugEffect*>(this);
+            auto idbg = dynamic_cast<DebugEffect*>(&effect);
             if (idbg)
             {
                 idbg->SetBiasedVertexNormals(showCompressed);
                 idbg->SetInstancingEnabled(false);
             }
 
-            T::Apply(context);
+            effect.Apply(context);
 
             context->IASetInputLayout((showCompressed) ? compressedInputLayout.Get() : inputLayout.Get());
         }
+
+        T effect;
 
     private:
         Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
@@ -175,48 +177,50 @@ private:
     };
 
     template<typename T>
-    class InstancedEffectWithDecl : public T
+    class InstancedEffectWithDecl
     {
     public:
         InstancedEffectWithDecl(ID3D11Device* device, std::function<void(T*)> setEffectParameters)
-            : T(device)
+            : effect(device)
         {
-            setEffectParameters(this);
+            setEffectParameters(&effect);
 
-            CreateTestInputLayout(device, this, nullptr, nullptr, &inputLayout, &compressedInputLayout);
+            CreateTestInputLayout(device, &effect, nullptr, nullptr, &inputLayout, &compressedInputLayout);
         }
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection, bool showCompressed)
         {
             using namespace DirectX;
 
-            T::SetMatrices(world, view, projection);
+            effect.SetMatrices(world, view, projection);
 
-            auto inmap = dynamic_cast<NormalMapEffect*>(this);
+            auto inmap = dynamic_cast<NormalMapEffect*>(&effect);
             if (inmap)
             {
                 inmap->SetBiasedVertexNormals(showCompressed);
                 inmap->SetInstancingEnabled(true);
             }
 
-            auto ipbr = dynamic_cast<PBREffect*>(this);
+            auto ipbr = dynamic_cast<PBREffect*>(&effect);
             if (ipbr)
             {
                 ipbr->SetBiasedVertexNormals(showCompressed);
                 ipbr->SetInstancingEnabled(true);
             }
 
-            auto idbg = dynamic_cast<DebugEffect*>(this);
+            auto idbg = dynamic_cast<DebugEffect*>(&effect);
             if (idbg)
             {
                 idbg->SetBiasedVertexNormals(showCompressed);
                 idbg->SetInstancingEnabled(true);
             }
 
-            T::Apply(context);
+            effect.Apply(context);
 
             context->IASetInputLayout((showCompressed) ? compressedInputLayout.Get() : inputLayout.Get());
         }
+
+        T effect;
 
     private:
         Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
@@ -224,25 +228,27 @@ private:
     };
 
     template<typename T>
-    class DGSLEffectWithDecl : public T
+    class DGSLEffectWithDecl
     {
     public:
         DGSLEffectWithDecl(ID3D11Device* device, std::function<void(T*)> setEffectParameters)
-            : T(device, nullptr)
+            : effect(device, nullptr)
         {
-            setEffectParameters(this);
+            setEffectParameters(&effect);
 
-            CreateTestInputLayout(device, this, &inputLayout, nullptr, nullptr, nullptr);
+            CreateTestInputLayout(device, &effect, &inputLayout, nullptr, nullptr, nullptr);
         }
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection)
         {
-            T::SetMatrices(world, view, projection);
+            effect.SetMatrices(world, view, projection);
 
-            T::Apply(context);
+            effect.Apply(context);
 
             context->IASetInputLayout(inputLayout.Get());
         }
+
+        T effect;
 
     private:
         Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;

@@ -107,25 +107,27 @@ private:
 #endif
 
     template<typename T>
-    class EffectWithDecl : public T
+    class EffectWithDecl
     {
     public:
         EffectWithDecl(ID3D11Device* device, std::function<void(T*)> setEffectParameters)
-            : T(device)
+            : effect(device)
         {
-            setEffectParameters(this);
+            setEffectParameters(&effect);
 
-            CreateTestInputLayout(device, this, &inputLayout);
+            CreateTestInputLayout(device, &effect, &inputLayout);
         }
 
         void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection)
         {
-            T::SetMatrices(world, view, projection);
+            effect.SetMatrices(world, view, projection);
 
-            T::Apply(context);
+            effect.Apply(context);
 
             context->IASetInputLayout(inputLayout.Get());
         }
+
+        T effect;
 
     private:
         Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
@@ -172,7 +174,7 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_indexBuffer;
-    
+
     DirectX::SimpleMath::Matrix             m_view;
     DirectX::SimpleMath::Matrix             m_projection;
 

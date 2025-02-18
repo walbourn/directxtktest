@@ -407,38 +407,38 @@ void Game::Render()
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Unlit with alpha fading.
-    m_basicEffectUnlit->SetAlpha(alphaFade);
+    m_basicEffectUnlit->effect.SetAlpha(alphaFade);
     m_basicEffectUnlit->Apply(context, world * XMMatrixTranslation(col0, row1, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_basicEffectUnlit->SetAlpha(1);
+    m_basicEffectUnlit->effect.SetAlpha(1);
 
     // Unlit with fog.
-    m_basicEffectUnlit->SetFogEnabled(true);
-    m_basicEffectUnlit->SetFogStart(fogstart);
-    m_basicEffectUnlit->SetFogEnd(fogend);
-    m_basicEffectUnlit->SetFogColor(gray);
+    m_basicEffectUnlit->effect.SetFogEnabled(true);
+    m_basicEffectUnlit->effect.SetFogStart(fogstart);
+    m_basicEffectUnlit->effect.SetFogEnd(fogend);
+    m_basicEffectUnlit->effect.SetFogColor(gray);
     m_basicEffectUnlit->Apply(context, world * XMMatrixTranslation(col0, row2, 2 - alphaFade * 6), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_basicEffectUnlit->SetFogEnabled(false);
+    m_basicEffectUnlit->effect.SetFogEnabled(false);
 
     // Simple unlit teapot with vertex colors.
     m_basicEffectUnlitVc->Apply(context, world * XMMatrixTranslation(colA, row0, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Simple unlit teapot with alpha fading with vertex colors.
-    m_basicEffectUnlitVc->SetAlpha(alphaFade);
+    m_basicEffectUnlitVc->effect.SetAlpha(alphaFade);
     m_basicEffectUnlitVc->Apply(context, world * XMMatrixTranslation(colA, row1, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_basicEffectUnlitVc->SetAlpha(1);
+    m_basicEffectUnlitVc->effect.SetAlpha(1);
 
     // Unlit with fog with vertex colors.
-    m_basicEffectUnlitVc->SetFogEnabled(true);
-    m_basicEffectUnlitVc->SetFogStart(fogstart);
-    m_basicEffectUnlitVc->SetFogEnd(fogend);
-    m_basicEffectUnlitVc->SetFogColor(gray);
+    m_basicEffectUnlitVc->effect.SetFogEnabled(true);
+    m_basicEffectUnlitVc->effect.SetFogStart(fogstart);
+    m_basicEffectUnlitVc->effect.SetFogEnd(fogend);
+    m_basicEffectUnlitVc->effect.SetFogColor(gray);
     m_basicEffectUnlitVc->Apply(context, world * XMMatrixTranslation(colA, row2, 2 - alphaFade * 6), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_basicEffectUnlitVc->SetFogEnabled(false);
+    m_basicEffectUnlitVc->effect.SetFogEnabled(false);
 
     // Simple lit teapot.
     m_basicEffect->Apply(context, world * XMMatrixTranslation(col1, row0, 0), m_view, m_projection);
@@ -449,83 +449,83 @@ void Game::Render()
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Simple lit with alpha fading.
-    m_basicEffect->SetAlpha(alphaFade);
+    m_basicEffect->effect.SetAlpha(alphaFade);
     m_basicEffect->Apply(context, world * XMMatrixTranslation(col1, row1, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_basicEffect->SetAlpha(1);
+    m_basicEffect->effect.SetAlpha(1);
 
     // Simple lit alpha fading, no specular.
-    m_basicEffectNoSpecular->SetAlpha(alphaFade);
+    m_basicEffectNoSpecular->effect.SetAlpha(alphaFade);
     m_basicEffectNoSpecular->Apply(context, world * XMMatrixTranslation(col3, row3, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_basicEffectNoSpecular->SetAlpha(1);
+    m_basicEffectNoSpecular->effect.SetAlpha(1);
 
     // Simple lit with fog.
-    m_basicEffect->SetFogEnabled(true);
-    m_basicEffect->SetFogStart(fogstart);
-    m_basicEffect->SetFogEnd(fogend);
-    m_basicEffect->SetFogColor(gray);
+    m_basicEffect->effect.SetFogEnabled(true);
+    m_basicEffect->effect.SetFogStart(fogstart);
+    m_basicEffect->effect.SetFogEnd(fogend);
+    m_basicEffect->effect.SetFogColor(gray);
     m_basicEffect->Apply(context, world * XMMatrixTranslation(col1, row2, 2 - alphaFade * 6), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_basicEffect->SetFogEnabled(false);
+    m_basicEffect->effect.SetFogEnabled(false);
 
-    m_basicEffect->SetLightEnabled(1, false);
-    m_basicEffect->SetLightEnabled(2, false);
+    m_basicEffect->effect.SetLightEnabled(1, false);
+    m_basicEffect->effect.SetLightEnabled(2, false);
 
     {
         // Light only from above.
-        m_basicEffect->SetLightDirection(0, XMVectorSet(0, -1, 0, 0));
+        m_basicEffect->effect.SetLightDirection(0, XMVectorSet(0, -1, 0, 0));
         m_basicEffect->Apply(context, world * XMMatrixTranslation(col2, row0, 0), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
 
         // Light only from the left.
-        m_basicEffect->SetLightDirection(0, XMVectorSet(1, 0, 0, 0));
+        m_basicEffect->effect.SetLightDirection(0, XMVectorSet(1, 0, 0, 0));
         m_basicEffect->Apply(context, world * XMMatrixTranslation(col3, row0, 0), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
 
         // Light only from straight in front.
-        m_basicEffect->SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
+        m_basicEffect->effect.SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
         m_basicEffect->Apply(context, world * XMMatrixTranslation(col4, row0, 0), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
     }
 
-    m_basicEffect->EnableDefaultLighting();
+    m_basicEffect->effect.EnableDefaultLighting();
 
     // Non uniform scaling.
     m_basicEffect->Apply(context, XMMatrixScaling(1, 2, 0.25f) * world * XMMatrixTranslation(col5, row0, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
-    m_basicEffect->SetPerPixelLighting(true);
+    m_basicEffect->effect.SetPerPixelLighting(true);
 
     {
-        m_basicEffect->SetLightEnabled(1, false);
-        m_basicEffect->SetLightEnabled(2, false);
+        m_basicEffect->effect.SetLightEnabled(1, false);
+        m_basicEffect->effect.SetLightEnabled(2, false);
 
         {
             // Light only from above + per pixel lighting.
-            m_basicEffect->SetLightDirection(0, XMVectorSet(0, -1, 0, 0));
+            m_basicEffect->effect.SetLightDirection(0, XMVectorSet(0, -1, 0, 0));
             m_basicEffect->Apply(context, world * XMMatrixTranslation(col2, row1, 0), m_view, m_projection);
             context->DrawIndexed(m_indexCount, 0, 0);
 
             // Light only from the left + per pixel lighting.
-            m_basicEffect->SetLightDirection(0, XMVectorSet(1, 0, 0, 0));
+            m_basicEffect->effect.SetLightDirection(0, XMVectorSet(1, 0, 0, 0));
             m_basicEffect->Apply(context, world * XMMatrixTranslation(col3, row1, 0), m_view, m_projection);
             context->DrawIndexed(m_indexCount, 0, 0);
 
             // Light only from straight in front + per pixel lighting.
-            m_basicEffect->SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
+            m_basicEffect->effect.SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
             m_basicEffect->Apply(context, world * XMMatrixTranslation(col4, row1, 0), m_view, m_projection);
             context->DrawIndexed(m_indexCount, 0, 0);
         }
 
-        m_basicEffect->EnableDefaultLighting();
+        m_basicEffect->effect.EnableDefaultLighting();
 
         // Non uniform scaling + per pixel lighting.
         m_basicEffect->Apply(context, XMMatrixScaling(1, 2, 0.25f) * world * XMMatrixTranslation(col5, row1, 0), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
     }
 
-    m_basicEffect->SetPerPixelLighting(false);
+    m_basicEffect->effect.SetPerPixelLighting(false);
 
     //--- SkinnedEFfect --------------------------------------------------------------------
 
@@ -538,36 +538,36 @@ void Game::Render()
         XMMatrixScaling(0, 0, 0),
     };
 
-    m_skinnedEffect->SetBoneTransforms(bones, 4);
+    m_skinnedEffect->effect.SetBoneTransforms(bones, 4);
     m_skinnedEffect->Apply(context, world, m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
-    m_skinnedEffectNoSpecular->SetBoneTransforms(bones, 4);
+    m_skinnedEffectNoSpecular->effect.SetBoneTransforms(bones, 4);
     m_skinnedEffectNoSpecular->Apply(context, world * XMMatrixTranslation(col5, row3, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Skinned effect with fog.
-    m_skinnedEffect->SetBoneTransforms(bones, 4);
-    m_skinnedEffect->SetFogEnabled(true);
-    m_skinnedEffect->SetFogStart(fogstart);
-    m_skinnedEffect->SetFogEnd(fogend);
-    m_skinnedEffect->SetFogColor(gray);
+    m_skinnedEffect->effect.SetBoneTransforms(bones, 4);
+    m_skinnedEffect->effect.SetFogEnabled(true);
+    m_skinnedEffect->effect.SetFogStart(fogstart);
+    m_skinnedEffect->effect.SetFogEnd(fogend);
+    m_skinnedEffect->effect.SetFogColor(gray);
     m_skinnedEffect->Apply(context, world * XMMatrixTranslation(colA, rowA, 2 - alphaFade * 6), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_skinnedEffect->SetFogEnabled(false);
+    m_skinnedEffect->effect.SetFogEnabled(false);
 
-    m_skinnedEffect->SetPerPixelLighting(true);
+    m_skinnedEffect->effect.SetPerPixelLighting(true);
 
-    m_skinnedEffect->SetBoneTransforms(bones, 4);
-    m_skinnedEffect->SetFogEnabled(true);
-    m_skinnedEffect->SetFogStart(fogstart);
-    m_skinnedEffect->SetFogEnd(fogend);
-    m_skinnedEffect->SetFogColor(gray);
+    m_skinnedEffect->effect.SetBoneTransforms(bones, 4);
+    m_skinnedEffect->effect.SetFogEnabled(true);
+    m_skinnedEffect->effect.SetFogStart(fogstart);
+    m_skinnedEffect->effect.SetFogEnd(fogend);
+    m_skinnedEffect->effect.SetFogColor(gray);
     m_skinnedEffect->Apply(context, world * XMMatrixTranslation(col0, rowA, 2 - alphaFade * 6), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_skinnedEffect->SetFogEnabled(false);
+    m_skinnedEffect->effect.SetFogEnabled(false);
 
-    m_skinnedEffect->SetPerPixelLighting(false);
+    m_skinnedEffect->effect.SetPerPixelLighting(false);
 
     // Skinned effect, variable scaling transforms.
     float scales[4] =
@@ -583,7 +583,7 @@ void Game::Render()
         bones[i] = XMMatrixScaling(scales[i], scales[i], scales[i]);
     }
 
-    m_skinnedEffect->SetBoneTransforms(bones, 4);
+    m_skinnedEffect->effect.SetBoneTransforms(bones, 4);
     m_skinnedEffect->Apply(context, world * XMMatrixTranslation(col3, rowA, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
@@ -601,11 +601,11 @@ void Game::Render()
         bones[i] = XMMatrixScaling(scales2[i], scales2[i], scales2[i]);
     }
 
-    m_skinnedEffect->SetPerPixelLighting(true);
-    m_skinnedEffect->SetBoneTransforms(bones, 4);
+    m_skinnedEffect->effect.SetPerPixelLighting(true);
+    m_skinnedEffect->effect.SetBoneTransforms(bones, 4);
     m_skinnedEffect->Apply(context, world * XMMatrixTranslation(col1, rowA, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_skinnedEffect->SetPerPixelLighting(false);
+    m_skinnedEffect->effect.SetPerPixelLighting(false);
 
     //--- EnvironmentMapEffect -------------------------------------------------------------
 
@@ -614,90 +614,90 @@ void Game::Render()
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Environment map with alpha fading.
-    m_envmap->SetAlpha(alphaFade);
+    m_envmap->effect.SetAlpha(alphaFade);
     m_envmap->Apply(context, world * XMMatrixTranslation(col6, row1, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_envmap->SetAlpha(1);
+    m_envmap->effect.SetAlpha(1);
 
     // Environment map with fog.
-    m_envmap->SetFogEnabled(true);
-    m_envmap->SetFogStart(fogstart);
-    m_envmap->SetFogEnd(fogend);
-    m_envmap->SetFogColor(gray);
+    m_envmap->effect.SetFogEnabled(true);
+    m_envmap->effect.SetFogStart(fogstart);
+    m_envmap->effect.SetFogEnd(fogend);
+    m_envmap->effect.SetFogColor(gray);
     m_envmap->Apply(context, world * XMMatrixTranslation(col6, row2, 2 - alphaFade * 6), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_envmap->SetFogEnabled(false);
+    m_envmap->effect.SetFogEnabled(false);
 
     // Environment map, animating the fresnel factor.
-    m_envmap->SetFresnelFactor(alphaFade * 3);
+    m_envmap->effect.SetFresnelFactor(alphaFade * 3);
     m_envmap->Apply(context, world * XMMatrixTranslation(col6, row4, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_envmap->SetFresnelFactor(1);
+    m_envmap->effect.SetFresnelFactor(1);
 
     // Environment map, animating the amount, with no fresnel.
-    m_envmap->SetEnvironmentMapAmount(alphaFade);
-    m_envmap->SetFresnelFactor(0);
+    m_envmap->effect.SetEnvironmentMapAmount(alphaFade);
+    m_envmap->effect.SetFresnelFactor(0);
     m_envmap->Apply(context, world * XMMatrixTranslation(col6, row5, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_envmap->SetEnvironmentMapAmount(1);
-    m_envmap->SetFresnelFactor(1);
+    m_envmap->effect.SetEnvironmentMapAmount(1);
+    m_envmap->effect.SetFresnelFactor(1);
 
     // Environment map, animating the amount.
-    m_envmap->SetEnvironmentMapAmount(alphaFade);
+    m_envmap->effect.SetEnvironmentMapAmount(alphaFade);
     m_envmap->Apply(context, world * XMMatrixTranslation(col6, row6, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_envmap->SetEnvironmentMapAmount(1);
+    m_envmap->effect.SetEnvironmentMapAmount(1);
 
     // Environment map, with animating specular
-    m_envmap->SetEnvironmentMapSpecular(blue * alphaFade);
+    m_envmap->effect.SetEnvironmentMapSpecular(blue * alphaFade);
     m_envmap->Apply(context, world * XMMatrixTranslation(col5, row5, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_envmap->SetEnvironmentMapSpecular(Colors::Black);
+    m_envmap->effect.SetEnvironmentMapSpecular(Colors::Black);
 
     // Environment map, with single light vertex color
-    m_envmap->SetLightEnabled(1, false);
-    m_envmap->SetLightEnabled(2, false);
+    m_envmap->effect.SetLightEnabled(1, false);
+    m_envmap->effect.SetLightEnabled(2, false);
     m_envmap->Apply(context, world * XMMatrixTranslation(col5, row6, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
-    m_envmap->SetPerPixelLighting(true);
+    m_envmap->effect.SetPerPixelLighting(true);
 
     {
-        m_envmap->SetLightEnabled(1, false);
-        m_envmap->SetLightEnabled(2, false);
+        m_envmap->effect.SetLightEnabled(1, false);
+        m_envmap->effect.SetLightEnabled(2, false);
 
         {
             // Light only from above + per pixel lighting, animating the fresnel factor.
-            m_envmap->SetLightDirection(0, XMVectorSet(0, -1, 0, 0));
-            m_envmap->SetFresnelFactor(alphaFade * 3);
+            m_envmap->effect.SetLightDirection(0, XMVectorSet(0, -1, 0, 0));
+            m_envmap->effect.SetFresnelFactor(alphaFade * 3);
             m_envmap->Apply(context, world * XMMatrixTranslation(col7, row4, 0), m_view, m_projection);
             context->DrawIndexed(m_indexCount, 0, 0);
-            m_envmap->SetFresnelFactor(1);
+            m_envmap->effect.SetFresnelFactor(1);
 
             // Light only from the left + per pixel lighting, animating the amount, with no fresnel.
-            m_envmap->SetEnvironmentMapAmount(alphaFade);
-            m_envmap->SetFresnelFactor(0);
-            m_envmap->SetLightDirection(0, XMVectorSet(1, 0, 0, 0));
+            m_envmap->effect.SetEnvironmentMapAmount(alphaFade);
+            m_envmap->effect.SetFresnelFactor(0);
+            m_envmap->effect.SetLightDirection(0, XMVectorSet(1, 0, 0, 0));
             m_envmap->Apply(context, world * XMMatrixTranslation(col7, row5, 0), m_view, m_projection);
             context->DrawIndexed(m_indexCount, 0, 0);
-            m_envmap->SetEnvironmentMapAmount(1);
-            m_envmap->SetFresnelFactor(1);
+            m_envmap->effect.SetEnvironmentMapAmount(1);
+            m_envmap->effect.SetFresnelFactor(1);
 
             // Light only from straight in front + per pixel lighting with fog.
-            m_envmap->SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
-            m_envmap->SetFogEnabled(true);
-            m_envmap->SetFogStart(fogstart);
-            m_envmap->SetFogEnd(fogend);
-            m_envmap->SetFogColor(gray);
+            m_envmap->effect.SetLightDirection(0, XMVectorSet(0, 0, -1, 0));
+            m_envmap->effect.SetFogEnabled(true);
+            m_envmap->effect.SetFogStart(fogstart);
+            m_envmap->effect.SetFogEnd(fogend);
+            m_envmap->effect.SetFogColor(gray);
             m_envmap->Apply(context, world * XMMatrixTranslation(col7, row6, 2 - alphaFade * 6), m_view, m_projection);
             context->DrawIndexed(m_indexCount, 0, 0);
-            m_envmap->SetFogEnabled(false);
+            m_envmap->effect.SetFogEnabled(false);
         }
 
-        m_envmap->EnableDefaultLighting();
+        m_envmap->effect.EnableDefaultLighting();
     }
 
-    m_envmap->SetPerPixelLighting(false);
+    m_envmap->effect.SetPerPixelLighting(false);
 
     m_spheremap->Apply(context, world * XMMatrixTranslation(col4, row5, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
@@ -712,19 +712,19 @@ void Game::Render()
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Dual texture with alpha fading.
-    m_dualTexture->SetAlpha(alphaFade);
+    m_dualTexture->effect.SetAlpha(alphaFade);
     m_dualTexture->Apply(context, world * XMMatrixTranslation(col7, row1, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_dualTexture->SetAlpha(1);
+    m_dualTexture->effect.SetAlpha(1);
 
     // Dual texture with fog.
-    m_dualTexture->SetFogEnabled(true);
-    m_dualTexture->SetFogStart(fogstart);
-    m_dualTexture->SetFogEnd(fogend);
-    m_dualTexture->SetFogColor(gray);
+    m_dualTexture->effect.SetFogEnabled(true);
+    m_dualTexture->effect.SetFogStart(fogstart);
+    m_dualTexture->effect.SetFogEnd(fogend);
+    m_dualTexture->effect.SetFogColor(gray);
     m_dualTexture->Apply(context, world * XMMatrixTranslation(col7, row2, 2 - alphaFade * 6), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_dualTexture->SetFogEnabled(false);
+    m_dualTexture->effect.SetFogEnabled(false);
 
     //--- AlphaTestEFfect ------------------------------------------------------------------
 
@@ -732,41 +732,41 @@ void Game::Render()
 
     {
         // Alpha test, > 0.
-        m_alphaTest->SetAlphaFunction(D3D11_COMPARISON_GREATER);
-        m_alphaTest->SetReferenceAlpha(0);
+        m_alphaTest->effect.SetAlphaFunction(D3D11_COMPARISON_GREATER);
+        m_alphaTest->effect.SetReferenceAlpha(0);
         m_alphaTest->Apply(context, world * XMMatrixTranslation(col8, row0, 0), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
 
         // Alpha test, > 128.
-        m_alphaTest->SetAlphaFunction(D3D11_COMPARISON_GREATER);
-        m_alphaTest->SetReferenceAlpha(128);
+        m_alphaTest->effect.SetAlphaFunction(D3D11_COMPARISON_GREATER);
+        m_alphaTest->effect.SetReferenceAlpha(128);
         m_alphaTest->Apply(context, world * XMMatrixTranslation(col8, row1, 0), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
 
         // Alpha test with fog.
-        m_alphaTest->SetFogEnabled(true);
-        m_alphaTest->SetFogStart(fogstart);
-        m_alphaTest->SetFogEnd(fogend);
-        m_alphaTest->SetFogColor(red);
+        m_alphaTest->effect.SetFogEnabled(true);
+        m_alphaTest->effect.SetFogStart(fogstart);
+        m_alphaTest->effect.SetFogEnd(fogend);
+        m_alphaTest->effect.SetFogColor(red);
         m_alphaTest->Apply(context, world * XMMatrixTranslation(col8, row2, 2 - alphaFade * 6), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
-        m_alphaTest->SetFogEnabled(false);
+        m_alphaTest->effect.SetFogEnabled(false);
 
         // Alpha test, < animating value.
-        m_alphaTest->SetAlphaFunction(D3D11_COMPARISON_LESS);
-        m_alphaTest->SetReferenceAlpha(1 + (int)(alphaFade * 254));
+        m_alphaTest->effect.SetAlphaFunction(D3D11_COMPARISON_LESS);
+        m_alphaTest->effect.SetReferenceAlpha(1 + (int)(alphaFade * 254));
         m_alphaTest->Apply(context, world * XMMatrixTranslation(col8, row4, 0), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
 
         // Alpha test, = 255.
-        m_alphaTest->SetAlphaFunction(D3D11_COMPARISON_EQUAL);
-        m_alphaTest->SetReferenceAlpha(255);
+        m_alphaTest->effect.SetAlphaFunction(D3D11_COMPARISON_EQUAL);
+        m_alphaTest->effect.SetReferenceAlpha(255);
         m_alphaTest->Apply(context, world * XMMatrixTranslation(col8, row5, 0), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
 
         // Alpha test, != 0.
-        m_alphaTest->SetAlphaFunction(D3D11_COMPARISON_NOT_EQUAL);
-        m_alphaTest->SetReferenceAlpha(0);
+        m_alphaTest->effect.SetAlphaFunction(D3D11_COMPARISON_NOT_EQUAL);
+        m_alphaTest->effect.SetReferenceAlpha(0);
         m_alphaTest->Apply(context, world * XMMatrixTranslation(col8, row6, 0), m_view, m_projection);
         context->DrawIndexed(m_indexCount, 0, 0);
     }
@@ -784,13 +784,13 @@ void Game::Render()
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // NormalMap with fog.
-    m_normalMapEffect->SetFogEnabled(true);
-    m_normalMapEffect->SetFogStart(fogstart);
-    m_normalMapEffect->SetFogEnd(fogend);
-    m_normalMapEffect->SetFogColor(gray);
+    m_normalMapEffect->effect.SetFogEnabled(true);
+    m_normalMapEffect->effect.SetFogStart(fogstart);
+    m_normalMapEffect->effect.SetFogEnd(fogend);
+    m_normalMapEffect->effect.SetFogColor(gray);
     m_normalMapEffect->Apply(context, world * XMMatrixTranslation(col9, row2, 2 - alphaFade * 6), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
-    m_normalMapEffect->SetFogEnabled(false);
+    m_normalMapEffect->effect.SetFogEnabled(false);
 
     // NormalMap with default diffuse
     m_normalMapEffectNoDiffuse->Apply(context, world * XMMatrixTranslation(col9, row4, 0), m_view, m_projection);
