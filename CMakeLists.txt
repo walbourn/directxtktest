@@ -234,7 +234,7 @@ if(NOT MINGW)
   target_precompile_headers(dgsltest PRIVATE DGSLTest/pch.h)
 endif()
 add_test(NAME "dgslShaders" COMMAND dgsltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/DGSLTest)
-set_tests_properties(dgslShaders PROPERTIES LABELS "Graphics;HLSL")
+set_tests_properties(dgslShaders PROPERTIES LABELS "Graphics;HLSL;Models")
 set_tests_properties(dgslShaders PROPERTIES TIMEOUT 40)
 
 # HDR
