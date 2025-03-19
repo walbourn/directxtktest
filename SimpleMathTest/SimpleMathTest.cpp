@@ -4156,6 +4156,21 @@ int TestM()
         }
     }
 
+    b = +a;
+    if ( b != a )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    b = -a;
+    if ( b != Matrix( -a._11, -a._12, -a._13, -a._14, -a._21, -a._22, -a._23, -a._24, -a._31, -a._32, -a._33, -a._34, -a._41, -a._42, -a._43, -a._44 ) )
+    {
+        printf("ERROR: - (unary)\n");
+        success = false;
+    }
+
+    b = a;
     b += Matrix(4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1);
     VerifyEqual(b, Matrix(5, 5, 5, 5, 9, 9, 9, 9, 13, 13, 13, 13, 17, 17, 17, 17));
 
@@ -4931,6 +4946,21 @@ int TestQ()
         }
     }
 
+    c = +b;
+    if ( c != b )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    c = -b;
+    if ( c != Vector4( -b.x, -b.y, -b.z, -b.w ) )
+    {
+        printf("ERROR: - (unary)\n");
+        success = false;
+    }
+
+    c = b;
     c += a;
     VerifyEqual(c, Quaternion(6, 8, 10, 12));
 
@@ -5304,6 +5334,21 @@ int TestC()
         }
     }
 
+    c = +b;
+    if ( c != b )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    c = -b;
+    if ( c != Vector4( -b.x, -b.y, -b.z, -b.w ) )
+    {
+        printf("ERROR: - (unary)\n");
+        success = false;
+    }
+
+    c = b;
     c += a;
     VerifyEqual(c, Color(5, 7, 9, 8));
 
