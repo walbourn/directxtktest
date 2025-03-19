@@ -18,6 +18,9 @@
 
 #ifdef USING_GAMEINPUT
 #include <GameInput.h>
+#if defined(GAMEINPUT_API_VERSION) && (GAMEINPUT_API_VERSION == 1)
+using namespace GameInput::v1;
+#endif
 #elif defined(USING_WINDOWS_GAMING_INPUT)
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -251,6 +254,9 @@ void Game::Update(DX::StepTimer const&)
                         }
                         else
                         {
+                        #if defined(GAMEINPUT_API_VERSION) && (GAMEINPUT_API_VERSION == 1)
+                            // TODO - test out a different method
+                        #else
                             GameInputBatteryState battery;
                             idevice->GetBatteryState(&battery);
                             switch (battery.status)
@@ -261,6 +267,7 @@ void Game::Update(DX::StepTimer const&)
                             case GameInputBatteryIdle:          OutputDebugStringA("             Battery idle\n"); break;
                             case GameInputBatteryCharging:      OutputDebugStringA("             Battery charging\n"); break;
                             }
+                        #endif
                         }
                     }
 #elif defined(USING_WINDOWS_GAMING_INPUT)
