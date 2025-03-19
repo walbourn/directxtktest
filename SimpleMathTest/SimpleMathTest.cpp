@@ -5119,6 +5119,9 @@ int TestQ()
         Quaternion::FromToRotation(Vector3::Right, Vector3::Left, q);
         VerifyNearEqual(q, Quaternion::CreateFromAxisAngle(Vector3::Backward, XM_PI));
 
+        q.Quaternion::FromToRotation(Vector3::Right, Vector3::Left);
+        VerifyNearEqual(q, Quaternion::CreateFromAxisAngle(Vector3::Backward, XM_PI));
+
         Quaternion::FromToRotation(Vector3::Forward, Vector3::Up, q);
         VerifyNearEqual(q, qrotx);
 
