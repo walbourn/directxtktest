@@ -958,6 +958,20 @@ int TestV2()
         success = false;
     }
 
+    v = +v1;
+    if ( v != v1 )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    v = -v1;
+    if ( v != Vector2( -v1.x, -v1.y ) )
+    {
+        printf("ERROR: - (unary)\n");
+        success = false;
+    }
+
     {
         XMFLOAT2 xm(6.f, -2.f);
         Vector2 vi(xm);
@@ -1977,6 +1991,20 @@ int TestV3()
         success = false;
     }
 
+    v = +v1;
+    if ( v != v1 )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    v = -v1;
+    if ( v != Vector3( -v1.x, -v1.y, -v1.z ) )
+    {
+        printf("ERROR: - (unary)\n");
+        success = false;
+    }
+
     {
         auto vc = Vector3(Colors::CornflowerBlue);
 
@@ -2967,6 +2995,20 @@ int TestV4()
     if ( v != v1 )
     {
         printf("ERROR: =\n");
+        success = false;
+    }
+
+    v = +v1;
+    if ( v != v1 )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    v = -v1;
+    if ( v != Vector4( -v1.x, -v1.y, -v1.z, -v1.w ) )
+    {
+        printf("ERROR: - (unary)\n");
         success = false;
     }
 
