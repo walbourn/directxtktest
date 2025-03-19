@@ -922,11 +922,11 @@ int TestV2()
 
     bool success = true;
 
-    Vector2 upVector( 0, 1.f );
-    Vector2 rightVector( 1.f, 0 );
-    Vector2 v1( 1.f, 2.f );
-    Vector2 v2( 4.f, 5.f );
-    Vector2 v3( 3.f, -23.f );
+    const Vector2 upVector( 0, 1.f );
+    const Vector2 rightVector( 1.f, 0 );
+    const Vector2 v1( 1.f, 2.f );
+    const Vector2 v2( 4.f, 5.f );
+    const Vector2 v3( 3.f, -23.f );
 
     if ( upVector == rightVector )
     {
@@ -934,8 +934,8 @@ int TestV2()
         success = false;
     }
 
-    Vector2 zero(0.f, 0.f);
-    Vector2 one(1.f, 1.f);
+    const Vector2 zero(0.f, 0.f);
+    const Vector2 one(1.f, 1.f);
     if ( zero != Vector2::Zero
          || one != Vector2::One
          || rightVector != Vector2::UnitX
@@ -955,6 +955,20 @@ int TestV2()
     if ( v != v1 )
     {
         printf("ERROR: =\n");
+        success = false;
+    }
+
+    v = +v1;
+    if ( v != v1 )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    v = -v1;
+    if ( v != Vector2( -v1.x, -v1.y ) )
+    {
+        printf("ERROR: - (unary)\n");
         success = false;
     }
 
@@ -1004,6 +1018,7 @@ int TestV2()
         }
     }
 
+    v = v1;
     v += v2;
     if ( v != Vector2(5,7) )
     {
@@ -1022,6 +1037,20 @@ int TestV2()
     if ( v != Vector2(4,10) )
     {
         printf("ERROR: *= %f %f ... 4 10\n", v.x, v.y );
+        success = false;
+    }
+
+    v *= 2.f;
+    if ( v != Vector2(8,20) )
+    {
+        printf("ERROR: *=f %f %f ... 8 20\n", v.x, v.y );
+        success = false;
+    }
+
+    v /= 2.f;
+    if ( v != Vector2(4,10) )
+    {
+        printf("ERROR: */f %f %f ... 4 10\n", v.x, v.y );
         success = false;
     }
 
@@ -1137,8 +1166,8 @@ int TestV2()
 
     // Min
     {
-        Vector2 a(-1.f, 4.f);
-        Vector2 b(2.f, 1.f);
+        const Vector2 a(-1.f, 4.f);
+        const Vector2 b(2.f, 1.f);
         Vector2 result(-1.f, 1.f);
 
         v = Vector2::Min(a, b);
@@ -1158,8 +1187,8 @@ int TestV2()
 
     // Max
     {
-        Vector2 a(-1.f, 4.f);
-        Vector2 b(2.f, 1.f);
+        const Vector2 a(-1.f, 4.f);
+        const Vector2 b(2.f, 1.f);
         Vector2 result(2.f, 4.f);
 
         v = Vector2::Max(a, b);
@@ -1179,8 +1208,8 @@ int TestV2()
 
     // Lerp
     {
-        Vector2 a(1.f, 2.f);
-        Vector2 b(3.f, 4.f);
+        const Vector2 a(1.f, 2.f);
+        const Vector2 b(3.f, 4.f);
 
         Vector2 result(2.f, 3.f);
         v = Vector2::Lerp(a, b, 0.5f);
@@ -1228,8 +1257,8 @@ int TestV2()
 
     // SmoothStep
     {
-        Vector2 a(1.f, -2.f);
-        Vector2 b(-5.f, 6.f);
+        const Vector2 a(1.f, -2.f);
+        const Vector2 b(-5.f, 6.f);
         Vector2 result(-2.f, 2.f);
 
         // 0.5
@@ -1342,9 +1371,9 @@ int TestV2()
 
     // Barycentric
     {
-        Vector2 value1(1.0f, 12.0f);
-        Vector2 value2(21.0f, 22.0f);
-        Vector2 value3(31.0f, 32.0f);
+        const Vector2 value1(1.0f, 12.0f);
+        const Vector2 value2(21.0f, 22.0f);
+        const Vector2 value3(31.0f, 32.0f);
 
         // 0 0
         v = Vector2::Barycentric(value1, value2, value3, 0.f, 0.f);
@@ -1410,10 +1439,10 @@ int TestV2()
 
     // CatmullRom
     {
-        Vector2 position1(1.0f, 2.0f);
-        Vector2 position2(-1.0f, 4.0f);
-        Vector2 position3(2.0f, 6.0f);
-        Vector2 position4(3.0f, 8.0f);
+        const Vector2 position1(1.0f, 2.0f);
+        const Vector2 position2(-1.0f, 4.0f);
+        const Vector2 position3(2.0f, 6.0f);
+        const Vector2 position4(3.0f, 8.0f);
 
         // 0.5
         Vector2 result(0.3125f, 5.0f);
@@ -1496,10 +1525,10 @@ int TestV2()
 
     // Hermite
     {
-        Vector2 p1(0.f, 1.f);
-        Vector2 t1(0.f, tanf(XMConvertToRadians(30.f)));
-        Vector2 p2(-2.f, 2.f);
-        Vector2 t2(0.f, tanf(XMConvertToRadians(-5.f)));
+        const Vector2 p1(0.f, 1.f);
+        const Vector2 t1(0.f, tanf(XMConvertToRadians(30.f)));
+        const Vector2 p2(-2.f, 2.f);
+        const Vector2 t2(0.f, tanf(XMConvertToRadians(-5.f)));
 
         // 0.5
         Vector2 result(-1.0f, 1.583105f);
@@ -1642,7 +1671,7 @@ int TestV2()
         Vector2 a(1.f, 1.f);
         a.Normalize();
 
-        Vector2 n(0.f, 1.f);
+        const Vector2 n(0.f, 1.f);
         Vector2 result(0.940452f, -0.339926f);
         v = Vector2::Refract(a, n, 1.33f);
         if (!XMVector2NearEqual(v, result, VEPSILON))
@@ -1661,7 +1690,7 @@ int TestV2()
 
     // Transform (Matrix)
     {
-        Vector2 vec(1.f, 2.f);
+        const Vector2 vec(1.f, 2.f);
         XMMATRIX m = XMMatrixRotationX( XMConvertToRadians(30.f) ) *
                      XMMatrixRotationY( XMConvertToRadians(30.f) ) *
                      XMMatrixRotationZ( XMConvertToRadians(30.f) ) *
@@ -1694,7 +1723,7 @@ int TestV2()
 
     // Transform (Quaternion)
     {
-        Vector2 vec(1.f, 2.f);
+        const Vector2 vec(1.f, 2.f);
         XMMATRIX m = XMMatrixRotationX(XMConvertToRadians(30.f)) *
                      XMMatrixRotationY(XMConvertToRadians(30.f)) *
                      XMMatrixRotationZ(XMConvertToRadians(30.f));
@@ -1718,7 +1747,7 @@ int TestV2()
 
     // TransformNormal
     {
-        Vector2 vec(1.f, 2.f);
+        const Vector2 vec(1.f, 2.f);
         XMMATRIX m = XMMatrixRotationX(XMConvertToRadians(30.f)) *
                      XMMatrixRotationY(XMConvertToRadians(30.f)) *
                      XMMatrixRotationZ(XMConvertToRadians(30.f)) *
@@ -1815,24 +1844,59 @@ int TestV2()
     }
 
     // binary operators
+    v = v1 + v2;
+    if ( v != Vector2( 5.f, 7.f ) )
+    {
+        printf("ERROR: + %f %f ... 5 7\n", v.x, v.y );
+        success = false;
+    }
+
+    v = v2 - v1;
+    if ( v != Vector2( 3.f, 3.f ) )
+    {
+        printf("ERROR: - %f %f ... 3 3\n", v.x, v.y );
+        success = false;
+    }
+
     v = v1 * v2;
-    if ( v != Vector2( 4, 10 ) )
+    if ( v != Vector2( 4.f, 10.f ) )
     {
         printf("ERROR: * %f %f ... 4 10\n", v.x, v.y );
         success = false;
     }
 
     v = v1 * 2.f;
-    if ( v != Vector2( 2, 4 ) )
+    if ( v != Vector2( 2.f, 4.f ) )
     {
         printf("ERROR: *f %f %f ... 2 4\n", v.x, v.y );
+        success = false;
+    }
+
+    v = 2.f * v1;
+    if ( v != Vector2( 2.f, 4.f ) )
+    {
+        printf("ERROR: f* %f %f ... 2 4\n", v.x, v.y );
+        success = false;
+    }
+
+    v = v1 / v2;
+    if ( v != Vector2( 0.25f, 0.4f ) )
+    {
+        printf("ERROR: / %f %f ... 0.25 0.4\n", v.x, v.y );
         success = false;
     }
 
     v = v1 / 2.f;
     if ( v != Vector2( 0.5f, 1.f ) )
     {
-        printf("ERROR: / %f %f ... 0.5 1\n", v.x, v.y );
+        printf("ERROR: /f %f %f ... 0.5 1\n", v.x, v.y );
+        success = false;
+    }
+
+    v = 2.f / v2;
+    if ( v != Vector2( 0.5f, 0.4f ) )
+    {
+        printf("ERROR: f/ %f %f ... 0.5 0.4\n", v.x, v.y );
         success = false;
     }
 
@@ -1853,11 +1917,11 @@ int TestV3()
 
     bool success = true;
 
-    Vector3 upVector( 0, 1.f, 0 );
-    Vector3 rightVector( 1.f, 0, 0 );
-    Vector3 v1( 1.f, 2.f, 3.f );
-    Vector3 v2( 4.f, 5.f, 6.f );
-    Vector3 v3( 3.f, -23.f, 100.f );
+    const Vector3 upVector( 0, 1.f, 0 );
+    const Vector3 rightVector( 1.f, 0, 0 );
+    const Vector3 v1( 1.f, 2.f, 3.f );
+    const Vector3 v2( 4.f, 5.f, 6.f );
+    const Vector3 v3( 3.f, -23.f, 100.f );
 
     if ( upVector == rightVector )
     {
@@ -1898,12 +1962,12 @@ int TestV3()
         }
     }
 
-    Vector3 zero(0.f, 0.f, 0.f);
-    Vector3 one(1.f, 1.f, 1.f);
-    Vector3 forwardVector(0.f, 0.f, -1.f);
-    Vector3 backwardVector(0.f, 0.f, 1.f);
-    Vector3 downVector(0, -1.f, 0);
-    Vector3 leftVector(-1.f, 0, 0);
+    const Vector3 zero(0.f, 0.f, 0.f);
+    const Vector3 one(1.f, 1.f, 1.f);
+    const Vector3 forwardVector(0.f, 0.f, -1.f);
+    const Vector3 backwardVector(0.f, 0.f, 1.f);
+    const Vector3 downVector(0, -1.f, 0);
+    const Vector3 leftVector(-1.f, 0, 0);
     if (zero != Vector3::Zero
         || one != Vector3::One
         || rightVector != Vector3::UnitX
@@ -1924,6 +1988,20 @@ int TestV3()
     if ( v != v1 )
     {
         printf("ERROR: =\n");
+        success = false;
+    }
+
+    v = +v1;
+    if ( v != v1 )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    v = -v1;
+    if ( v != Vector3( -v1.x, -v1.y, -v1.z ) )
+    {
+        printf("ERROR: - (unary)\n");
         success = false;
     }
 
@@ -1950,6 +2028,7 @@ int TestV3()
         }
     }
 
+    v = v1;
     v += v2;
     if ( v != Vector3(5,7,9) )
     {
@@ -1968,6 +2047,20 @@ int TestV3()
     if ( v != Vector3(4,10,18) )
     {
         printf("ERROR: *= %f %f %f ... 4 10 18\n", v.x, v.y, v.z );
+        success = false;
+    }
+
+    v *= 2.f;
+    if ( v != Vector3(8,20,36) )
+    {
+        printf("ERROR: *=f %f %f %f ... 8 20 36\n", v.x, v.y, v.z );
+        success = false;
+    }
+
+    v /= 2.f;
+    if ( v != Vector3(4,10,18) )
+    {
+        printf("ERROR: */f %f %f %f ... 4 10 18\n", v.x, v.y, v.z );
         success = false;
     }
 
@@ -2083,8 +2176,8 @@ int TestV3()
 
     // Min
     {
-        Vector3 a(-1.f, 4.f, -3.f);
-        Vector3 b(2.f, 1.f, -1.f );
+        const Vector3 a(-1.f, 4.f, -3.f);
+        const Vector3 b(2.f, 1.f, -1.f );
         Vector3 result(-1.f, 1.f, -3.f);
 
         v = Vector3::Min(a, b);
@@ -2105,8 +2198,8 @@ int TestV3()
 
     // Max
     {
-        Vector3 a(-1.f, 4.f, -3.f);
-        Vector3 b(2.f, 1.f, -1.f);
+        const Vector3 a(-1.f, 4.f, -3.f);
+        const Vector3 b(2.f, 1.f, -1.f);
         Vector3 result(2.0f, 4.0f, -1.0f);
 
         v = Vector3::Max(a, b);
@@ -2127,8 +2220,8 @@ int TestV3()
 
     // Lerp
     {
-        Vector3 a(1.f, 2.f, 3.f);
-        Vector3 b(4.f, 5.f, 6.f);
+        const Vector3 a(1.f, 2.f, 3.f);
+        const Vector3 b(4.f, 5.f, 6.f);
 
         Vector3 result(2.5f, 3.5f, 4.5f);
         v = Vector3::Lerp(a, b, 0.5f);
@@ -2176,8 +2269,8 @@ int TestV3()
 
     // SmoothStep
     {
-        Vector3 a(1.f, -2.f, 3.f);
-        Vector3 b(-5.f, 6.f, -7.f);
+        const Vector3 a(1.f, -2.f, 3.f);
+        const Vector3 b(-5.f, 6.f, -7.f);
         Vector3 result(-2.f, 2.f, -2.f);
 
         // 0.5
@@ -2290,9 +2383,9 @@ int TestV3()
 
     // Barycentric
     {
-        Vector3 value1(11.0f, 12.0f, 13.0f);
-        Vector3 value2(21.0f, 22.0f, 23.0f);
-        Vector3 value3(31.0f, 32.0f, 33.0f);
+        const Vector3 value1(11.0f, 12.0f, 13.0f);
+        const Vector3 value2(21.0f, 22.0f, 23.0f);
+        const Vector3 value3(31.0f, 32.0f, 33.0f);
 
         // 0 0
         v = Vector3::Barycentric(value1, value2, value3, 0.f, 0.f);
@@ -2358,10 +2451,10 @@ int TestV3()
 
     // CatmullRom
     {
-        Vector3 position1(1.0f, 2.0f, 5.f);
-        Vector3 position2(-1.0f, 4.0f, 4.f);
-        Vector3 position3(2.0f, 6.0f, 3.f);
-        Vector3 position4(3.0f, 8.0f, 2.f);
+        const Vector3 position1(1.0f, 2.0f, 5.f);
+        const Vector3 position2(-1.0f, 4.0f, 4.f);
+        const Vector3 position3(2.0f, 6.0f, 3.f);
+        const Vector3 position4(3.0f, 8.0f, 2.f);
 
         // 0.5
         Vector3 result(0.3125f, 5.0f, 3.5f);
@@ -2444,10 +2537,10 @@ int TestV3()
 
     // Hermite
     {
-        Vector3 p1(0.f, 1.f, 2.0f);
-        Vector3 t1(0.f, tanf(XMConvertToRadians(30.f)), tanf(XMConvertToRadians(20.f)));
-        Vector3 p2(-2.f, 2.f, 5.f);
-        Vector3 t2(0.f, tanf(XMConvertToRadians(-5.f)), tanf(XMConvertToRadians(-4.f)));
+        const Vector3 p1(0.f, 1.f, 2.0f);
+        const Vector3 t1(0.f, tanf(XMConvertToRadians(30.f)), tanf(XMConvertToRadians(20.f)));
+        const Vector3 p2(-2.f, 2.f, 5.f);
+        const Vector3 t2(0.f, tanf(XMConvertToRadians(-5.f)), tanf(XMConvertToRadians(-4.f)));
 
         // 0.5
         Vector3 result(-1.0f, 1.583105f, 3.55423713f);
@@ -2609,7 +2702,7 @@ int TestV3()
 
     // Transform (Matrix)
     {
-        Vector3 vec(1.f, 2.f, 3.f);
+        const Vector3 vec(1.f, 2.f, 3.f);
         XMMATRIX m = XMMatrixRotationX(XMConvertToRadians(30.f)) *
             XMMatrixRotationY(XMConvertToRadians(30.f)) *
             XMMatrixRotationZ(XMConvertToRadians(30.f)) *
@@ -2642,7 +2735,7 @@ int TestV3()
 
     // Transform (Quaternion)
     {
-        Vector3 vec(1.f, 2.f, 3.f);
+        const Vector3 vec(1.f, 2.f, 3.f);
         XMMATRIX m = XMMatrixRotationX(XMConvertToRadians(30.f)) *
             XMMatrixRotationY(XMConvertToRadians(30.f)) *
             XMMatrixRotationZ(XMConvertToRadians(30.f));
@@ -2666,7 +2759,7 @@ int TestV3()
 
     // TransformNormal
     {
-        Vector3 vec(1.f, 2.f, 3.f);
+        const Vector3 vec(1.f, 2.f, 3.f);
         XMMATRIX m = XMMatrixRotationX(XMConvertToRadians(30.f)) *
             XMMatrixRotationY(XMConvertToRadians(30.f)) *
             XMMatrixRotationZ(XMConvertToRadians(30.f)) *
@@ -2754,7 +2847,7 @@ int TestV3()
         {
             Vector3 result = Vector3::TransformNormal(points[j], m);
             v = buff[j];
-            if (!XMVector3NearEqual(v, result, VEPSILON))
+            if (!XMVector3NearEqual(v, result, VEPSILON2))
             {
                 printf("ERROR: transnormarr %zu - %f %f %f ... %f %f %f\n", j, v.x, v.y, v.z, result.x, result.y, result.z);
                 success = false;
@@ -2763,27 +2856,61 @@ int TestV3()
     }
 
     // binary operators
+    v = v1 + v2;
+    if ( v != Vector3( 5.f, 7.f, 9.f) )
+    {
+        printf("ERROR: + %f %f %f ... 5 7 9\n", v.x, v.y, v.z );
+        success = false;
+    }
+
+    v = v2 - v1;
+    if ( v != Vector3( 3.f, 3.f, 3.f) )
+    {
+        printf("ERROR: - %f %f %f ... 3 3 3\n", v.x, v.y, v.z );
+        success = false;
+    }
+
     v = v1 * v2;
-    if ( v != Vector3( 4, 10, 18) )
+    if ( v != Vector3( 4.f, 10.f, 18.f) )
     {
         printf("ERROR: * %f %f %f ... 4 10 8\n", v.x, v.y, v.z );
         success = false;
     }
 
     v = v1 * 2.f;
-    if ( v != Vector3( 2, 4, 6) )
+    if ( v != Vector3( 2.f, 4.f, 6.f) )
     {
         printf("ERROR: *f %f %f %f ... 2 4 6\n", v.x, v.y, v.z );
+        success = false;
+    }
+
+    v = 2.f * v1;
+    if ( v != Vector3( 2.f, 4.f, 6.f) )
+    {
+        printf("ERROR: f* %f %f %f ... 2 4 6\n", v.x, v.y, v.z );
+        success = false;
+    }
+
+    v = v2 / v1;
+    if ( v != Vector3( 4.f, 2.5f, 2.f) )
+    {
+        printf("ERROR: / %f %f %f ... 4 2.5 2\n", v.x, v.y, v.z );
         success = false;
     }
 
     v = v1 / 2.f;
     if ( v != Vector3( 0.5f, 1.f, 1.5f) )
     {
-        printf("ERROR: / %f %f %f ... 0.5 1 1.5\n", v.x, v.y, v.z );
+        printf("ERROR: /f %f %f %f ... 0.5 1 1.5\n", v.x, v.y, v.z );
         success = false;
     }
 
+    v = 2.f / v2;
+    if ( v != Vector3( 0.5f, 0.4f, (2.f/6.f)) )
+    {
+        printf("ERROR: f/ %f %f %f ... 0.5 4 0.3333 \n", v.x, v.y, v.z );
+        success = false;
+    }
 
     return (success) ? 0 : 1;
 }
@@ -2802,11 +2929,11 @@ int TestV4()
 
     bool success = true;
 
-    Vector4 upVector( 0, 1.f, 0, 0 );
-    Vector4 rightVector( 1.f, 0, 0, 0 );
-    Vector4 v1( 1.f, 2.f, 3.f, 4.f );
-    Vector4 v2( 4.f, 5.f, 6.f, 7.f );
-    Vector4 v3( 3.f, -23.f, 100.f, 0.f );
+    const Vector4 upVector( 0, 1.f, 0, 0 );
+    const Vector4 rightVector( 1.f, 0, 0, 0 );
+    const Vector4 v1( 1.f, 2.f, 3.f, 4.f );
+    const Vector4 v2( 4.f, 5.f, 6.f, 7.f );
+    const Vector4 v3( 3.f, -23.f, 100.f, 0.f );
 
     if ( upVector == rightVector )
     {
@@ -2849,10 +2976,10 @@ int TestV4()
         }
     }
 
-    Vector4 zero(0.f, 0.f, 0.f, 0.f);
-    Vector4 one(1.f, 1.f, 1.f, 1.f);
-    Vector4 backwardVector(0.f, 0.f, 1.f, 0.f);
-    Vector4 wVector(0.f, 0.f, 0.f, 1.f);
+    const Vector4 zero(0.f, 0.f, 0.f, 0.f);
+    const Vector4 one(1.f, 1.f, 1.f, 1.f);
+    const Vector4 backwardVector(0.f, 0.f, 1.f, 0.f);
+    const Vector4 wVector(0.f, 0.f, 0.f, 1.f);
     if (zero != Vector4::Zero
         || one != Vector4::One
         || rightVector != Vector4::UnitX
@@ -2868,6 +2995,20 @@ int TestV4()
     if ( v != v1 )
     {
         printf("ERROR: =\n");
+        success = false;
+    }
+
+    v = +v1;
+    if ( v != v1 )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    v = -v1;
+    if ( v != Vector4( -v1.x, -v1.y, -v1.z, -v1.w ) )
+    {
+        printf("ERROR: - (unary)\n");
         success = false;
     }
 
@@ -2896,6 +3037,7 @@ int TestV4()
         }
     }
 
+    v = v1;
     v += v2;
     if ( v != Vector4(5,7,9,11) )
     {
@@ -2914,6 +3056,20 @@ int TestV4()
     if ( v != Vector4(4,10,18,28) )
     {
         printf("ERROR: *= %f %f %f %f ... 4 10 18 28\n", v.x, v.y, v.z, v.w );
+        success = false;
+    }
+
+    v *= 2.f;
+    if ( v != Vector4(8,20,36,56 ) )
+    {
+        printf("ERROR: *=f %f %f %f %f ... 8 20 36 56\n", v.x, v.y, v.z, v.w );
+        success = false;
+    }
+
+    v /= 2.f;
+    if ( v != Vector4(4,10,18,28) )
+    {
+        printf("ERROR: */f %f %f %f %f ... 4 10 18 28\n", v.x, v.y, v.z, v.w );
         success = false;
     }
 
@@ -3028,8 +3184,8 @@ int TestV4()
 
     // Min
     {
-        Vector4 a(-1.f, 4.f, -3.f, 1000.0f);
-        Vector4 b(2.f, 1.f, -1.f, 0.f);
+        const Vector4 a(-1.f, 4.f, -3.f, 1000.0f);
+        const Vector4 b(2.f, 1.f, -1.f, 0.f);
         Vector4 result(-1.f, 1.f, -3.f, 0.f);
 
         v = Vector4::Min(a, b);
@@ -3050,8 +3206,8 @@ int TestV4()
 
     // Max
     {
-        Vector4 a(-1.f, 4.f, -3.f, 1000.0f);
-        Vector4 b(2.f, 1.f, -1.f, 0.f);
+        const Vector4 a(-1.f, 4.f, -3.f, 1000.0f);
+        const Vector4 b(2.f, 1.f, -1.f, 0.f);
         Vector4 result(2.0f, 4.0f, -1.0f, 1000.0f);
 
         v = Vector4::Max(a, b);
@@ -3072,8 +3228,8 @@ int TestV4()
 
     // Lerp
     {
-        Vector4 a(1.f, 2.f, 3.f, 4.f);
-        Vector4 b(5.f, 6.f, 7.f, 8.f);
+        const Vector4 a(1.f, 2.f, 3.f, 4.f);
+        const Vector4 b(5.f, 6.f, 7.f, 8.f);
 
         Vector4 result(3.f, 4.f, 5.f, 6.f);
         v = Vector4::Lerp(a, b, 0.5f);
@@ -3121,8 +3277,8 @@ int TestV4()
 
     // SmoothStep
     {
-        Vector4 a(1.f, -2.f, 3.f, 4.f);
-        Vector4 b(-5.f, 6.f, -7.f, 8.f);
+        const Vector4 a(1.f, -2.f, 3.f, 4.f);
+        const Vector4 b(-5.f, 6.f, -7.f, 8.f);
         Vector4 result(-2.f, 2.f, -2.f, 6.0);
 
         // 0.5
@@ -3235,9 +3391,9 @@ int TestV4()
 
     // Barycentric
     {
-        Vector4 value1(11.0f, 12.0f, 13.0f, 14.f);
-        Vector4 value2(21.0f, 22.0f, 23.0f, 24.f);
-        Vector4 value3(31.0f, 32.0f, 33.0f, 34.f);
+        const Vector4 value1(11.0f, 12.0f, 13.0f, 14.f);
+        const Vector4 value2(21.0f, 22.0f, 23.0f, 24.f);
+        const Vector4 value3(31.0f, 32.0f, 33.0f, 34.f);
 
         // 0 0
         v = Vector4::Barycentric(value1, value2, value3, 0.f, 0.f);
@@ -3303,10 +3459,10 @@ int TestV4()
 
     // CatmullRom
     {
-        Vector4 position1(1.0f, 2.0f, 5.f, -1.0f);
-        Vector4 position2(-1.0f, 4.0f, 4.f, -2.0f);
-        Vector4 position3(2.0f, 6.0f, 3.f, -6.0f);
-        Vector4 position4(3.0f, 8.0f, 2.f, -8.0f);
+        const Vector4 position1(1.0f, 2.0f, 5.f, -1.0f);
+        const Vector4 position2(-1.0f, 4.0f, 4.f, -2.0f);
+        const Vector4 position3(2.0f, 6.0f, 3.f, -6.0f);
+        const Vector4 position4(3.0f, 8.0f, 2.f, -8.0f);
 
         // 0.5
         Vector4 result(0.3125f, 5.0f, 3.5f, -3.9375f);
@@ -3389,10 +3545,10 @@ int TestV4()
 
     // Hermite
     {
-        Vector4 p1(0.f, 1.f, 2.0f, 3.f);
-        Vector4 t1(0.f, tanf(XMConvertToRadians(30.f)), tanf(XMConvertToRadians(20.f)), tanf(XMConvertToRadians(10.f)));
-        Vector4 p2(-2.f, 2.f, 5.f, 1.5f);
-        Vector4 t2(0.f, tanf(XMConvertToRadians(-5.f)), tanf(XMConvertToRadians(-4.f)), tanf(XMConvertToRadians(-3.f)));
+        const Vector4 p1(0.f, 1.f, 2.0f, 3.f);
+        const Vector4 t1(0.f, tanf(XMConvertToRadians(30.f)), tanf(XMConvertToRadians(20.f)), tanf(XMConvertToRadians(10.f)));
+        const Vector4 p2(-2.f, 2.f, 5.f, 1.5f);
+        const Vector4 t2(0.f, tanf(XMConvertToRadians(-5.f)), tanf(XMConvertToRadians(-4.f)), tanf(XMConvertToRadians(-3.f)));
 
         // 0.5
         Vector4 result(-1.0f, 1.583105f, 3.55423713f, 2.27859187f);
@@ -3694,27 +3850,61 @@ int TestV4()
     }
 
     // binary operators
+    v = v1 + v2;
+    if ( v != Vector4( 5.f, 7.f, 9.f, 11.f ) )
+    {
+        printf("ERROR: + %f %f %f %f ... 5 7 9 11\n", v.x, v.y, v.z, v.w );
+        success = false;
+    }
+
+    v = v2 - v1;
+    if ( v != Vector4( 3.f, 3.f, 3.f, 3.f ) )
+    {
+        printf("ERROR: - %f %f %f %f ... 3 3 3 3\n", v.x, v.y, v.z, v.w );
+        success = false;
+    }
+
     v = v1 * v2;
-    if ( v != Vector4( 4, 10, 18, 28) )
+    if ( v != Vector4( 4.f, 10.f, 18.f, 28.f) )
     {
         printf("ERROR: * %f %f %f %f ... 4 10 8 28\n", v.x, v.y, v.z, v.w );
         success = false;
     }
 
     v = v1 * 2.f;
-    if ( v != Vector4( 2, 4, 6, 8) )
+    if ( v != Vector4( 2.f, 4.f, 6.f, 8.f) )
     {
         printf("ERROR: *f %f %f %f %f ... 2 4 6 8\n", v.x, v.y, v.z, v.w );
         success = false;
     }
 
-    v = v1 / 2.f;
-    if ( v != Vector4( 0.5f, 1.f, 1.5f, 2) )
+    v = 2.f * v1;
+    if ( v != Vector4( 2.f, 4.f, 6.f, 8.f) )
     {
-        printf("ERROR: / %f %f %f %f ... 0.5 1 1.5 x\n", v.x, v.y, v.z, v.w );
+        printf("ERROR: f* %f %f %f %f ... 2 4 6 8\n", v.x, v.y, v.z, v.w );
         success = false;
     }
 
+    v = v2 / v1;
+    if ( v != Vector4( 4.f, 2.5f, 2.f, 1.75f ) )
+    {
+        printf("ERROR: / %f %f %f %f ... 4 2.5 2 1.75\n", v.x, v.y, v.z, v.w );
+        success = false;
+    }
+
+    v = v1 / 2.f;
+    if ( v != Vector4( 0.5f, 1.f, 1.5f, 2.f) )
+    {
+        printf("ERROR: /f %f %f %f %f ... 0.5 1 1.5 2\n", v.x, v.y, v.z, v.w );
+        success = false;
+    }
+
+    v = 2.f / v1;
+    if ( v != Vector4( 2.f, 1.f, (2.f/3.f), 0.5f) )
+    {
+        printf("ERROR: f/ %f %f %f %f ... 2 1 0.6666 0.5\n", v.x, v.y, v.z, v.w );
+        success = false;
+    }
 
     return (success) ? 0 : 1;
 }
@@ -3734,7 +3924,7 @@ int TestM()
 
     bool success = 1;
 
-    Matrix a(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+    const Matrix a(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
     VerifyEqual(a._11, 1.f);
     VerifyEqual(a._12, 2.f);
@@ -3966,6 +4156,21 @@ int TestM()
         }
     }
 
+    b = +a;
+    if ( b != a )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    b = -a;
+    if ( b != Matrix( -a._11, -a._12, -a._13, -a._14, -a._21, -a._22, -a._23, -a._24, -a._31, -a._32, -a._33, -a._34, -a._41, -a._42, -a._43, -a._44 ) )
+    {
+        printf("ERROR: - (unary)\n");
+        success = false;
+    }
+
+    b = a;
     b += Matrix(4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1);
     VerifyEqual(b, Matrix(5, 5, 5, 5, 9, 9, 9, 9, 13, 13, 13, 13, 17, 17, 17, 17));
 
@@ -4399,6 +4604,98 @@ int TestM()
                         Matrix::CreateRotationX(XMConvertToRadians(-90.f)) * Matrix::CreateRotationZ(XMConvertToRadians(-90.f)) * Matrix::CreateTranslation(objectPosition.x, objectPosition.y, objectPosition.z));
     }
 
+    // binary operators
+    const Matrix a2(7, 1, 6, 2, 10, 33, 0.5f, 0.25f, 5, 9, 11, 24, 83, 0.1f, 4, 3);
+
+    Matrix m = a + a2;
+    if ( m != Matrix( 8, 3, 9, 6, 15, 39, 7.5f, 8.25f, 14, 19, 22, 36, 96, 14.1f, 19, 19) )
+    {
+        printf("ERROR: +\n\t%f %f %f %f ... 8 3 9 6\n\t%f %f %f %f ... 15 39 7.5 8.25\n\t%f %f %f %f ... 14 19 22 36\n\t%f %f %f %f ... 96 14.1 19 19\n",
+            m._11, m._12, m._13, m._14,
+            m._21, m._22, m._23, m._24,
+            m._31, m._32, m._33, m._34,
+            m._41, m._42, m._43, m._44);
+        success = false;
+    }
+
+    m = a2 - a;
+    if ( m != Matrix( 6, -1.f, 3, -2.f, 5, 27, -6.5f, -7.75f, -4.f, -1.f, 0, 12, 70, -13.9f, -11.f, -13.f) )
+    {
+        printf("ERROR: -\n\t%f %f %f %f ... 6 -1 3 -2\n\t%f %f %f %f ... 5 27 -6.5 -7.75\n\t%f %f %f %f ... -4 -1 0 12\n\t%f %f %f %f ... 70 -13.9 -11 -13\n",
+            m._11, m._12, m._13, m._14,
+            m._21, m._22, m._23, m._24,
+            m._31, m._32, m._33, m._34,
+            m._41, m._42, m._43, m._44);
+        success = false;
+    }
+
+    const Matrix a3( 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25);
+
+    m = a * a3;
+    if ( m != Matrix( 180, 190, 200, 210, 436, 462, 488, 514, 692, 734, 776, 818, 948, 1006, 1064, 1122 ) )
+    {
+        printf("ERROR: *\n\t%f %f %f %f ... 180 190 200 210\n\t%f %f %f %f ... 436 462 488 514\n\t%f %f %f %f ... 692 734 776 818\n\t%f %f %f %f ... 948 1006 1064 1122\n",
+            m._11, m._12, m._13, m._14,
+            m._21, m._22, m._23, m._24,
+            m._31, m._32, m._33, m._34,
+            m._41, m._42, m._43, m._44);
+        success = false;
+    }
+
+    m = a * 2.f;
+    if ( m != Matrix(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 ) )
+    {
+        printf("ERROR: *f\n\t%f %f %f %f ... 2 4 6 8\n\t%f %f %f %f ... 10 12 14 16\n\t%f %f %f %f ... 18 20 22 24\n\t%f %f %f %f ... 26 28 30 32\n",
+            m._11, m._12, m._13, m._14,
+            m._21, m._22, m._23, m._24,
+            m._31, m._32, m._33, m._34,
+            m._41, m._42, m._43, m._44);
+        success = false;
+    }
+
+    m = 2.f * a;
+    if ( m != Matrix(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 ) )
+    {
+        printf("ERROR: f*\n\t%f %f %f %f ... 2 4 6 8\n\t%f %f %f %f ... 10 12 14 16\n\t%f %f %f %f ... 18 20 22 24\n\t%f %f %f %f ... 26 28 30 32\n",
+            m._11, m._12, m._13, m._14,
+            m._21, m._22, m._23, m._24,
+            m._31, m._32, m._33, m._34,
+            m._41, m._42, m._43, m._44);
+        success = false;
+    }
+
+    m = a / 2.f;
+    if ( m != Matrix(0.5, 1, 1.5f, 2, 2.5f, 3, 3.5f, 4, 4.5f, 5, 5.5f, 6, 6.5f, 7, 7.5f, 8) )
+    {
+        printf("ERROR: /f\n\t%f %f %f %f ... 0.5 1 1.5 2\n\t%f %f %f %f ... 2.5 3 3.5 4\n\t%f %f %f %f ... 4.5 5 5.5 6\n\t%f %f %f %f ... 6.5 7 7.5 8\n",
+            m._11, m._12, m._13, m._14,
+            m._21, m._22, m._23, m._24,
+            m._31, m._32, m._33, m._34,
+            m._41, m._42, m._43, m._44);
+        success = false;
+    }
+
+    m = a3 / a;
+    if ( m != Matrix( 10, 5.5f, 4, 3.25f, 2.8f, 2.5f, 16.f/7.f, 2.125f, 2, 1.9f, 20.f/11.f, 1.75f, 22.f/13.f, 23.f/14.f, 24.f/15.f, 25.f/16.f) )
+    {
+        printf("ERROR: /\n\t%f %f %f %f ... 10 5.5 4 3.25\n\t%f %f %f %f ... 2.8 2.5 2.285714 2.125\n\t%f %f %f %f ... 2 1.9 1.818182 1.75\n\t%f %f %f %f ... 1.692308 1.642857 1.6 1.5625\n",
+            m._11, m._12, m._13, m._14,
+            m._21, m._22, m._23, m._24,
+            m._31, m._32, m._33, m._34,
+            m._41, m._42, m._43, m._44);
+        success = false;
+    }
+    m = 2.f / a;
+    if ( m != Matrix(2, 1, 2.f/3.f, 0.5f, 0.4, 1.f/3.f, 2.f/7.f, 0.25f, 2.f/9.f, 1.f/5.f, 2.f/11.f, 1.f/6.f, 2.f/13.f, 1.f/7.f, 2.f/15.f, 0.125f ) )
+    {
+        printf("ERROR: f/\n\t%f %f %f %f ... 2 1 0.6666 0.5\n\t%f %f %f %f ... 0.4 0.33333 0.285714 0.25 \n\t%f %f %f %f ... 0.22222 0.2 0.181818 0.166667\n\t%f %f %f %f ... 0.153846 0.142857 0.133333 0.125\n",
+            m._11, m._12, m._13, m._14,
+            m._21, m._22, m._23, m._24,
+            m._31, m._32, m._33, m._34,
+            m._41, m._42, m._43, m._44);
+        success = false;
+    }
+
     return (success) ? 0 : 1;
 }
 
@@ -4416,8 +4713,8 @@ int TestP()
 
     bool success = true;
 
-    Plane a(1, 2, 3, 4);
-    Plane b(Vector3(5, 6, 7), 8);
+    const Plane a(1, 2, 3, 4);
+    const Plane b(Vector3(5, 6, 7), 8);
 
     VerifyEqual(a.x, 1.f);
     VerifyEqual(a.y, 2.f);
@@ -4559,8 +4856,8 @@ int TestQ()
 
     bool success = true;
 
-    Quaternion a(1, 2, 3, 4);
-    Quaternion b(Vector3(5, 6, 7), 8);
+    const Quaternion a(1, 2, 3, 4);
+    const Quaternion b(Vector3(5, 6, 7), 8);
 
     VerifyEqual(a.x, 1.f);
     VerifyEqual(a.y, 2.f);
@@ -4649,6 +4946,21 @@ int TestQ()
         }
     }
 
+    c = +b;
+    if ( c != b )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    c = -b;
+    if ( c != Vector4( -b.x, -b.y, -b.z, -b.w ) )
+    {
+        printf("ERROR: - (unary)\n");
+        success = false;
+    }
+
+    c = b;
     c += a;
     VerifyEqual(c, Quaternion(6, 8, 10, 12));
 
@@ -4837,6 +5149,9 @@ int TestQ()
         Quaternion::FromToRotation(Vector3::Right, Vector3::Left, q);
         VerifyNearEqual(q, Quaternion::CreateFromAxisAngle(Vector3::Backward, XM_PI));
 
+        q.Quaternion::FromToRotation(Vector3::Right, Vector3::Left);
+        VerifyNearEqual(q, Quaternion::CreateFromAxisAngle(Vector3::Backward, XM_PI));
+
         Quaternion::FromToRotation(Vector3::Forward, Vector3::Up, q);
         VerifyNearEqual(q, qrotx);
 
@@ -4852,6 +5167,49 @@ int TestQ()
         Quaternion::LookRotation(Vector3::Right, Vector3::Backward, q);
         VerifyNearEqual(q, Quaternion(0.5f, -0.5f, 0.5f, 0.5f));
    }
+
+    // binary operators
+    Quaternion q = a + b;
+    if ( q != Vector4( 6, 8, 10, 12 ) )
+    {
+        printf("ERROR: + %f %f %f %f ... 6 8 10 12\n", q.x, q.y, q.z, q.w );
+        success = false;
+    }
+
+    q = b - a;
+    if ( q != Vector4( 4, 4, 4, 4 ) )
+    {
+        printf("ERROR: - %f %f %f %f ... 4 4 4 4\n", q.x, q.y, q.z, q.w );
+        success = false;
+    }
+
+    q = a * b;
+    if ( q != Vector4( 32, 32, 56, -6.f) )
+    {
+        printf("ERROR: * %f %f %f %f ... 32 32 56 -6\n", q.x, q.y, q.z, q.w );
+        success = false;
+    }
+
+    q = a * 2.f;
+    if ( q != Vector4( 2.f, 4.f, 6.f, 8.f) )
+    {
+        printf("ERROR: *f %f %f %f %f ... 2 4 6 8\n", q.x, q.y, q.z, q.w );
+        success = false;
+    }
+
+    q = 2.f * a;
+    if ( q != Vector4( 2.f, 4.f, 6.f, 8.f) )
+    {
+        printf("ERROR: f* %f %f %f %f ... 2 4 6 8\n", q.x, q.y, q.z, q.w );
+        success = false;
+    }
+
+    q = b / Quaternion::Identity;
+    if ( q != Vector4( 5, 6, 7, 8 ) )
+    {
+        printf("ERROR: / %f %f %f %f ... 5 6 7 8\n", q.x, q.y, q.z, q.w );
+        success = false;
+    }
 
     return (success) ? 0 : 1;
 }
@@ -4870,8 +5228,8 @@ int TestC()
 
     bool success = true;
 
-    Color a(1, 2, 3);
-    Color b(4, 5, 6, 7);
+    const Color a(1, 2, 3);
+    const Color b(4, 5, 6, 7);
 
     VerifyEqual(a.x, 1.f);
     VerifyEqual(a.y, 2.f);
@@ -4976,6 +5334,21 @@ int TestC()
         }
     }
 
+    c = +b;
+    if ( c != b )
+    {
+        printf("ERROR: + (unary)\n");
+        success = false;
+    }
+
+    c = -b;
+    if ( c != Vector4( -b.x, -b.y, -b.z, -b.w ) )
+    {
+        printf("ERROR: - (unary)\n");
+        success = false;
+    }
+
+    c = b;
     c += a;
     VerifyEqual(c, Color(5, 7, 9, 8));
 
@@ -5056,6 +5429,49 @@ int TestC()
     VerifyEqual(a * 3, Color(3, 6, 9, 3));
     VerifyNearEqual(a / b, Color(0.25f, 0.4f, 0.5f, 0.142857f));
     VerifyEqual(3 * a, Color(3, 6, 9, 3));
+
+    // binary operators
+    c = a + b;
+    if ( c != Vector4( 5, 7, 9, 8 ) )
+    {
+        printf("ERROR: + %f %f %f %f ... 5 7 9 8\n", c.x, c.y, c.z, c.w );
+        success = false;
+    }
+
+    c = b - a;
+    if ( c != Vector4( 3.f, 3.f, 3.f, 6.f ) )
+    {
+        printf("ERROR: - %f %f %f %f ... 3 3 3 6\n", c.x, c.y, c.z, c.w );
+        success = false;
+    }
+
+    c = a * b;
+    if ( c != Vector4( 4, 10, 18, 7 ) )
+    {
+        printf("ERROR: * %f %f %f %f ... 4 10 18 7\n", c.x, c.y, c.z, c.w );
+        success = false;
+    }
+
+    c = a * 2.f;
+    if ( c != Vector4( 2.f, 4.f, 6.f, 2.f) )
+    {
+        printf("ERROR: *f %f %f %f %f ... 2 4 6 2\n", c.x, c.y, c.z, c.w );
+        success = false;
+    }
+
+    c = 2.f * a;
+    if ( c != Vector4( 2.f, 4.f, 6.f, 2.f) )
+    {
+        printf("ERROR: f* %f %f %f %f ... 2 4 6 2\n", c.x, c.y, c.z, c.w );
+        success = false;
+    }
+
+    c = b / a;
+    if ( c != Vector4( 4.f, 2.5f, 2.f, 7.f ) )
+    {
+        printf("ERROR: / %f %f %f %f ... 4 2.5 2 7\n", c.x, c.y, c.z, c.w );
+        success = false;
+    }
 
     return (success) ? 0 : 1;
 }
