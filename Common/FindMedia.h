@@ -105,6 +105,12 @@ namespace DX
         // On failure, return the file as the path but also throw an error
         wcscpy_s(strDestPath, size_t(cchDest), strFilename);
 
+#ifdef _DEBUG
+        wchar_t errorMessage[1024] = {};
+        swprintf_s(errorMessage, 1024, L"ERROR: FindMedia file not found: %ls\n", strFilename);
+        OutputDebugStringW(errorMessage);
+#endif
+
         throw std::runtime_error("File not found");
     }
 }

@@ -23,6 +23,12 @@
 
 namespace DX
 {
+    inline bool FileExists(_In_z_ const wchar_t* name)
+    {
+        std::ifstream inFile(name, std::ios::in | std::ios::binary);
+        return inFile.is_open();
+    }
+
     inline std::vector<uint8_t> ReadData(_In_z_ const wchar_t* name)
     {
         std::ifstream inFile(name, std::ios::in | std::ios::binary | std::ios::ate);
@@ -49,7 +55,14 @@ namespace DX
 #endif
 
         if (!inFile)
+        {
+#ifdef _DEBUG
+            wchar_t errorMessage[1024] = {};
+            swprintf_s(errorMessage, 1024, L"ERROR: ReadData file not open %ls\n", name);
+            OutputDebugStringW(errorMessage);
+#endif
             throw std::runtime_error("ReadData");
+        }
 
         const std::streampos len = inFile.tellg();
         if (!inFile)
