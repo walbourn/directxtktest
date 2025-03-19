@@ -1004,6 +1004,7 @@ int TestV2()
         }
     }
 
+    v = v1;
     v += v2;
     if ( v != Vector2(5,7) )
     {
@@ -1022,6 +1023,20 @@ int TestV2()
     if ( v != Vector2(4,10) )
     {
         printf("ERROR: *= %f %f ... 4 10\n", v.x, v.y );
+        success = false;
+    }
+
+    v *= 2.f;
+    if ( v != Vector2(8,20) )
+    {
+        printf("ERROR: *=f %f %f ... 8 20\n", v.x, v.y );
+        success = false;
+    }
+
+    v /= 2.f;
+    if ( v != Vector2(4,10) )
+    {
+        printf("ERROR: */f %f %f ... 4 10\n", v.x, v.y );
         success = false;
     }
 
@@ -1985,6 +2000,7 @@ int TestV3()
         }
     }
 
+    v = v1;
     v += v2;
     if ( v != Vector3(5,7,9) )
     {
@@ -2003,6 +2019,20 @@ int TestV3()
     if ( v != Vector3(4,10,18) )
     {
         printf("ERROR: *= %f %f %f ... 4 10 18\n", v.x, v.y, v.z );
+        success = false;
+    }
+
+    v *= 2.f;
+    if ( v != Vector3(8,20,36) )
+    {
+        printf("ERROR: *=f %f %f %f ... 8 20 36\n", v.x, v.y, v.z );
+        success = false;
+    }
+
+    v /= 2.f;
+    if ( v != Vector3(4,10,18) )
+    {
+        printf("ERROR: */f %f %f %f ... 4 10 18\n", v.x, v.y, v.z );
         success = false;
     }
 
@@ -2965,6 +2995,7 @@ int TestV4()
         }
     }
 
+    v = v1;
     v += v2;
     if ( v != Vector4(5,7,9,11) )
     {
@@ -2983,6 +3014,20 @@ int TestV4()
     if ( v != Vector4(4,10,18,28) )
     {
         printf("ERROR: *= %f %f %f %f ... 4 10 18 28\n", v.x, v.y, v.z, v.w );
+        success = false;
+    }
+
+    v *= 2.f;
+    if ( v != Vector4(8,20,36,56 ) )
+    {
+        printf("ERROR: *=f %f %f %f %f ... 8 20 36 56\n", v.x, v.y, v.z, v.w );
+        success = false;
+    }
+
+    v /= 2.f;
+    if ( v != Vector4(4,10,18,28) )
+    {
+        printf("ERROR: */f %f %f %f %f ... 4 10 18 28\n", v.x, v.y, v.z, v.w );
         success = false;
     }
 
