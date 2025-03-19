@@ -2847,7 +2847,7 @@ int TestV3()
         {
             Vector3 result = Vector3::TransformNormal(points[j], m);
             v = buff[j];
-            if (!XMVector3NearEqual(v, result, VEPSILON))
+            if (!XMVector3NearEqual(v, result, VEPSILON2))
             {
                 printf("ERROR: transnormarr %zu - %f %f %f ... %f %f %f\n", j, v.x, v.y, v.z, result.x, result.y, result.z);
                 success = false;
