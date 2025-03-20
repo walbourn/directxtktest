@@ -24,6 +24,12 @@
 // Build with Reverb enabled or not
 #define USE_REVERB
 
+// Enable zero-center
+//#define USE_ZERO_CENTER
+
+// Enable doppler effect
+#define USE_DOPPLER
+
 // Build with custom emitter curves
 //#define USE_CUSTOM_CURVES
 
@@ -203,6 +209,14 @@ void Game::Initialize(
 
 #ifdef USE_MASTER_LIMITER
     eflags = eflags | AudioEngine_UseMasteringLimiter;
+#endif
+
+#ifdef USE_ZERO_CENTER
+    eflags = eflags | AudioEngine_ZeroCenter3D;
+#endif
+
+#ifndef USE_DOPPLER
+    eflags = eflags | AudioEngine_DisableDopplerEffect;
 #endif
 
     m_audEngine = std::make_unique<AudioEngine>(eflags);
