@@ -18,7 +18,10 @@
 
 #ifdef USING_GAMEINPUT
 #include <GameInput.h>
-#if defined(GAMEINPUT_API_VERSION) && (GAMEINPUT_API_VERSION == 1)
+#ifndef GAMEINPUT_API_VERSION
+#define GAMEINPUT_API_VERSION 0
+#endif
+#if GAMEINPUT_API_VERSION == 1
 using namespace GameInput::v1;
 #endif
 #elif defined(USING_WINDOWS_GAMING_INPUT)
@@ -33,6 +36,13 @@ using namespace GameInput::v1;
 #elif !defined(_XBOX_ONE)
 #include <xinput.h>
 #endif
+
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wcovered-switch-default"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#endif
+
+#pragma warning(disable : 4061)
 
 extern void ExitGame() noexcept;
 
@@ -137,7 +147,9 @@ void Game::Initialize(
 
 #ifdef USING_GAMEINPUT
 
-    OutputDebugStringA("INFO: Using GameInput\n");
+    char buff[64] = {};
+    sprintf_s(buff, "INFO: Using GameInput (API v%d)\n", GAMEINPUT_API_VERSION);
+    OutputDebugStringA(buff);
 
     m_ctrlChanged.Attach(CreateEvent(nullptr, FALSE, FALSE, nullptr));
     if (!m_ctrlChanged.IsValid())
@@ -254,13 +266,20 @@ void Game::Update(DX::StepTimer const&)
                         }
                         else
                         {
-                        #if defined(GAMEINPUT_API_VERSION) && (GAMEINPUT_API_VERSION == 1)
-                            // TODO - test out a different method
-                        #else
+                            auto status = idevice->GetDeviceStatus();
+                            switch (status)
+                            {
+                                case GameInputDeviceNoStatus:   OutputDebugStringA("             No device status\n"); break;
+                                case GameInputDeviceConnected:  OutputDebugStringA("             Device connected\n"); break;
+                                default:                        OutputDebugStringA("             Failed getting device status\n"); break;
+                            }
+
+                        #if GAMEINPUT_API_VERSION == 0
                             GameInputBatteryState battery;
                             idevice->GetBatteryState(&battery);
                             switch (battery.status)
                             {
+                            default:
                             case GameInputBatteryUnknown:       break;
                             case GameInputBatteryNotPresent:    OutputDebugStringA("             Battery not present\n"); break;
                             case GameInputBatteryDischarging:   OutputDebugStringA("             Battery discharging\n"); break;
