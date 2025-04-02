@@ -248,13 +248,14 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     {
         wchar_t ext[_MAX_EXT];
         _wsplitpath_s(pConv.szSrc.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, ext, _MAX_EXT);
-        bool isdds = (_wcsicmp(ext, L".dds") == 0);
-        bool iswav = (_wcsicmp(ext, L".wav") == 0);
-        bool isxwb = (_wcsicmp(ext, L".xwb") == 0);
+        const bool isdds = (_wcsicmp(ext, L".dds") == 0);
+        const bool iswav = (_wcsicmp(ext, L".wav") == 0);
+        const bool isxwb = (_wcsicmp(ext, L".xwb") == 0);
 
         bool usedds = false;
         bool usewav = false;
         bool usexwb = false;
+        bool usewic = false;
         if (dwOptions & (1 << OPT_DDS))
         {
             usedds = true;
@@ -267,11 +268,16 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         {
             usexwb = true;
         }
-        else if (!(dwOptions & (1 << OPT_WIC)))
+        else if (dwOptions & (1 << OPT_WIC))
         {
-            usedds = isdds;
-            usewav = iswav;
-            usexwb = isxwb;
+            usewic = true;
+        }
+        else
+        {
+            usedds = true;
+            usewav = true;
+            usexwb = true;
+            usewic = true;
         }
 
         // Load source image
@@ -291,7 +297,13 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(L"ERROR: DDSTexture file not not found:\n%ls\n", pConv.szSrc.c_str());
                 return 1;
             }
-            else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && isdds)))
+            else if (FAILED(hr)
+                && hr != E_INVALIDARG
+                && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)
+                && hr != E_OUTOFMEMORY
+                && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF)
+                && hr != HRESULT_FROM_WIN32(ERROR_INVALID_DATA)
+                && (hr != E_FAIL || (hr == E_FAIL && isdds)))
             {
 #ifdef _DEBUG
                 char buff[128] = {};
@@ -305,7 +317,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(L"%ls", SUCCEEDED(hr) ? L"*" : L".");
             }
         }
-        else if (usewav)
+
+        if (usewav)
         {
             std::unique_ptr<uint8_t[]> data;
             DirectX::WAVData result = {};
@@ -315,7 +328,13 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(L"ERROR: WAVAudio file not not found:\n%ls\n", pConv.szSrc.c_str());
                 return 1;
             }
-            else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_INVALID_DATA) && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && iswav)))
+            else if (FAILED(hr)
+                && hr != E_INVALIDARG
+                && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)
+                && hr != E_OUTOFMEMORY
+                && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF)
+                && hr != HRESULT_FROM_WIN32(ERROR_INVALID_DATA)
+                && (hr != E_FAIL || (hr == E_FAIL && iswav)))
             {
 #ifdef _DEBUG
                 char buff[128] = {};
@@ -329,7 +348,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(L"%ls", SUCCEEDED(hr) ? L"*" : L".");
             }
         }
-        else if (usexwb)
+
+        if (usexwb)
         {
             auto wb = std::make_unique<DirectX::WaveBankReader>();
             hr = wb->Open(pConv.szSrc.c_str());
@@ -338,7 +358,13 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(L"ERROR: XWBAudio file not not found:\n%ls\n", pConv.szSrc.c_str());
                 return 1;
             }
-            else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != E_OUTOFMEMORY && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF) && (hr != E_FAIL || (hr == E_FAIL && isxwb)))
+            else if (FAILED(hr)
+                && hr != E_INVALIDARG
+                && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)
+                && hr != E_OUTOFMEMORY
+                && hr != HRESULT_FROM_WIN32(ERROR_HANDLE_EOF)
+                && hr != HRESULT_FROM_WIN32(ERROR_INVALID_DATA)
+                && (hr != E_FAIL || (hr == E_FAIL && isxwb)))
             {
 #ifdef _DEBUG
                 char buff[128] = {};
@@ -358,7 +384,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(L".");
             }
         }
-        else
+
+        if (usewic)
         {
             hr = DirectX::CreateWICTextureFromFileEx(device.Get(), pConv.szSrc.c_str(), 0, D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0, DirectX::WIC_LOADER_DEFAULT, tex.GetAddressOf(), nullptr);
             if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
@@ -366,7 +393,12 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(L"ERROR: WICTexture file not found:\n%ls\n", pConv.szSrc.c_str());
                 return 1;
             }
-            else if (FAILED(hr) && hr != E_INVALIDARG && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) && hr != WINCODEC_ERR_COMPONENTNOTFOUND && hr != E_OUTOFMEMORY && hr != WINCODEC_ERR_BADHEADER)
+            else if (FAILED(hr)
+                && hr != E_INVALIDARG
+                && hr != HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)
+                && hr != WINCODEC_ERR_COMPONENTNOTFOUND
+                && hr != E_OUTOFMEMORY
+                && hr != WINCODEC_ERR_BADHEADER)
             {
 #ifdef _DEBUG
                 char buff[128] = {};
