@@ -71,7 +71,7 @@ namespace
         OPT_MAX
     };
 
-    static_assert(OPT_MAX <= 32, "dwOptions is a DWORD bitfield");
+    static_assert(OPT_MAX <= 32, "dwOptions is a unsigned int bitfield");
 
     //////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
@@ -165,7 +165,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     }
 
     // Process command line
-    DWORD dwOptions = 0;
+    uint32_t dwOptions = 0;
     std::list<SConversion> conversion;
 
     for (int iArg = 1; iArg < argc; iArg++)
@@ -182,7 +182,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             if (*pValue)
                 *pValue++ = 0;
 
-            DWORD dwOption = LookupByName(pArg, g_pOptions);
+            uint32_t dwOption = LookupByName(pArg, g_pOptions);
 
             if (!dwOption || (dwOptions & (1 << dwOption)))
             {
@@ -198,10 +198,17 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             case OPT_WAV:
             case OPT_WIC:
             case OPT_XWB:
-                if ((dwOptions & ((1 << OPT_DDS) | (1 << OPT_WAV) | (1 << OPT_WIC) | (1 << OPT_XWB))) & ~(1 << dwOption))
                 {
-                    wprintf(L"-dds, -wav, -wic, and -xwb are mutually exclusive options\n");
-                    return 1;
+                    uint32_t mask = (1 << OPT_DDS)
+                        | (1 << OPT_WAV)
+                        | (1 << OPT_WIC)
+                        | (1 << OPT_XWB);
+                    mask &= ~(1 << dwOption);
+                    if (dwOptions & mask)
+                    {
+                        wprintf(L"-dds, -wav, -wic, and -xwb are mutually exclusive options\n");
+                        return 1;
+                    }
                 }
                 break;
 
