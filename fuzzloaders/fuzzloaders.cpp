@@ -40,6 +40,8 @@
 #include "WICTextureLoader.h"
 #include "WaveBankReader.h"
 #include "WAVFileReader.h"
+#include "Effects.h"
+#include "Model.h"
 
 #include <wrl\client.h>
 
@@ -68,6 +70,9 @@ namespace
         OPT_WAV,
         OPT_WIC,
         OPT_XWB,
+        OPT_CMO,
+        OPT_SDKMESH,
+        OPT_VBO,
         OPT_MAX
     };
 
@@ -80,7 +85,10 @@ namespace
     const SValue<uint32_t> g_pOptions [] =
     {
         { L"r",         OPT_RECURSIVE },
+        { L"cmo",       OPT_CMO },
         { L"dds",       OPT_DDS },
+        { L"sdkmesh",   OPT_SDKMESH },
+        { L"vbo",       OPT_VBO },
         { L"wav",       OPT_WAV },
         { L"wic",       OPT_WIC },
         { L"xwb",       OPT_XWB },
@@ -99,7 +107,10 @@ namespace
             L"Usage: fuzzloaders <options> <files>\n"
             L"\n"
             L"   -r                  wildcard filename search is recursive\n"
+            L"   -cmo                force use of CMO mesh loader\n"
             L"   -dds                force use of DDSTextureLoader\n"
+            L"   -sdkmesh            force use of SDKMESH loader\n"
+            L"   -vbo                force use of VBO loader\n"
             L"   -wav                force use of WAVFileReader\n"
             L"   -wic                force use of WICTextureLoader\n"
             L"   -xwb                force use of WaveBankReader\n";
@@ -143,6 +154,65 @@ namespace
 
         return hr;
     }
+
+    class StubEffectFactory : public DirectX::IEffectFactory
+    {
+    public:
+        StubEffectFactory(_In_ ID3D11Device* device) noexcept(false)
+        {
+            static const uint32_t s_pixel = 0xffffffff;
+
+            D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+
+            D3D11_TEXTURE2D_DESC desc = {};
+            desc.Width = desc.Height = desc.MipLevels = desc.ArraySize = 1;
+            desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            desc.SampleDesc.Count = 1;
+            desc.Usage = D3D11_USAGE_IMMUTABLE;
+            desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+            ComPtr<ID3D11Texture2D> tex;
+            HRESULT hr = device->CreateTexture2D(&desc, &initData, tex.GetAddressOf());
+            if(FAILED(hr))
+                throw std::runtime_error("CreateTexture2D");
+
+            D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+            SRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+            SRVDesc.Texture2D.MipLevels = 1;
+
+            hr = device->CreateShaderResourceView(tex.Get(), &SRVDesc, defaultTex.GetAddressOf());
+            if(FAILED(hr))
+                throw std::runtime_error("CreateShaderResourceView");
+
+            defaultFX = std::make_shared<DirectX::DebugEffect>(device);
+        }
+
+        StubEffectFactory(StubEffectFactory const&) = delete;
+        StubEffectFactory& operator= (StubEffectFactory const&) = delete;
+
+        std::shared_ptr<DirectX::IEffect> CreateEffect(
+            _In_ const EffectInfo&,
+            _In_opt_ ID3D11DeviceContext*) override
+        {
+            return defaultFX;
+        }
+
+        void CreateTexture(
+            _In_z_ const wchar_t*,
+            _In_opt_ ID3D11DeviceContext*,
+            _Outptr_ ID3D11ShaderResourceView** textureView) override
+        {
+            if (textureView)
+            {
+                *textureView = defaultTex.Get();
+            }
+        }
+
+    private:
+        ComPtr<ID3D11ShaderResourceView> defaultTex;
+        std::shared_ptr<DirectX::IEffect> defaultFX;
+    };
 }
 
 //--------------------------------------------------------------------------------------
@@ -198,15 +268,22 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             case OPT_WAV:
             case OPT_WIC:
             case OPT_XWB:
+            case OPT_CMO:
+            case OPT_SDKMESH:
+            case OPT_VBO:
                 {
                     uint32_t mask = (1 << OPT_DDS)
                         | (1 << OPT_WAV)
                         | (1 << OPT_WIC)
-                        | (1 << OPT_XWB);
+                        | (1 << OPT_XWB)
+                        | (1 << OPT_CMO)
+                        | (1 << OPT_SDKMESH)
+                        | (1 << OPT_VBO)
+                        ;
                     mask &= ~(1 << dwOption);
                     if (dwOptions & mask)
                     {
-                        wprintf(L"-dds, -wav, -wic, and -xwb are mutually exclusive options\n");
+                        wprintf(L"-cmo, -dds, -sdkmesh, -vbo, -wav, -wic, and -xwb are mutually exclusive options\n");
                         return 1;
                     }
                 }
@@ -263,6 +340,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         bool usewav = false;
         bool usexwb = false;
         bool usewic = false;
+        bool usecmo = false;
+        bool usesdkmesh = false;
+        bool usevbo = false;
         if (dwOptions & (1 << OPT_DDS))
         {
             usedds = true;
@@ -279,12 +359,27 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         {
             usewic = true;
         }
+        else if (dwOptions & (1 << OPT_CMO))
+        {
+            usecmo = true;
+        }
+        else if (dwOptions & (1 << OPT_SDKMESH))
+        {
+            usesdkmesh = true;
+        }
+        else if (dwOptions & (1 << OPT_VBO))
+        {
+            usevbo = true;
+        }
         else
         {
             usedds = true;
             usewav = true;
             usexwb = true;
             usewic = true;
+            usecmo = true;
+            usesdkmesh = true;
+            usevbo = true;
         }
 
         // Load source image
@@ -419,6 +514,49 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(L"%ls", SUCCEEDED(hr) ? L"*" : L".");
             }
         }
+
+        // Load meshes
+        StubEffectFactory fxFactory(device.Get());
+
+        if(usecmo)
+        {
+            try
+            {
+                std::ignore = DirectX::Model::CreateFromCMO(device.Get(), pConv.szSrc.c_str(), fxFactory, DirectX::ModelLoader_AllowLargeModels);
+                wprintf(L".");
+            }
+            catch(const std::exception&)
+            {
+                wprintf(L"*");
+            }
+        }
+
+        if(usesdkmesh)
+        {
+            try
+            {
+                std::ignore = DirectX::Model::CreateFromSDKMESH(device.Get(), pConv.szSrc.c_str(), fxFactory, DirectX::ModelLoader_AllowLargeModels);
+                wprintf(L".");
+            }
+            catch(const std::exception&)
+            {
+                wprintf(L"*");
+            }
+        }
+
+        if(usevbo)
+        {
+            try
+            {
+                std::ignore = DirectX::Model::CreateFromVBO(device.Get(), pConv.szSrc.c_str(), nullptr, DirectX::ModelLoader_AllowLargeModels);
+                wprintf(L".");
+            }
+            catch(const std::exception&)
+            {
+                wprintf(L"*");
+            }
+        }
+
         fflush(stdout);
     }
 
@@ -462,12 +600,49 @@ extern "C" __declspec(dllexport) int LLVMFuzzerTestOneInput(const uint8_t *data,
     }
 
     // Memory version
+#ifdef FUZZING_FOR_MESHES
+    StubEffectFactory fxFactory(device);
+
+    try
+    {
+        std::ignore = DirectX::Model::CreateFromCMO(device, data, size, fxFactory, DirectX::ModelLoader_AllowLargeModels);
+    }
+    catch(const std::exception&)
+    {
+        // Ignore C++ standard exceptions
+    }
+
+    try
+    {
+        std::ignore = DirectX::Model::CreateFromSDKMESH(device, data, size, fxFactory, DirectX::ModelLoader_AllowLargeModels);
+    }
+    catch(const std::exception&)
+    {
+        // Ignore C++ standard exceptions
+    }
+
+    try
+    {
+        std::ignore = DirectX::Model::CreateFromVBO(device, data, size, nullptr, DirectX::ModelLoader_AllowLargeModels);
+    }
+    catch(const std::exception&)
+    {
+        // Ignore C++ standard exceptions
+    }
+#elif defined(FUZZING_FOR_AUDIO)
+    {
+        std::unique_ptr<uint8_t[]> wavData;
+        DirectX::WAVData result = {};
+        std::ignore = DirectX::LoadWAVAudioInMemoryEx(data, size, result);
+    }
+#else // fuzzing for DDS
     {
         ComPtr<ID3D11Resource> tex;
         std::ignore = DirectX::CreateDDSTextureFromMemoryEx(device, data, size, 0,
                 D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0,
                 DirectX::DDS_LOADER_DEFAULT, tex.GetAddressOf(), nullptr, nullptr);
     }
+#endif
 
     // Disk version
     wchar_t tempFileName[MAX_PATH] = {};
@@ -490,13 +665,11 @@ extern "C" __declspec(dllexport) int LLVMFuzzerTestOneInput(const uint8_t *data,
             return 0;
     }
 
-    {
-        ComPtr<ID3D11Resource> tex;
-        std::ignore = DirectX::CreateDDSTextureFromFileEx(device, tempFileName, 0,
-                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0,
-                DirectX::DDS_LOADER_DEFAULT, tex.GetAddressOf(), nullptr, nullptr);
-    }
+#ifdef FUZZING_FOR_MESHES
 
+    // CMO, SDKMESH, and VBO are already covered by Memory version
+
+#elif defined(FUZZING_FOR_AUDIO)
     {
         std::unique_ptr<uint8_t[]> wavData;
         DirectX::WAVData result = {};
@@ -507,6 +680,14 @@ extern "C" __declspec(dllexport) int LLVMFuzzerTestOneInput(const uint8_t *data,
         auto wb = std::make_unique<DirectX::WaveBankReader>();
         std::ignore = wb->Open(tempFileName);
     }
+#else // fuzzing for DDS
+    {
+        ComPtr<ID3D11Resource> tex;
+        std::ignore = DirectX::CreateDDSTextureFromFileEx(device, tempFileName, 0,
+                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_WRITE, 0,
+                DirectX::DDS_LOADER_DEFAULT, tex.GetAddressOf(), nullptr, nullptr);
+    }
+#endif
 
     return 0;
 }
