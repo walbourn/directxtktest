@@ -1054,11 +1054,14 @@ void Game::UnitTests()
         WAVEFORMATEX testwfx3 = testwfx;
         testwfx3.wBitsPerSample = 178;
 
+        #pragma warning(push)
+        #pragma warning(disable:6385 6387)
         if (IsValid(nullptr) || IsValid(&testwfx) || !IsValid(&testwfx2) || IsValid(&testwfx3))
         {
             OutputDebugStringA("ERROR: Failed waveformat valid A tests\n");
             success = false;
         }
+        #pragma warning(pop)
 
         testwfx2 = testwfx;
         testwfx2.nChannels = XAUDIO2_MAX_AUDIO_CHANNELS  * 2;
