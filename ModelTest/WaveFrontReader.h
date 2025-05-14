@@ -45,6 +45,7 @@
 #endif
 
 #include <algorithm>
+#include <cctype>
 #include <cstdint>
 #include <fstream>
 #include <locale>
@@ -74,7 +75,7 @@ namespace DX
 
         WaveFrontReader() noexcept : hasNormals(false), hasTexcoords(false) {}
 
-        HRESULT Load(_In_z_ const wchar_t* szFileName, bool ccw = true)
+        HRESULT Load(_In_z_ const wchar_t* szFileName, bool ccw = true, bool loadmtl = true)
         {
             Clear();
 
@@ -122,7 +123,11 @@ namespace DX
                 if (!InFile)
                     break;
 
-                if (*strCommand.c_str() == L'#')
+                if (strCommand.empty() || *strCommand.c_str() == 0)
+                {
+                    continue;
+                }
+                else if (*strCommand.c_str() == L'#')
                 {
                     // Comment
                 }
@@ -372,6 +377,11 @@ namespace DX
                         materials.emplace_back(mat);
                     }
                 }
+                else if (!std::isprint(*strCommand.c_str()))
+                {
+                    // non-printable characters outside of comments mean this is not a text file
+                    return E_FAIL;
+                }
                 else
                 {
     #ifdef _DEBUG
@@ -392,7 +402,7 @@ namespace DX
             BoundingBox::CreateFromPoints(bounds, positions.size(), positions.data(), sizeof(XMFLOAT3));
 
             // If an associated material file was found, read that in as well.
-            if (*strMaterialFilename)
+            if (*strMaterialFilename && loadmtl)
             {
     #ifdef _WIN32
                 wchar_t ext[_MAX_EXT] = {};
@@ -437,6 +447,7 @@ namespace DX
             InFile.imbue(std::locale::classic());
 
             auto curMaterial = materials.end();
+            bool foundmat = false;
 
             for (;; )
             {
@@ -445,8 +456,19 @@ namespace DX
                 if (!InFile)
                     break;
 
-                if (0 == wcscmp(strCommand.c_str(), L"newmtl"))
+                if (strCommand.empty() || *strCommand.c_str() == 0)
+                    continue;
+
+                if (*strCommand.c_str() == L'#')
                 {
+                    // Comment
+                    InFile.ignore(1000, L'\n');
+                    continue;
+                }
+                else if (0 == wcscmp(strCommand.c_str(), L"newmtl"))
+                {
+                    foundmat = true;
+
                     // Switching active materials
                     wchar_t strName[MAX_PATH] = {};
                     InFile.width(MAX_PATH);
@@ -462,16 +484,17 @@ namespace DX
                         }
                     }
                 }
+                else if (!std::isprint(*strCommand.c_str()))
+                {
+                    // non-printable characters outside of comments mean this is not a text file
+                    return E_FAIL;
+                }
 
                 // The rest of the commands rely on an active material
                 if (curMaterial == materials.end())
                     continue;
 
-                if (0 == wcscmp(strCommand.c_str(), L"#"))
-                {
-                    // Comment
-                }
-                else if (0 == wcscmp(strCommand.c_str(), L"Ka"))
+                if (0 == wcscmp(strCommand.c_str(), L"Ka"))
                 {
                     // Ambient color
                     float r, g, b;
@@ -570,7 +593,7 @@ namespace DX
 
             InFile.close();
 
-            return S_OK;
+            return (foundmat) ? S_OK : E_FAIL;
         }
 
         void Clear()
