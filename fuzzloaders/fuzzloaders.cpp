@@ -191,14 +191,14 @@ namespace
         StubEffectFactory(StubEffectFactory const&) = delete;
         StubEffectFactory& operator= (StubEffectFactory const&) = delete;
 
-        std::shared_ptr<DirectX::IEffect> CreateEffect(
+        std::shared_ptr<DirectX::IEffect> __cdecl CreateEffect(
             _In_ const EffectInfo&,
             _In_opt_ ID3D11DeviceContext*) override
         {
             return defaultFX;
         }
 
-        void CreateTexture(
+        void __cdecl CreateTexture(
             _In_z_ const wchar_t*,
             _In_opt_ ID3D11DeviceContext*,
             _Outptr_ ID3D11ShaderResourceView** textureView) override
