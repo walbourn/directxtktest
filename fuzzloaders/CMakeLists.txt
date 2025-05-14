@@ -8,6 +8,9 @@ project (fuzzloaders
   HOMEPAGE_URL "https://github.com/walbourn/directxtktest/wiki"
   LANGUAGES CXX)
 
+option(BUILD_MESH_FUZZING "Build fuzzing for Meshes" OFF)
+option(BUILD_AUDIO_FUZZING "Build fuzzing for Audio" OFF)
+
 if(CMAKE_VERSION VERSION_LESS 3.21)
   get_property(not_top DIRECTORY PROPERTY PARENT_DIRECTORY)
   if(not_top)
@@ -29,6 +32,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE ../../Audio ../../XWBTool)
 
 if(BUILD_FUZZING)
     target_compile_definitions(${PROJECT_NAME} PRIVATE FUZZING_BUILD_MODE)
+    if(BUILD_AUDIO_FUZZING)
+        message(STATUS "Building fuzzloaders for audio formats.")
+        target_compile_definitions(${PROJECT_NAME} PRIVATE FUZZING_FOR_AUDIO)
+    elseif(BUILD_MESH_FUZZING)
+        message(STATUS "Building fuzzloaders for mesh formats.")
+        target_compile_definitions(${PROJECT_NAME} PRIVATE FUZZING_FOR_MESHES)
+    else()
+        message(STATUS "Building fuzzloaders for DDS textures.")
+    endif()
 endif()
 
 if(MINGW)
