@@ -7,12 +7,14 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 //-------------------------------------------------------------------------------------
 
-#include "DirectxHelpers.h"
+#include "DirectXHelpers.h"
+
 #include "Effects.h"
 #include "VertexTypes.h"
 
 #include <cmath>
 #include <cstdio>
+#include <iterator>
 #include <random>
 
 #include <wrl/client.h>
@@ -184,20 +186,36 @@ bool Test03(ID3D11Device *device)
             { "COLOR",       0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA , 0 },
         };
 
-        auto effect = std::make_unique<BasicEffect>(device);
-        effect->SetVertexColorEnabled(true);
+        std::unique_ptr<BasicEffect> effect;
+        try
+        {
+            effect = std::make_unique<BasicEffect>(device);
+            effect->SetVertexColorEnabled(true);
+        }
+        catch(const std::exception& e)
+        {
+            printf("ERROR: Failed creating required effect object (except: %s)\n", e.what());
+            return false;
+        }
 
         ComPtr<ID3D11InputLayout> il;
-        if (FAILED(CreateInputLayoutFromEffect(device, effect.get(), s_inputElementDesc, std::size(s_inputElementDesc), il.GetAddressOf())))
+        HRESULT hr = CreateInputLayoutFromEffect(device,
+            effect.get(),
+            s_inputElementDesc, std::size(s_inputElementDesc),
+            il.GetAddressOf());
+        if (FAILED(hr))
         {
-            printf("ERROR: Failed CreateInputLayoutFromEffect(1) test\n");
+            printf("ERROR: Failed CreateInputLayoutFromEffect(1) test (%08X)\n", static_cast<unsigned int>(hr));
             success = false;
         }
 
         ComPtr<ID3D11InputLayout> il2;
-        if (FAILED(CreateInputLayoutFromEffect<VertexPositionColor>(device, effect.get(), il2.GetAddressOf())))
+        hr = CreateInputLayoutFromEffect<VertexPositionColor>(device,
+            effect.get(),
+            il2.GetAddressOf());
+        if (FAILED(hr))
         {
-            printf("ERROR: Failed CreateInputLayoutFromEffect(2) test\n");
+            printf("ERROR: Failed CreateInputLayoutFromEffect(2) test (%08X)\n", static_cast<unsigned int>(hr));
             success = false;
         }
     }

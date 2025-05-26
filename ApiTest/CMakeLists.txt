@@ -28,6 +28,8 @@ add_executable(${PROJECT_NAME}
   directxhelpers.cpp
   graphicsmemory.cpp
   primitivebatch.cpp
+  primitives.cpp
+  sprites.cpp
   vertextypes.cpp
   )
 

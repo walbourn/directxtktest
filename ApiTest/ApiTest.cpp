@@ -8,7 +8,9 @@
 //-------------------------------------------------------------------------------------
 
 #include <crtdbg.h>
+
 #include <cstdio>
+#include <exception>
 #include <iterator>
 
 #include "DirectXMath.h"
@@ -18,6 +20,8 @@
 #include <wrl/client.h>
 
 //#define D3D_DEBUG
+
+using Microsoft::WRL::ComPtr;
 
 namespace
 {
@@ -75,15 +79,21 @@ extern bool Test03(ID3D11Device *device);
 extern bool Test04(ID3D11Device *device);
 extern bool Test05(ID3D11Device *device);
 extern bool Test06(ID3D11Device *device);
+extern bool Test07(ID3D11Device *device);
+extern bool Test08(ID3D11Device *device);
+extern bool Test09(ID3D11Device *device);
 
 TestInfo g_Tests[] =
 {
     { "BufferHelpers", Test01 },
     { "CommonStates", Test02 },
     { "DirectXHelpers", Test03 },
-    { "GraphicsMemory", Test04 },
-    { "PrimitiveBatch", Test05 },
-    { "VertexTypes", Test06 },
+    { "GeometricPrimitive", Test04 },
+    { "GraphicsMemory", Test05 },
+    { "PrimitiveBatch", Test06 },
+    { "SpriteBatch", Test07 },
+    { "SpriteFont", Test08 },
+    { "VertexTypes", Test09 },
 };
 
 //-------------------------------------------------------------------------------------
@@ -99,7 +109,22 @@ bool RunTests(ID3D11Device* device)
     {
         printf("%s: ", g_Tests[i].name );
 
-        if ( g_Tests[i].func(device) )
+        bool passed = false;
+
+        try
+        {
+            passed = g_Tests[i].func(device);
+        }
+        catch(const std::exception& e)
+        {
+            printf("ERROR: Failed with a standard C++ exception: %s\n", e.what());
+        }
+        catch(...)
+        {
+            printf("ERROR: Failed with an unknown C++ exception\n");
+        }
+
+        if (passed)
         {
             ++nPass;
             printf("PASS\n");
@@ -130,8 +155,8 @@ int __cdecl wmain()
         return -1;
     }
 
-    Microsoft::WRL::ComPtr<ID3D11Device> device;
-    Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
+    ComPtr<ID3D11Device> device;
+    ComPtr<ID3D11DeviceContext> context;
     HRESULT hr = CreateDevice(device.GetAddressOf(), context.GetAddressOf());
     if (FAILED(hr))
     {

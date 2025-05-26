@@ -19,7 +19,7 @@ static_assert(std::is_nothrow_move_assignable<GraphicsMemory>::value, "Move Assi
 
 using namespace DirectX;
 
-bool Test04(ID3D11Device *device)
+bool Test05(ID3D11Device *device)
 {
     std::unique_ptr<GraphicsMemory> graphicsMemory;
     try

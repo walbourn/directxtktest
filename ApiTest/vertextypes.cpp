@@ -8,6 +8,7 @@
 //-------------------------------------------------------------------------------------
 
 #include "VertexTypes.h"
+
 #include "DirectXHelpers.h"
 #include "Effects.h"
 
@@ -17,6 +18,7 @@
 #include <wrl/client.h>
 
 using namespace DirectX;
+using Microsoft::WRL::ComPtr;
 
 //--------------------------------------------------------------------------------------
 // As of DirectXMath 3.13, these types are is_nothrow_copy/move_assignable
@@ -98,9 +100,6 @@ static_assert(std::is_copy_assignable<VertexPositionNormalTangentColorTextureSki
 static_assert(std::is_nothrow_move_constructible<VertexPositionNormalTangentColorTextureSkinning>::value, "Move Ctor.");
 static_assert(std::is_move_assignable<VertexPositionNormalTangentColorTextureSkinning>::value, "Move Assign.");
 
-using namespace DirectX;
-using Microsoft::WRL::ComPtr;
-
 namespace
 {
     template<class T>
@@ -129,11 +128,20 @@ namespace
     }
 }
 
-bool Test06(ID3D11Device *device)
+bool Test09(ID3D11Device *device)
 {
     bool success = true;
 
-    auto effect = std::make_unique<BasicEffect>(device);
+    std::unique_ptr<BasicEffect> effect;
+    try
+    {
+        effect = std::make_unique<BasicEffect>(device);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating required effect object (except: %s)\n", e.what());
+        return false;
+    }
 
     if (!TestVertexType<VertexPosition>(device, effect.get()))
     {
