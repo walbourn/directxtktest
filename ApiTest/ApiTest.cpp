@@ -74,6 +74,7 @@ extern bool Test02(ID3D11Device *device);
 extern bool Test03(ID3D11Device *device);
 extern bool Test04(ID3D11Device *device);
 extern bool Test05(ID3D11Device *device);
+extern bool Test06(ID3D11Device *device);
 
 TestInfo g_Tests[] =
 {
@@ -81,7 +82,8 @@ TestInfo g_Tests[] =
     { "CommonStates", Test02 },
     { "DirectXHelpers", Test03 },
     { "GraphicsMemory", Test04 },
-    { "VertexTypes", Test05 },
+    { "PrimitiveBatch", Test05 },
+    { "VertexTypes", Test06 },
 };
 
 //-------------------------------------------------------------------------------------

@@ -11,6 +11,7 @@
 #include "Effects.h"
 #include "VertexTypes.h"
 
+#include <cmath>
 #include <cstdio>
 #include <random>
 

@@ -129,7 +129,7 @@ namespace
     }
 }
 
-bool Test05(ID3D11Device *device)
+bool Test06(ID3D11Device *device)
 {
     bool success = true;
 
