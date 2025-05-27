@@ -97,6 +97,9 @@ extern _Success_(return) bool Test12(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test13(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test14(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test15(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test16(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test17(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test18(_In_ ID3D11Device *device);
 
 const TestInfo g_Tests[] =
 {
@@ -116,6 +119,9 @@ const TestInfo g_Tests[] =
     { "PBREffect", Test12 },
     { "Model", Test13 },
     { "DGSLModel", Test15 },
+    { "GamePad", Test16 },
+    { "Keyboard", Test17 },
+    { "Mouse", Test18 },
 };
 
 //-------------------------------------------------------------------------------------

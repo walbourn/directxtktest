@@ -32,6 +32,7 @@ add_executable(${PROJECT_NAME}
   postprocess.cpp
   primitivebatch.cpp
   primitives.cpp
+  shared.cpp
   sprites.cpp
   vertextypes.cpp
   )
