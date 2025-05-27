@@ -64,6 +64,19 @@ static_assert(std::is_nothrow_move_assignable<EffectFactory>::value, "Move Assig
 static_assert(std::is_nothrow_move_constructible<PBREffectFactory>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<PBREffectFactory>::value, "Move Assign.");
 
+static_assert(std::is_nothrow_move_constructible<DGSLEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<DGSLEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<SkinnedDGSLEffect>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<SkinnedDGSLEffect>::value, "Move Assign.");
+
+static_assert(std::is_nothrow_move_constructible<DGSLEffectFactory>::value, "Move Ctor.");
+static_assert(std::is_nothrow_move_assignable<DGSLEffectFactory>::value, "Move Assign.");
+
+// VS 2017 on XDK incorrectly thinks it's not noexcept
+static_assert(std::is_nothrow_move_constructible<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Ctor.");
+static_assert(std::is_move_assignable<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Assign.");
+
 namespace
 {
     struct TestVertex
@@ -756,6 +769,131 @@ bool Test12(_In_ ID3D11Device *device)
             {
                 skin->SetBiasedVertexNormals((combos & 0x1) ? true : false);
                 skin->SetEmissiveTexture((combos & 0x2) ? emissiveTex.Get() : nullptr);
+                skin->Apply(context.Get());
+            }
+        }
+        catch(const std::exception& e)
+        {
+            printf("ERROR: Failed applying skin (except: %s)\n", e.what());
+            success = false;
+        }
+    }
+
+    return success;
+}
+
+_Success_(return)
+bool Test14(_In_ ID3D11Device *device)
+{
+    if (!device)
+        return false;
+
+    ComPtr<ID3D11DeviceContext> context;
+    device->GetImmediateContext(context.GetAddressOf());
+
+    bool success = true;
+
+    // Create effect
+    std::unique_ptr<DGSLEffect> dgsl;
+    try
+    {
+        dgsl = std::make_unique<DGSLEffect>(device);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating object (except: %s)\n", e.what());
+        success = false;
+    }
+
+    std::unique_ptr<SkinnedDGSLEffect> skin;
+    try
+    {
+        skin = std::make_unique<SkinnedDGSLEffect>(device);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating skin object (except: %s)\n", e.what());
+        success = false;
+    }
+
+    // Create input layouts
+    ComPtr<ID3D11InputLayout> il;
+    HRESULT hr = CreateInputLayoutFromEffect<VertexPositionNormalTangentColorTexture>(device,
+        dgsl.get(),
+        il.GetAddressOf());
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed creating input layout (%08X)\n", static_cast<unsigned int>(hr));
+        success = false;
+    }
+
+    ComPtr<ID3D11InputLayout> ilSkin;
+    hr = CreateInputLayoutFromEffect<VertexPositionNormalTangentColorTextureSkinning>(device,
+        skin.get(),
+        ilSkin.GetAddressOf());
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed creating input layout for skin (%08X)\n", static_cast<unsigned int>(hr));
+        success = false;
+    }
+
+    // Apply
+    ComPtr<ID3D11ShaderResourceView> defaultTex;
+    {
+        const uint32_t s_pixel = 0xffffffff;
+
+        D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+
+        hr = CreateTextureFromMemory(device, 1u, 1u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+            nullptr,
+            defaultTex.GetAddressOf());
+        if (FAILED(hr))
+        {
+            printf("ERROR: failed to create needed test texture (%08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+    }
+
+    try
+    {
+        context->IASetInputLayout(il.Get());
+
+        dgsl->SetTexture(defaultTex.Get());
+
+        for(int combos = 0; combos <= 0x7f; ++combos)
+        {
+            dgsl->SetLightingEnabled((combos & 0x1) ? true : false);
+            dgsl->SetVertexColorEnabled((combos & 0x2) ? true : false);
+            dgsl->SetTextureEnabled((combos & 0x4) ? true : false);
+            dgsl->Apply(context.Get());
+        }
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed applying dgsl (except: %s)\n", e.what());
+        success = false;
+    }
+
+    for(size_t j = 1; j <= 4; ++j)
+    {
+        if (j == 3)
+        {
+            // Weights have to be 1, 2, or 4.
+            continue;
+        }
+
+        try
+        {
+            context->IASetInputLayout(ilSkin.Get());
+
+            skin->SetTexture(defaultTex.Get());
+            skin->SetWeightsPerVertex(static_cast<int>(j));
+
+            for(int combos = 0; combos <= 0x7f; ++combos)
+            {
+                skin->SetLightingEnabled((combos & 0x1) ? true : false);
+                skin->SetVertexColorEnabled((combos & 0x2) ? true : false);
+                skin->SetTextureEnabled((combos & 0x4) ? true : false);
                 skin->Apply(context.Get());
             }
         }

@@ -95,6 +95,8 @@ extern _Success_(return) bool Test10(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test11(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test12(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test13(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test14(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test15(_In_ ID3D11Device *device);
 
 const TestInfo g_Tests[] =
 {
@@ -109,9 +111,11 @@ const TestInfo g_Tests[] =
     { "SpriteBatch", Test08 },
     { "SpriteFont", Test09 },
     { "VertexTypes", Test10 },
+    { "DGSLEffect", Test14 },
     { "NormalMapEffect", Test11 },
     { "PBREffect", Test12 },
     { "Model", Test13 },
+    { "DGSLModel", Test15 },
 };
 
 //-------------------------------------------------------------------------------------

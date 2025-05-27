@@ -94,3 +94,62 @@ bool Test13(_In_ ID3D11Device *device)
 
     return success;
 }
+
+_Success_(return)
+bool Test15(_In_ ID3D11Device *device)
+{
+    if (!device)
+        return false;
+
+    std::unique_ptr<DGSLEffectFactory> fxFactory;
+
+    try
+    {
+        fxFactory = std::make_unique<DGSLEffectFactory>(device);
+
+        fxFactory->SetDirectory(L"DGSLTest");
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating effects factory object (except: %s)\n", e.what());
+        return false;
+    }
+
+    // Create model
+    bool success = true;
+
+    std::unique_ptr<Model> unlit;
+    try
+    {
+        unlit = Model::CreateFromCMO(device, L"DGSLTest\\teapot_unlit.cmo", *fxFactory);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating model from CMO (except: %s)\n", e.what());
+        success = false;
+    }
+
+    std::unique_ptr<Model> lambert;
+    try
+    {
+        lambert = Model::CreateFromCMO(device, L"DGSLTest\\teapot_lambert.cmo", *fxFactory);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating model from CMO 2 (except: %s)\n", e.what());
+        success = false;
+    }
+
+    std::unique_ptr<Model> phong;
+    try
+    {
+        phong = Model::CreateFromCMO(device, L"DGSLTest\\teapot_phong.cmo", *fxFactory);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating model from CMO 3 (except: %s)\n", e.what());
+        success = false;
+    }
+
+    return success;
+}
