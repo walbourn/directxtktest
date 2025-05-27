@@ -28,6 +28,7 @@ add_executable(${PROJECT_NAME}
   directxhelpers.cpp
   effects.cpp
   graphicsmemory.cpp
+  model.cpp
   postprocess.cpp
   primitivebatch.cpp
   primitives.cpp

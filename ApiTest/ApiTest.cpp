@@ -94,6 +94,7 @@ extern _Success_(return) bool Test09(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test10(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test11(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test12(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test13(_In_ ID3D11Device *device);
 
 const TestInfo g_Tests[] =
 {
@@ -110,6 +111,7 @@ const TestInfo g_Tests[] =
     { "VertexTypes", Test10 },
     { "NormalMapEffect", Test11 },
     { "PBREffect", Test12 },
+    { "Model", Test13 },
 };
 
 //-------------------------------------------------------------------------------------
@@ -172,9 +174,16 @@ int __cdecl wmain()
         return -1;
     }
 
+    HRESULT hr = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
+    if (FAILED(hr))
+    {
+        printf("ERROR: Unable to initialize COM (%08X).\n", static_cast<unsigned int>(hr));
+        return -1;
+    }
+
     ComPtr<ID3D11Device> device;
     ComPtr<ID3D11DeviceContext> context;
-    HRESULT hr = CreateDevice(device.GetAddressOf(), context.GetAddressOf());
+    hr = CreateDevice(device.GetAddressOf(), context.GetAddressOf());
     if (FAILED(hr))
     {
         printf("ERROR: Unable to create a Direct3D 11 device (%08X).\n", static_cast<unsigned int>(hr));
