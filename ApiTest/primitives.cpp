@@ -19,8 +19,12 @@ using namespace DirectX;
 static_assert(std::is_nothrow_move_constructible<GeometricPrimitive>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<GeometricPrimitive>::value, "Move Assign.");
 
-bool Test04(ID3D11Device *device)
+_Success_(return)
+bool Test04(_In_ ID3D11Device *device)
 {
+    if (!device)
+        return false;
+
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
     device->GetImmediateContext(context.GetAddressOf());
 

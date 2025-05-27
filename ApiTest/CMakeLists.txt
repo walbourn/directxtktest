@@ -26,7 +26,9 @@ add_executable(${PROJECT_NAME}
   bufferhelpers.cpp
   commonstates.cpp
   directxhelpers.cpp
+  effects.cpp
   graphicsmemory.cpp
+  postprocess.cpp
   primitivebatch.cpp
   primitives.cpp
   sprites.cpp

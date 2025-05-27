@@ -15,15 +15,17 @@
 #include <wrl/client.h>
 
 using namespace DirectX;
+using Microsoft::WRL::ComPtr;
 
 static_assert(std::is_nothrow_move_constructible<CommonStates>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<CommonStates>::value, "Move Assign.");
 
-using namespace DirectX;
-using Microsoft::WRL::ComPtr;
-
-bool Test02(ID3D11Device *device)
+_Success_(return)
+bool Test02(_In_ ID3D11Device *device)
 {
+    if (!device)
+        return false;
+
     std::unique_ptr<CommonStates> states;
     try
     {

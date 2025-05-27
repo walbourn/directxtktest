@@ -43,8 +43,12 @@ namespace
     }
 }
 
-bool Test03(ID3D11Device *device)
+_Success_(return)
+bool Test03(_In_ ID3D11Device *device)
 {
+    if (!device)
+        return false;
+
     bool success = true;
 
     std::random_device rd;

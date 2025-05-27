@@ -20,8 +20,12 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
-bool Test01(ID3D11Device *device)
+_Success_(return)
+bool Test01(_In_ ID3D11Device *device)
 {
+    if (!device)
+        return false;
+
     bool success = true;
 
     // CreateStaticBuffer

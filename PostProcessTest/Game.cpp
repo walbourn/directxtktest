@@ -41,17 +41,6 @@ namespace
 
 //--------------------------------------------------------------------------------------
 
-static_assert(std::is_nothrow_move_constructible<BasicPostProcess>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<BasicPostProcess>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<DualPostProcess>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<DualPostProcess>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<ToneMapPostProcess>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<ToneMapPostProcess>::value, "Move Assign.");
-
-//--------------------------------------------------------------------------------------
-
 // Constructor.
 Game::Game() noexcept(false) :
     m_scene(0),

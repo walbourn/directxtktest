@@ -40,8 +40,16 @@ namespace
         D3D_FEATURE_LEVEL_10_0,
     };
 
-    HRESULT CreateDevice(ID3D11Device** pDev, ID3D11DeviceContext** pContext)
+    HRESULT CreateDevice(_Outptr_ ID3D11Device** pDev, _Outptr_ ID3D11DeviceContext** pContext)
     {
+        if (pDev)
+            *pDev = nullptr;
+        if (pContext)
+            *pContext = nullptr;
+
+        if (!pDev)
+            return E_INVALIDARG;
+
         HRESULT hr = E_FAIL;
 
         UINT createDeviceFlags = 0;
@@ -65,7 +73,7 @@ namespace
 //-------------------------------------------------------------------------------------
 // Types and globals
 
-typedef bool (*TestFN)(ID3D11Device *device);
+typedef _Success_(return) bool (*TestFN)(_In_ ID3D11Device *device);
 
 struct TestInfo
 {
@@ -73,31 +81,36 @@ struct TestInfo
     TestFN func;
 };
 
-extern bool Test01(ID3D11Device *device);
-extern bool Test02(ID3D11Device *device);
-extern bool Test03(ID3D11Device *device);
-extern bool Test04(ID3D11Device *device);
-extern bool Test05(ID3D11Device *device);
-extern bool Test06(ID3D11Device *device);
-extern bool Test07(ID3D11Device *device);
-extern bool Test08(ID3D11Device *device);
-extern bool Test09(ID3D11Device *device);
+extern _Success_(return) bool Test00(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test01(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test02(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test03(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test04(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test05(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test06(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test07(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test08(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test09(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test10(_In_ ID3D11Device *device);
 
-TestInfo g_Tests[] =
+const TestInfo g_Tests[] =
 {
+    { "BasicEffects", Test00 },
     { "BufferHelpers", Test01 },
     { "CommonStates", Test02 },
     { "DirectXHelpers", Test03 },
     { "GeometricPrimitive", Test04 },
     { "GraphicsMemory", Test05 },
-    { "PrimitiveBatch", Test06 },
-    { "SpriteBatch", Test07 },
-    { "SpriteFont", Test08 },
-    { "VertexTypes", Test09 },
+    { "PostProcess", Test06 },
+    { "PrimitiveBatch", Test07 },
+    { "SpriteBatch", Test08 },
+    { "SpriteFont", Test09 },
+    { "VertexTypes", Test10 },
 };
 
 //-------------------------------------------------------------------------------------
-bool RunTests(ID3D11Device* device)
+_Success_(return)
+bool RunTests(_In_ ID3D11Device* device)
 {
     if (!device)
         return false;

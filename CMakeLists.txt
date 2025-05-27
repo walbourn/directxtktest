@@ -37,7 +37,7 @@ list(APPEND TEST_EXES apitest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ApiTest)
 add_test(NAME "apitest" COMMAND apitest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 set_tests_properties(apitest PROPERTIES LABELS "API")
-set_tests_properties(apitest PROPERTIES TIMEOUT 120)
+set_tests_properties(apitest PROPERTIES TIMEOUT 30)
 
 if((BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST)
    AND (NOT NO_WCHAR_T)

@@ -69,7 +69,7 @@ namespace
             float u = XMVectorGetX(itextureCoordinate) - 0.5f;
             float v = XMVectorGetY(itextureCoordinate) - 0.5f;
 
-            float d = 1 - sqrt(u * u + v * v) * 2;
+            float d = 1 - sqrtf(u * u + v * v) * 2;
 
             if (d < 0)
                 d = 0;
@@ -183,48 +183,6 @@ void Game::CreateTestInputLayout(ID3D11Device* device, IEffect* effect, ID3D11In
         CreateInputLayoutFromEffect<TestVertex>(device, effect, pInputLayout)
     );
 }
-
-//--------------------------------------------------------------------------------------
-
-static_assert(std::is_nothrow_move_constructible<BasicEffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<BasicEffect>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<AlphaTestEffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<AlphaTestEffect>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<DualTextureEffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<DualTextureEffect>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<EnvironmentMapEffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<EnvironmentMapEffect>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<SkinnedEffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<SkinnedEffect>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<NormalMapEffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<NormalMapEffect>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<SkinnedNormalMapEffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<SkinnedNormalMapEffect>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<PBREffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<PBREffect>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<SkinnedPBREffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<SkinnedPBREffect>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<DebugEffect>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<DebugEffect>::value, "Move Assign.");
-
-// VS 2017 on XDK incorrectly thinks it's not noexcept
-static_assert(std::is_nothrow_move_constructible<IEffectFactory::EffectInfo>::value, "Move Ctor.");
-static_assert(std::is_move_assignable<IEffectFactory::EffectInfo>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<EffectFactory>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<EffectFactory>::value, "Move Assign.");
-
-static_assert(std::is_nothrow_move_constructible<PBREffectFactory>::value, "Move Ctor.");
-static_assert(std::is_nothrow_move_assignable<PBREffectFactory>::value, "Move Assign.");
 
 //--------------------------------------------------------------------------------------
 

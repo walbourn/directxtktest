@@ -17,10 +17,12 @@ using namespace DirectX;
 static_assert(std::is_nothrow_move_constructible<GraphicsMemory>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<GraphicsMemory>::value, "Move Assign.");
 
-using namespace DirectX;
-
-bool Test05(ID3D11Device *device)
+_Success_(return)
+bool Test05(_In_ ID3D11Device *device)
 {
+    if (!device)
+        return false;
+
     std::unique_ptr<GraphicsMemory> graphicsMemory;
     try
     {

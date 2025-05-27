@@ -103,6 +103,7 @@ static_assert(std::is_move_assignable<VertexPositionNormalTangentColorTextureSki
 namespace
 {
     template<class T>
+    _Success_(return)
     inline bool TestVertexType(_In_ ID3D11Device *device, _In_ IEffect* effect)
     {
         static_assert(T::InputElementCount > 0, "element count must be non-zero");
@@ -128,8 +129,12 @@ namespace
     }
 }
 
-bool Test09(ID3D11Device *device)
+_Success_(return)
+bool Test10(_In_ ID3D11Device *device)
 {
+    if (!device)
+        return false;
+
     bool success = true;
 
     std::unique_ptr<BasicEffect> effect;

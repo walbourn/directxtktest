@@ -21,8 +21,12 @@ using namespace DirectX;
 static_assert(std::is_nothrow_move_constructible<PrimitiveBatch<VertexPositionColor>>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<PrimitiveBatch<VertexPositionColor>>::value, "Move Assign.");
 
-bool Test06(ID3D11Device *device)
+_Success_(return)
+bool Test07(_In_ ID3D11Device *device)
 {
+    if (!device)
+        return false;
+
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
     device->GetImmediateContext(context.GetAddressOf());
 
