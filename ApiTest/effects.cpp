@@ -114,7 +114,6 @@ namespace
     };
 }
 
-// BasicEffects
 _Success_(return)
 bool Test00(_In_ ID3D11Device *device)
 {
@@ -184,7 +183,10 @@ bool Test00(_In_ ID3D11Device *device)
 
     // Create input layouts
     ComPtr<ID3D11InputLayout> ilBasic;
-    HRESULT hr = CreateInputLayoutFromEffect<VertexPositionNormalTexture>(device,
+    basic->SetTextureEnabled(true);
+    basic->SetLightingEnabled(true);
+    basic->SetVertexColorEnabled(true);
+    HRESULT hr = CreateInputLayoutFromEffect<TestVertex>(device,
         basic.get(),
         ilBasic.GetAddressOf());
     if (FAILED(hr))
@@ -194,7 +196,8 @@ bool Test00(_In_ ID3D11Device *device)
     }
 
     ComPtr<ID3D11InputLayout> ilAlpha;
-    hr = CreateInputLayoutFromEffect<VertexPositionNormalTexture>(device,
+    alpha->SetVertexColorEnabled(true);
+    hr = CreateInputLayoutFromEffect<TestVertex>(device,
         alpha.get(),
         ilAlpha.GetAddressOf());
     if (FAILED(hr))
@@ -204,6 +207,7 @@ bool Test00(_In_ ID3D11Device *device)
     }
 
     ComPtr<ID3D11InputLayout> ilDual;
+    dual->SetVertexColorEnabled(true);
     hr = CreateInputLayoutFromEffect<TestVertex>(device,
         dual.get(),
         ilDual.GetAddressOf());
@@ -272,13 +276,14 @@ bool Test00(_In_ ID3D11Device *device)
 
         basic->SetTexture(defaultTex.Get());
 
-        for(int combos = 0; combos <= 0x1f; ++combos)
+        for(int combos = 0; combos <= 0x3f; ++combos)
         {
             basic->SetLightingEnabled((combos & 0x1) ? true : false);
             basic->SetFogEnabled((combos & 0x2) ? true : false);
             basic->SetVertexColorEnabled((combos & 0x4) ? true : false);
             basic->SetTextureEnabled((combos & 0x8) ? true : false);
             basic->SetPerPixelLighting((combos & 0x10) ? true : false);
+            basic->SetBiasedVertexNormals((combos & 0x20) ? true : false);
             basic->Apply(context.Get());
         }
     }
@@ -338,10 +343,14 @@ bool Test00(_In_ ID3D11Device *device)
             envmap->SetTexture(defaultTex.Get());
             envmap->SetEnvironmentMap(secondTex.Get());
 
-            for(int combos = 0; combos <= 0x3; ++combos)
+            // TODO: Mapping_Sphere, Mapping_DualParabola
+            for(int combos = 0; combos <= 0x1F; ++combos)
             {
                 envmap->SetFogEnabled((combos & 0x1) ? true : false);
                 envmap->SetPerPixelLighting((combos & 0x2) ? true : false);
+                envmap->SetBiasedVertexNormals((combos & 0x4) ? true : false);
+                envmap->SetFresnelFactor((combos & 0x8) ? 1.f : 0.f);
+                envmap->SetEnvironmentMapSpecular((combos & 0x10) ? g_XMOne : g_XMZero);
                 envmap->Apply(context.Get());
             }
         }
@@ -367,16 +376,17 @@ bool Test00(_In_ ID3D11Device *device)
             skin->SetWeightsPerVertex(static_cast<int>(j));
             skin->SetTexture(defaultTex.Get());
 
-            for(int combos = 0; combos <= 0x3; ++combos)
+            for(int combos = 0; combos <= 0x7; ++combos)
             {
                 skin->SetFogEnabled((combos & 0x1) ? true : false);
                 skin->SetPerPixelLighting((combos & 0x2) ? true : false);
+                skin->SetBiasedVertexNormals((combos & 0x4) ? true : false);
                 skin->Apply(context.Get());
             }
         }
         catch(const std::exception& e)
         {
-            printf("ERROR: Failed applying envmap (except: %s)\n", e.what());
+            printf("ERROR: Failed applying skin (except: %s)\n", e.what());
             success = false;
         }
     }
@@ -384,8 +394,377 @@ bool Test00(_In_ ID3D11Device *device)
     return success;
 }
 
-// TODO: NormalMapEffect
-// SkinnedNormalMapEffect
-// PBREffect
-// SkinnedPBREffect
-// DebugEffect
+_Success_(return)
+bool Test11(_In_ ID3D11Device *device)
+{
+    if (!device)
+        return false;
+
+    ComPtr<ID3D11DeviceContext> context;
+    device->GetImmediateContext(context.GetAddressOf());
+
+    bool success = true;
+
+    // Create effect
+    std::unique_ptr<NormalMapEffect> nmap;
+    try
+    {
+        nmap = std::make_unique<NormalMapEffect>(device);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating object (except: %s)\n", e.what());
+        success = false;
+    }
+
+    std::unique_ptr<SkinnedNormalMapEffect> skin;
+    try
+    {
+        skin = std::make_unique<SkinnedNormalMapEffect>(device);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating skin object (except: %s)\n", e.what());
+        success = false;
+    }
+
+    std::unique_ptr<DebugEffect> dbg;
+    try
+    {
+        dbg = std::make_unique<DebugEffect>(device);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating debug object (except: %s)\n", e.what());
+        success = false;
+    }
+
+    // Create input layouts
+    ComPtr<ID3D11InputLayout> il;
+    nmap->SetVertexColorEnabled(true);
+    HRESULT hr = CreateInputLayoutFromEffect<TestVertex>(device,
+        nmap.get(),
+        il.GetAddressOf());
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed creating input layout (%08X)\n", static_cast<unsigned int>(hr));
+        success = false;
+    }
+
+    ComPtr<ID3D11InputLayout> ilSkin;
+    hr = CreateInputLayoutFromEffect<TestVertex>(device,
+        skin.get(),
+        ilSkin.GetAddressOf());
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed creating input layout for skin (%08X)\n", static_cast<unsigned int>(hr));
+        success = false;
+    }
+
+    ComPtr<ID3D11InputLayout> ilDebug;
+    dbg->SetVertexColorEnabled(true);
+    hr = CreateInputLayoutFromEffect<TestVertex>(device,
+        dbg.get(),
+        ilDebug.GetAddressOf());
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed creating input layout for debug (%08X)\n", static_cast<unsigned int>(hr));
+        success = false;
+    }
+
+    // Apply
+    ComPtr<ID3D11ShaderResourceView> defaultTex;
+    {
+        const uint32_t s_pixel = 0xffffffff;
+
+        D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+
+        hr = CreateTextureFromMemory(device, 1u, 1u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+            nullptr,
+            defaultTex.GetAddressOf());
+        if (FAILED(hr))
+        {
+            printf("ERROR: failed to create needed test texture (%08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+    }
+
+    ComPtr<ID3D11ShaderResourceView> normalTex;
+    {
+        const uint32_t s_pixel = 0xf0f0f0f0;
+
+        D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+
+        hr = CreateTextureFromMemory(device, 1u, 1u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+            nullptr,
+            normalTex.GetAddressOf());
+        if (FAILED(hr))
+        {
+            printf("ERROR: failed to create needed test texture (%08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+    }
+
+    ComPtr<ID3D11ShaderResourceView> specularTex;
+    {
+        const uint32_t s_pixel = 0xabababff;
+
+        D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+
+        hr = CreateTextureFromMemory(device, 1u, 1u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+            nullptr,
+            specularTex.GetAddressOf());
+        if (FAILED(hr))
+        {
+            printf("ERROR: failed to create needed test texture (%08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+    }
+
+    try
+    {
+        context->IASetInputLayout(il.Get());
+
+        nmap->SetTexture(defaultTex.Get());
+        nmap->SetNormalTexture(normalTex.Get());
+
+        for(int combos = 0; combos <= 0xf; ++combos)
+        {
+            nmap->SetFogEnabled((combos & 0x1) ? true : false);
+            nmap->SetVertexColorEnabled((combos & 0x2) ? true : false);
+            nmap->SetBiasedVertexNormals((combos & 0x4) ? true : false);
+            nmap->SetSpecularTexture((combos & 0x8) ? specularTex.Get() : nullptr);
+            nmap->Apply(context.Get());
+        }
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed applying nmap (except: %s)\n", e.what());
+        success = false;
+    }
+
+    for(size_t j = 1; j <= 4; ++j)
+    {
+        if (j == 3)
+        {
+            // Weights have to be 1, 2, or 4.
+            continue;
+        }
+
+        try
+        {
+            context->IASetInputLayout(ilSkin.Get());
+
+            skin->SetWeightsPerVertex(static_cast<int>(j));
+            skin->SetTexture(defaultTex.Get());
+            skin->SetNormalTexture(normalTex.Get());
+
+            for(int combos = 0; combos <= 0x7; ++combos)
+            {
+                skin->SetFogEnabled((combos & 0x1) ? true : false);
+                skin->SetBiasedVertexNormals((combos & 0x2) ? true : false);
+                skin->SetSpecularTexture((combos & 0x4) ? specularTex.Get() : nullptr);
+                skin->Apply(context.Get());
+            }
+        }
+        catch(const std::exception& e)
+        {
+            printf("ERROR: Failed applying skin (except: %s)\n", e.what());
+            success = false;
+        }
+    }
+
+    for(size_t j = 0; j <= 3; ++j)
+    {
+        try
+        {
+            dbg->SetMode(static_cast<DebugEffect::Mode>(j));
+            context->IASetInputLayout(ilDebug.Get());
+
+            for(int combos = 0; combos <= 0x3; ++combos)
+            {
+                dbg->SetVertexColorEnabled((combos & 0x1) ? true : false);
+                dbg->SetBiasedVertexNormals((combos & 0x2) ? true : false);
+                dbg->Apply(context.Get());
+            }
+        }
+        catch(const std::exception& e)
+        {
+            printf("ERROR: Failed applying dbg (except: %s)\n", e.what());
+            success = false;
+        }
+    }
+
+    return success;
+}
+
+_Success_(return)
+bool Test12(_In_ ID3D11Device *device)
+{
+    if (!device)
+        return false;
+
+    ComPtr<ID3D11DeviceContext> context;
+    device->GetImmediateContext(context.GetAddressOf());
+
+    bool success = true;
+
+    // Create effect
+    std::unique_ptr<PBREffect> pbr;
+    try
+    {
+        pbr = std::make_unique<PBREffect>(device);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating object (except: %s)\n", e.what());
+        success = false;
+    }
+
+    std::unique_ptr<SkinnedPBREffect> skin;
+    try
+    {
+        skin = std::make_unique<SkinnedPBREffect>(device);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed creating skin object (except: %s)\n", e.what());
+        success = false;
+    }
+
+    // Create input layouts
+    ComPtr<ID3D11InputLayout> il;
+    HRESULT hr = CreateInputLayoutFromEffect<VertexPositionNormalTexture>(device,
+        pbr.get(),
+        il.GetAddressOf());
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed creating input layout (%08X)\n", static_cast<unsigned int>(hr));
+        success = false;
+    }
+
+    ComPtr<ID3D11InputLayout> ilSkin;
+    hr = CreateInputLayoutFromEffect<TestVertex>(device,
+        skin.get(),
+        ilSkin.GetAddressOf());
+    if (FAILED(hr))
+    {
+        printf("ERROR: Failed creating input layout for skin (%08X)\n", static_cast<unsigned int>(hr));
+        success = false;
+    }
+
+    // Apply
+    ComPtr<ID3D11ShaderResourceView> albetoTex;
+    {
+        const uint32_t s_pixel = 0xffffffff;
+
+        D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+
+        hr = CreateTextureFromMemory(device, 1u, 1u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+            nullptr,
+            albetoTex.GetAddressOf());
+        if (FAILED(hr))
+        {
+            printf("ERROR: failed to create needed test texture (%08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+    }
+
+    ComPtr<ID3D11ShaderResourceView> normalTex;
+    {
+        const uint32_t s_pixel = 0xf0f0f0f0;
+
+        D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+
+        hr = CreateTextureFromMemory(device, 1u, 1u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+            nullptr,
+            normalTex.GetAddressOf());
+        if (FAILED(hr))
+        {
+            printf("ERROR: failed to create needed test texture (%08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+    }
+
+    ComPtr<ID3D11ShaderResourceView> rmaTex;
+    {
+        const uint32_t s_pixel = 0xabababff;
+
+        D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+
+        hr = CreateTextureFromMemory(device, 1u, 1u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+            nullptr,
+            rmaTex.GetAddressOf());
+        if (FAILED(hr))
+        {
+            printf("ERROR: failed to create needed test texture (%08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+    }
+
+    ComPtr<ID3D11ShaderResourceView> emissiveTex;
+    {
+        const uint32_t s_pixel = 0x11111111;
+
+        D3D11_SUBRESOURCE_DATA initData = { &s_pixel, sizeof(uint32_t), 0 };
+
+        hr = CreateTextureFromMemory(device, 1u, 1u, DXGI_FORMAT_R8G8B8A8_UNORM, initData,
+            nullptr,
+            emissiveTex.GetAddressOf());
+        if (FAILED(hr))
+        {
+            printf("ERROR: failed to create needed test texture (%08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+    }
+
+    try
+    {
+        context->IASetInputLayout(il.Get());
+
+        pbr->SetSurfaceTextures(albetoTex.Get(), normalTex.Get(), rmaTex.Get());
+
+        for(int combos = 0; combos <= 0x3f; ++combos)
+        {
+            pbr->SetBiasedVertexNormals((combos & 0x1) ? true : false);
+            pbr->SetEmissiveTexture((combos & 0x2) ? emissiveTex.Get() : nullptr);
+            pbr->Apply(context.Get());
+        }
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed applying pbr (except: %s)\n", e.what());
+        success = false;
+    }
+
+    for(size_t j = 1; j <= 4; ++j)
+    {
+        if (j == 3)
+        {
+            // Weights have to be 1, 2, or 4.
+            continue;
+        }
+
+        try
+        {
+            context->IASetInputLayout(ilSkin.Get());
+
+            skin->SetWeightsPerVertex(static_cast<int>(j));
+            skin->SetSurfaceTextures(albetoTex.Get(), normalTex.Get(), rmaTex.Get());
+
+            for(int combos = 0; combos <= 0x3; ++combos)
+            {
+                skin->SetBiasedVertexNormals((combos & 0x1) ? true : false);
+                skin->SetEmissiveTexture((combos & 0x2) ? emissiveTex.Get() : nullptr);
+                skin->Apply(context.Get());
+            }
+        }
+        catch(const std::exception& e)
+        {
+            printf("ERROR: Failed applying skin (except: %s)\n", e.what());
+            success = false;
+        }
+    }
+
+    return success;
+}
