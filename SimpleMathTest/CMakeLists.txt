@@ -221,7 +221,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|IntelLLVM")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(${PROJECT_NAME} PRIVATE
         "-Wno-reserved-id-macro" "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic"
-        "-Wno-gnu-anonymous-struct" "-Wno-ignored-attributes" "-Wno-global-constructors" "-Wno-missing-variable-declarations"
+        "-Wno-gnu-anonymous-struct" "-Wno-ignored-attributes" "-Wno-global-constructors"
         "-Wno-nested-anon-types")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     target_compile_options(${PROJECT_NAME} PRIVATE /Zc:__cplusplus /Zc:inline /fp:fast)
