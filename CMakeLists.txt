@@ -600,3 +600,21 @@ if(ENABLE_CODE_COVERAGE)
     endif()
   endif()
 endif()
+
+if((NOT BUILD_BVT) AND (CMAKE_VERSION VERSION_GREATER_EQUAL 3.21))
+  if(BUILD_XAUDIO_REDIST)
+    add_custom_command(TARGET simpleaudiotest POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E $<IF:$<BOOL:$<TARGET_RUNTIME_DLLS:simpleaudiotest>>,copy,true>
+        $<TARGET_RUNTIME_DLLS:simpleaudiotest> $<TARGET_FILE_DIR:simpleaudiotest>
+        COMMAND_EXPAND_LISTS
+        )
+  endif()
+
+  if(BUILD_GAMEINPUT)
+    add_custom_command(TARGET gamepadtest POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E $<IF:$<BOOL:$<TARGET_RUNTIME_DLLS:gamepadtest>>,copy,true>
+        $<TARGET_RUNTIME_DLLS:gamepadtest> $<TARGET_FILE_DIR:gamepadtest>
+        COMMAND_EXPAND_LISTS
+        )
+  endif()
+endif()
