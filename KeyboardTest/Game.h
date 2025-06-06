@@ -92,7 +92,7 @@ private:
 
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
-    
+
     // DirectXTK Test Objects
 #ifdef XBOX
     std::unique_ptr<DirectX::GraphicsMemory> m_graphicsMemory;

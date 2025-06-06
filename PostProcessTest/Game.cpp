@@ -293,7 +293,7 @@ void Game::Render()
     case 8:
         {
             descstr = L"BloomBlur (extract + horizontal)";
-        
+
             // Pass 1 (scene -> blur1)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);
@@ -321,7 +321,7 @@ void Game::Render()
     case 9:
         {
             descstr = L"BloomBlur (extract + vertical)";
-        
+
             // Pass 1 (scene -> blur1)
             m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
             m_basicPostProcess->SetBloomExtractParameter(0.25f);

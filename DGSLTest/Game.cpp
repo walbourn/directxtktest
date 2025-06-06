@@ -412,7 +412,7 @@ void Game::CreateDeviceDependentResources()
 #ifdef GAMMA_CORRECT_RENDERING
     m_fx->EnableForceSRGB(true);
 #endif
-    
+
 #ifdef LH_COORDS
     bool ccw = false;
 #else

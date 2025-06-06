@@ -296,7 +296,7 @@ int __cdecl wmain()
         auto audioStart = wavData.get() + sizeof(WAVEFORMATEX);
 
         GenerateSineWave( reinterpret_cast<int16_t*>( audioStart ), 44100, 440 );
-        
+
         auto wfx = reinterpret_cast<WAVEFORMATEX*>( wavData.get() );
         wfx->wFormatTag = WAVE_FORMAT_PCM;
         wfx->nChannels = 1;
@@ -454,7 +454,7 @@ int __cdecl wmain()
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur );
 
         dump_wfx( soundEffect->GetFormat() );
-    
+
         auto effect = soundEffect->CreateInstance();
 
         // Standard
@@ -775,7 +775,7 @@ int __cdecl wmain()
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur );
 
         dump_wfx( soundEffect->GetFormat() );
-    
+
         auto effect = soundEffect->CreateInstance();
 
         // Standard
@@ -1096,7 +1096,7 @@ int __cdecl wmain()
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur );
 
         dump_wfx( soundEffect->GetFormat() );
-    
+
         auto effect = soundEffect->CreateInstance();
 
         // Standard
@@ -1399,7 +1399,7 @@ int __cdecl wmain()
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur);
 
         dump_wfx( soundEffect->GetFormat() );
-    
+
         auto effect = soundEffect->CreateInstance();
 
         // Standard
@@ -1442,7 +1442,7 @@ int __cdecl wmain()
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur);
 
         dump_wfx( soundEffect->GetFormat() );
-    
+
         auto effect = soundEffect->CreateInstance();
 
         // Standard
@@ -1485,7 +1485,7 @@ int __cdecl wmain()
 
         printf( "\nINFO: Loaded musicmono_xwma.wav (%zu bytes, %zu samples, %zu ms)\n",
                 soundEffect->GetSampleSizeInBytes(), soundEffect->GetSampleDuration(), effectDur );
-    
+
         dump_wfx( soundEffect->GetFormat() );
 
         auto effect = soundEffect->CreateInstance();
@@ -2499,7 +2499,7 @@ int __cdecl wmain()
         printf(".");
         Sleep (1000);
         UPDATE
-   
+
         audEngine.reset();
     }
 
@@ -2511,5 +2511,5 @@ int __cdecl wmain()
     audEngine.reset();
     CoUninitialize();
 
-    return 0; 
+    return 0;
 }

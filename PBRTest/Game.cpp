@@ -514,7 +514,7 @@ void Game::Render()
         context->DrawIndexed(m_indexCount, 0, 0);
     }
 
-    //--- PBREffect (constant) -------------------------------------------------------------   
+    //--- PBREffect (constant) -------------------------------------------------------------
     context->IASetInputLayout(m_inputLayoutPBR.Get());
 
     m_pbr->SetAlpha(1.f);

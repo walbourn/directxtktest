@@ -493,7 +493,7 @@ void Game::Render()
     });
     local = XMMatrixMultiply(XMMatrixScaling(2.f, 2.f, 2.f), XMMatrixTranslation(2.5f, row1, 0.f));
     m_soldier->Draw(context, *m_states, local, m_view, m_projection);
-    
+
     // Show the new frame.
     m_deviceResources->Present();
 

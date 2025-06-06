@@ -769,7 +769,7 @@ void Game::CreateDeviceDependentResources()
         DDS_ALPHA_MODE alphaMode = DDS_ALPHA_MODE_UNKNOWN;
 
         ComPtr<ID3D11Resource> res;
-        DX::ThrowIfFailed(CreateDDSTextureFromFile(device, context, L"dx5_logo_autogen.dds", 
+        DX::ThrowIfFailed(CreateDDSTextureFromFile(device, context, L"dx5_logo_autogen.dds",
             res.GetAddressOf(), m_dxlogo.ReleaseAndGetAddressOf(), 0, &alphaMode));
 
         if (alphaMode != DDS_ALPHA_MODE_UNKNOWN)
