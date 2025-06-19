@@ -47,7 +47,7 @@ if((BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST)
   list(APPEND XAUDIO_TESTS wavtest)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/WavTest)
   add_test(NAME "wavtest" COMMAND wavtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-  set_tests_properties(wavtest PROPERTIES LABELS "Audio")
+  set_tests_properties(wavtest PROPERTIES LABELS "Audio;wav")
   set_tests_properties(wavtest PROPERTIES TIMEOUT 60)
 
   # fuzzloaders
