@@ -47,7 +47,7 @@ namespace DX
             L"Media\\HDR",
             L"Media\\Sounds",
             L"Media\\Videos",
-            0
+            nullptr
         };
 
         if (!searchFolders)

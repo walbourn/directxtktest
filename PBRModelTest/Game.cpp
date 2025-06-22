@@ -12,6 +12,8 @@
 #include "pch.h"
 #include "Game.h"
 
+#include "FindMedia.h"
+
 //#define USE_FAST_SEMANTICS
 
 // Build for LH vs. RH coords
@@ -662,35 +664,39 @@ void Game::CreateDeviceDependentResources()
     bool ccw = true;
 #endif
 
-#ifdef PC
-#define IBL_PATH L"..\\PBRTest\\"
-#else
-#define IBL_PATH
-#endif
-
     static const wchar_t* s_radianceIBL[s_nIBL] =
     {
-        IBL_PATH L"Atrium_diffuseIBL.dds",
-        IBL_PATH L"Garage_diffuseIBL.dds",
-        IBL_PATH L"SunSubMixer_diffuseIBL.dds",
+        L"Atrium_diffuseIBL.dds",
+        L"Garage_diffuseIBL.dds",
+        L"SunSubMixer_diffuseIBL.dds",
     };
     static const wchar_t* s_irradianceIBL[s_nIBL] =
     {
-        IBL_PATH L"Atrium_specularIBL.dds",
-        IBL_PATH L"Garage_specularIBL.dds",
-        IBL_PATH L"SunSubMixer_specularIBL.dds",
+        L"Atrium_specularIBL.dds",
+        L"Garage_specularIBL.dds",
+        L"SunSubMixer_specularIBL.dds",
     };
 
     static_assert(std::size(s_radianceIBL) == std::size(s_irradianceIBL), "IBL array mismatch");
 
+    static const wchar_t* s_searchFolders[] =
+    {
+        L"PBRModelTest",
+        L"PBRTest",
+        nullptr
+    };
+
     for (size_t j = 0; j < s_nIBL; ++j)
     {
+        wchar_t strFilePath[MAX_PATH] = {};
+        DX::FindMediaFile(strFilePath, MAX_PATH, s_radianceIBL[j], s_searchFolders);
         DX::ThrowIfFailed(
-            CreateDDSTextureFromFile(device, s_radianceIBL[j], nullptr, m_radianceIBL[j].ReleaseAndGetAddressOf())
+            CreateDDSTextureFromFile(device, strFilePath, nullptr, m_radianceIBL[j].ReleaseAndGetAddressOf())
         );
 
+        DX::FindMediaFile(strFilePath, MAX_PATH, s_irradianceIBL[j], s_searchFolders);
         DX::ThrowIfFailed(
-            CreateDDSTextureFromFile(device, s_irradianceIBL[j], nullptr, m_irradianceIBL[j].ReleaseAndGetAddressOf())
+            CreateDDSTextureFromFile(device, strFilePath, nullptr, m_irradianceIBL[j].ReleaseAndGetAddressOf())
         );
     }
 

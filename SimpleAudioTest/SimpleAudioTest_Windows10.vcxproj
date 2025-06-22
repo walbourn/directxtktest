@@ -225,6 +225,7 @@
   <ItemGroup>
     <ClInclude Include="..\Common\DeviceResourcesUWP.h" />
     <ClInclude Include="..\Common\DirectXTKTest.h" />
+    <ClInclude Include="..\Common\FindMedia.h" />
     <ClInclude Include="..\Common\StepTimer.h" />
     <ClInclude Include="..\Common\TextConsole.h" />
     <ClInclude Include="Game.h" />
@@ -331,7 +332,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <AppxManifest Include="PackageUWP.appxmanifest" />
+    <AppxManifest Include="PackageUWP.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DirectXTK_Windows10_2022.vcxproj">
