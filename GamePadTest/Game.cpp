@@ -23,6 +23,8 @@
 #endif
 #if GAMEINPUT_API_VERSION == 1
 using namespace GameInput::v1;
+#elif GAMEINPUT_API_VERSION == 2
+using namespace GameInput::v2;
 #endif
 #elif defined(USING_WINDOWS_GAMING_INPUT)
 #ifdef _MSC_VER
