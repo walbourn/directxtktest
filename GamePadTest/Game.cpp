@@ -259,7 +259,7 @@ void Game::Update(DX::StepTimer const&)
                     OutputDebugStringA(buff);
 
                     {
-                        ComPtr<IGameInputDevice> idevice;
+                        ComPtr<GamePad::GameInputDevice_t> idevice;
                         m_gamePad->GetDevice(j, idevice.GetAddressOf());
 
                         if (!idevice)
