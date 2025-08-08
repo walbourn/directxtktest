@@ -232,10 +232,10 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
       target_compile_options(${PROJECT_NAME} PRIVATE /ZH:SHA_256)
     endif()
 
-    set(WarningsEXE "/wd4061" "/wd4365" "/wd4514" "/wd4571" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045")
+    set(WarningsEXE /wd4061 /wd4365 /wd4514 /wd4571 /wd4668 /wd4710 /wd4820 /wd5039 /wd5045)
 
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.26)
-      list(APPEND WarningsEXE "/wd5105")
+      list(APPEND WarningsEXE /wd5105)
       target_compile_options(${PROJECT_NAME} PRIVATE /Zc:preprocessor)
     endif()
 
@@ -244,7 +244,10 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     endif()
 
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.34)
-      list(APPEND WarningsEXE "/wd5262" "/wd5264")
+      list(APPEND WarningsEXE /wd5262 /wd5264)
+    endif()
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.50)
+      list(APPEND WarningsEXE /wd4865)
     endif()
 
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsEXE})
