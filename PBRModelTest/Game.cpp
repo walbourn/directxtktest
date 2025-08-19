@@ -681,6 +681,7 @@ void Game::CreateDeviceDependentResources()
 
     static const wchar_t* s_searchFolders[] =
     {
+        L"..\\PBRTest",
         L"PBRModelTest",
         L"PBRTest",
         nullptr

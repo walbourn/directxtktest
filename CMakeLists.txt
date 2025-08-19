@@ -135,7 +135,7 @@ if(NOT BUILD_BVT)
       target_precompile_headers(primitivestest PRIVATE PrimitivesTest/pch.h)
     endif()
     add_test(NAME "primitiveBatch" COMMAND primitivestest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PrimitivesTest)
-    set_tests_properties(primitiveBatch PROPERTIES LABELS "Graphics")
+    set_tests_properties(primitiveBatch PROPERTIES LABELS "Graphics;Shapes")
     set_tests_properties(primitiveBatch PROPERTIES TIMEOUT 60)
 
 # SPRITE BATCH
