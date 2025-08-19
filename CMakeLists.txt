@@ -276,7 +276,7 @@ if(NOT BUILD_BVT)
       target_precompile_headers(hdrtest PRIVATE HDRTest/pch.h)
     endif()
     add_test(NAME "hdr" COMMAND hdrtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/HDRTest)
-    set_tests_properties(hdr PROPERTIES LABELS "Graphics")
+    set_tests_properties(hdr PROPERTIES LABELS "Graphics;PostProcess")
     set_tests_properties(hdr PROPERTIES TIMEOUT 40)
 
 # PBR
@@ -331,7 +331,7 @@ if(NOT BUILD_BVT)
       target_precompile_headers(postprocesstest PRIVATE PostProcessTest/pch.h)
     endif()
     add_test(NAME "postProcess" COMMAND postprocesstest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PostProcessTest)
-    set_tests_properties(postProcess PROPERTIES LABELS "Graphics")
+    set_tests_properties(postProcess PROPERTIES LABELS "Graphics;PostProcess")
     set_tests_properties(postProcess PROPERTIES TIMEOUT 180)
 endif()
 
