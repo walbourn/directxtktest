@@ -34,6 +34,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/HeaderTest)
 
 # apitest
 list(APPEND TEST_EXES apitest)
+list(APPEND XAUDIO_TESTS apitest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ApiTest)
 add_test(NAME "apitest" COMMAND apitest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 set_tests_properties(apitest PROPERTIES LABELS "API")

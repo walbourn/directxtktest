@@ -21,7 +21,7 @@ if(PROJECT_IS_TOP_LEVEL)
   message(FATAL_ERROR "DirectX Tool Kit Test Suite should be built by the main CMakeLists")
 endif()
 
-add_executable(${PROJECT_NAME}
+set(SOURCES
   ApiTest.cpp
   bufferhelpers.cpp
   commonstates.cpp
@@ -35,8 +35,17 @@ add_executable(${PROJECT_NAME}
   primitives.cpp
   shared.cpp
   sprites.cpp
-  vertextypes.cpp
-  )
+  vertextypes.cpp)
+
+if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST)
+  list(APPEND SOURCES audio.cpp)
+endif()
+
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE TEST_AUDIO)
+endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE ../../Src)
 
