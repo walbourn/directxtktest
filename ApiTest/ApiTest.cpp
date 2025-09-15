@@ -100,6 +100,7 @@ extern _Success_(return) bool Test15(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test16(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test17(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test18(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test19(_In_ ID3D11Device *device);
 
 const TestInfo g_Tests[] =
 {
@@ -122,6 +123,7 @@ const TestInfo g_Tests[] =
     { "GamePad", Test16 },
     { "Keyboard", Test17 },
     { "Mouse", Test18 },
+    { "LoaderHelpers (internal)", Test19 },
 };
 
 //-------------------------------------------------------------------------------------

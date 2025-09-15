@@ -593,6 +593,9 @@ if(ENABLE_CODE_COVERAGE)
   endforeach()
 
   if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/MSVCCodeCovBVT.cmd.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MSVCCodeCovBVT.cmd COPYONLY)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/coverage-bvt.config.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/coverage-bvt.config COPYONLY)
+
     configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/MSVCCodeCov.cmd.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MSVCCodeCov.cmd COPYONLY)
     configure_file(${CMAKE_CURRENT_LIST_DIR}/codecov/coverage.config.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/coverage.config COPYONLY)
 

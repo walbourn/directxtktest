@@ -28,6 +28,7 @@ add_executable(${PROJECT_NAME}
   directxhelpers.cpp
   effects.cpp
   graphicsmemory.cpp
+  loaderhelpers.cpp
   model.cpp
   postprocess.cpp
   primitivebatch.cpp
@@ -36,6 +37,8 @@ add_executable(${PROJECT_NAME}
   sprites.cpp
   vertextypes.cpp
   )
+
+target_include_directories(${PROJECT_NAME} PRIVATE ../../Src)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXTK d3d11.lib)
 
