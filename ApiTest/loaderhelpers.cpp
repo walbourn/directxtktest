@@ -8,6 +8,14 @@
 //-------------------------------------------------------------------------------------
 
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX 1
+#define NODRAWTEXT
+#define NOGDI
+#define NOBITMAP
+#define NOMCX
+#define NOSERVICE
+#define NOHELP
+
 #include <dxgiformat.h>
 #include <wincodec.h>
 #include <wrl/client.h>
