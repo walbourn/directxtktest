@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-cmake_minimum_required (VERSION 3.20)
+cmake_minimum_required (VERSION 3.21)
 
 project (DirectXTKTest
   DESCRIPTION "DirectX Tool Kit for DX11 Test Suite"
@@ -9,15 +9,6 @@ project (DirectXTKTest
   LANGUAGES CXX)
 
 option(BUILD_BVT "Build-verification test" OFF)
-
-if(CMAKE_VERSION VERSION_LESS 3.21)
-  get_property(not_top DIRECTORY PROPERTY PARENT_DIRECTORY)
-  if(not_top)
-    set(PROJECT_IS_TOP_LEVEL false)
-  else()
-    set(PROJECT_IS_TOP_LEVEL true)
-  endif()
-endif()
 
 if(PROJECT_IS_TOP_LEVEL)
   message(FATAL_ERROR "DirectX Tool Kit Test Suite should be built by the main CMakeLists")
@@ -610,7 +601,7 @@ if(ENABLE_CODE_COVERAGE)
   endif()
 endif()
 
-if((NOT BUILD_BVT) AND (CMAKE_VERSION VERSION_GREATER_EQUAL 3.21))
+if(NOT BUILD_BVT)
   if(BUILD_XAUDIO_REDIST)
     add_custom_command(TARGET simpleaudiotest POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E $<IF:$<BOOL:$<TARGET_RUNTIME_DLLS:simpleaudiotest>>,copy,true>

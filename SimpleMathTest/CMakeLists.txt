@@ -1,7 +1,7 @@
 ﻿# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-cmake_minimum_required (VERSION 3.20)
+cmake_minimum_required (VERSION 3.21)
 
 project (simplemathtest
   DESCRIPTION "DirectX Tool Kit Simple Math Test Suite"
@@ -13,15 +13,6 @@ option(BUILD_AVX_TEST      "Build for /arch:AVX" OFF)
 option(BUILD_AVX2_TEST     "Build for /arch:AVX2" OFF)
 option(BUILD_DISABLE_SVML  "Disable use of SVML (VS 2019)" OFF)
 option(BUILD_NO_INTRINSICS "Disable use of compiler intrinsics" OFF)
-
-if(CMAKE_VERSION VERSION_LESS 3.21)
-  get_property(not_top DIRECTORY PROPERTY PARENT_DIRECTORY)
-  if(not_top)
-    set(PROJECT_IS_TOP_LEVEL false)
-  else()
-    set(PROJECT_IS_TOP_LEVEL true)
-  endif()
-endif()
 
 if(MINGW OR (NOT WIN32))
    set(BUILD_FOR_ONECORE OFF)
