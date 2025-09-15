@@ -142,8 +142,8 @@ bool Test19(_In_ ID3D11Device *device)
 
     UINT targetx = 100;
     UINT targety = 100;
-    FitPowerOf2( 1024, 768, targetx, targety, 65535 );
-    if ( (targetx != 63) || (targety != 63) )
+    FitPowerOf2( 1024, 768, targetx, targety, 65536 );
+    if ( (targetx != 64) || (targety != 64) )
     {
         printf("ERROR: FitPowerOf2 failed on 100x100 -> %ux%u\n", targetx, targety);
         success = false;
@@ -151,8 +151,8 @@ bool Test19(_In_ ID3D11Device *device)
 
     targetx = 200;
     targety = 100;
-    FitPowerOf2( 1024, 768, targetx, targety, 65535 );
-    if ( (targetx != 127) || (targety != 127) )
+    FitPowerOf2( 1024, 768, targetx, targety, 65536 );
+    if ( (targetx != 128) || (targety != 128) )
     {
         printf("ERROR: FitPowerOf2 failed on 200x100 -> %ux%u\n", targetx, targety);
         success = false;
@@ -160,8 +160,8 @@ bool Test19(_In_ ID3D11Device *device)
 
     targetx = 100;
     targety = 200;
-    FitPowerOf2( 768, 1024, targetx, targety, 65535 );
-    if ( (targetx != 127) || (targety != 127) )
+    FitPowerOf2( 768, 1024, targetx, targety, 65536 );
+    if ( (targetx != 128) || (targety != 128) )
     {
         printf("ERROR: FitPowerOf2 failed on 100x200 -> %ux%u\n", targetx, targety);
         success = false;
