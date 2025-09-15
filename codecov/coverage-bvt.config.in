@@ -9,10 +9,6 @@
         <Sources>
             <Exclude>
                 <Source>.*\\d3dx12\.h</Source>
-                <Source>.*\\DirectXTK\\Audio\\.*</Source>
-                <Source>.*\\DirectXTK\\Src\\GamePad.*</Source>
-                <Source>.*\\DirectXTK\\Src\\Keyboard.*</Source>
-                <Source>.*\\DirectXTK\\Src\\Mouse.*</Source>
                 <Source>.*\\DirectXTK\\Tests\\.*</Source>
             </Exclude>
         </Sources>

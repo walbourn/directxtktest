@@ -11,23 +11,14 @@ cd /d %BINDIR%
 
 set "FILES="
 
-REM apitest
-Microsoft.CodeCoverage.Console instrument --settings coverage-bvt.config apitest.exe
+for %%1 in (apitest ddswictest simplemathtest wavtest) do (Microsoft.CodeCoverage.Console instrument --settings coverage-bvt.config .\%%1.exe
 pushd ..\..\..\..\Tests
-Microsoft.CodeCoverage.Console collect %BINDIR%\apitest.exe
+@if errorlevel 1 goto pushfail
+Microsoft.CodeCoverage.Console collect %BINDIR%\%%1.exe -ctest
 @if errorlevel 1 goto failure
-call set "FILES=%%FILES%% output_apitest.coverage"
-move output.coverage %BINDIR%\output_apitest.coverage
-popd
-
-REM ddswictest
-Microsoft.CodeCoverage.Console instrument --settings coverage-bvt.config ddswictest.exe
-pushd ..\..\..\..\Tests
-Microsoft.CodeCoverage.Console collect %BINDIR%\ddswictest.exe
-@if errorlevel 1 goto failure
-call set "FILES=%%FILES%% output_ddswictest.coverage"
-move output.coverage %BINDIR%\output_ddswictest.coverage
-popd
+call set "FILES=%%FILES%% output_%%1.coverage"
+move output.coverage %BINDIR%\output_%%1.coverage
+popd)
 
 Microsoft.CodeCoverage.Console merge %FILES%
 @if errorlevel 1 goto failure
