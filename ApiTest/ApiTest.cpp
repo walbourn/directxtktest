@@ -108,12 +108,12 @@ extern _Success_(return) bool TestA01(_In_ ID3D11Device *device);
 
 const TestInfo g_Tests[] =
 {
-    { "BasicEffects", Test00 },
+    { "GraphicsMemory", Test00 },
+    { "BasicEffects", Test05 },
     { "BufferHelpers", Test01 },
     { "CommonStates", Test02 },
     { "DirectXHelpers", Test03 },
     { "GeometricPrimitive", Test04 },
-    { "GraphicsMemory", Test05 },
     { "PostProcess", Test06 },
     { "PrimitiveBatch", Test07 },
     { "SpriteBatch", Test08 },

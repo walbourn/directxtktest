@@ -18,7 +18,7 @@ static_assert(std::is_nothrow_move_constructible<GraphicsMemory>::value, "Move C
 static_assert(std::is_nothrow_move_assignable<GraphicsMemory>::value, "Move Assign.");
 
 _Success_(return)
-bool Test05(_In_ ID3D11Device *device)
+bool Test00(_In_ ID3D11Device *device)
 {
     if (!device)
         return false;
