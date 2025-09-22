@@ -44,7 +44,9 @@
 #endif
 #pragma warning(pop)
 
+#ifndef __MINGW32__
 #define _CRTDBG_MAP_ALLOC
+#endif
 #include <crtdbg.h>
 
 #include <Windows.h>

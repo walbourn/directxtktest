@@ -7,7 +7,9 @@
 
 #pragma once
 
+#ifndef __MINGW32__
 #define _CRTDBG_MAP_ALLOC
+#endif
 #include <stdlib.h>
 
 #ifdef _WIN32
