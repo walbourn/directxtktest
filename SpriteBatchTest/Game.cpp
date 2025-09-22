@@ -24,6 +24,9 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
+    constexpr float SWAP_TIME = 1.f;
+    constexpr float INTERACTIVE_TIME = 10.f;
+
 #ifdef GAMMA_CORRECT_RENDERING
     // Linear colors for DirectXMath were not added until v3.17 in the Windows SDK (22621)
     const XMVECTORF32 c_clearColor = { { { 0.127437726f, 0.300543845f, 0.846873462f, 1.f } } };
@@ -37,7 +40,9 @@ namespace
     }
 }
 
-Game::Game() noexcept(false)
+Game::Game() noexcept(false) :
+    m_sortMode(0),
+    m_delay(0)
 {
 #ifdef GAMMA_CORRECT_RENDERING
     constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
@@ -116,7 +121,7 @@ void Game::Tick()
 }
 
 // Updates the world.
-void Game::Update(DX::StepTimer const&)
+void Game::Update(DX::StepTimer const& timer)
 {
     auto pad = m_gamePad->GetState(0);
     auto kb = m_keyboard->GetState();
@@ -124,6 +129,17 @@ void Game::Update(DX::StepTimer const&)
     {
         ExitGame();
     }
+
+    if (pad.IsConnected())
+    {
+        m_gamePadButtons.Update(pad);
+    }
+    else
+    {
+        m_gamePadButtons.Reset();
+    }
+
+    m_keyboardButtons.Update(kb);
 
     if (kb.Left || (pad.IsConnected() && pad.dpad.left))
     {
@@ -144,6 +160,23 @@ void Game::Update(DX::StepTimer const&)
     {
         m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_ROTATE180);
         assert(m_spriteBatch->GetRotation() == DXGI_MODE_ROTATION_ROTATE180);
+    }
+
+    if (m_keyboardButtons.IsKeyPressed(Keyboard::Space) || (m_gamePadButtons.y == GamePad::ButtonStateTracker::PRESSED))
+    {
+        m_sortMode = SpriteSortMode_Deferred;
+
+        m_delay = INTERACTIVE_TIME;
+    }
+    else if (!kb.Space && !(pad.IsConnected() && pad.IsYPressed()))
+    {
+        m_delay -= static_cast<float>(timer.GetElapsedSeconds());
+
+        if (m_delay <= 0.f)
+        {
+            CycleSortMode();
+            m_delay = SWAP_TIME;
+        }
     }
 }
 #pragma endregion
@@ -183,7 +216,9 @@ void Game::Render()
 
     float time = 60.f * static_cast<float>(m_timer.GetTotalSeconds());
 
-    m_spriteBatch->Begin(SpriteSortMode_Deferred, m_states->NonPremultiplied());
+    auto sortMode = static_cast<SpriteSortMode>(m_sortMode);
+
+    m_spriteBatch->Begin(sortMode, m_states->NonPremultiplied());
 
     // Moving
     m_spriteBatch->Draw(m_cat.Get(), XMFLOAT2(900, 384.f + sinf(time / 60.f)*384.f), nullptr, Colors::White, 0.f, XMFLOAT2(128, 128), 1, SpriteEffects_None, 0);
@@ -256,15 +291,15 @@ void Game::Render()
     // Test alt samplers
     RECT tileRect = { long(256), long(256), long(256 * 3), long(256 * 3) };
 
-    m_spriteBatch->Begin(SpriteSortMode_Deferred, m_states->NonPremultiplied(), m_states->PointClamp());
+    m_spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), m_states->PointClamp());
     m_spriteBatch->Draw(m_cat.Get(), XMFLOAT2(1100.f, 100.f), nullptr, Colors::White, time / 50, XMFLOAT2(128, 128));
     m_spriteBatch->End();
 
-    m_spriteBatch->Begin(SpriteSortMode_Deferred, m_states->NonPremultiplied(), m_states->AnisotropicClamp());
+    m_spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), m_states->AnisotropicClamp());
     m_spriteBatch->Draw(m_cat.Get(), XMFLOAT2(1100.f, 350.f), &tileRect, Colors::White, time / 50, XMFLOAT2(256, 256));
     m_spriteBatch->End();
 
-    m_spriteBatch->Begin(SpriteSortMode_Deferred, m_states->NonPremultiplied(), m_states->AnisotropicWrap());
+    m_spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), m_states->AnisotropicWrap());
     m_spriteBatch->Draw(m_cat.Get(), XMFLOAT2(1100.f, 600.f), &tileRect, Colors::White, time / 50, XMFLOAT2(256, 256));
     m_spriteBatch->End();
 
@@ -294,6 +329,12 @@ void Game::Clear()
 
 #pragma region Message Handlers
 // Message handlers
+void Game::OnActivated()
+{
+    m_gamePadButtons.Reset();
+    m_keyboardButtons.Reset();
+}
+
 void Game::OnSuspending()
 {
     m_deviceResources->Suspend();
@@ -304,6 +345,8 @@ void Game::OnResuming()
     m_deviceResources->Resume();
 
     m_timer.ResetElapsedTime();
+    m_gamePadButtons.Reset();
+    m_keyboardButtons.Reset();
 }
 
 #ifdef PC
@@ -439,3 +482,13 @@ void Game::OnDeviceRestored()
 }
 #endif
 #pragma endregion
+
+void Game::CycleSortMode()
+{
+    m_sortMode += 1;
+
+    if (m_sortMode > SpriteSortMode_FrontToBack)
+    {
+        m_sortMode = SpriteSortMode_Deferred;
+    }
+}

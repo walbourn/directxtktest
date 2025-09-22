@@ -50,7 +50,7 @@ public:
 #endif
 
     // Messages
-    void OnActivated() {}
+    void OnActivated();
     void OnDeactivated() {}
     void OnSuspending();
     void OnResuming();
@@ -86,6 +86,8 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 
+    void CycleSortMode();
+
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
@@ -95,6 +97,9 @@ private:
     // Input devices.
     std::unique_ptr<DirectX::GamePad>       m_gamePad;
     std::unique_ptr<DirectX::Keyboard>      m_keyboard;
+
+    DirectX::GamePad::ButtonStateTracker    m_gamePadButtons;
+    DirectX::Keyboard::KeyboardStateTracker m_keyboardButtons;
 
     // DirectXTK Test Objects
 #ifdef XBOX
@@ -108,4 +113,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_letterA;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_letterB;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_letterC;
+
+    unsigned int m_sortMode;
+    float m_delay;
 };
