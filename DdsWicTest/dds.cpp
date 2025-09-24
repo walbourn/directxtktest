@@ -935,7 +935,7 @@ bool Test01(_In_ ID3D11Device* pDevice)
             0,
             D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
             flags,
-            res.GetAddressOf(), nullptr, &alpha);
+            res.GetAddressOf(), nullptr /* We use the NULL device */, &alpha);
         if ( FAILED(hr) )
         {
             if (((hr == HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND)) || (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND)))
@@ -1073,6 +1073,34 @@ bool Test01(_In_ ID3D11Device* pDevice)
                 break;
             }
 
+        #ifndef BUILD_BVT_ONLY
+            hr = CreateDDSTextureFromFileEx(
+                pDevice,
+                szPath,
+                0,
+                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+                flags | DDS_LOADER_FORCE_SRGB,
+                res.ReleaseAndGetAddressOf(), nullptr);
+            if (FAILED(hr))
+            {
+                success = false;
+                printf( "ERROR: Failed loading dds from file force-srgb (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
+            }
+
+            hr = CreateDDSTextureFromFileEx(
+                pDevice,
+                szPath,
+                0,
+                D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+                flags | DDS_LOADER_IGNORE_SRGB,
+                res.ReleaseAndGetAddressOf(), nullptr);
+            if (FAILED(hr))
+            {
+                success = false;
+                printf( "ERROR: Failed loading dds from file ignore-srgb (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
+            }
+        #endif // !BUILD_BVT_ONLY
+
             if (pass)
                 ++npass;
         }
@@ -1084,6 +1112,83 @@ bool Test01(_In_ ID3D11Device* pDevice)
     {
         printf("\nSkipped DIRECTX_TEX_MEDIA cases...\n");
     }
+
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        HRESULT hr = CreateDDSTextureFromFile(
+            nullDevice,
+            nullptr,
+            nullptr,
+            nullptr,
+            0,
+            nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateDDSTextureFromFileEx(
+            nullDevice,
+            nullptr,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            DDS_LOADER_DEFAULT,
+            nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args ex (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        ID3D11DeviceContext* nullContext = nullptr;
+        hr = CreateDDSTextureFromFile(
+            nullDevice,
+            nullContext,
+            nullptr,
+            nullptr,
+            nullptr,
+            0,
+            nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateDDSTextureFromFileEx(
+            nullDevice,
+            nullContext,
+            nullptr,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            DDS_LOADER_DEFAULT,
+            nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args context ex (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> srv;
+        hr = CreateDDSTextureFromFileEx(
+            pDevice,
+            L"Test.DDS",
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            DDS_LOADER_DEFAULT,
+            res.GetAddressOf(), srv.GetAddressOf());
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid bind args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+    }
+    #pragma warning(pop)
 
     printf("%zu files tested, %zu files passed ", ncount, npass );
 
@@ -1285,6 +1390,81 @@ bool Test02(_In_ ID3D11Device* pDevice)
         ++ncount;
     }
 
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        const uint8_t* nullData = nullptr;
+        HRESULT hr = CreateDDSTextureFromMemory(
+            nullDevice,
+            nullData, 0,
+            nullptr,
+            nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateDDSTextureFromMemoryEx(
+            nullDevice,
+            nullData, 0,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            DDS_LOADER_DEFAULT,
+            nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args ex (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        ID3D11DeviceContext* nullContext = nullptr;
+        hr = CreateDDSTextureFromMemory(
+            nullDevice,
+            nullContext,
+            nullData, 0,
+            nullptr,
+            nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateDDSTextureFromMemoryEx(
+            nullDevice,
+            nullContext,
+            nullData, 0,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            DDS_LOADER_DEFAULT,
+            nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args context ex (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> srv;
+        std::unique_ptr<uint8_t[]> empty = std::make_unique<uint8_t[]>(1);
+        hr = CreateDDSTextureFromMemoryEx(
+            pDevice,
+            empty.get(), 1,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            DDS_LOADER_DEFAULT,
+            res.GetAddressOf(), srv.GetAddressOf());
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid bind args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+    }
+    #pragma warning(pop)
+
     printf("%zu files tested, %zu files passed ", ncount, npass );
 
     return success;
@@ -1434,6 +1614,20 @@ bool Test05(_In_ ID3D11Device* pDevice)
 
         ++ncount;
     }
+
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11DeviceContext* nullContext = nullptr;
+        HRESULT hr = SaveDDSTextureToFile(nullContext, nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+    }
+    #pragma warning(pop)
 
     printf("%zu files tested, %zu files passed ", ncount, npass );
 

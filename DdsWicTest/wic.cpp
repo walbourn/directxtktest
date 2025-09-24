@@ -549,8 +549,123 @@ bool Test03(_In_ ID3D11Device* pDevice)
                 ++npass;
         }
 
+    #ifndef BUILD_BVT_ONLY
+        hr = CreateWICTextureFromFileEx(
+            pDevice,
+            szPath,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_FIT_POW2,
+            res.ReleaseAndGetAddressOf(), nullptr);
+        if (FAILED(hr))
+        {
+            success = false;
+            printf( "ERROR: Failed loading wic from file fit pow2 (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
+        }
+
+        hr = CreateWICTextureFromFileEx(
+            pDevice,
+            szPath,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_MAKE_SQUARE,
+            res.ReleaseAndGetAddressOf(), nullptr);
+        if (FAILED(hr))
+        {
+            success = false;
+            printf( "ERROR: Failed loading wic from file make square (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
+        }
+
+        hr = CreateWICTextureFromFileEx(
+            pDevice,
+            szPath,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_FORCE_RGBA32,
+            res.ReleaseAndGetAddressOf(), nullptr);
+        if (FAILED(hr))
+        {
+            success = false;
+            printf( "ERROR: Failed loading wic from file force RGBA (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
+        }
+
+        hr = CreateWICTextureFromFileEx(
+            pDevice,
+            szPath,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_FORCE_SRGB,
+            res.ReleaseAndGetAddressOf(), nullptr);
+        if (FAILED(hr))
+        {
+            success = false;
+            printf( "ERROR: Failed loading wic from file force srgb (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
+        }
+    #endif // !BUILD_BVT_ONLY
+
         ++ncount;
     }
+
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        wchar_t* nullPath = nullptr;
+        HRESULT hr = CreateWICTextureFromFile(
+            nullDevice,
+            nullPath,
+            nullptr,
+            nullptr,
+            0);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateWICTextureFromFileEx(
+            nullDevice,
+            nullPath,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid ex args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        ID3D11DeviceContext* nullContext = nullptr;
+         hr = CreateWICTextureFromFile(
+            pDevice,
+            nullContext,
+            nullptr,
+            nullptr,
+            nullptr,
+            0);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateWICTextureFromFileEx(
+            nullDevice,
+            nullContext,
+            nullptr,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid ex args context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+    }
+    #pragma warning(pop)
 
     printf("%zu files tested, %zu files passed ", ncount, npass );
 
@@ -665,6 +780,69 @@ bool Test04(_In_ ID3D11Device* pDevice)
 
         ++ncount;
     }
+
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        const uint8_t* nullData = nullptr;
+        HRESULT hr = CreateWICTextureFromMemory(
+            nullDevice,
+            nullData,
+            0,
+            nullptr, nullptr,
+            0);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateWICTextureFromMemoryEx(
+            nullDevice,
+            nullData,
+            0,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args ex (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        ID3D11DeviceContext* nullContext = nullptr;
+        hr = CreateWICTextureFromMemory(
+            nullDevice,
+            nullContext,
+            nullData,
+            0,
+            nullptr, nullptr,
+            0);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateWICTextureFromMemoryEx(
+            nullDevice,
+            nullContext,
+            nullData,
+            0,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args ex context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+    }
+    #pragma warning(pop)
 
     printf("%zu files tested, %zu files passed ", ncount, npass );
 
@@ -817,6 +995,19 @@ bool Test06(_In_ ID3D11Device* pDevice)
         }
 
         ++ncount;
+    }
+
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11DeviceContext* nullContext = nullptr;
+        HRESULT hr = SaveWICTextureToFile(nullContext, nullptr, GUID_ContainerFormatGif, nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
     }
 
     printf("%zu files tested, %zu files passed ", ncount, npass );

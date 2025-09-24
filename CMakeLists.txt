@@ -53,7 +53,7 @@ list(APPEND TEST_EXES ddswictest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/DdsWicTest)
 add_test(NAME "ddswictest" COMMAND ddswictest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 set_tests_properties(ddswictest PROPERTIES LABELS "ImageFormats")
-set_tests_properties(ddswictest PROPERTIES TIMEOUT 60)
+set_tests_properties(ddswictest PROPERTIES TIMEOUT 180)
 
 # D3D11
 set(D3D_COMMON_FILES

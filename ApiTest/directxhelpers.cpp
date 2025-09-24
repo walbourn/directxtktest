@@ -224,5 +224,7 @@ bool Test03(_In_ ID3D11Device *device)
         }
     }
 
+    // TODO - MapGuard
+
     return success;
 }
