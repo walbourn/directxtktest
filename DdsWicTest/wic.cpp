@@ -487,7 +487,7 @@ bool Test03(_In_ ID3D11Device* pDevice)
             0,
             D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
             WIC_LOADER_DEFAULT,
-            res.GetAddressOf(), nullptr);
+            res.GetAddressOf(), nullptr /* We use the NULL device */);
         if ( FAILED(hr) )
         {
             if (((hr == HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND)) || (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND)))
@@ -601,9 +601,57 @@ bool Test03(_In_ ID3D11Device* pDevice)
             success = false;
             printf( "ERROR: Failed loading wic from file force srgb (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
         }
+
+        ID3D11DeviceContext* nullContext = nullptr;
+        // Using the NULL device, we can't use an immediate context or test autogen mips
+        hr = CreateWICTextureFromFileEx(
+            pDevice,
+            nullContext,
+            szPath,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), nullptr);
+        if (FAILED(hr))
+        {
+            success = false;
+            printf( "ERROR: Failed loading wic from file context (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+        }
     #endif // !BUILD_BVT_ONLY
 
         ++ncount;
+    }
+
+    // missing file
+    {
+        ComPtr<ID3D11Resource> res;
+        HRESULT hr = CreateWICTextureFromFileEx(
+            pDevice,
+            L"TestFileDoesNotExist.PNG",
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), nullptr);
+        if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+        {
+            success = false;
+            printf("ERROR: Expected failure for missing file (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        ID3D11DeviceContext* nullContext = nullptr;
+        hr = CreateWICTextureFromFileEx(
+            pDevice,
+            nullContext,
+            L"TestFileDoesNotExist.PNG",
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), nullptr);
+        if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+        {
+            success = false;
+            printf("ERROR: Expected failure for missing file context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
     }
 
     // invalid args
@@ -638,10 +686,10 @@ bool Test03(_In_ ID3D11Device* pDevice)
         }
 
         ID3D11DeviceContext* nullContext = nullptr;
-         hr = CreateWICTextureFromFile(
+        hr = CreateWICTextureFromFile(
             pDevice,
             nullContext,
-            nullptr,
+            nullPath,
             nullptr,
             nullptr,
             0);
@@ -654,7 +702,7 @@ bool Test03(_In_ ID3D11Device* pDevice)
         hr = CreateWICTextureFromFileEx(
             nullDevice,
             nullContext,
-            nullptr,
+            nullPath,
             0,
             D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
             WIC_LOADER_DEFAULT,
@@ -663,6 +711,35 @@ bool Test03(_In_ ID3D11Device* pDevice)
         {
             success = false;
             printf("ERROR: Expected failure for invalid ex args context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> srv;
+        hr = CreateWICTextureFromFileEx(
+            pDevice,
+            L"TestFileDoesNotExist.PNG",
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), srv.GetAddressOf());
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid bind args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateWICTextureFromFileEx(
+            pDevice,
+            nullContext,
+            L"TestFileDoesNotExist.PNG",
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), srv.GetAddressOf());
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid bind args context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
         }
     }
     #pragma warning(pop)
@@ -776,6 +853,24 @@ bool Test04(_In_ ID3D11Device* pDevice)
                 if (pass)
                     ++npass;
             }
+
+        #ifndef BUILD_BVT_ONLY
+            ID3D11DeviceContext* nullContext = nullptr;
+            hr = CreateWICTextureFromMemoryEx(
+                    pDevice,
+                    nullContext,
+                    blob.get(),
+                    blobSize,
+                    0,
+                    D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+                    WIC_LOADER_DEFAULT,
+                    res.GetAddressOf(), nullptr);
+            if (FAILED(hr))
+            {
+                success = false;
+                printf( "ERROR: Failed loading wic from memory context (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+            }
+        #endif // !BUILD_BVT_ONLY
         }
 
         ++ncount;
@@ -841,6 +936,62 @@ bool Test04(_In_ ID3D11Device* pDevice)
             printf("ERROR: Expected failure for invalid args ex context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
         }
 
+        ComPtr<ID3D11Resource> res;
+        ComPtr<ID3D11ShaderResourceView> srv;
+        auto empty = std::make_unique<uint8_t[]>(1);
+        hr = CreateWICTextureFromMemoryEx(
+            pDevice,
+            empty.get(), 1,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), srv.GetAddressOf());
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid bind args (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateWICTextureFromMemoryEx(
+            pDevice,
+            nullContext,
+            empty.get(), 1,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), srv.GetAddressOf());
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for invalid bind args context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateWICTextureFromMemoryEx(
+            pDevice,
+            empty.get(), 0,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), srv.GetAddressOf());
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for zero size (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = CreateWICTextureFromMemoryEx(
+            pDevice,
+            nullContext,
+            empty.get(), 0,
+            0,
+            D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, 0,
+            WIC_LOADER_DEFAULT,
+            res.GetAddressOf(), srv.GetAddressOf());
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("ERROR: Expected failure for zero size context (HRESULT %08X)\n", static_cast<unsigned int>(hr));
+        }
     }
     #pragma warning(pop)
 
