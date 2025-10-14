@@ -22,7 +22,9 @@
 #include "WAVFileReader.h"
 
 #include <cstdio>
+#include <fstream>
 #include <stdexcept>
+#include <vector>
 
 #include "SoundCommon.h"
 
@@ -159,70 +161,344 @@ bool Test01()
         OutputDebugStringA("\n");
 #endif
 
-        std::unique_ptr<uint8_t[]> wavData;
-        WAVData result = {};
-        HRESULT hr = LoadWAVAudioFromFileEx(szPath, wavData, result);
-        if ( FAILED(hr) )
+        bool pass = true;
+
+        std::vector<uint8_t> rawData;
         {
-            if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) && g_TestMedia[index].tag == WAVE_FAIL_CASE)
+            std::ifstream inFile(szPath, std::ios::in | std::ios::binary | std::ios::ate);
+            if (inFile)
             {
-                ++npass;
-            }
-            else
-            {
-                success = false;
-                printf( "Failed loading wav from file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                std::streamsize size = inFile.tellg();
+                inFile.seekg(0, std::ios::beg);
+                rawData.resize(size);
+                if (!inFile.read(reinterpret_cast<char*>(rawData.data()), size))
+                {
+                    rawData.clear();
+                }
             }
         }
-        else if (!result.wfx || !result.startAudio)
+
+        // LoadWAVAudioFromFile/Memory
+        if (g_TestMedia[index].tag != WAVE_FORMAT_XMA2
+            && g_TestMedia[index].tag != WAVE_FORMAT_WMAUDIO2
+            && g_TestMedia[index].tag != WAVE_FORMAT_WMAUDIO3)
         {
-            success = false;
-            printf( "Bad metadata read from (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
-        }
-        else if (GetFormatTag(result.wfx) != g_TestMedia[index].tag
-                 || result.wfx->nChannels != g_TestMedia[index].channels
-                 || result.wfx->wBitsPerSample != g_TestMedia[index].bits
-                 || result.wfx->nSamplesPerSec != g_TestMedia[index].rate
-                 || result.seekCount != g_TestMedia[index].seek
-                 || result.loopLength != g_TestMedia[index].loop)
-        {
-            success = false;
-            printf( "Metadata error in wav file:\n%ls\n", szPath );
-            printwaveex(result.wfx);
-            if (result.seekCount > 0)
-            {
-                printf("\nSeekCount = %u\n", result.seekCount);
-            }
-            if (result.loopLength > 0)
-            {
-                printf("\nLoop = %u..%u\n", result.loopStart, result.loopLength);
-            }
-            printf("\n");
-        }
-        else
-        {
-            uint8_t digest[16];
-            hr = MD5Checksum( wavData.get(), result.audioBytes, digest );
+            std::unique_ptr<uint8_t[]> wavData;
+            const WAVEFORMATEX *wfx = nullptr;
+            const uint8_t* startAudio = nullptr;
+            uint32_t audioBytes = 0;
+            HRESULT hr = LoadWAVAudioFromFile(szPath, wavData, &wfx, &startAudio, &audioBytes);
             if ( FAILED(hr) )
             {
-                success = false;
-                printf( "Failed computing MD5 checksum of wave data (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) && g_TestMedia[index].tag == WAVE_FAIL_CASE)
+                {
+                }
+                else
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Failed loading wav from file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                }
             }
-            else if ( memcmp( digest, g_TestMedia[index].md5, 16 ) != 0 )
+            else if (!wfx || !startAudio || !audioBytes)
             {
                 success = false;
-                printf( "Failed comparing MD5 checksum:\n%ls\n", szPath );
-                printdigest( "computed", digest );
-                printdigest( "expected", g_TestMedia[index].md5 );
+                pass = false;
+                printf( "Bad metadata read from (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+            }
+            else if (GetFormatTag(wfx) != g_TestMedia[index].tag
+                    || wfx->nChannels != g_TestMedia[index].channels
+                    || wfx->wBitsPerSample != g_TestMedia[index].bits
+                    || wfx->nSamplesPerSec != g_TestMedia[index].rate)
+            {
+                success = false;
+                pass = false;
+                printf( "Metadata error in wav file:\n%ls\n", szPath );
+                printwaveex(wfx);
+                printf("\n");
             }
             else
-                ++npass;
+            {
+                uint8_t digest[16];
+                hr = MD5Checksum( wavData.get(), audioBytes, digest );
+                if ( FAILED(hr) )
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Failed computing MD5 checksum of wave data (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                }
+                else if ( memcmp( digest, g_TestMedia[index].md5, 16 ) != 0 )
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Failed comparing MD5 checksum:\n%ls\n", szPath );
+                    printdigest( "computed", digest );
+                    printdigest( "expected", g_TestMedia[index].md5 );
+                }
+            }
+
+            if (!rawData.empty())
+            {
+                hr = LoadWAVAudioInMemory(rawData.data(), rawData.size(), &wfx, &startAudio, &audioBytes);
+                if ( FAILED(hr) )
+                {
+                    if (g_TestMedia[index].tag == WAVE_FAIL_CASE)
+                    {
+                    }
+                    else
+                    {
+                        success = false;
+                        pass = false;
+                        printf( "Failed loading wav from memory (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                    }
+                }
+                else if (!wfx || !startAudio || !audioBytes)
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Bad metadata read from memory (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                }
+                else if (GetFormatTag(wfx) != g_TestMedia[index].tag
+                        || wfx->nChannels != g_TestMedia[index].channels
+                        || wfx->wBitsPerSample != g_TestMedia[index].bits
+                        || wfx->nSamplesPerSec != g_TestMedia[index].rate)
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Metadata error in wav memory\n%ls\n", szPath );
+                    printwaveex(wfx);
+                    printf("\n");
+                }
+                else
+                {
+                    uint8_t digest[16];
+                    hr = MD5Checksum( rawData.data(), audioBytes, digest );
+                    if ( FAILED(hr) )
+                    {
+                        success = false;
+                        pass = false;
+                        printf( "Failed computing MD5 checksum of wave data in memory (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                    }
+                    else if ( memcmp( digest, g_TestMedia[index].md5, 16 ) != 0 )
+                    {
+                        success = false;
+                        pass = false;
+                        printf( "Failed comparing MD5 checksum in memory:\n%ls\n", szPath );
+                        printdigest( "computed", digest );
+                        printdigest( "expected", g_TestMedia[index].md5 );
+                    }
+                }
+            }
         }
+
+        // LoadWAVAudioFromFileEx/Memory
+        {
+            std::unique_ptr<uint8_t[]> wavData;
+            WAVData result = {};
+            HRESULT hr = LoadWAVAudioFromFileEx(szPath, wavData, result);
+            if ( FAILED(hr) )
+            {
+                if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) && g_TestMedia[index].tag == WAVE_FAIL_CASE)
+                {
+                }
+                else
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Failed loading wav from file ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                }
+            }
+            else if (!result.wfx || !result.startAudio)
+            {
+                success = false;
+                pass = false;
+                printf( "Bad metadata read from ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+            }
+            else if (GetFormatTag(result.wfx) != g_TestMedia[index].tag
+                    || result.wfx->nChannels != g_TestMedia[index].channels
+                    || result.wfx->wBitsPerSample != g_TestMedia[index].bits
+                    || result.wfx->nSamplesPerSec != g_TestMedia[index].rate
+                    || result.seekCount != g_TestMedia[index].seek
+                    || result.loopLength != g_TestMedia[index].loop)
+            {
+                success = false;
+                pass = false;
+                printf( "Metadata error in wav file ex:\n%ls\n", szPath );
+                printwaveex(result.wfx);
+                if (result.seekCount > 0)
+                {
+                    printf("\nSeekCount = %u\n", result.seekCount);
+                }
+                if (result.loopLength > 0)
+                {
+                    printf("\nLoop = %u..%u\n", result.loopStart, result.loopLength);
+                }
+                printf("\n");
+            }
+            else
+            {
+                uint8_t digest[16];
+                hr = MD5Checksum( wavData.get(), result.audioBytes, digest );
+                if ( FAILED(hr) )
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Failed computing MD5 checksum of wave data ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                }
+                else if ( memcmp( digest, g_TestMedia[index].md5, 16 ) != 0 )
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Failed comparing MD5 checksum ex:\n%ls\n", szPath );
+                    printdigest( "computed", digest );
+                    printdigest( "expected", g_TestMedia[index].md5 );
+                }
+            }
+
+            if (!rawData.empty())
+            {
+                hr = LoadWAVAudioInMemoryEx(rawData.data(), rawData.size(), result);
+                if ( FAILED(hr) )
+                {
+                    if (g_TestMedia[index].tag == WAVE_FAIL_CASE)
+                    {
+                    }
+                    else
+                    {
+                        success = false;
+                        pass = false;
+                        printf( "Failed loading wav from memory ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                    }
+                }
+                else if (!result.wfx || !result.startAudio)
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Bad metadata read from memory ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                }
+                else if (GetFormatTag(result.wfx) != g_TestMedia[index].tag
+                        || result.wfx->nChannels != g_TestMedia[index].channels
+                        || result.wfx->wBitsPerSample != g_TestMedia[index].bits
+                        || result.wfx->nSamplesPerSec != g_TestMedia[index].rate
+                        || result.seekCount != g_TestMedia[index].seek
+                        || result.loopLength != g_TestMedia[index].loop)
+                {
+                    success = false;
+                    pass = false;
+                    printf( "Metadata error in wav memory ex:\n%ls\n", szPath );
+                    printwaveex(result.wfx);
+                    if (result.seekCount > 0)
+                    {
+                        printf("\nSeekCount = %u\n", result.seekCount);
+                    }
+                    if (result.loopLength > 0)
+                    {
+                        printf("\nLoop = %u..%u\n", result.loopStart, result.loopLength);
+                    }
+                    printf("\n");
+                }
+                else
+                {
+                    uint8_t digest[16];
+                    hr = MD5Checksum( rawData.data(), result.audioBytes, digest );
+                    if ( FAILED(hr) )
+                    {
+                        success = false;
+                        pass = false;
+                        printf( "Failed computing MD5 checksum of wave data memory ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
+                    }
+                    else if ( memcmp( digest, g_TestMedia[index].md5, 16 ) != 0 )
+                    {
+                        success = false;
+                        pass = false;
+                        printf( "Failed comparing MD5 checksum memory ex:\n%ls\n", szPath );
+                        printdigest( "computed", digest );
+                        printdigest( "expected", g_TestMedia[index].md5 );
+                    }
+                }
+            }
+        }
+
+        if (pass)
+            ++npass;
 
         ++ncount;
     }
 
     printf("%zu files tested, %zu files passed ", ncount, npass );
+
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        std::unique_ptr<uint8_t[]> wavData;
+
+        // LoadWAVAudioFromFile
+        HRESULT hr = LoadWAVAudioFromFile(nullptr, wavData, nullptr, nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("\nERROR: Expected failure for null filename (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        const WAVEFORMATEX *wfx = nullptr;
+        const uint8_t* startAudio = nullptr;
+        uint32_t audioBytes = 0;
+        hr = LoadWAVAudioFromFile(L"TestFileNotExist.wav", wavData, &wfx, &startAudio, &audioBytes);
+        if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+        {
+            success = false;
+            printf("\nERROR: Expected failure for missing file (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        // LoadWAVAudioInMemory
+        hr = LoadWAVAudioInMemory(nullptr, 0, nullptr, nullptr, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("\nERROR: Expected failure for null parameters for memory (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        uint8_t buff[4] = {};
+        hr = LoadWAVAudioInMemory(buff, 0, &wfx, &startAudio, &audioBytes);
+        if (hr != E_FAIL)
+        {
+            success = false;
+            printf("\nERROR: Expected failure for to little data for memory (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        // LoadWAVAudioFromFileEx
+        WAVData result = {};
+        hr = LoadWAVAudioFromFileEx(nullptr, wavData, result);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("\nERROR: Expected failure for null filename ex (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = LoadWAVAudioFromFileEx(L"TestFileNotExist.wav", wavData, result);
+        if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+        {
+            success = false;
+            printf("\nERROR: Expected failure for missing file ex (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        // LoadWAVAudioInMemoryEx
+        hr = LoadWAVAudioInMemoryEx(nullptr, 0, result);
+        if (hr != E_INVALIDARG)
+        {
+            success = false;
+            printf("\nERROR: Expected failure for null parameters for memory ex (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+        }
+
+        hr = LoadWAVAudioInMemoryEx(buff, 0, result);
+        if (hr != E_FAIL)
+        {
+            success = false;
+            printf("\nERROR: Expected failure for to little data for memory ex (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+        }
+    }
+    #pragma warning(pop)
 
     return success;
 }

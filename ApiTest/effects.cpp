@@ -24,58 +24,89 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
+static_assert(!std::is_copy_constructible<BasicEffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<BasicEffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<BasicEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<BasicEffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<AlphaTestEffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<AlphaTestEffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<AlphaTestEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<AlphaTestEffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<DualTextureEffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<DualTextureEffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<DualTextureEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<DualTextureEffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<EnvironmentMapEffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<EnvironmentMapEffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<EnvironmentMapEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<EnvironmentMapEffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<SkinnedEffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<SkinnedEffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<SkinnedEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<SkinnedEffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<NormalMapEffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<NormalMapEffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<NormalMapEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<NormalMapEffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<SkinnedNormalMapEffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<SkinnedNormalMapEffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<SkinnedNormalMapEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<SkinnedNormalMapEffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<PBREffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<PBREffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<PBREffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<PBREffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<SkinnedPBREffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<SkinnedPBREffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<SkinnedPBREffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<SkinnedPBREffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<DebugEffect>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<DebugEffect>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<DebugEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<DebugEffect>::value, "Move Assign.");
 
-// VS 2017 on XDK incorrectly thinks it's not noexcept
+static_assert(std::is_nothrow_default_constructible<IEffectFactory::EffectInfo>::value, "Copy Ctor.");
+static_assert(std::is_nothrow_copy_constructible<IEffectFactory::EffectInfo>::value, "Copy Ctor.");
+static_assert(std::is_nothrow_copy_assignable<IEffectFactory::EffectInfo>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<IEffectFactory::EffectInfo>::value, "Move Ctor.");
 static_assert(std::is_move_assignable<IEffectFactory::EffectInfo>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<EffectFactory>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<EffectFactory>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<EffectFactory>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<EffectFactory>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<PBREffectFactory>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<PBREffectFactory>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<PBREffectFactory>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<PBREffectFactory>::value, "Move Assign.");
-
 static_assert(std::is_nothrow_move_constructible<DGSLEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<DGSLEffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<EffectFactory>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<EffectFactory>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<SkinnedDGSLEffect>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<SkinnedDGSLEffect>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<DGSLEffectFactory>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<DGSLEffectFactory>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<DGSLEffectFactory>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<DGSLEffectFactory>::value, "Move Assign.");
 
-// VS 2017 on XDK incorrectly thinks it's not noexcept
+static_assert(std::is_nothrow_default_constructible<DGSLEffectFactory::DGSLEffectInfo>::value, "Copy Ctor.");
+static_assert(std::is_nothrow_copy_constructible<DGSLEffectFactory::DGSLEffectInfo>::value, "Copy Ctor.");
+static_assert(std::is_nothrow_copy_assignable<DGSLEffectFactory::DGSLEffectInfo>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Ctor.");
-static_assert(std::is_move_assignable<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Assign.");
+static_assert(std::is_nothrow_move_assignable<DGSLEffectFactory::DGSLEffectInfo>::value, "Move Assign.");
 
 namespace
 {
@@ -404,6 +435,79 @@ bool Test05(_In_ ID3D11Device *device)
         }
     }
 
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        try
+        {
+            auto invalid = std::make_unique<BasicEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<AlphaTestEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device alpha\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<DualTextureEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device dual\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<EnvironmentMapEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device envmap\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<SkinnedEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device skin\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<EffectFactory>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device for EffectFactory\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+    }
+    #pragma warning(pop)
+
     return success;
 }
 
@@ -608,6 +712,46 @@ bool Test11(_In_ ID3D11Device *device)
         }
     }
 
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        try
+        {
+            auto invalid = std::make_unique<NormalMapEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<SkinnedNormalMapEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device skin\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<DebugEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device debug\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+    }
+    #pragma warning(pop)
+
     return success;
 }
 
@@ -779,6 +923,45 @@ bool Test12(_In_ ID3D11Device *device)
         }
     }
 
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        try
+        {
+            auto invalid = std::make_unique<PBREffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+        try
+        {
+            auto invalid = std::make_unique<SkinnedPBREffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device skin\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<PBREffectFactory>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device for PBREffectFactory\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+    }
+    #pragma warning(pop)
+
     return success;
 }
 
@@ -903,6 +1086,46 @@ bool Test14(_In_ ID3D11Device *device)
             success = false;
         }
     }
+
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        try
+        {
+            auto invalid = std::make_unique<DGSLEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<SkinnedDGSLEffect>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device skin\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+
+        try
+        {
+            auto invalid = std::make_unique<DGSLEffectFactory>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device for DGSLEffectFactory\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+    }
+    #pragma warning(pop)
 
     return success;
 }

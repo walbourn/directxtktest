@@ -67,6 +67,13 @@ bool Test03(_In_ ID3D11Device *device)
     }
 
     // AlignUp/Down - uint32_t
+    if (AlignUp(2, 0) != 2 || AlignDown(2, 0) != 2)
+    {
+        printf("ERROR: Failed Align(x,0) tests\n");
+        success = false;
+    }
+
+    // AlignUp/Down - uint32_t
     {
         std::uniform_int_distribution<uint32_t> dist(1, UINT16_MAX);
         for (size_t j = 1; j < 0x20000; j <<= 1)
@@ -225,6 +232,28 @@ bool Test03(_In_ ID3D11Device *device)
     }
 
     // TODO - MapGuard
+
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        HRESULT hr = CreateInputLayoutFromEffect(nullDevice, nullptr, nullptr, 0, nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            printf("ERROR: CreateInputLayoutFromEffect - expected failure for null output (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+
+        ComPtr<ID3D11InputLayout> il;
+        hr = CreateInputLayoutFromEffect(nullDevice, nullptr, nullptr, 0, il.GetAddressOf());
+        if (hr != E_INVALIDARG)
+        {
+            printf("ERROR: CreateInputLayoutFromEffect - expected failure for null device (HRESULT: %08X)\n", static_cast<unsigned int>(hr));
+            success = false;
+        }
+    }
+    #pragma warning(pop)
 
     return success;
 }

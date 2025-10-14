@@ -29,7 +29,7 @@ set(SOURCES
   vertextypes.cpp)
 
 if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST)
-  list(APPEND SOURCES audio.cpp)
+  list(APPEND SOURCES audio.cpp soundcmn.cpp)
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -38,7 +38,7 @@ if(BUILD_XAUDIO_WIN10 OR BUILD_XAUDIO_WIN8 OR BUILD_XAUDIO_REDIST)
   target_compile_definitions(${PROJECT_NAME} PRIVATE TEST_AUDIO)
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE ../../Src)
+target_include_directories(${PROJECT_NAME} PRIVATE ../../Src ../../Audio)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE DirectXTK d3d11.lib)
 

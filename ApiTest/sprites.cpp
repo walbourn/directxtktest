@@ -20,9 +20,13 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
+static_assert(!std::is_copy_constructible<SpriteBatch>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<SpriteBatch>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<SpriteBatch>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<SpriteBatch>::value, "Move Assign.");
 
+static_assert(!std::is_copy_constructible<SpriteFont>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<SpriteFont>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<SpriteFont>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<SpriteFont>::value, "Move Assign.");
 
@@ -36,6 +40,8 @@ bool Test08(_In_ ID3D11Device *device)
     ComPtr<ID3D11DeviceContext> context;
     device->GetImmediateContext(context.GetAddressOf());
 
+    bool success = true;
+
     std::unique_ptr<SpriteBatch> batch;
     try
     {
@@ -44,10 +50,22 @@ bool Test08(_In_ ID3D11Device *device)
     catch(const std::exception& e)
     {
         printf("ERROR: Failed creating object (except: %s)\n", e.what());
-        return false;
+        success = false;
     }
 
-    return true;
+    // invalid args
+    try
+    {
+        auto invalid = std::make_unique<SpriteBatch>(nullptr);
+
+        printf("ERROR: Failed to throw on null device context\n");
+        success = false;
+    }
+    catch(const std::exception&)
+    {
+    }
+
+    return success;
 }
 
 // SpriteFont
@@ -71,6 +89,7 @@ bool Test09(_In_ ID3D11Device *device)
     };
 
     std::vector<std::unique_ptr<SpriteFont>> fonts;
+    fonts.resize(std::size(s_fonts));
 
     bool success = true;
 
@@ -79,7 +98,7 @@ bool Test09(_In_ ID3D11Device *device)
         try
         {
             auto font = std::make_unique<SpriteFont>(device, s_fonts[j]);
-            fonts.emplace_back(std::move(font));
+            fonts[j] = std::move(font);
         }
         catch(const std::exception& e)
         {
@@ -120,6 +139,68 @@ bool Test09(_In_ ID3D11Device *device)
             printf("FAILED: GetSpriteSheet for %ls\n", s_fonts[j]);
             success = false;
         }
+    }
+
+    // invalid args
+    try
+    {
+        ID3D11Device* nullDevice = nullptr;
+        auto invalid = std::make_unique<SpriteFont>(nullDevice, nullptr);
+
+        printf("ERROR: Failed to throw on null device\n");
+        success = false;
+    }
+    catch(const std::exception&)
+    {
+    }
+
+    try
+    {
+        auto invalid = std::make_unique<SpriteFont>(device, nullptr);
+
+        printf("ERROR: Failed to throw on null filename\n");
+        success = false;
+    }
+    catch(const std::exception&)
+    {
+    }
+
+    try
+    {
+        ID3D11Device* nullDevice = nullptr;
+        const wchar_t* nullFilename = nullptr;
+        auto invalid = std::make_unique<SpriteFont>(nullDevice, nullFilename, 0);
+
+        printf("ERROR: Failed to throw on null device ctor 2\n");
+        success = false;
+    }
+    catch(const std::exception&)
+    {
+    }
+
+    try
+    {
+        const uint8_t* ptr = nullptr;
+        auto invalid = std::make_unique<SpriteFont>(device, ptr, 0);
+
+        printf("ERROR: Failed to throw on null memory ctor 2\n");
+        success = false;
+    }
+    catch(const std::exception&)
+    {
+    }
+
+    try
+    {
+        ID3D11ShaderResourceView* nullSRV = nullptr;
+        SpriteFont::Glyph const* ptr = nullptr;
+        auto invalid = std::make_unique<SpriteFont>(nullSRV, ptr, 0, 0.f);
+
+        printf("ERROR: Failed to throw on null ctor 3\n");
+        success = false;
+    }
+    catch(const std::exception&)
+    {
     }
 
     return success;

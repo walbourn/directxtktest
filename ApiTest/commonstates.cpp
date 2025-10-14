@@ -17,6 +17,8 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
+static_assert(!std::is_copy_constructible<CommonStates>::value, "Copy Ctor.");
+static_assert(!std::is_copy_assignable<CommonStates>::value, "Copy Assign.");
 static_assert(std::is_nothrow_move_constructible<CommonStates>::value, "Move Ctor.");
 static_assert(std::is_nothrow_move_assignable<CommonStates>::value, "Move Assign.");
 
@@ -77,6 +79,24 @@ bool Test02(_In_ ID3D11Device *device)
         printf("ERROR: Failed CommonStates sampler state tests\n");
         success = false;
     }
+
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        ID3D11Device* nullDevice = nullptr;
+        try
+        {
+            auto invalid = std::make_unique<CommonStates>(nullDevice);
+
+            printf("ERROR: Failed to throw for null device\n");
+            success = false;
+        }
+        catch(const std::exception&)
+        {
+        }
+    }
+    #pragma warning(pop)
 
     return success;
 }

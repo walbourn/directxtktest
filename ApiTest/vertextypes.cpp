@@ -148,10 +148,40 @@ bool Test10(_In_ ID3D11Device *device)
         return false;
     }
 
+    // VertexPosition
+    {
+        VertexPosition verts = { XMFLOAT3(1.f, 2.f, .3f ) };
+
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f)
+        {
+            printf("ERROR: VertexPosition data incorrect\n");
+            success = false;
+        }
+    }
+
     if (!TestVertexType<VertexPosition>(device, effect.get()))
     {
         printf("ERROR: Failed VertexPosition tests\n");
         success = false;
+    }
+
+    // VertexPositionColor
+    {
+        VertexPositionColor verts = { XMFLOAT3(1.f, 2.f, .3f), XMFLOAT4(0.5f, 0.25f, 0.75f, 1.f) };
+
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.color.x != 0.5f
+            || verts.color.y != 0.25f
+            || verts.color.z != 0.75f
+            || verts.color.w != 1.f)
+        {
+            printf("ERROR: VertexPositionColor data incorrect\n");
+            success = false;
+        }
     }
 
     if (!TestVertexType<VertexPositionColor>(device, effect.get()))
@@ -160,10 +190,42 @@ bool Test10(_In_ ID3D11Device *device)
         success = false;
     }
 
+    // VertexPositionTexture
+    {
+        VertexPositionTexture verts = { XMFLOAT3(1.f, 2.f, .3f), XMFLOAT2(0.5f, 0.25f) };
+
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.textureCoordinate.x != 0.5f
+            || verts.textureCoordinate.y != 0.25f)
+        {
+            printf("ERROR: VertexPositionTexture data incorrect\n");
+            success = false;
+        }
+    }
+
     if (!TestVertexType<VertexPositionTexture>(device, effect.get()))
     {
         printf("ERROR: Failed VertexPositionTexture tests\n");
         success = false;
+    }
+
+    // VertexPositionDualTexture
+    {
+        VertexPositionDualTexture verts = { XMFLOAT3(1.f, 2.f, .3f), XMFLOAT2(0.5f, 0.25f), XMFLOAT2(0.75f, 0.125f) };
+
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.textureCoordinate0.x != 0.5f
+            || verts.textureCoordinate0.y != 0.25f
+            || verts.textureCoordinate1.x != 0.75f
+            || verts.textureCoordinate1.y != 0.125f)
+        {
+            printf("ERROR: VertexPositionDualTexture data incorrect\n");
+            success = false;
+        }
     }
 
     if (!TestVertexType<VertexPositionDualTexture>(device, effect.get()))
@@ -172,10 +234,44 @@ bool Test10(_In_ ID3D11Device *device)
         success = false;
     }
 
+    // VertexPositionNormal
+    {
+        VertexPositionNormal verts = { XMFLOAT3(1.f, 2.f, .3f), XMFLOAT3(0.5f, 0.25f, 0.75f) };
+
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.normal.x != 0.5f
+            || verts.normal.y != 0.25f
+            || verts.normal.z != 0.75f)
+        {
+            printf("ERROR: VertexPositionNormal data incorrect\n");
+            success = false;
+        }
+    }
+
     if (!TestVertexType<VertexPositionNormal>(device, effect.get()))
     {
         printf("ERROR: Failed VertexPositionNormal tests\n");
         success = false;
+    }
+
+    // VertexPositionColorTexture
+    {
+        VertexPositionColorTexture verts = { XMFLOAT3(1.f, 2.f, .3f), XMFLOAT4(0.5f, 0.25f, 0.75f, 1.f), XMFLOAT2(0.1f, 0.2f) };
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.color.x != 0.5f
+            || verts.color.y != 0.25f
+            || verts.color.z != 0.75f
+            || verts.color.w != 1.f
+            || verts.textureCoordinate.x != 0.1f
+            || verts.textureCoordinate.y != 0.2f)
+        {
+            printf("ERROR: VertexPositionColorTexture data incorrect\n");
+            success = false;
+        }
     }
 
     if (!TestVertexType<VertexPositionColorTexture>(device, effect.get()))
@@ -184,10 +280,46 @@ bool Test10(_In_ ID3D11Device *device)
         success = false;
     }
 
+    // VertexPositionNormalColor
+    {
+        VertexPositionNormalColor verts = { XMFLOAT3(1.f, 2.f, .3f), XMFLOAT3(0.5f, 0.25f, 0.75f), XMFLOAT4(0.1f, 0.2f, 0.3f, 0.4f) };
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.normal.x != 0.5f
+            || verts.normal.y != 0.25f
+            || verts.normal.z != 0.75f
+            || verts.color.x != 0.1f
+            || verts.color.y != 0.2f
+            || verts.color.z != 0.3f
+            || verts.color.w != 0.4f)
+        {
+            printf("ERROR: VertexPositionNormalColor data incorrect\n");
+            success = false;
+        }
+    }
+
     if (!TestVertexType<VertexPositionNormalColor>(device, effect.get()))
     {
         printf("ERROR: Failed VertexPositionNormalColor tests\n");
         success = false;
+    }
+
+    // VertexPositionNormalTexture
+    {
+        VertexPositionNormalTexture verts = { XMFLOAT3(1.f, 2.f, .3f), XMFLOAT3(0.5f, 0.25f, 0.75f), XMFLOAT2(0.1f, 0.2f) };
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.normal.x != 0.5f
+            || verts.normal.y != 0.25f
+            || verts.normal.z != 0.75f
+            || verts.textureCoordinate.x != 0.1f
+            || verts.textureCoordinate.y != 0.2f)
+        {
+            printf("ERROR: VertexPositionNormalTexture data incorrect\n");
+            success = false;
+        }
     }
 
     if (!TestVertexType<VertexPositionNormalTexture>(device, effect.get()))
@@ -196,16 +328,93 @@ bool Test10(_In_ ID3D11Device *device)
         success = false;
     }
 
+    // VertexPositionNormalColorTexture
+    {
+        VertexPositionNormalColorTexture verts = { XMFLOAT3(1.f, 2.f, .3f), XMFLOAT3(0.5f, 0.25f, 0.75f), XMFLOAT4(0.1f, 0.2f, 0.3f, 0.4f), XMFLOAT2(0.1f, 0.2f) };
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.normal.x != 0.5f
+            || verts.normal.y != 0.25f
+            || verts.normal.z != 0.75f
+            || verts.color.x != 0.1f
+            || verts.color.y != 0.2f
+            || verts.color.z != 0.3f
+            || verts.color.w != 0.4f
+            || verts.textureCoordinate.x != 0.1f
+            || verts.textureCoordinate.y != 0.2f)
+        {
+            printf("ERROR: VertexPositionNormalColorTexture data incorrect\n");
+            success = false;
+        }
+    }
+
     if (!TestVertexType<VertexPositionNormalColorTexture>(device, effect.get()))
     {
         printf("ERROR: Failed VertexPositionNormalColorTexture tests\n");
         success = false;
     }
 
+    // VertexPositionNormalTangentColorTexture
+    {
+        VertexPositionNormalTangentColorTexture verts =
+        {
+            XMFLOAT3(1.f, 2.f, .3f), XMFLOAT3(0.5f, 0.25f, 0.75f), XMFLOAT4(0.1f, 0.2f, 0.3f, 0.4f),
+            0xAABBCCDD, XMFLOAT2(0.1f, 0.2f)
+        };
+
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.normal.x != 0.5f
+            || verts.normal.y != 0.25f
+            || verts.normal.z != 0.75f
+            || verts.tangent.x != 0.1f
+            || verts.tangent.y != 0.2f
+            || verts.tangent.z != 0.3f
+            || verts.tangent.w != 0.4f
+            || verts.color != 0xAABBCCDD
+            || verts.textureCoordinate.x != 0.1f
+            || verts.textureCoordinate.y != 0.2f)
+        {
+            printf("ERROR: VertexPositionNormalTangentColorTexture data incorrect\n");
+            success = false;
+        }
+    }
+
     if (!TestVertexType<VertexPositionNormalTangentColorTexture>(device, effect.get()))
     {
         printf("ERROR: Failed VertexPositionNormalTangentColorTexture tests\n");
         success = false;
+    }
+
+    // VertexPositionNormalTangentColorTextureSkinning
+    {
+        VertexPositionNormalTangentColorTextureSkinning verts =
+        {
+            XMFLOAT3(1.f, 2.f, .3f), XMFLOAT3(0.5f, 0.25f, 0.75f), XMFLOAT4(0.1f, 0.2f, 0.3f, 0.4f),
+            0xAABBCCDD, XMFLOAT2(0.1f, 0.2f), XMUINT4(1,2,3,4), XMFLOAT4(0.1f,0.2f,0.3f,0.4f)
+        };
+
+        if (verts.position.x != 1.f
+            || verts.position.y != 2.f
+            || verts.position.z != .3f
+            || verts.normal.x != 0.5f
+            || verts.normal.y != 0.25f
+            || verts.normal.z != 0.75f
+            || verts.tangent.x != 0.1f
+            || verts.tangent.y != 0.2f
+            || verts.tangent.z != 0.3f
+            || verts.tangent.w != 0.4f
+            || verts.color != 0xAABBCCDD
+            || verts.textureCoordinate.x != 0.1f
+            || verts.textureCoordinate.y != 0.2f
+            || verts.indices != 0x04030201
+            || verts.weights != 0x664C3319)
+        {
+            printf("ERROR: VertexPositionNormalTangentColorTextureSkinning data incorrect\n");
+            success = false;
+        }
     }
 
     if (!TestVertexType<VertexPositionNormalTangentColorTextureSkinning>(device, effect.get()))

@@ -782,7 +782,7 @@ namespace
         { 200, 200, 1, 1, DXGI_FORMAT_YUY2, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"lenaYUY2.dds", {} },
         { 1280, 1024, 1, 1, DXGI_FORMAT_YUY2, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"testpatternYUY2.dds", {} },
 
-        #ifdef _M_X64
+        #if defined(_M_X64) || defined(_M_ARM64) || defined(__amd64__) || defined(__aarch64__)
         // Very large images
         { 16384, 16384, 1, 15, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"earth16kby16k.dds", {} },
         { 16384, 16384, 1, 1, DXGI_FORMAT_R8G8B8A8_SNORM, D3D11_RESOURCE_DIMENSION_TEXTURE2D, 0, DDS_ALPHA_MODE_UNKNOWN, DXTEX_MEDIA_PATH L"earth16kby16k_snorm.dds", {} }, // D3DFMT_Q8W8V8U8
@@ -927,6 +927,8 @@ bool Test01(_In_ ID3D11Device* pDevice)
             flags |= DDS_LOADER_IGNORE_MIPS;
         }
 
+        bool pass = true;
+
         ComPtr<ID3D11Resource> res;
         DDS_ALPHA_MODE alpha = DDS_ALPHA_MODE_UNKNOWN;
         HRESULT hr = CreateDDSTextureFromFileEx(
@@ -946,29 +948,27 @@ bool Test01(_In_ ID3D11Device* pDevice)
                 continue;
             }
 
-            success = false;
+            success = pass = false;
             printf( "ERROR: Failed loading dds from file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
         }
         else if (!res.Get())
         {
-            success = false;
+            success = pass = false;
             printf( "ERROR: Failed to return resource (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
         }
         else if (alpha != g_TestMedia[index].alphaMode)
         {
-            success = false;
+            success = pass = false;
             printf( "ERROR: Failed to return expected alpha mode (%u...%u):\n%ls\n", alpha, g_TestMedia[index].alphaMode, szPath );
         }
         else
         {
-            bool pass = false;
-
             D3D11_RESOURCE_DIMENSION dimension = D3D11_RESOURCE_DIMENSION_UNKNOWN;
             res->GetType(&dimension);
 
             if (dimension != g_TestMedia[index].dimension)
             {
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Unexpected resource dimension (%d..%d)\n%ls\n", dimension, g_TestMedia[index].dimension, szPath );
             }
 
@@ -987,19 +987,15 @@ bool Test01(_In_ ID3D11Device* pDevice)
                             g_TestMedia[index].format,
                             D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
 
-                        if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                        if (!IsMetadataCorrect(tex.Get(), expected, szPath))
                         {
-                            pass = true;
-                        }
-                        else
-                        {
-                            success = false;
+                            success = pass = false;
                         }
                     }
 
                     if (FAILED(hr))
                     {
-                        success = false;
+                        success = pass = false;
                         printf( "ERROR: Failed to obtain 1D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
                     }
                 }
@@ -1018,19 +1014,15 @@ bool Test01(_In_ ID3D11Device* pDevice)
                             g_TestMedia[index].format, {},
                             D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
 
-                        if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                        if (!IsMetadataCorrect(tex.Get(), expected, szPath))
                         {
-                            pass = true;
-                        }
-                        else
-                        {
-                            success = false;
+                            success = pass = false;
                         }
                     }
 
                     if (FAILED(hr))
                     {
-                        success = false;
+                        success = pass = false;
                         printf( "ERROR: Failed to obtain 2D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
                     }
                 }
@@ -1049,26 +1041,22 @@ bool Test01(_In_ ID3D11Device* pDevice)
                             g_TestMedia[index].format,
                             D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
 
-                        if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                        if (!IsMetadataCorrect(tex.Get(), expected, szPath))
                         {
-                            pass = true;
-                        }
-                        else
-                        {
-                            success = false;
+                            success = pass = false;
                         }
                     }
 
                     if (FAILED(hr))
                     {
-                        success = false;
+                        success = pass = false;
                         printf( "ERROR: Failed to obtain 3D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
                     }
                 }
                 break;
 
             default:
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Unknown resource dimension %d\n%ls\n", dimension, szPath );
                 break;
             }
@@ -1083,7 +1071,7 @@ bool Test01(_In_ ID3D11Device* pDevice)
                 res.ReleaseAndGetAddressOf(), nullptr);
             if (FAILED(hr))
             {
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Failed loading dds from file force-srgb (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
             }
 
@@ -1096,7 +1084,7 @@ bool Test01(_In_ ID3D11Device* pDevice)
                 res.ReleaseAndGetAddressOf(), nullptr);
             if (FAILED(hr))
             {
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Failed loading dds from file ignore-srgb (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
             }
 
@@ -1109,7 +1097,7 @@ bool Test01(_In_ ID3D11Device* pDevice)
                 res.ReleaseAndGetAddressOf(), nullptr);
             if (FAILED(hr))
             {
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Failed loading dds from file max size (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath);
             }
 
@@ -1125,14 +1113,14 @@ bool Test01(_In_ ID3D11Device* pDevice)
                 res.ReleaseAndGetAddressOf(), nullptr, &alpha);
             if (FAILED(hr))
             {
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Failed loading dds from file context (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
             }
         #endif // !BUILD_BVT_ONLY
-
-            if (pass)
-                ++npass;
         }
+
+        if (pass)
+            ++npass;
 
         ++ncount;
     }
@@ -1296,6 +1284,8 @@ bool Test02(_In_ ID3D11Device* pDevice)
         OutputDebugStringA("\n");
 #endif
 
+        bool pass = true;
+
         Blob blob;
         size_t blobSize;
         HRESULT hr = LoadBlobFromFile(szPath, blob, blobSize);
@@ -1308,7 +1298,7 @@ bool Test02(_In_ ID3D11Device* pDevice)
                 continue;
             }
 
-            success = false;
+            success = pass = false;
             printf( "ERROR: Failed loading dds from file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
         }
         else
@@ -1331,29 +1321,27 @@ bool Test02(_In_ ID3D11Device* pDevice)
                 res.GetAddressOf(), nullptr, &alpha);
             if ( FAILED(hr) )
             {
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Failed loading dds from memory (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
             }
             else if (!res.Get())
             {
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Failed to return resource (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
             }
             else if (alpha != g_TestMedia[index].alphaMode)
             {
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Failed to return expected alpha mode (%u...%u):\n%ls\n", alpha, g_TestMedia[index].alphaMode, szPath );
             }
             else
             {
-                bool pass = false;
-
                 D3D11_RESOURCE_DIMENSION dimension = D3D11_RESOURCE_DIMENSION_UNKNOWN;
                 res->GetType(&dimension);
 
                 if (dimension != g_TestMedia[index].dimension)
                 {
-                    success = false;
+                    success = pass = false;
                     printf( "ERROR: Unexpected resource dimension (%d..%d)\n%ls\n", dimension, g_TestMedia[index].dimension, szPath );
                 }
 
@@ -1372,19 +1360,15 @@ bool Test02(_In_ ID3D11Device* pDevice)
                                 g_TestMedia[index].format,
                                 D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
 
-                            if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                            if (!IsMetadataCorrect(tex.Get(), expected, szPath))
                             {
-                                pass = true;
-                            }
-                            else
-                            {
-                                success = false;
+                                success = pass = false;
                             }
                         }
 
                         if (FAILED(hr))
                         {
-                            success = false;
+                            success = pass = false;
                             printf( "ERROR: Failed to obtain 1D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
                         }
                     }
@@ -1403,19 +1387,15 @@ bool Test02(_In_ ID3D11Device* pDevice)
                                 g_TestMedia[index].format, {},
                                 D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
 
-                            if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                            if (!IsMetadataCorrect(tex.Get(), expected, szPath))
                             {
-                                pass = true;
-                            }
-                            else
-                            {
-                                success = false;
+                                success = pass = false;
                             }
                         }
 
                         if (FAILED(hr))
                         {
-                            success = false;
+                            success = pass = false;
                             printf( "ERROR: Failed to obtain 2D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
                         }
                     }
@@ -1434,32 +1414,25 @@ bool Test02(_In_ ID3D11Device* pDevice)
                                 g_TestMedia[index].format,
                                 D3D11_USAGE_STAGING, 0, D3D11_CPU_ACCESS_READ, g_TestMedia[index].miscFlags };
 
-                            if (IsMetadataCorrect(tex.Get(), expected, szPath))
+                            if (!IsMetadataCorrect(tex.Get(), expected, szPath))
                             {
-                                pass = true;
-                            }
-                            else
-                            {
-                                success = false;
+                                success = pass = false;
                             }
                         }
 
                         if (FAILED(hr))
                         {
-                            success = false;
+                            success = pass = false;
                             printf( "ERROR: Failed to obtain 3D texture desc (%08X)\n%ls\n", static_cast<unsigned int>(hr), szPath );
                         }
                     }
                     break;
 
                 default:
-                    success = false;
+                    success = pass = false;
                     printf( "ERROR: Unknown resource dimension %d\n%ls\n", dimension, szPath );
                     break;
                 }
-
-                if (pass)
-                    ++npass;
             }
 
         #ifndef BUILD_BVT_ONLY
@@ -1475,11 +1448,14 @@ bool Test02(_In_ ID3D11Device* pDevice)
                 res.GetAddressOf(), nullptr, &alpha);
             if (FAILED(hr))
             {
-                success = false;
+                success = pass = false;
                 printf( "ERROR: Failed loading dds from memory context (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
             }
         #endif // !BUILD_BVT_ONLY
         }
+
+        if (pass)
+            ++npass;
 
         ++ncount;
     }

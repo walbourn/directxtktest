@@ -23,6 +23,8 @@ bool Test00(_In_ ID3D11Device *device)
     if (!device)
         return false;
 
+    bool success = true;
+
     std::unique_ptr<GraphicsMemory> graphicsMemory;
     try
     {
@@ -31,8 +33,20 @@ bool Test00(_In_ ID3D11Device *device)
     catch(const std::exception& e)
     {
         printf("ERROR: Failed creating object (except: %s)\n", e.what());
-        return false;
+        success = false;
     }
 
-    return true;
+    // invalid args
+    try
+    {
+        auto invalid = std::make_unique<GraphicsMemory>(nullptr);
+
+        printf("ERROR: Failed to throw for null device pointer\n");
+        success = false;
+    }
+    catch(const std::exception&)
+    {
+    }
+
+    return success;
 }

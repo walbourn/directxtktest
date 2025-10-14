@@ -34,26 +34,27 @@ namespace
         bool streaming;
         uint32_t entries;
         uint32_t audioBytes;
+        uint32_t waveAlign;
         const wchar_t *fname;
         uint8_t md5[16];
     };
 
     const TestMedia g_TestMedia[] =
     {
-        // Type | Entries | BankAudioBytes | Filename | MD5Hash
-        { false, 14, 5628004, L"BasicAudioTest\\ADPCMdroid.xwb", {0xd9,0xc3,0xa6,0x2d,0xe0,0x08,0xd0,0x17,0x4b,0x26,0x01,0xb7,0x86,0xa4,0xa2,0xbd} },
-        { false, 4, 3164688, L"BasicAudioTest\\compact.xwb", {0xce,0xed,0x17,0x05,0xad,0x3c,0xfb,0x43,0x4b,0x1b,0x2d,0x3e,0x8a,0x84,0xbb,0x9c} },
-        { false, 14, 20582244, L"BasicAudioTest\\droid.xwb", {0xa4,0x53,0x90,0x3a,0xcc,0x7a,0x7a,0x8d,0xd7,0x8e,0x6d,0x7b,0xe7,0x49,0xb6,0x64} },
-        { false, 4, 3164688, L"BasicAudioTest\\wavebank.xwb", {0xce,0xed,0x17,0x05,0xad,0x3c,0xfb,0x43,0x4b,0x1b,0x2d,0x3e,0x8a,0x84,0xbb,0x9c} },
-        { false, 14, 820656, L"BasicAudioTest\\xwmadroid.xwb", {0x8a,0x43,0xb6,0xe4,0x59,0x22,0x70,0x11,0x0d,0x09,0x06,0x1c,0x4b,0x0f,0x97,0x16} },
-        { true, 3, 9545728, L"StreamingAudioTest\\WaveBank.xwb", {0x52,0x48,0x91,0x66,0xa4,0xc0,0xce,0x8e,0x7f,0x05,0x9d,0xcb,0xfc,0x3b,0x1c,0x75} },
-        { true, 3, 9547776, L"StreamingAudioTest\\WaveBank4Kn.xwb", {0x52,0x48,0x91,0x66,0xa4,0xc0,0xce,0x8e,0x7f,0x05,0x9d,0xcb,0xfc,0x3b,0x1c,0x75} },
-        { true, 3, 2613248, L"StreamingAudioTest\\WaveBankADPCM.xwb", {0x38,0x10,0x45,0x4f,0x43,0xdc,0xfe,0xb3,0xaa,0xe2,0xdf,0x4e,0x38,0x77,0x48,0xbf} },
-        { true, 3, 2617344, L"StreamingAudioTest\\WaveBankADPCM4Kn.xwb", {0x38,0x10,0x45,0x4f,0x43,0xdc,0xfe,0xb3,0xaa,0xe2,0xdf,0x4e,0x38,0x77,0x48,0xbf} },
-        { true, 3, 1492992, L"StreamingAudioTest\\WaveBankXMA2.xwb", {0xe0,0xaa,0x31,0x9b,0x5a,0x83,0x90,0x99,0x96,0xbf,0x04,0x18,0xa4,0x98,0xea,0xfa} },
-        { true, 3, 1495040, L"StreamingAudioTest\\WaveBankXMA2_4Kn.xwb", {0xe0,0xaa,0x31,0x9b,0x5a,0x83,0x90,0x99,0x96,0xbf,0x04,0x18,0xa4,0x98,0xea,0xfa} },
-        { true, 3, 663552, L"StreamingAudioTest\\WaveBankxWMA.xwb", {0x75,0x3f,0x19,0xa5,0x28,0x07,0xd5,0xda,0xe9,0x83,0xa0,0xc2,0x18,0x11,0xaf,0xbd} },
-        { true, 3, 667648, L"StreamingAudioTest\\WaveBankxWMA4Kn.xwb", {0x75,0x3f,0x19,0xa5,0x28,0x07,0xd5,0xda,0xe9,0x83,0xa0,0xc2,0x18,0x11,0xaf,0xbd} },
+        // Type | Entries | BankAudioBytes | WaveAlign | Filename | MD5Hash
+        { false, 14, 5628004, 4, L"BasicAudioTest\\ADPCMdroid.xwb", {0xd9,0xc3,0xa6,0x2d,0xe0,0x08,0xd0,0x17,0x4b,0x26,0x01,0xb7,0x86,0xa4,0xa2,0xbd} },
+        { false, 4, 3164688, 4, L"BasicAudioTest\\compact.xwb", {0xce,0xed,0x17,0x05,0xad,0x3c,0xfb,0x43,0x4b,0x1b,0x2d,0x3e,0x8a,0x84,0xbb,0x9c} },
+        { false, 14, 20582244, 4, L"BasicAudioTest\\droid.xwb", {0xa4,0x53,0x90,0x3a,0xcc,0x7a,0x7a,0x8d,0xd7,0x8e,0x6d,0x7b,0xe7,0x49,0xb6,0x64} },
+        { false, 4, 3164688, 4, L"BasicAudioTest\\wavebank.xwb", {0xce,0xed,0x17,0x05,0xad,0x3c,0xfb,0x43,0x4b,0x1b,0x2d,0x3e,0x8a,0x84,0xbb,0x9c} },
+        { false, 14, 820656, 4, L"BasicAudioTest\\xwmadroid.xwb", {0x8a,0x43,0xb6,0xe4,0x59,0x22,0x70,0x11,0x0d,0x09,0x06,0x1c,0x4b,0x0f,0x97,0x16} },
+        { true, 3, 9545728, 0, L"StreamingAudioTest\\WaveBank.xwb", {0x52,0x48,0x91,0x66,0xa4,0xc0,0xce,0x8e,0x7f,0x05,0x9d,0xcb,0xfc,0x3b,0x1c,0x75} },
+        { true, 3, 9547776, 0, L"StreamingAudioTest\\WaveBank4Kn.xwb", {0x52,0x48,0x91,0x66,0xa4,0xc0,0xce,0x8e,0x7f,0x05,0x9d,0xcb,0xfc,0x3b,0x1c,0x75} },
+        { true, 3, 2613248, 0, L"StreamingAudioTest\\WaveBankADPCM.xwb", {0x38,0x10,0x45,0x4f,0x43,0xdc,0xfe,0xb3,0xaa,0xe2,0xdf,0x4e,0x38,0x77,0x48,0xbf} },
+        { true, 3, 2617344, 0, L"StreamingAudioTest\\WaveBankADPCM4Kn.xwb", {0x38,0x10,0x45,0x4f,0x43,0xdc,0xfe,0xb3,0xaa,0xe2,0xdf,0x4e,0x38,0x77,0x48,0xbf} },
+        { true, 3, 1492992, 0, L"StreamingAudioTest\\WaveBankXMA2.xwb", {0xe0,0xaa,0x31,0x9b,0x5a,0x83,0x90,0x99,0x96,0xbf,0x04,0x18,0xa4,0x98,0xea,0xfa} },
+        { true, 3, 1495040, 0, L"StreamingAudioTest\\WaveBankXMA2_4Kn.xwb", {0xe0,0xaa,0x31,0x9b,0x5a,0x83,0x90,0x99,0x96,0xbf,0x04,0x18,0xa4,0x98,0xea,0xfa} },
+        { true, 3, 663552, 0, L"StreamingAudioTest\\WaveBankxWMA.xwb", {0x75,0x3f,0x19,0xa5,0x28,0x07,0xd5,0xda,0xe9,0x83,0xa0,0xc2,0x18,0x11,0xaf,0xbd} },
+        { true, 3, 667648, 0, L"StreamingAudioTest\\WaveBankxWMA4Kn.xwb", {0x75,0x3f,0x19,0xa5,0x28,0x07,0xd5,0xda,0xe9,0x83,0xa0,0xc2,0x18,0x11,0xaf,0xbd} },
     };
 
 #define printdigest(str,digest) printf( "%s:\n0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x\n", str, \
@@ -155,8 +156,7 @@ bool Test02()
                         const DWORD error = GetLastError();
                         if (error != ERROR_IO_PENDING)
                         {
-                            success = false;
-                            pass = false;
+                            success = pass = false;
                             printf( "ERROR: Async read failed %08X:\n%ls\n%u duration  %u offset  %u length\n",
                                 static_cast<unsigned int>(HRESULT_FROM_WIN32(error)),
                                 szPath,
@@ -172,8 +172,7 @@ bool Test02()
                         const BOOL result = GetOverlappedResultEx(async, &request, &cb, 0, FALSE);
                         if (!result)
                         {
-                            success = false;
-                            pass = false;
+                            success = pass = false;
                             const DWORD error = GetLastError();
                             printf("ERROR: Async read failed %08X\n", static_cast<unsigned int>(HRESULT_FROM_WIN32(error)));
                         }
@@ -185,14 +184,12 @@ bool Test02()
                         hr = MD5Checksum( wavData.get(), metadata.lengthBytes, digest );
                         if ( FAILED(hr) )
                         {
-                            success = false;
-                            pass = false;
+                            success = pass = false;
                             printf( "Failed computing MD5 checksum of wavebank (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
                         }
                         else if ( memcmp( digest, g_TestMedia[index].md5, 16 ) != 0 )
                         {
-                            success = false;
-                            pass = false;
+                            success = pass = false;
                             printf( "Failed comparing MD5 checksum:\n%ls\n", szPath );
                             printdigest( "computed", digest );
                             printdigest( "expected", g_TestMedia[index].md5 );
@@ -207,12 +204,14 @@ bool Test02()
             }
             else
             {
+                bool pass = true;
+
                 const uint8_t* wavData = nullptr;
                 uint32_t audioBytes = 0;
                 hr = wb->GetWaveData(0, &wavData, audioBytes);
                 if ( FAILED(hr) )
                 {
-                    success = false;
+                    success = pass = false;
                     printf( "Failed get wave data for entry 0 (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
                 }
                 else
@@ -221,19 +220,117 @@ bool Test02()
                     hr = MD5Checksum( wavData, audioBytes, digest );
                     if ( FAILED(hr) )
                     {
-                        success = false;
+                        success = pass = false;
                         printf( "Failed computing MD5 checksum of wavebank (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
                     }
                     else if ( memcmp( digest, g_TestMedia[index].md5, 16 ) != 0 )
                     {
-                        success = false;
+                        success = pass = false;
                         printf( "Failed comparing MD5 checksum:\n%ls\n", szPath );
                         printdigest( "computed", digest );
                         printdigest( "expected", g_TestMedia[index].md5 );
                     }
-                    else
-                        ++npass;
                 }
+
+                if (pass && wb->HasNames())
+                {
+                    if (wb->BankName() == nullptr)
+                    {
+                        printf( "ERROR: Expected non-null bank name\n" );
+                        success = pass = false;
+                    }
+
+                    if (wb->Find("NameNotFound") != uint32_t(-1))
+                    {
+                        printf( "ERROR: Expected failure for Find with bad name\n" );
+                        success = pass = false;
+                    }
+                }
+
+                if (wb->GetWaveAlignment() != g_TestMedia[index].waveAlign)
+                {
+                    printf( "ERROR: Expected wave alignment %u, got %u: %ls\n", g_TestMedia[index].waveAlign, wb->GetWaveAlignment(), szPath );
+                    success = pass = false;
+                }
+
+                if (pass)
+                    ++npass;
+            }
+
+            // invalid args
+            if (!index)
+            {
+            #pragma warning(push)
+            #pragma warning(disable:6385 6387)
+                auto ret2 = wb->Find(nullptr);
+                if (ret2 != uint32_t(-1))
+                {
+                    printf("ERROR: Expected failure for null parameter for Find\n");
+                    success = false;
+                }
+
+                hr = wb->GetFormat(0, nullptr, 0);
+                if (hr != E_INVALIDARG)
+                {
+                    printf("ERROR: Expected failure for null parameter for GetFormat\n");
+                    success = false;
+                }
+
+                WAVEFORMATEX wfx = {};
+                hr = wb->GetFormat(0, &wfx, 0);
+                if (hr != E_INVALIDARG)
+                {
+                    printf("ERROR: Expected failure for zero size for GetFormat\n");
+                    success = false;
+                }
+
+                hr = wb->GetFormat(INT32_MAX, &wfx, sizeof(wfx));
+                if (hr != E_FAIL)
+                {
+                    printf("ERROR: Expected failure for out of range index for GetFormat\n");
+                    success = false;
+                }
+
+                uint32_t size = 0;
+                hr = wb->GetWaveData(0, nullptr, size);
+                if (hr != E_INVALIDARG)
+                {
+                    printf("ERROR: Expected failure for null parameter for GetWaveData\n");
+                    success = false;
+                }
+
+                const uint8_t* data = nullptr;
+                hr = wb->GetWaveData(INT32_MAX, &data, size);
+                if (hr != E_FAIL)
+                {
+                    printf("ERROR: Expected failure for out of range index for GetWaveData\n");
+                    success = false;
+                }
+
+                uint32_t tag = 0;
+                hr = wb->GetSeekTable(0, nullptr, size, tag);
+                if (hr != E_INVALIDARG)
+                {
+                    printf("ERROR: Expected failure for null parameter for GetSeekTable\n");
+                    success = false;
+                }
+
+                const uint32_t* data32 = nullptr;
+                hr = wb->GetSeekTable(INT32_MAX, &data32, size, tag);
+                if (hr != E_FAIL)
+                {
+                    printf("ERROR: Expected failure for out of range index for GetSeekTable\n");
+                    success = false;
+                }
+
+                WaveBankReader::Metadata mdata = {};
+                hr = wb->GetMetadata(INT32_MAX, mdata);
+                if (hr != E_FAIL)
+                {
+                    printf("ERROR: Expected failure for out of range index for GetMetadata\n");
+                    success = false;
+                }
+            #pragma warning(pop)
             }
         }
 
@@ -241,6 +338,27 @@ bool Test02()
     }
 
     printf("%zu files tested, %zu files passed ", ncount, npass );
+
+    // invalid args
+    #pragma warning(push)
+    #pragma warning(disable:6385 6387)
+    {
+        auto wb = std::make_unique<DirectX::WaveBankReader>();
+        HRESULT hr = wb->Open(nullptr);
+        if (hr != E_INVALIDARG)
+        {
+            printf("\nERROR: Expected failure for null filename\n");
+            success = false;
+        }
+
+        hr = wb->Open(L"TestFileNotExist.xwb");
+        if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+        {
+            printf("\nERROR: Expected failure for null filename\n");
+            success = false;
+        }
+    }
+    #pragma warning(pop)
 
     return success;
 }
