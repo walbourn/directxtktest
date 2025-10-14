@@ -235,7 +235,7 @@ int __cdecl wmain()
     eflags = eflags | AudioEngine_Debug;
 #endif
 
-    std::unique_ptr<AudioEngine> audEngine( new AudioEngine( eflags ) );
+    auto audEngine = std::make_unique<AudioEngine>( eflags );
 
     {
         auto output = audEngine->GetOutputFormat();
@@ -289,8 +289,8 @@ int __cdecl wmain()
         static const uint32_t s_channels[FMT_CASES] = { 1, 2, 6, 4, 1, 8 };
         static const uint32_t s_bits[FMT_CASES] = { 16, 8, 16, 8, 8, 16 };
 
-        std::unique_ptr<DynamicSoundEffectInstance> effect( new DynamicSoundEffectInstance( audEngine.get(),
-                    nullptr, s_rate[j], s_channels[j], s_bits[j] ) );
+        auto effect = std::make_unique<DynamicSoundEffectInstance>( audEngine.get(),
+                    [](DynamicSoundEffectInstance*){ /*noop*/ }, s_rate[j], s_channels[j], s_bits[j] );
 
         auto wfx = effect->GetFormat();
         dump_wfx(wfx);
@@ -351,8 +351,11 @@ int __cdecl wmain()
     {
         uint32_t buffNeededCount = 0;
 
-        std::unique_ptr<DynamicSoundEffectInstance> effect( new DynamicSoundEffectInstance( audEngine.get(),
-                        [&buffNeededCount](DynamicSoundEffectInstance*){ InterlockedIncrement( &buffNeededCount ); }, 44100, 1, 16 ) );
+        auto effect = std::make_unique<DynamicSoundEffectInstance>( audEngine.get(),
+                        [&buffNeededCount](DynamicSoundEffectInstance*)
+                        {
+                            InterlockedIncrement( &buffNeededCount );
+                        }, 44100, 1, 16 );
 
         if ( buffNeededCount > 0 )
         {
@@ -401,7 +404,7 @@ int __cdecl wmain()
 
         uint32_t buffNeededCount = 0;
 
-        std::unique_ptr<DynamicSoundEffectInstance> effect( new DynamicSoundEffectInstance( audEngine.get(),
+        auto effect = std::make_unique<DynamicSoundEffectInstance>( audEngine.get(),
                         [&audioBytes, &buffNeededCount](DynamicSoundEffectInstance* effect)
                         {
                             InterlockedIncrement( &buffNeededCount );
@@ -414,7 +417,7 @@ int __cdecl wmain()
                                 ++count;
                             }
 
-                        }, 44100, 1, 16 ) );
+                        }, 44100, 1, 16 );
 
         effect->Play();
 
@@ -640,7 +643,6 @@ int __cdecl wmain()
         uint32_t currentStreamBuffer = 0;
         size_t bufferSize[MAX_BUFFER_COUNT] = {};
         std::unique_ptr<uint8_t[]> buffers[MAX_BUFFER_COUNT];
-
         bool endofstream = false;
 
         std::unique_ptr<DynamicSoundEffectInstance> effect( new DynamicSoundEffectInstance( audEngine.get(),
