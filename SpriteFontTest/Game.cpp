@@ -271,7 +271,11 @@ void Game::Render()
         SpriteEffects flip = (SpriteEffects)((int)(time / 100) & 3);
         m_multicoloredFont->DrawString(m_spriteBatch.get(), L"OMG it's full of stars!", XMFLOAT2(610, 130), Colors::White, XM_PIDIV2, XMFLOAT2(0, 0), 1, flip);
 
+        m_comicFont->SetPixelAlignment((int)(time / 100) & 1 ? true : false);
+
         m_comicFont->DrawString(m_spriteBatch.get(), L"This is a larger block\nof text using a\nfont scaled to a\nsmaller size.\nSome c\x1234ha\x1543rac\x2453te\x1634r\x1563s are not in the font, but should show up as hyphens.", XMFLOAT2(10, 90), Colors::Black, 0, XMFLOAT2(0, 0), 0.5f);
+
+        m_comicFont->SetPixelAlignment(false);
 
         wchar_t tmp[256] = {};
         swprintf_s(tmp, L"%llu frames", m_frame);
