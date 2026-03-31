@@ -27,8 +27,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <RootNamespace>D3D11Test</RootNamespace>
-    <ProjectGuid>{a66c50ca-7194-4f0d-80d0-9bb70c886170}</ProjectGuid>
+    <RootNamespace>GamePadTest</RootNamespace>
+    <ProjectGuid>{ea1d19c3-f601-4fcf-8a17-bc8a3b839a92}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
     <Keyword>Win32Proj</Keyword>
     <!-- - - - -->
@@ -120,42 +120,42 @@
     <IncludePath>$(GDKWindowsIncludePath);$(IncludePath);</IncludePath>
     <LibraryPath>$(GDKWindowsLibPath);$(LibraryPath)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>D3D11Test</TargetName>
+    <TargetName>GamePadTest</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ExecutablePath>$(GameDK)bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(GDKWindowsIncludePath);$(IncludePath);</IncludePath>
     <LibraryPath>$(GDKWindowsLibPath);$(LibraryPath)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>D3D11Test</TargetName>
+    <TargetName>GamePadTest</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
     <ExecutablePath>$(GameDK)bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(GDKWindowsIncludePath);$(IncludePath);</IncludePath>
     <LibraryPath>$(GDKWindowsLibPath);$(LibraryPath)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>D3D11Test</TargetName>
+    <TargetName>GamePadTest</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|ARM64'">
     <ExecutablePath>$(GameDK)bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(GDKWindowsIncludePath);$(IncludePath);</IncludePath>
     <LibraryPath>$(GDKWindowsLibPath);$(LibraryPath)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>D3D11Test</TargetName>
+    <TargetName>GamePadTest</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(GameDK)bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(GDKWindowsIncludePath);$(IncludePath);</IncludePath>
     <LibraryPath>$(GDKWindowsLibPath);$(LibraryPath)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>D3D11Test</TargetName>
+    <TargetName>GamePadTest</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ExecutablePath>$(GameDK)bin;$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(GDKWindowsIncludePath);$(IncludePath);</IncludePath>
     <LibraryPath>$(GDKWindowsLibPath);$(LibraryPath)</LibraryPath>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>D3D11Test</TargetName>
+    <TargetName>GamePadTest</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
@@ -318,6 +318,7 @@
   <ItemGroup>
     <ClInclude Include="..\Common\DeviceResourcesPC.h" />
     <ClInclude Include="..\Common\DirectXTKTest.h" />
+    <ClInclude Include="..\Common\FindMedia.h" />
     <ClInclude Include="..\Common\StepTimer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />
@@ -357,6 +358,10 @@ makepkg.exe localize /d "$(OutDir)." /pd "$(OutDir)." /gc "%(Identity)"</Command
       <Message>MGC Compile</Message>
       <Outputs>$(OutDir)MicrosoftGame.config</Outputs>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="comic.spritefont" />
+    <None Include="xboxController.spritefont" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DirectXTK_GDKW_2022.vcxproj">
