@@ -1,15 +1,16 @@
 # GitHub Copilot Instructions — DirectXTK Test Suite
 
-These instructions define how GitHub Copilot should assist with the DirectX Tool Kit for DirectX 11 **test suite**. They supplement the [parent project instructions](../../.github/copilot-instructions.md) with test-specific conventions.
+These instructions define how GitHub Copilot should assist with the DirectX Tool Kit for DirectX 11 **test suite** located in this repository ([Test Suite](https://github.com/walbourn/directxtktest/)). They supplement the [parent project instructions](https://github.com/microsoft/DirectXTK/blob/main/.github/copilot-instructions.md) with test-specific conventions.
 
 ## Context
 
 - **Project**: Test suite for DirectX Tool Kit for DirectX 11
 - **Repository**: <https://github.com/walbourn/directxtktest>
-- **Language**: C++
+- **Language**: C++17
 - **Test Framework**: Custom lightweight framework (no third-party dependency)
-- **Build System**: CMake with CTest integration
+- **Build System**: CMake / CTest (built as subdirectory of the main DirectXTK repo)
 - **Documentation**: <https://github.com/walbourn/directxtktest/wiki>
+- **Parent Project**: <https://github.com/microsoft/DirectXTK>
 
 ## Test Categories
 
