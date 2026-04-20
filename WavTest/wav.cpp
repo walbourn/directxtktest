@@ -36,8 +36,6 @@ using namespace DirectX;
 
 namespace
 {
-    const uint32_t WAVE_FAIL_CASE = 0;
-
     struct TestMedia
     {
         uint32_t tag;
@@ -70,10 +68,6 @@ namespace
         { WAVE_FORMAT_PCM, 2, 16, 44100, 0, 0, L"WavTest\\sample-9s.wav", {0x32,0xaa,0x7e,0x22,0xf8,0x05,0xb8,0x51,0x97,0x4d,0x0b,0xd1,0x57,0x30,0xd7,0x40} },
         { WAVE_FORMAT_PCM, 2, 16, 44100, 0, 0, L"WavTest\\sample-12s.wav", {0xbd,0x16,0x02,0x54,0x5f,0xc9,0x15,0xf5,0x09,0xec,0xfb,0xe2,0x07,0x85,0x51,0xf4} },
         { WAVE_FORMAT_PCM, 2, 16, 44100, 0, 0, L"WavTest\\sample-15s.wav", {0x1e,0x1c,0xcf,0x08,0x0f,0xf5,0x0a,0xe8,0xe8,0xa5,0x79,0x6a,0xef,0x23,0xec,0x54} },
-        { WAVE_FAIL_CASE, 0, 0, 0, 0, 0, L"WavTest\\crash-2fa7e302c14e1801282c6377c5c1db0c37393210.wav", {} },
-        { WAVE_FAIL_CASE, 0, 0, 0, 0, 0, L"WavTest\\crash-3917a73fa8d28811c1fd16b106844a3b0c2f8860.wav", {} },
-        { WAVE_FAIL_CASE, 0, 0, 0, 0, 0, L"WavTest\\crash-6dbfd0730b2b3e39ffb0f13b4518e28543df5c8a.wav", {} },
-        { WAVE_FAIL_CASE, 0, 0, 0, 0, 0, L"WavTest\\crash-16ddb25a6080f6f5a40e30d521b8e5b476ab8c10.wav", {} },
     };
 
 #define printdigest(str,digest) printf( "%s:\n0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x\n", str, \
@@ -131,6 +125,10 @@ namespace
             wprintf(L" (%hs %u channels, %u-bit, %lu Hz)", GetFormatTagName(wfx->wFormatTag), wfx->nChannels, wfx->wBitsPerSample, wfx->nSamplesPerSec);
         }
     }
+
+    struct find_closer { void operator()(HANDLE h) noexcept { assert(h != INVALID_HANDLE_VALUE); if (h) FindClose(h); } };
+
+    using ScopedFindHandle = std::unique_ptr<void, find_closer>;
 }
 
 //-------------------------------------------------------------------------------------
@@ -190,15 +188,9 @@ bool Test01()
             HRESULT hr = LoadWAVAudioFromFile(szPath, wavData, &wfx, &startAudio, &audioBytes);
             if ( FAILED(hr) )
             {
-                if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) && g_TestMedia[index].tag == WAVE_FAIL_CASE)
-                {
-                }
-                else
-                {
-                    success = false;
-                    pass = false;
-                    printf( "Failed loading wav from file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
-                }
+                success = false;
+                pass = false;
+                printf( "Failed loading wav from file (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
             }
             else if (!wfx || !startAudio || !audioBytes)
             {
@@ -242,15 +234,9 @@ bool Test01()
                 hr = LoadWAVAudioInMemory(rawData.data(), rawData.size(), &wfx, &startAudio, &audioBytes);
                 if ( FAILED(hr) )
                 {
-                    if (g_TestMedia[index].tag == WAVE_FAIL_CASE)
-                    {
-                    }
-                    else
-                    {
-                        success = false;
-                        pass = false;
-                        printf( "Failed loading wav from memory (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
-                    }
+                    success = false;
+                    pass = false;
+                    printf( "Failed loading wav from memory (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
                 }
                 else if (!wfx || !startAudio || !audioBytes)
                 {
@@ -298,15 +284,9 @@ bool Test01()
             HRESULT hr = LoadWAVAudioFromFileEx(szPath, wavData, result);
             if ( FAILED(hr) )
             {
-                if (hr != HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) && g_TestMedia[index].tag == WAVE_FAIL_CASE)
-                {
-                }
-                else
-                {
-                    success = false;
-                    pass = false;
-                    printf( "Failed loading wav from file ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
-                }
+                success = false;
+                pass = false;
+                printf( "Failed loading wav from file ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
             }
             else if (!result.wfx || !result.startAudio)
             {
@@ -360,15 +340,9 @@ bool Test01()
                 hr = LoadWAVAudioInMemoryEx(rawData.data(), rawData.size(), result);
                 if ( FAILED(hr) )
                 {
-                    if (g_TestMedia[index].tag == WAVE_FAIL_CASE)
-                    {
-                    }
-                    else
-                    {
-                        success = false;
-                        pass = false;
-                        printf( "Failed loading wav from memory ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
-                    }
+                    success = false;
+                    pass = false;
+                    printf( "Failed loading wav from memory ex (HRESULT %08X):\n%ls\n", static_cast<unsigned int>(hr), szPath );
                 }
                 else if (!result.wfx || !result.startAudio)
                 {
@@ -499,6 +473,111 @@ bool Test01()
         }
     }
     #pragma warning(pop)
+
+    return success;
+}
+
+//-------------------------------------------------------------------------------------
+// Fuzz
+bool Test03()
+{
+    bool success = true;
+
+    WIN32_FIND_DATA findData = {};
+    ScopedFindHandle hFile(safe_handle(
+        FindFirstFileExW(L"WavTest\\crash-*.wav", FindExInfoBasic, &findData,
+            FindExSearchNameMatch, nullptr,
+            FIND_FIRST_EX_LARGE_FETCH)));
+    if (!hFile)
+    {
+        printf("ERROR: FindFirstFileEx FAILED (%lu)\n", GetLastError());
+        return false;
+    }
+
+    size_t ncount = 0;
+
+    for (;;)
+    {
+        if (!(findData.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)))
+        {
+            ++ncount;
+
+            if (!(ncount % 10))
+            {
+                printf(".");
+            }
+
+            wchar_t szPath[MAX_PATH] = {};
+            wcscpy_s(szPath, L"WavTest\\");
+            wcscat_s(szPath, findData.cFileName);
+
+            OutputDebugString(findData.cFileName);
+            OutputDebugStringA("\n");
+
+            // memory
+            {
+                std::vector<uint8_t> rawData;
+                {
+                    std::ifstream inFile(szPath, std::ios::in | std::ios::binary | std::ios::ate);
+                    if (inFile)
+                    {
+                        std::streamsize size = inFile.tellg();
+                        inFile.seekg(0, std::ios::beg);
+                        rawData.resize(static_cast<size_t>(size));
+                        if (!inFile.read(reinterpret_cast<char*>(rawData.data()), size))
+                        {
+                            rawData.clear();
+                        }
+                    }
+                }
+
+                if (rawData.empty())
+                {
+                    success = false;
+                    printf("Failed reading file data:\n%ls\n", szPath);
+                }
+                else
+                {
+                    const WAVEFORMATEX *wfx = nullptr;
+                    const uint8_t* startAudio = nullptr;
+                    uint32_t audioBytes = 0;
+                    HRESULT hr = LoadWAVAudioInMemory(rawData.data(), rawData.size(), &wfx, &startAudio, &audioBytes);
+                    if (SUCCEEDED(hr))
+                    {
+                        success = false;
+                        printf("ERROR: frommemory expected failure\n%ls\n", szPath);
+                    }
+                }
+            }
+
+            // file
+            {
+                std::unique_ptr<uint8_t[]> wavData;
+                const WAVEFORMATEX *wfx = nullptr;
+                const uint8_t* startAudio = nullptr;
+                uint32_t audioBytes = 0;
+                HRESULT hr = LoadWAVAudioFromFile(szPath, wavData, &wfx, &startAudio, &audioBytes);
+                if (SUCCEEDED(hr))
+                {
+                    success = false;
+                    printf("ERROR: fromfile expected failure\n%ls\n", szPath);
+                }
+            }
+        }
+
+        if (!FindNextFileW(hFile.get(), &findData))
+        {
+            break;
+        }
+    }
+
+    if (!ncount)
+    {
+        printf("ERROR: expected to find test files\n");
+        return false;
+    }
+
+    printf(" %zu files tested ", ncount);
 
     return success;
 }

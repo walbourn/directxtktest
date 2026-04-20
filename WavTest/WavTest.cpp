@@ -38,11 +38,15 @@ struct TestInfo
 
 extern bool Test01();
 extern bool Test02();
+extern bool Test03();
+extern bool Test04();
 
 TestInfo g_Tests[] =
 {
     { "WAVFileReader", Test01 },
     { "WaveBankReader", Test02 },
+    { "Fuzzing (wav)", Test03 },
+    { "Fuzzing (xwb)", Test04 },
 };
 
 

@@ -21,6 +21,7 @@
 
 #include "WaveBankReader.h"
 
+#include <cassert>
 #include <cstdio>
 #include <stdexcept>
 #include <tuple>
@@ -71,6 +72,12 @@ namespace
         }
         return size;
     }
+
+    inline HANDLE safe_handle(HANDLE h) noexcept { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
+
+    struct find_closer { void operator()(HANDLE h) noexcept { assert(h != INVALID_HANDLE_VALUE); if (h) FindClose(h); } };
+
+    using ScopedFindHandle = std::unique_ptr<void, find_closer>;
 }
 
 //-------------------------------------------------------------------------------------
@@ -359,6 +366,69 @@ bool Test02()
         }
     }
     #pragma warning(pop)
+
+    return success;
+}
+
+//-------------------------------------------------------------------------------------
+// Fuzz
+bool Test04()
+{
+    bool success = true;
+
+    WIN32_FIND_DATA findData = {};
+    ScopedFindHandle hFile(safe_handle(
+        FindFirstFileExW(L"WavTest\\*.xwb", FindExInfoBasic, &findData,
+            FindExSearchNameMatch, nullptr,
+            FIND_FIRST_EX_LARGE_FETCH)));
+    if (!hFile)
+    {
+        printf("ERROR: FindFirstFileEx FAILED (%lu)\n", GetLastError());
+        return false;
+    }
+
+    size_t ncount = 0;
+
+    for (;;)
+    {
+        if (!(findData.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)))
+        {
+            ++ncount;
+
+            if (!(ncount % 10))
+            {
+                printf(".");
+            }
+
+            wchar_t szPath[MAX_PATH] = {};
+            wcscpy_s(szPath, L"WavTest\\");
+            wcscat_s(szPath, findData.cFileName);
+
+            OutputDebugString(findData.cFileName);
+            OutputDebugStringA("\n");
+
+            auto wb = std::make_unique<DirectX::WaveBankReader>();
+            HRESULT hr = wb->Open(szPath);
+            if (SUCCEEDED(hr))
+            {
+                success = false;
+                printf("ERROR: expected failure\n%ls\n", szPath);
+            }
+        }
+
+        if (!FindNextFileW(hFile.get(), &findData))
+        {
+            break;
+        }
+    }
+
+    if (!ncount)
+    {
+        printf("ERROR: expected to find test files\n");
+        return false;
+    }
+
+    printf(" %zu files tested ", ncount);
 
     return success;
 }
