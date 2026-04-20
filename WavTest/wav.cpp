@@ -170,7 +170,7 @@ bool Test01()
             {
                 std::streamsize size = inFile.tellg();
                 inFile.seekg(0, std::ios::beg);
-                rawData.resize(size);
+                rawData.resize(static_cast<size_t>(size));
                 if (!inFile.read(reinterpret_cast<char*>(rawData.data()), size))
                 {
                     rawData.clear();
