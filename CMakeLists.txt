@@ -55,6 +55,13 @@ add_test(NAME "ddswictest" COMMAND ddswictest -ctest WORKING_DIRECTORY ${CMAKE_C
 set_tests_properties(ddswictest PROPERTIES LABELS "ImageFormats")
 set_tests_properties(ddswictest PROPERTIES TIMEOUT 180)
 
+# fontfiletest
+list(APPEND TEST_EXES fontfiletest)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/FontFileTest)
+add_test(NAME "fontfiletest" COMMAND fontfiletest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+set_tests_properties(fontfiletest PROPERTIES LABELS "ImageFormats;Sprites")
+set_tests_properties(fontfiletest PROPERTIES TIMEOUT 30)
+
 # D3D11
 set(D3D_COMMON_FILES
   Common/MainPC.cpp

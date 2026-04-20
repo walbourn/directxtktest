@@ -21,6 +21,7 @@ These instructions define how GitHub Copilot should assist with the DirectX Tool
 | Audio I/O | `WavTest` | `Audio`, `wav` |
 | Audio playback | `Audio3DTest`, `BasicAudioTest`, `SimpleAudioTest`, `DynamicAudioTest`, `StreamingAudioTest` | `Audio` |
 | Graphics rendering | `D3D11Test`, `MSAATest`, `EffectsTest`, `DGSLTest`, `PrimitivesTest`, `SpriteBatchTest`, `SpriteFontTest`, `LoadTest`, `ModelTest`, `ShaderTest`, `AnimTest`, `HDRTest`, `PBRTest`, `PBRModelTest`, `PostProcessTest` | `Graphics`, and optionally `HLSL`, `Sprites`, `Models`, `Shapes`, `PostProcess` |
+| Font file I/O | `FontFileTest` | `ImageFormats`, `Sprites` |
 | Image formats | `DdsWicTest` | `ImageFormats` |
 | Input devices | `GamePadTest`, `KeyboardTest`, `MouseTest` | `Input` |
 | Fuzz testing | `fuzzloaders` | — |
@@ -29,7 +30,7 @@ These instructions define how GitHub Copilot should assist with the DirectX Tool
 
 ### Two Test Patterns
 
-**1. Console tests** (`ApiTest`, `HeaderTest`, `WavTest`, `DdsWicTest`, `SimpleMathTest`)
+**1. Console tests** (`ApiTest`, `HeaderTest`, `WavTest`, `DdsWicTest`, `SimpleMathTest`, `FontFileTest`)
 
 These are headless executables that run to completion without creating a window. Some create a D3D11 device briefly. They use a **test registry** pattern:
 
@@ -50,6 +51,8 @@ const TestInfo g_Tests[] =
 ```
 
 Each test function returns `true` (pass) or `false` (fail). The `wmain()` entry point iterates the registry, prints results, and exits with `0` on success or `-1` on failure.
+
+> **Note**: Some console tests like `FontFileTest` and `WavTest` do not require a D3D11 device, so their test functions take no parameters (`bool Test01()` instead of `bool Test01(ID3D11Device*)`). These tests validate file format parsing without GPU access — use `using TestFN = bool (*)();` for the function pointer type. These tests also do not use a precompiled header; instead they directly include the specific headers they need (e.g., `BinaryReader.h`, `SpriteFont.h`).
 
 **2. Graphics tests** (`D3D11Test`, `EffectsTest`, `DGSLTest`, `ModelTest`, etc.)
 
@@ -264,6 +267,31 @@ static const wchar_t* s_searchFolders[] =
     nullptr
 };
 ```
+
+### File Format Validation Tests (`FontFileTest`, `WavTest`)
+
+File format tests validate binary file parsing without requiring a D3D device. They follow a data-driven pattern with a table of expected values:
+
+```cpp
+struct TestMedia
+{
+    uint32_t    expectedField;
+    const wchar_t *fname;
+};
+
+const TestMedia g_TestMedia[] =
+{
+    { 95, L"SpriteFontTest\\comic.spritefont" },
+    // ...
+};
+```
+
+Key conventions:
+- Test functions iterate `g_TestMedia[]` and validate parsed data against expected values.
+- Test both **from-file** and **from-memory** code paths (load via `BinaryReader` from path, then also from a `std::vector<uint8_t>` buffer).
+- Include **negative tests** for invalid inputs: empty data, bad magic headers, truncated files. Verify that exceptions are thrown as expected.
+- Media files referenced by relative path from the test's working directory (e.g., `SpriteFontTest\\comic.spritefont`).
+- These tests include their library headers directly (`#include "BinaryReader.h"`) rather than using a precompiled header, and set `target_include_directories` to `../../Inc` and `../../Src` in CMake.
 
 ### Platform Conditionals
 
