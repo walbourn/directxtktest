@@ -20,6 +20,10 @@
 
 #include <Windows.h>
 
+#ifdef __MINGW32__
+#include <unknwn.h>
+#endif
+
 #include "BinaryReader.h"
 #include "SpriteFont.h"
 
