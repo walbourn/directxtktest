@@ -63,16 +63,28 @@ namespace
         { 14, 102.0f, 0, 512, 276, DXGI_FORMAT_R8G8B8A8_UNORM, 2048, 276, L"SpriteFontTest\\XboxOneController.spritefont" },
     };
 
-    const char* GetFormatName(DXGI_FORMAT fmt)
+    // These are the only formats supported by MakeSpriteFont
+    bool IsValidTextureFormat(DXGI_FORMAT fmt) noexcept
+    {
+        switch(fmt)
+        {
+        case DXGI_FORMAT_R8G8B8A8_UNORM:
+        case DXGI_FORMAT_BC2_UNORM:
+        case DXGI_FORMAT_B4G4R4A4_UNORM:
+            return true;
+
+        default:
+            return false;
+        }
+    }
+
+    const char* GetFormatName(DXGI_FORMAT fmt) noexcept
     {
         switch (fmt)
         {
-        case DXGI_FORMAT_BC2_UNORM: return "BC2_UNORM";
-        case DXGI_FORMAT_BC2_UNORM_SRGB: return "BC2_UNORM_SRGB";
-        case DXGI_FORMAT_B8G8R8A8_UNORM: return "B8G8R8A8_UNORM";
-        case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB: return "B8G8R8A8_UNORM_SRGB";
         case DXGI_FORMAT_R8G8B8A8_UNORM: return "R8G8B8A8_UNORM";
-        case DXGI_FORMAT_R8_UNORM: return "R8_UNORM";
+        case DXGI_FORMAT_BC2_UNORM: return "BC2_UNORM";
+        case DXGI_FORMAT_B4G4R4A4_UNORM: return "B4G4R4A4_UNORM";
         default: return "*UNKNOWN*";
         }
     }
@@ -89,7 +101,7 @@ namespace
             {
                 if (!fuzzing)
                 {
-                    printf("Invalid magic header in spritefont file:\n%ls\n", szPath);
+                    printf("ERROR: Invalid magic header in spritefont file:\n%ls\n", szPath);
                 }
                 return false;
             }
@@ -103,7 +115,7 @@ namespace
         {
             if (glyphCount != g_TestMedia[index].glyphCount)
             {
-                printf("Glyph count mismatch in spritefont file (expected %u, got %u):\n%ls\n",
+                printf("ERROR: Glyph count mismatch in spritefont file (expected %u, got %u):\n%ls\n",
                     g_TestMedia[index].glyphCount, glyphCount, szPath);
                 return false;
             }
@@ -118,7 +130,7 @@ namespace
                 {
                     if (!fuzzing)
                     {
-                        printf("Glyphs not sorted at index %u (char %u <= %u):\n%ls\n",
+                        printf("ERROR: Glyphs not sorted at index %u (char %u <= %u):\n%ls\n",
                             i, glyphData[i].Character, glyphData[i-1].Character, szPath);
                     }
                     return false;
@@ -136,14 +148,14 @@ namespace
             float diff = lineSpacing - g_TestMedia[index].lineSpacing;
             if (diff < -0.1f || diff > 0.1f)
             {
-                printf("Line spacing mismatch (expected %.1f, got %.1f):\n%ls\n",
+                printf("ERROR: Line spacing mismatch (expected %.1f, got %.1f):\n%ls\n",
                     g_TestMedia[index].lineSpacing, lineSpacing, szPath);
                 return false;
             }
 
             if (defaultChar != g_TestMedia[index].defaultChar)
             {
-                printf("Default character mismatch (expected %u, got %u):\n%ls\n",
+                printf("ERROR: Default character mismatch (expected %u, got %u):\n%ls\n",
                     g_TestMedia[index].defaultChar, defaultChar, szPath);
                 return false;
             }
@@ -156,12 +168,27 @@ namespace
         auto textureStride = reader.Read<uint32_t>();
         auto textureRows = reader.Read<uint32_t>();
 
+        if (!textureWidth
+            || !textureHeight
+            || !textureStride
+            || !textureRows
+            || (textureWidth > D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION)
+            || (textureHeight > D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION)
+            || !IsValidTextureFormat(textureFormat))
+        {
+            if (!fuzzing)
+            {
+                printf("ERROR: Invalid texture metadata:\n%ls\n", szPath);
+            }
+            return false;
+        }
+
         if (!fuzzing)
         {
             if (textureWidth != g_TestMedia[index].textureWidth
                 || textureHeight != g_TestMedia[index].textureHeight)
             {
-                printf("Texture dimensions mismatch (expected %ux%u, got %ux%u):\n%ls\n",
+                printf("ERROR: Texture dimensions mismatch (expected %ux%u, got %ux%u):\n%ls\n",
                     g_TestMedia[index].textureWidth, g_TestMedia[index].textureHeight,
                     textureWidth, textureHeight, szPath);
                 return false;
@@ -169,7 +196,7 @@ namespace
 
             if (textureFormat != g_TestMedia[index].textureFormat)
             {
-                printf("Texture format mismatch (expected %s, got %s):\n%ls\n",
+                printf("ERROR: Texture format mismatch (expected %s, got %s):\n%ls\n",
                     GetFormatName(g_TestMedia[index].textureFormat),
                     GetFormatName(textureFormat), szPath);
                 return false;
@@ -178,7 +205,7 @@ namespace
             if (textureStride != g_TestMedia[index].textureStride
                 || textureRows != g_TestMedia[index].textureRows)
             {
-                printf("Texture layout mismatch (expected stride %u rows %u, got stride %u rows %u):\n%ls\n",
+                printf("ERROR: Texture layout mismatch (expected stride %u rows %u, got stride %u rows %u):\n%ls\n",
                     g_TestMedia[index].textureStride, g_TestMedia[index].textureRows,
                     textureStride, textureRows, szPath);
                 return false;
@@ -191,21 +218,14 @@ namespace
         {
             if (!fuzzing)
             {
-                printf("Texture data size overflow:\n%ls\n", szPath);
+                printf("ERROR: Texture data size overflow:\n%ls\n", szPath);
             }
             return false;
         }
         else
         {
             auto textureData = reader.ReadArray<uint8_t>(static_cast<size_t>(dataSize));
-            if (!textureData)
-            {
-                if (!fuzzing)
-                {
-                    printf("Failed reading texture data:\n%ls\n", szPath);
-                }
-                return false;
-            }
+            assert(textureData != nullptr);
         }
 
         return true;
@@ -257,13 +277,13 @@ bool Test01()
         {
             success = false;
             pass = false;
-            printf( "C++ Exception loading spritefont from file (except: %s):\n%ls\n", e.what(), szPath );
+            printf( "ERROR: C++ Exception loading spritefont from file (except: %s):\n%ls\n", e.what(), szPath );
         }
         catch (...)
         {
             success = false;
             pass = false;
-            printf( "Unknown C++ Exception loading spritefont from file:\n%ls\n", szPath );
+            printf( "ERROR: Unknown C++ Exception loading spritefont from file:\n%ls\n", szPath );
         }
 
         // From memory
@@ -297,13 +317,13 @@ bool Test01()
                 {
                     success = false;
                     pass = false;
-                    printf( "C++ Exception parsing spritefont file (except: %s):\n%ls\n", e.what(), szPath );
+                    printf( "ERROR: C++ Exception parsing spritefont file (except: %s):\n%ls\n", e.what(), szPath );
                 }
                 catch (...)
                 {
                     success = false;
                     pass = false;
-                    printf( "Unknown C++ Exception parsing spritefont file:\n%ls\n", szPath );
+                    printf( "ERROR: Unknown C++ Exception parsing spritefont file:\n%ls\n", szPath );
                 }
             }
         }
@@ -488,7 +508,7 @@ bool Test02()
             if (!failed)
             {
                 success = false;
-                printf("ERROR: expected failure\n%ls\n", szPath);
+                printf("\nERROR: expected failure\n%ls\n", szPath);
             }
         }
 
