@@ -37,10 +37,12 @@ struct TestInfo
 };
 
 extern bool Test01();
+extern bool Test02();
 
 TestInfo g_Tests[] =
 {
     { "BinaryReader", Test01 },
+    { "Fuzzing", Test02 },
 };
 
 

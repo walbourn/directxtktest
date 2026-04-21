@@ -77,7 +77,7 @@ namespace
         }
     }
 
-    bool TestSpriteFontParsing(BinaryReader& reader, size_t index, const wchar_t* szPath) noexcept(false)
+    bool TestSpriteFontParsing(BinaryReader& reader, size_t index, const wchar_t* szPath, bool fuzzing=false) noexcept(false)
     {
         // Needs to match parsing logic in SpriteFont::Impl ctor
 
@@ -87,7 +87,10 @@ namespace
         {
             if (reader.Read<uint8_t>() != *magic)
             {
-                printf( "Invalid magic header in spritefont file:\n%ls\n", szPath );
+                if (!fuzzing)
+                {
+                    printf("Invalid magic header in spritefont file:\n%ls\n", szPath);
+                }
                 return false;
             }
         }
@@ -96,11 +99,14 @@ namespace
         auto glyphCount = reader.Read<uint32_t>();
         auto glyphData = reader.ReadArray<SpriteFont::Glyph>(glyphCount);
 
-        if (glyphCount != g_TestMedia[index].glyphCount)
+        if (!fuzzing)
         {
-            printf( "Glyph count mismatch in spritefont file (expected %u, got %u):\n%ls\n",
-                g_TestMedia[index].glyphCount, glyphCount, szPath );
-            return false;
+            if (glyphCount != g_TestMedia[index].glyphCount)
+            {
+                printf("Glyph count mismatch in spritefont file (expected %u, got %u):\n%ls\n",
+                    g_TestMedia[index].glyphCount, glyphCount, szPath);
+                return false;
+            }
         }
 
         // Verify glyphs are sorted by character code
@@ -110,8 +116,11 @@ namespace
             {
                 if (glyphData[i].Character <= glyphData[i-1].Character)
                 {
-                    printf( "Glyphs not sorted at index %u (char %u <= %u):\n%ls\n",
-                        i, glyphData[i].Character, glyphData[i-1].Character, szPath );
+                    if (!fuzzing)
+                    {
+                        printf("Glyphs not sorted at index %u (char %u <= %u):\n%ls\n",
+                            i, glyphData[i].Character, glyphData[i-1].Character, szPath);
+                    }
                     return false;
                 }
             }
@@ -122,19 +131,22 @@ namespace
         auto defaultChar = reader.Read<uint32_t>();
 
         // Allow small epsilon for floating-point comparison
-        float diff = lineSpacing - g_TestMedia[index].lineSpacing;
-        if (diff < -0.1f || diff > 0.1f)
+        if (!fuzzing)
         {
-            printf( "Line spacing mismatch (expected %.1f, got %.1f):\n%ls\n",
-                g_TestMedia[index].lineSpacing, lineSpacing, szPath );
-            return false;
-        }
+            float diff = lineSpacing - g_TestMedia[index].lineSpacing;
+            if (diff < -0.1f || diff > 0.1f)
+            {
+                printf("Line spacing mismatch (expected %.1f, got %.1f):\n%ls\n",
+                    g_TestMedia[index].lineSpacing, lineSpacing, szPath);
+                return false;
+            }
 
-        if (defaultChar != g_TestMedia[index].defaultChar)
-        {
-            printf( "Default character mismatch (expected %u, got %u):\n%ls\n",
-                g_TestMedia[index].defaultChar, defaultChar, szPath );
-            return false;
+            if (defaultChar != g_TestMedia[index].defaultChar)
+            {
+                printf("Default character mismatch (expected %u, got %u):\n%ls\n",
+                    g_TestMedia[index].defaultChar, defaultChar, szPath);
+                return false;
+            }
         }
 
         // Read texture metadata
@@ -144,37 +156,43 @@ namespace
         auto textureStride = reader.Read<uint32_t>();
         auto textureRows = reader.Read<uint32_t>();
 
-        if (textureWidth != g_TestMedia[index].textureWidth
-            || textureHeight != g_TestMedia[index].textureHeight)
+        if (!fuzzing)
         {
-            printf( "Texture dimensions mismatch (expected %ux%u, got %ux%u):\n%ls\n",
-                g_TestMedia[index].textureWidth, g_TestMedia[index].textureHeight,
-            textureWidth, textureHeight, szPath );
-            return false;
-        }
+            if (textureWidth != g_TestMedia[index].textureWidth
+                || textureHeight != g_TestMedia[index].textureHeight)
+            {
+                printf("Texture dimensions mismatch (expected %ux%u, got %ux%u):\n%ls\n",
+                    g_TestMedia[index].textureWidth, g_TestMedia[index].textureHeight,
+                    textureWidth, textureHeight, szPath);
+                return false;
+            }
 
-        if (textureFormat != g_TestMedia[index].textureFormat)
-        {
-            printf( "Texture format mismatch (expected %s, got %s):\n%ls\n",
-                GetFormatName(g_TestMedia[index].textureFormat),
-                GetFormatName(textureFormat), szPath );
-            return false;
-        }
+            if (textureFormat != g_TestMedia[index].textureFormat)
+            {
+                printf("Texture format mismatch (expected %s, got %s):\n%ls\n",
+                    GetFormatName(g_TestMedia[index].textureFormat),
+                    GetFormatName(textureFormat), szPath);
+                return false;
+            }
 
-        if (textureStride != g_TestMedia[index].textureStride
-            || textureRows != g_TestMedia[index].textureRows)
-        {
-            printf( "Texture layout mismatch (expected stride %u rows %u, got stride %u rows %u):\n%ls\n",
-                g_TestMedia[index].textureStride, g_TestMedia[index].textureRows,
-                textureStride, textureRows, szPath );
-            return false;
+            if (textureStride != g_TestMedia[index].textureStride
+                || textureRows != g_TestMedia[index].textureRows)
+            {
+                printf("Texture layout mismatch (expected stride %u rows %u, got stride %u rows %u):\n%ls\n",
+                    g_TestMedia[index].textureStride, g_TestMedia[index].textureRows,
+                    textureStride, textureRows, szPath);
+                return false;
+            }
         }
 
         // Validate texture data is present
         const uint64_t dataSize = uint64_t(textureStride) * uint64_t(textureRows);
         if (dataSize > UINT32_MAX)
         {
-            printf( "Texture data size overflow:\n%ls\n", szPath );
+            if (!fuzzing)
+            {
+                printf("Texture data size overflow:\n%ls\n", szPath);
+            }
             return false;
         }
         else
@@ -182,13 +200,20 @@ namespace
             auto textureData = reader.ReadArray<uint8_t>(static_cast<size_t>(dataSize));
             if (!textureData)
             {
-                printf( "Failed reading texture data:\n%ls\n", szPath );
+                if (!fuzzing)
+                {
+                    printf("Failed reading texture data:\n%ls\n", szPath);
+                }
                 return false;
             }
         }
 
         return true;
     }
+
+    struct find_closer { void operator()(HANDLE h) noexcept { assert(h != INVALID_HANDLE_VALUE); if (h) FindClose(h); } };
+
+    using ScopedFindHandle = std::unique_ptr<void, find_closer>;
 }
 
 //-------------------------------------------------------------------------------------
@@ -400,6 +425,86 @@ bool Test01()
             success = false;
         }
     }
+
+    return success;
+}
+
+//-------------------------------------------------------------------------------------
+// Fuzz
+bool Test02()
+{
+    bool success = true;
+
+    WIN32_FIND_DATA findData = {};
+    ScopedFindHandle hFile(safe_handle(
+        FindFirstFileExW(L"FontFileTest\\*.spritefont", FindExInfoBasic, &findData,
+            FindExSearchNameMatch, nullptr,
+            FIND_FIRST_EX_LARGE_FETCH)));
+    if (!hFile)
+    {
+        printf("ERROR: FindFirstFileEx FAILED (%lu)\n", GetLastError());
+        return false;
+    }
+
+    size_t ncount = 0;
+
+    for (;;)
+    {
+        if (!(findData.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)))
+        {
+            ++ncount;
+
+            if (!(ncount % 10))
+            {
+                printf(".");
+            }
+
+            wchar_t szPath[MAX_PATH] = {};
+            wcscpy_s(szPath, L"FontFileTest\\");
+            wcscat_s(szPath, findData.cFileName);
+
+            OutputDebugString(findData.cFileName);
+            OutputDebugStringA("\n");
+
+            bool failed = false;
+            try
+            {
+                BinaryReader reader(szPath);
+
+                if (!TestSpriteFontParsing(reader, 0, szPath, true))
+                {
+                    failed = true;
+                }
+            }
+            catch (const std::exception&)
+            {
+                failed = true;
+            }
+            catch (...)
+            {
+                failed = true;
+            }
+
+            if (!failed)
+            {
+                success = false;
+                printf("ERROR: expected failure\n%ls\n", szPath);
+            }
+        }
+
+        if (!FindNextFileW(hFile.get(), &findData))
+        {
+            break;
+        }
+    }
+
+    if (!ncount)
+    {
+        printf("ERROR: expected to find test files\n");
+        return false;
+    }
+
+    printf(" %zu files tested ", ncount);
 
     return success;
 }
