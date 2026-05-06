@@ -47,7 +47,3 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     endif()
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsEXE})
 endif()
-
-if(WIN32)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0A00)
-endif()
