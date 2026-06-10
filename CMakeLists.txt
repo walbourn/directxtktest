@@ -123,6 +123,22 @@ if(NOT BUILD_BVT)
     set_tests_properties(effects PROPERTIES LABELS "Graphics;HLSL")
     set_tests_properties(effects PROPERTIES TIMEOUT 60)
 
+# NPR EFFECTS
+    list(APPEND TEST_EXES nprtest)
+    add_executable(nprtest WIN32
+        NPRTest/Game.cpp
+        NPRTest/Game.h
+        NPRTest/pch.h
+        ${D3D_COMMON_FILES}
+        )
+    target_include_directories(nprtest PRIVATE ./NPRTest ../Src)
+    if(NOT MINGW)
+      target_precompile_headers(nprtest PRIVATE NPRTest/pch.h)
+    endif()
+    add_test(NAME "npr" COMMAND nprtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/NPRTest)
+    set_tests_properties(npr PROPERTIES LABELS "Graphics;HLSL")
+    set_tests_properties(npr PROPERTIES TIMEOUT 60)
+
 # PRIMITIVE BATCH
     list(APPEND TEST_EXES primitivestest)
     add_executable(primitivestest WIN32
