@@ -280,7 +280,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                         | (1 << OPT_SDKMESH)
                         | (1 << OPT_VBO)
                         ;
-                    mask &= ~(1 << dwOption);
+                    mask &= ~(1u << dwOption);
                     if (dwOptions & mask)
                     {
                         wprintf(L"-cmo, -dds, -sdkmesh, -vbo, -wav, -wic, and -xwb are mutually exclusive options\n");
