@@ -317,6 +317,16 @@ void Game::Render()
         }
     }
 
+    // Test Custom
+    m_spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), nullptr, nullptr, nullptr, []()
+    {
+        // TODO: need to use function callback on Begin
+    });
+
+    // TODO: Draw
+
+    m_spriteBatch->End();
+
     // Show the new frame.
     m_deviceResources->Present();
 
