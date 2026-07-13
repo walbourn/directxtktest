@@ -12,6 +12,8 @@
 #include "pch.h"
 #include "Game.h"
 
+#include "ReadData.h"
+
 #define GAMMA_CORRECT_RENDERING
 #define USE_FAST_SEMANTICS
 
@@ -318,14 +320,31 @@ void Game::Render()
     }
 
     // Test Custom
-    m_spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), nullptr, nullptr, nullptr, []()
+    auto context = m_deviceResources->GetD3DDeviceContext();
+    CustomShaderConstants constants;
+    constants.lightDir = XMVector3Normalize(XMVectorSet(cosf(time / 10.f), sinf(time / 10.f), -0.577f, 1.f));
+    m_spriteBatch->GetViewportTransform(context, constants.worldViewProj);
+    m_customCB->SetData(context, constants);
+
+    m_spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), nullptr, nullptr, nullptr, [&]()
     {
-        // TODO: need to use function callback on Begin
+        context->VSSetShader(m_customVS.Get(), nullptr, 0);
+        context->PSSetShader(m_customPS.Get(), nullptr, 0);
+        context->IASetInputLayout(m_customInputLayout.Get());
+
+        auto cb = m_customCB->GetBuffer();
+        context->VSSetConstantBuffers(0, 1, &cb);
+        context->PSSetConstantBuffers(0, 1, &cb);
     });
 
-    // TODO: Draw
+    auto cat_n = m_catNormalMap.Get();
+    context->PSSetShaderResources(1, 1, &cat_n);
+    m_spriteBatch->Draw(m_cat.Get(), XMFLOAT2(700, 150), nullptr, Colors::White, 0.f, XMFLOAT2(128, 128), 1, SpriteEffects_None, 0);
 
     m_spriteBatch->End();
+
+    ID3D11ShaderResourceView* nullSRV = nullptr;
+    context->PSSetShaderResources(1, 1, &nullSRV);
 
     // Show the new frame.
     m_deviceResources->Present();
@@ -446,6 +465,10 @@ void Game::CreateDeviceDependentResources()
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_cat.ReleaseAndGetAddressOf()));
 
+    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"cat_n.dds",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
+        nullptr, m_catNormalMap.ReleaseAndGetAddressOf()));
+
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"a.dds",
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_letterA.ReleaseAndGetAddressOf()));
@@ -457,6 +480,23 @@ void Game::CreateDeviceDependentResources()
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"c.dds",
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_letterC.ReleaseAndGetAddressOf()));
+
+    // Set up custom shaders.
+    auto blob = DX::ReadData(L"CustomSpriteVS.cso");
+    DX::ThrowIfFailed(device->CreateVertexShader( blob.data(), blob.size(),
+        nullptr, m_customVS.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(device->CreateInputLayout(
+        VertexPositionColorTexture::InputElements,
+        VertexPositionColorTexture::InputElementCount,
+        blob.data(), blob.size(),
+        m_customInputLayout.ReleaseAndGetAddressOf()));
+
+    blob = DX::ReadData(L"CustomSpritePS.cso");
+    DX::ThrowIfFailed(device->CreatePixelShader( blob.data(), blob.size(),
+        nullptr, m_customPS.ReleaseAndGetAddressOf()));
+
+    m_customCB = std::make_unique<DirectX::ConstantBuffer<CustomShaderConstants>>(device);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -489,10 +529,16 @@ void Game::CreateWindowSizeDependentResources()
 #ifdef LOSTDEVICE
 void Game::OnDeviceLost()
 {
+    m_customVS.Reset();
+    m_customPS.Reset();
+    m_customInputLayout.Reset();
+    m_customCB.reset();
+
     m_states.reset();
     m_spriteBatch.reset();
 
     m_cat.Reset();
+    m_catNormalMap.Reset();
     m_letterA.Reset();
     m_letterB.Reset();
     m_letterC.Reset();

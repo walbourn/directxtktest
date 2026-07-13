@@ -90,6 +90,7 @@
 #include <system_error>
 #include <tuple>
 
+#include "BufferHelpers.h"
 #include "CommonStates.h"
 #include "DDSTextureLoader.h"
 #include "GamePad.h"
@@ -98,6 +99,7 @@
 #include "Mouse.h"
 #include "SimpleMath.h"
 #include "SpriteBatch.h"
+#include "VertexTypes.h"
 
 namespace DX
 {

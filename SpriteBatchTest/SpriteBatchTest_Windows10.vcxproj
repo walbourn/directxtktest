@@ -270,6 +270,7 @@
     <Image Include="b.dds" />
     <Image Include="c.dds" />
     <Image Include="cat.dds" />
+    <Image Include="cat_n.dds" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageUWP.appxmanifest" />
