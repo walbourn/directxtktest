@@ -343,6 +343,25 @@ void Game::Render()
 
     m_spriteBatch->End();
 
+    constants.lightDir = XMVector3Normalize(XMVectorSet(cosf(time / 20.f), sinf(time / 20.f), -0.577f, 1.f));
+    m_customCB->SetData(context, constants);
+
+    m_spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), m_states->PointClamp(), nullptr, nullptr, [&]()
+        {
+            context->VSSetShader(m_customVS.Get(), nullptr, 0);
+            context->PSSetShader(m_customPS.Get(), nullptr, 0);
+            context->IASetInputLayout(m_customInputLayout.Get());
+
+            auto cb = m_customCB->GetBuffer();
+            context->VSSetConstantBuffers(0, 1, &cb);
+            context->PSSetConstantBuffers(0, 1, &cb);
+        });
+
+    context->PSSetShaderResources(1, 1, &cat_n);
+    m_spriteBatch->Draw(m_cat.Get(), XMFLOAT2(700, 450), nullptr, Colors::White, 0.f, XMFLOAT2(128, 128), 1, SpriteEffects_None, 0);
+
+    m_spriteBatch->End();
+
     ID3D11ShaderResourceView* nullSRV = nullptr;
     context->PSSetShaderResources(1, 1, &nullSRV);
 
