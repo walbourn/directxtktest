@@ -485,6 +485,21 @@ void Game::Render()
 
     m_basicEffect->effect.SetPerPixelLighting(false);
 
+    // Textured basic effect
+    m_basicEffectTx->Apply(context, world * XMMatrixTranslation(col0, row4, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    m_basicEffectTxVc->Apply(context, world * XMMatrixTranslation(col1, row4, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    m_basicEffectTx->effect.SetFogEnabled(true);
+    m_basicEffectTx->effect.SetFogStart(fogstart);
+    m_basicEffectTx->effect.SetFogEnd(fogend);
+    m_basicEffectTx->effect.SetFogColor(gray);
+    m_basicEffectTx->Apply(context, world * XMMatrixTranslation(colA, row4, 2 - alphaFade * 6), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+    m_basicEffectTx->effect.SetFogEnabled(false);
+
     //--- SkinnedEFfect --------------------------------------------------------------------
 
     // Skinned effect, identity transforms.
@@ -946,6 +961,21 @@ void Game::CreateDeviceDependentResources()
         effect->DisableSpecular();
     });
 
+    m_basicEffectTx = std::make_unique<EffectWithDecl<BasicEffect>>(device, [&](BasicEffect* effect)
+        {
+            effect->SetTextureEnabled(true);
+            effect->SetTexture(m_opaqueCat.Get());
+            effect->EnableDefaultLighting();
+        });
+
+    m_basicEffectTxVc = std::make_unique<EffectWithDecl<BasicEffect>>(device, [&](BasicEffect* effect)
+        {
+            effect->SetVertexColorEnabled(true);
+            effect->SetTextureEnabled(true);
+            effect->SetTexture(m_opaqueCat.Get());
+            effect->EnableDefaultLighting();
+        });
+
     m_skinnedEffect = std::make_unique<EffectWithDecl<SkinnedEffect>>(device, [&](SkinnedEffect* effect)
     {
         effect->EnableDefaultLighting();
@@ -1068,6 +1098,8 @@ void Game::OnDeviceLost()
     m_basicEffectUnlitVc.reset();
     m_basicEffect.reset();
     m_basicEffectNoSpecular.reset();
+    m_basicEffectTx.reset();
+    m_basicEffectTxVc.reset();
 
     m_skinnedEffect.reset();
     m_skinnedEffectNoSpecular.reset();

@@ -145,6 +145,8 @@ private:
     std::unique_ptr<EffectWithDecl<DirectX::BasicEffect>>       m_basicEffectUnlitVc;
     std::unique_ptr<EffectWithDecl<DirectX::BasicEffect>>       m_basicEffect;
     std::unique_ptr<EffectWithDecl<DirectX::BasicEffect>>       m_basicEffectNoSpecular;
+    std::unique_ptr<EffectWithDecl<DirectX::BasicEffect>>       m_basicEffectTx;
+    std::unique_ptr<EffectWithDecl<DirectX::BasicEffect>>       m_basicEffectTxVc;
 
     std::unique_ptr<EffectWithDecl<DirectX::SkinnedEffect>>     m_skinnedEffect;
     std::unique_ptr<EffectWithDecl<DirectX::SkinnedEffect>>     m_skinnedEffectNoSpecular;
