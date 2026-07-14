@@ -110,9 +110,22 @@ private:
     std::unique_ptr<DirectX::SpriteBatch>   m_spriteBatch;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_cat;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_catNormalMap;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_letterA;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_letterB;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_letterC;
+
+    Microsoft::WRL::ComPtr<ID3D11VertexShader>          m_customVS;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader>           m_customPS;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>           m_customInputLayout;
+
+    XM_ALIGNED_STRUCT(16) CustomShaderConstants
+    {
+        DirectX::XMVECTOR lightDir;
+        DirectX::XMMATRIX worldViewProj;
+    };
+
+    std::unique_ptr<DirectX::ConstantBuffer<CustomShaderConstants>> m_customCB;
 
     unsigned int m_sortMode;
     float m_delay;
