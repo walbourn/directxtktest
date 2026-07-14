@@ -489,7 +489,9 @@ add_custom_command(TARGET compileHLSLShaders POST_BUILD
                   COMMAND ${CMAKE_COMMAND} -E copy ${CSO_SHADER_FILES} $<TARGET_FILE_DIR:spritebatchtest>
                   COMMAND_EXPAND_LISTS)
 
-add_dependencies(spritebatchtest compileHLSLShaders)
+if(NOT BUILD_BVT)
+  add_dependencies(spritebatchtest compileHLSLShaders)
+endif()
 
 message(STATUS "Enabled tests: ${TEST_EXES}")
 foreach(t IN LISTS TEST_EXES)
