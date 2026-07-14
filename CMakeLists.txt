@@ -485,11 +485,11 @@ endforeach(FILE)
 
 add_custom_target(compileHLSLShaders ALL DEPENDS ${CSO_SHADER_FILES})
 
-add_custom_command(TARGET compileHLSLShaders POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy ${CSO_SHADER_FILES} $<TARGET_FILE_DIR:spritebatchtest>
-                  COMMAND_EXPAND_LISTS)
-
 if(NOT BUILD_BVT)
+  add_custom_command(TARGET compileHLSLShaders POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy ${CSO_SHADER_FILES} $<TARGET_FILE_DIR:spritebatchtest>
+                    COMMAND_EXPAND_LISTS)
+
   add_dependencies(spritebatchtest compileHLSLShaders)
 endif()
 
