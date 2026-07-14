@@ -33,8 +33,10 @@ namespace
     const XMVECTORF32 c_clearColor = Colors::CornflowerBlue;
 #endif
 
-    constexpr float row0 = 1.5f;
-    constexpr float row1 = -1.5f;
+    constexpr float row0 = 2.0f;
+    constexpr float row1 = 0.5f;
+    constexpr float row2 = -0.5f;
+    constexpr float row3 = -2.0f;
 
     constexpr float col0 = -4.f;
     constexpr float col1 = -2.f;
@@ -297,19 +299,19 @@ void Game::Render()
     //--- NPREffect: Gooch shading ---------------------------------------------------------
 
     // Default Gooch shading.
-    m_goochEffect->Apply(context, world * XMMatrixTranslation(col0, row1, 0), m_view, m_projection);
+    m_goochEffect->Apply(context, world * XMMatrixTranslation(col0, row2, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Gooch shading, no specular.
-    m_goochEffectNoSpecular->Apply(context, world * XMMatrixTranslation(col1, row1, 0), m_view, m_projection);
+    m_goochEffectNoSpecular->Apply(context, world * XMMatrixTranslation(col1, row2, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Gooch shading with vertex color.
-    m_goochEffectVc->Apply(context, world * XMMatrixTranslation(col2, row1, 0), m_view, m_projection);
+    m_goochEffectVc->Apply(context, world * XMMatrixTranslation(col2, row2, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Gooch shading with custom cool/warm colors.
-    m_goochEffectCustom->Apply(context, world * XMMatrixTranslation(col3, row1, 0), m_view, m_projection);
+    m_goochEffectCustom->Apply(context, world * XMMatrixTranslation(col3, row2, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Show the new frame.
