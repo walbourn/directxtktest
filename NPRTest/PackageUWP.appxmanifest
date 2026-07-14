@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  IgnorableNamespaces="uap mp">
+
+  <Identity
+    Name="016c5013-53c9-46b6-bc90-a2721d9c0263"
+    Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
+    Version="1.0.0.0" />
+
+  <mp:PhoneIdentity PhoneProductId="016c5013-53c9-46b6-bc90-a2721d9c0263" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+
+  <Properties>
+    <DisplayName>NPRTest (DirectX 11)</DisplayName>
+    <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
+    <Logo>StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="$targetnametoken$.exe"
+      EntryPoint="NPRTest.App">
+      <uap:VisualElements
+        DisplayName="NPRTest (DirectX 11)"
+        Square150x150Logo="Logo.png"
+        Square44x44Logo="SmallLogo.png"
+        Description="NPRTest for DirectX Tool Kit for DirectX 11 (UWP)"
+        BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="WideLogo.png"/>
+        <uap:SplashScreen Image="SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>
