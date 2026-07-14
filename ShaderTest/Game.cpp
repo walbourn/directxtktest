@@ -2653,6 +2653,36 @@ void Game::CreateDeviceDependentResources()
         effect->SetVertexColorEnabled(true);
     }));
 
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetVertexColorEnabled(true);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetVertexColorEnabled(true);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
     m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
     {
         effect->SetMode(NPREffect::Mode_Cel);
@@ -2673,6 +2703,36 @@ void Game::CreateDeviceDependentResources()
     {
         effect->SetMode(NPREffect::Mode_Gooch);
         effect->SetVertexColorEnabled(true);
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetVertexColorEnabled(true);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetVertexColorEnabled(true);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
     }));
 
     //--- DGSLEffect -----------------------------------------------------------------------
