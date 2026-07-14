@@ -33,10 +33,10 @@ namespace
     const XMVECTORF32 c_clearColor = Colors::CornflowerBlue;
 #endif
 
-    constexpr float row0 = 2.0f;
-    constexpr float row1 = 0.5f;
-    constexpr float row2 = -0.5f;
-    constexpr float row3 = -2.0f;
+    constexpr float row0 = 2.5f;
+    constexpr float row1 = 1.0f;
+    constexpr float row2 = -1.0f;
+    constexpr float row3 = -2.5f;
 
     constexpr float col0 = -4.f;
     constexpr float col1 = -2.f;
@@ -266,6 +266,9 @@ void Game::Render()
     context->RSSetState(m_states->CullCounterClockwise());
 #endif
 
+    auto sampler = m_states->LinearWrap();
+    context->PSSetSamplers(0, 1, &sampler);
+
     // Set vertex and index buffers.
     UINT vertexStride = sizeof(TestVertex);
     UINT vertexOffset = 0;
@@ -277,15 +280,28 @@ void Game::Render()
     //--- NPREffect: Cel shading -----------------------------------------------------------
 
     // Default cel shading (4 bands).
+    auto celeffect = reinterpret_cast<NPREffect*>(m_celEffect.get());
+    if(celeffect)
+    {
+        celeffect->SetCelShaderBands(4);
+    }
     m_celEffect->Apply(context, world * XMMatrixTranslation(col0, row0, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Cel shading with 2 bands.
-    m_celEffectBands2->Apply(context, world * XMMatrixTranslation(col1, row0, 0), m_view, m_projection);
+    if (celeffect)
+    {
+        celeffect->SetCelShaderBands(2);
+    }
+    m_celEffect->Apply(context, world * XMMatrixTranslation(col1, row0, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Cel shading with 8 bands.
-    m_celEffectBands8->Apply(context, world * XMMatrixTranslation(col2, row0, 0), m_view, m_projection);
+    if (celeffect)
+    {
+        celeffect->SetCelShaderBands(8);
+    }
+    m_celEffect->Apply(context, world * XMMatrixTranslation(col2, row0, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Cel shading, no specular.
@@ -294,6 +310,41 @@ void Game::Render()
 
     // Cel shading with vertex color.
     m_celEffectVc->Apply(context, world * XMMatrixTranslation(col4, row0, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Cel shading with 4 bands and texture.
+    celeffect = reinterpret_cast<NPREffect*>(m_celEffectTx.get());
+    if (celeffect)
+    {
+        celeffect->SetCelShaderBands(4);
+    }
+    m_celEffectTx->Apply(context, world * XMMatrixTranslation(col0, row1, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Cel shading with 2 bands and texture.
+    celeffect = reinterpret_cast<NPREffect*>(m_celEffectTx.get());
+    if (celeffect)
+    {
+        celeffect->SetCelShaderBands(2);
+    }
+    m_celEffectTx->Apply(context, world * XMMatrixTranslation(col1, row1, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Cel shading with 8 bands and texture.
+    celeffect = reinterpret_cast<NPREffect*>(m_celEffectTx.get());
+    if (celeffect)
+    {
+        celeffect->SetCelShaderBands(8);
+    }
+    m_celEffectTx->Apply(context, world * XMMatrixTranslation(col2, row1, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Cel shading with texture, no specular.
+    m_celEffectTxNoSpecular->Apply(context, world * XMMatrixTranslation(col3, row1, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Cel shading with vertex color and texture.
+    m_celEffectTxVc->Apply(context, world * XMMatrixTranslation(col4, row1, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     //--- NPREffect: Gooch shading ---------------------------------------------------------
@@ -312,6 +363,18 @@ void Game::Render()
 
     // Gooch shading with custom cool/warm colors.
     m_goochEffectCustom->Apply(context, world * XMMatrixTranslation(col3, row2, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Gooch shading with texture.
+    m_goochEffectTx->Apply(context, world * XMMatrixTranslation(col0, row3, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Gooch shading with texture, no specular.
+    m_goochEffectTxNoSpecular->Apply(context, world * XMMatrixTranslation(col1, row3, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Gooch shading with vertex color.
+    m_goochEffectTxVc->Apply(context, world * XMMatrixTranslation(col2, row3, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Show the new frame.
@@ -424,6 +487,16 @@ void Game::CreateDeviceDependentResources()
     red.v  = Colors::Red;
 #endif
 
+#ifdef GAMMA_CORRECT_RENDERING
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
+#else
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_DEFAULT;
+#endif
+
+    DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"reftexture.dds",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
+        nullptr, m_reftxt.ReleaseAndGetAddressOf()));
+
     //--- Cel shading (Mode_Cel) -----------------------------------------------------------
 
     // Default cel shading.
@@ -433,24 +506,6 @@ void Game::CreateDeviceDependentResources()
         effect->EnableDefaultLighting();
         effect->SetDiffuseColor(blue);
         effect->SetCelShaderBands(4);
-    });
-
-    // Cel shading with 2 bands.
-    m_celEffectBands2 = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
-    {
-        effect->SetMode(NPREffect::Mode_Cel);
-        effect->EnableDefaultLighting();
-        effect->SetDiffuseColor(blue);
-        effect->SetCelShaderBands(2);
-    });
-
-    // Cel shading with 8 bands.
-    m_celEffectBands8 = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
-    {
-        effect->SetMode(NPREffect::Mode_Cel);
-        effect->EnableDefaultLighting();
-        effect->SetDiffuseColor(blue);
-        effect->SetCelShaderBands(8);
     });
 
     // Cel shading, no specular.
@@ -468,6 +523,38 @@ void Game::CreateDeviceDependentResources()
     {
         effect->SetMode(NPREffect::Mode_Cel);
         effect->EnableDefaultLighting();
+        effect->SetCelShaderBands(4);
+        effect->SetVertexColorEnabled(true);
+    });
+
+    // Cel shading with texture.
+    m_celEffectTx = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->EnableDefaultLighting();
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_reftxt.Get());
+        effect->SetCelShaderBands(4);
+    });
+
+    // Cel shading with texture, no specular
+    m_celEffectTxNoSpecular = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->EnableDefaultLighting();
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_reftxt.Get());
+        effect->SetCelShaderBands(4);
+        effect->DisableSpecular();
+    });
+
+    // Cel shading with vertex color and texture.
+    m_celEffectTxVc = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->EnableDefaultLighting();
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_reftxt.Get());
         effect->SetCelShaderBands(4);
         effect->SetVertexColorEnabled(true);
     });
@@ -508,6 +595,41 @@ void Game::CreateDeviceDependentResources()
         effect->SetGoochCoolColor(Colors::Cyan, 0.4f);
         effect->SetGoochWarmColor(Colors::Yellow, 0.4f);
     });
+
+    // Gooch shading with texture.
+    m_goochEffectTx = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_reftxt.Get());
+        effect->EnableDefaultLighting();
+        effect->SetGoochCoolColor(Colors::Red, 0.4f);
+        effect->SetGoochWarmColor(Colors::Green, 0.4f);
+    });
+
+    // Gooch shading with texture, no specular.
+    m_goochEffectTxNoSpecular = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_reftxt.Get());
+        effect->EnableDefaultLighting();
+        effect->SetGoochCoolColor(Colors::Red, 0.4f);
+        effect->SetGoochWarmColor(Colors::Green, 0.4f);
+        effect->DisableSpecular();
+    });
+
+    // Gooch shading with vertex color and texture.
+    m_goochEffectTxVc = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_reftxt.Get());
+        effect->EnableDefaultLighting();
+        effect->SetGoochCoolColor(Colors::Red, 0.4f);
+        effect->SetGoochWarmColor(Colors::Green, 0.4f);
+        effect->SetVertexColorEnabled(true);
+    });
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -539,18 +661,24 @@ void Game::CreateWindowSizeDependentResources()
 void Game::OnDeviceLost()
 {
     m_celEffect.reset();
-    m_celEffectBands2.reset();
-    m_celEffectBands8.reset();
     m_celEffectNoSpecular.reset();
     m_celEffectVc.reset();
+    m_celEffectTx.reset();
+    m_celEffectTxNoSpecular.reset();
+    m_celEffectTxVc.reset();
 
     m_goochEffect.reset();
     m_goochEffectNoSpecular.reset();
     m_goochEffectVc.reset();
     m_goochEffectCustom.reset();
+    m_goochEffectTx.reset();
+    m_goochEffectTxNoSpecular.reset();
+    m_goochEffectTxVc.reset();
 
     m_vertexBuffer.Reset();
     m_indexBuffer.Reset();
+
+    m_reftxt.Reset();
 
     m_states.reset();
 
