@@ -14,11 +14,13 @@
 #include "VertexTypes.h"
 
 #include <cstdio>
+#include <stdexcept>
 #include <type_traits>
 
 #include <wrl/client.h>
 
 #include <DirectXMath.h>
+#include <DirectXColors.h>
 #include <DirectXPackedVector.h>
 
 using namespace DirectX;
@@ -1193,6 +1195,7 @@ bool Test21(_In_ ID3D11Device *device)
         }
     }
 
+    // shader combos
     try
     {
         context->IASetInputLayout(il.Get());
@@ -1212,7 +1215,150 @@ bool Test21(_In_ ID3D11Device *device)
         success = false;
     }
 
+    // camera settings
+    try
+    {
+        XMMATRIX world = XMMatrixTranslation(1.f, 2.f, 3.f);
+        npr->SetWorld(world);
+
+        constexpr XMVECTORF32 pos = { { { 0.f, 0.f, -10.f, 0.f } } };
+        XMMATRIX view = XMMatrixLookAtLH(pos, g_XMZero, g_XMIdentityR1);
+        npr->SetView(view);
+
+        XMMATRIX proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, 1.0f, 0.1f, 100.0f);
+        npr->SetProjection(proj);
+
+        npr->SetMatrices(world, view, proj);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed npr camera methods (except: %s)\n", e.what());
+        success = false;
+    }
+
+    // light settings
+    try
+    {
+        npr->SetLightDirection(0, g_XMIdentityR2);
+        npr->SetLightDirection(1, g_XMIdentityR2);
+
+        npr->EnableDefaultLighting();
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed npr light methods (except: %s)\n", e.what());
+        success = false;
+    }
+
+    // material settings
+    try
+    {
+        npr->SetDiffuseColor(Colors::Red);
+        npr->SetSpecularColor(Colors::Blue);
+        npr->SetRimLightingColor(Colors::Green);
+        npr->SetAlpha(0.5f);
+        npr->SetColorAndAlpha(Colors::White);
+
+        npr->SetSpecularThreshold(0.5f, 0.003f);
+        npr->DisableSpecular();
+
+        npr->SetRimLightingPower(3.5f);
+        npr->SetRimLightingIntensity(0.75f);
+        npr->SetRimLightingRange(0.3f, 0.4f);
+        npr->DisableRimLighting();
+
+        npr->SetCelShaderBands(6);
+
+        npr->SetGoochCoolColor(Colors::Blue, 0.1f);
+        npr->SetGoochWarmColor(Colors::Red, 0.4);
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed npr materials methods (except: %s)\n", e.what());
+        success = false;
+    }
+
     // invalid args
+    bool threw = false;
+    try
+    {
+        npr->SetSpecularThreshold(2.f, 4.f);
+    }
+    catch(const std::invalid_argument&)
+    {
+        threw = true;
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Unexpected error for invalid specular threshold (except: %s)\n", e.what());
+        success = false;
+    }
+    if (!threw)
+    {
+        printf("ERROR: Failed to throw for invalid specular threshold\n");
+        success = false;
+    }
+
+    threw = false;
+    try
+    {
+        npr->SetRimLightingIntensity(2.f);
+    }
+    catch(const std::invalid_argument&)
+    {
+        threw = true;
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Unexpected error for invalid rim lighting intensity (except: %s)\n", e.what());
+        success = false;
+    }
+    if (!threw)
+    {
+        printf("ERROR: Failed to throw for invalid rim lighting intensity\n");
+        success = false;
+    }
+
+    threw = false;
+    try
+    {
+        npr->SetRimLightingRange(-1.f, -2.f);
+    }
+    catch(const std::invalid_argument&)
+    {
+        threw = true;
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Unexpected error for invalid rim lighting range (except: %s)\n", e.what());
+        success = false;
+    }
+    if (!threw)
+    {
+        printf("ERROR: Failed to throw for invalid rim lighting range\n");
+        success = false;
+    }
+
+    threw = false;
+    try
+    {
+        npr->SetCelShaderBands(-1);
+    }
+    catch(const std::invalid_argument&)
+    {
+        threw = true;
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Unexpected error for invalid cel shader bands (except: %s)\n", e.what());
+        success = false;
+    }
+    if (!threw)
+    {
+        printf("ERROR: Failed to throw for invalid cel shader bands\n");
+        success = false;
+    }
+
     #pragma warning(push)
     #pragma warning(disable:6385 6387)
     {
