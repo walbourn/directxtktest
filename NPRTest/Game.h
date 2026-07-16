@@ -142,18 +142,22 @@ private:
     // Cel shading (Mode_Cel)
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffect;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectNoSpecular;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectNoRim;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectVc;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTx;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTxNoSpecular;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTxNoRim;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTxVc;
 
     // Gooch shading (Mode_Gooch)
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffect;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectNoSpecular;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectNoRim;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectVc;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectCustom;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTx;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTxNoSpecular;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTxNoRim;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTxVc;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
