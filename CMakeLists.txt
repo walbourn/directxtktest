@@ -136,7 +136,7 @@ if(NOT BUILD_BVT)
       target_precompile_headers(nprtest PRIVATE NPRTest/pch.h)
     endif()
     add_test(NAME "npr" COMMAND nprtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/NPRTest)
-    set_tests_properties(npr PROPERTIES LABELS "Graphics;HLSL")
+    set_tests_properties(npr PROPERTIES LABELS "Graphics;HLSL;NPR")
     set_tests_properties(npr PROPERTIES TIMEOUT 60)
 
 # PRIMITIVE BATCH
@@ -293,7 +293,7 @@ if(NOT BUILD_BVT)
       target_precompile_headers(hdrtest PRIVATE HDRTest/pch.h)
     endif()
     add_test(NAME "hdr" COMMAND hdrtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/HDRTest)
-    set_tests_properties(hdr PROPERTIES LABELS "Graphics;PostProcess")
+    set_tests_properties(hdr PROPERTIES LABELS "Graphics;PostProcess;HDR")
     set_tests_properties(hdr PROPERTIES TIMEOUT 40)
 
 # PBR
@@ -311,7 +311,7 @@ if(NOT BUILD_BVT)
       target_precompile_headers(pbrtest PRIVATE PBRTest/pch.h)
     endif()
     add_test(NAME "pbrShaders" COMMAND pbrtest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PBRTest)
-    set_tests_properties(pbrShaders PROPERTIES LABELS "Graphics;HLSL")
+    set_tests_properties(pbrShaders PROPERTIES LABELS "Graphics;HLSL;HDR;PBR")
     set_tests_properties(pbrShaders PROPERTIES TIMEOUT 40)
 
 # PBR MODEL
@@ -332,7 +332,7 @@ if(NOT BUILD_BVT)
       target_precompile_headers(pbrmodeltest PRIVATE PBRModelTest/pch.h)
     endif()
     add_test(NAME "modelsPBR" COMMAND pbrmodeltest -ctest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/PBRModelTest)
-    set_tests_properties(modelsPBR PROPERTIES LABELS "Graphics;Models")
+    set_tests_properties(modelsPBR PROPERTIES LABELS "Graphics;Models;HDR;PBR")
     set_tests_properties(modelsPBR PROPERTIES TIMEOUT 60)
 
 # POST-PROCESSING

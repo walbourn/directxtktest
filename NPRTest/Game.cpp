@@ -254,6 +254,11 @@ void Game::Render()
     // Time-based animation
     float time = static_cast<float>(m_timer.GetTotalSeconds());
 
+    float alphaFade = (sin(time * 2) + 1) / 2;
+
+    if (alphaFade >= 1)
+        alphaFade = 1 - FLT_EPSILON;
+
     float yaw = time * 0.4f;
     float pitch = time * 0.7f;
     float roll = time * 1.1f;
@@ -261,7 +266,7 @@ void Game::Render()
     XMMATRIX world = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
     // Set state objects.
-    context->OMSetBlendState(m_states->Opaque(), Colors::White, 0xFFFFFFFF);
+    context->OMSetBlendState(m_states->AlphaBlend(), Colors::White, 0xFFFFFFFF);
     context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 #ifdef LH_COORDS
     context->RSSetState(m_states->CullClockwise());
@@ -336,6 +341,13 @@ void Game::Render()
     m_celEffectTxVc->Apply(context, world * XMMatrixTranslation(col5, row1, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
+    // Cel shading (4 bands) with alpha.
+    m_celEffect->effect.SetCelShaderBands(4);
+    m_celEffect->effect.SetAlpha(alphaFade);
+    m_celEffect->Apply(context, world * XMMatrixTranslation(col1, row3, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+    m_celEffect->effect.SetAlpha(1.f);
+
     //--- NPREffect: Gooch shading ---------------------------------------------------------
 
     // Default Gooch shading.
@@ -380,6 +392,12 @@ void Game::Render()
     // Gooch shading with vertex color.
     m_goochEffectTxVc->Apply(context, world * XMMatrixTranslation(col5, row3, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Default Gooch shading with alpha.
+    m_goochEffect->effect.SetAlpha(alphaFade);
+    m_goochEffect->Apply(context, world * XMMatrixTranslation(col2, row3, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+    m_goochEffect->effect.SetAlpha(1.f);
 
     // Show the new frame.
     m_deviceResources->Present();
