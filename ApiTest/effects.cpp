@@ -1215,6 +1215,26 @@ bool Test21(_In_ ID3D11Device *device)
         success = false;
     }
 
+    try
+    {
+        context->IASetInputLayout(il.Get());
+
+        npr->SetTexture(defaultTex.Get());
+        npr->SetMatCap(defaultTex.Get());
+
+        for(int combos = 0; combos <= 0x1f; ++combos)
+        {
+            npr->SetBiasedVertexNormals((combos & 0x1) ? true : false);
+            npr->SetMode(NPREffect::Mode_MatCap);
+            npr->Apply(context.Get());
+        }
+    }
+    catch(const std::exception& e)
+    {
+        printf("ERROR: Failed applying matcap npr (except: %s)\n", e.what());
+        success = false;
+    }
+
     // camera settings
     try
     {

@@ -35,10 +35,11 @@ namespace
     const XMVECTORF32 c_rimToonColor = { { { 0.6f, 0.8f, 1.0f } } };
     const XMVECTORF32 c_rimGoochColor = { { { 1.f, 1.f, 1.f, 1.f, } } };
 
-    constexpr float row0 = 2.5f;
-    constexpr float row1 = 1.0f;
-    constexpr float row2 = -1.0f;
-    constexpr float row3 = -2.5f;
+    constexpr float row0 = 3.0f;
+    constexpr float row1 = 1.5f;
+    constexpr float row2 = 0.f;
+    constexpr float row3 = -1.5f;
+    constexpr float row4 = -3.0f;
 
     constexpr float col0 = -5.f;
     constexpr float col1 = -3.f;
@@ -399,6 +400,36 @@ void Game::Render()
     context->DrawIndexed(m_indexCount, 0, 0);
     m_goochEffect->effect.SetAlpha(1.f);
 
+    // Default MatCap shading
+    m_matcapEffect->effect.SetMatCap(m_mapCapTxt1.Get());
+    m_matcapEffect->Apply(context, world * XMMatrixTranslation(col0, row4, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    m_matcapEffect->effect.SetAlpha(alphaFade);
+    m_matcapEffect->effect.SetMatCap(m_mapCapTxt2.Get());
+    m_matcapEffect->Apply(context, world * XMMatrixTranslation(col1, row4, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+    m_matcapEffect->effect.SetAlpha(1.f);
+
+    // MapCap shading with vertex color.
+    m_matcapEffectVc->Apply(context, world * XMMatrixTranslation(col2, row4, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    // Mapcap shading with texture.
+    m_matcapEffectTx->effect.SetMatCap(m_mapCapTxt1.Get());
+    m_matcapEffectTx->Apply(context, world * XMMatrixTranslation(col3, row4, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
+    m_matcapEffectTx->effect.SetAlpha(alphaFade);
+    m_matcapEffectTx->effect.SetMatCap(m_mapCapTxt2.Get());
+    m_matcapEffectTx->Apply(context, world * XMMatrixTranslation(col4, row4, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+    m_matcapEffectTx->effect.SetAlpha(1.f);
+
+    // Mapcap sahding with vertex color and texture.
+    m_matcapEffectTxVc->Apply(context, world * XMMatrixTranslation(col5, row4, 0), m_view, m_projection);
+    context->DrawIndexed(m_indexCount, 0, 0);
+
     // Show the new frame.
     m_deviceResources->Present();
 
@@ -507,17 +538,27 @@ void Game::CreateDeviceDependentResources()
     green.v = XMColorSRGBToRGB(Colors::Green);
     grey.v = XMColorSRGBToRGB(Colors::Gray);
     DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
+    WIC_LOADER_FLAGS wicLoadFlags = WIC_LOADER_FORCE_SRGB;
 #else
     blue.v = Colors::Blue;
     red.v  = Colors::Red;
     green.v = Colors::Green;
     grey.v = Colors::Gray;
     DDS_LOADER_FLAGS loadFlags = DDS_LOADER_DEFAULT;
+    WIC_LOADER_FLAGS wicLoadFlags = WIC_LOADER_DEFAULT;
 #endif
 
     DX::ThrowIfFailed(CreateDDSTextureFromFileEx(device, L"reftexture.dds",
         0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, loadFlags,
         nullptr, m_reftxt.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"matcap_gold.png",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, wicLoadFlags,
+        nullptr, m_mapCapTxt1.ReleaseAndGetAddressOf()));
+
+    DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"matcap_ice.png",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, wicLoadFlags,
+        nullptr, m_mapCapTxt2.ReleaseAndGetAddressOf()));
 
     //--- Cel shading (Mode_Cel) -----------------------------------------------------------
 
@@ -709,12 +750,48 @@ void Game::CreateDeviceDependentResources()
         effect->SetGoochWarmColor(green, 0.4f);
         effect->SetVertexColorEnabled(true);
     });
+
+    //--- MatCap shading (Mode_MatCap) -----------------------------------------------------
+
+    // Default MatCap shading
+    m_matcapEffect = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_mapCapTxt1.Get());
+    });
+
+    // MapCap shading with vertex color.
+    m_matcapEffectVc = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_mapCapTxt1.Get());
+        effect->SetVertexColorEnabled(true);
+    });
+
+    // Mapcap shading with texture.
+    m_matcapEffectTx = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_reftxt.Get());
+        effect->SetMatCap(m_mapCapTxt1.Get());
+    });
+
+    // Mapcap sahding with vertex color and texture.
+    m_matcapEffectTxVc = std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_reftxt.Get());
+        effect->SetMatCap(m_mapCapTxt1.Get());
+        effect->SetVertexColorEnabled(true);
+    });
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    static const XMVECTORF32 cameraPosition = { { { 0.f, 0.f, 6.f, 0.f } } };
+    static const XMVECTORF32 cameraPosition = { { { 0.f, 0.f, 7.f, 0.f } } };
 
     const auto size = m_deviceResources->GetOutputSize();
     const float aspect = (float)size.right / (float)size.bottom;
@@ -758,10 +835,17 @@ void Game::OnDeviceLost()
     m_goochEffectTxNoRim.reset();
     m_goochEffectTxVc.reset();
 
+    m_matcapEffect.reset();
+    m_matcapEffectVc.reset();
+    m_matcapEffectTx.reset();
+    m_matcapEffectTxVc.reset();
+
     m_vertexBuffer.Reset();
     m_indexBuffer.Reset();
 
     m_reftxt.Reset();
+    m_mapCapTxt1.Reset();
+    m_mapCapTxt2.Reset();
 
     m_states.reset();
 

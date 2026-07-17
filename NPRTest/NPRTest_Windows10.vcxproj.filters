@@ -57,6 +57,12 @@
     <Image Include="reftexture.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="matcap_gold.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="matcap_ice.png">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="PackageUWP.appxmanifest" />

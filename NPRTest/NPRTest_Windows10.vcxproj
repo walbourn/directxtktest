@@ -246,6 +246,8 @@
     <Image Include="..\Common\SplashScreen.scale-100.png" />
     <Image Include="..\Common\StoreLogo.scale-100.png" />
     <Image Include="..\Common\WideLogo.scale-100.png" />
+    <Image Include="matcap_gold.png" />
+    <Image Include="matcap_ice.png" />
     <Image Include="reftexture.dds" />
   </ItemGroup>
   <ItemGroup>
