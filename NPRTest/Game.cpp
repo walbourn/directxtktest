@@ -506,16 +506,12 @@ void Game::CreateDeviceDependentResources()
     red.v  = XMColorSRGBToRGB(Colors::Red);
     green.v = XMColorSRGBToRGB(Colors::Green);
     grey.v = XMColorSRGBToRGB(Colors::Gray);
+    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
 #else
     blue.v = Colors::Blue;
     red.v  = Colors::Red;
     green.v = Colors::Green;
     grey.v = Colors::Gray;
-#endif
-
-#ifdef GAMMA_CORRECT_RENDERING
-    DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
-#else
     DDS_LOADER_FLAGS loadFlags = DDS_LOADER_DEFAULT;
 #endif
 
@@ -552,7 +548,6 @@ void Game::CreateDeviceDependentResources()
         effect->SetMode(NPREffect::Mode_Cel);
         effect->EnableDefaultLighting();
         effect->SetDiffuseColor(blue);
-        effect->SetRimLightingColor(c_rimToonColor);
         effect->SetCelShaderBands(4);
         effect->DisableRimLighting();
     });
@@ -695,7 +690,6 @@ void Game::CreateDeviceDependentResources()
         effect->SetTextureEnabled(true);
         effect->SetTexture(m_reftxt.Get());
         effect->SetDiffuseColor(grey);
-        effect->SetRimLightingColor(c_rimGoochColor);
         effect->EnableDefaultLighting();
         effect->SetGoochCoolColor(red, 0.4f);
         effect->SetGoochWarmColor(green, 0.4f);
