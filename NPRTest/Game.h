@@ -1,0 +1,182 @@
+//--------------------------------------------------------------------------------------
+// File: Game.h
+//
+// Developer unit test for DirectX Tool Kit - NPREffect
+//
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+//
+// https://go.microsoft.com/fwlink/?LinkId=248929
+//--------------------------------------------------------------------------------------
+#pragma once
+
+#include "DirectXTKTest.h"
+#include "StepTimer.h"
+
+constexpr uint32_t c_testTimeout = 10000;
+
+// A basic game implementation that creates a D3D11 device and
+// provides a game loop.
+class Game
+#ifdef LOSTDEVICE
+    final : public DX::IDeviceNotify
+#endif
+{
+public:
+
+    Game() noexcept(false);
+    ~Game() = default;
+
+    Game(Game&&) = default;
+    Game& operator= (Game&&) = default;
+
+    Game(Game const&) = delete;
+    Game& operator= (Game const&) = delete;
+
+    // Initialization and management
+#ifdef COREWINDOW
+    void Initialize(IUnknown* window, int width, int height, DXGI_MODE_ROTATION rotation);
+#else
+    void Initialize(HWND window, int width, int height, DXGI_MODE_ROTATION rotation);
+#endif
+
+    // Basic game loop
+    void Tick();
+
+#ifdef LOSTDEVICE
+    // IDeviceNotify
+    virtual void OnDeviceLost() override;
+    virtual void OnDeviceRestored() override;
+#endif
+
+    // Messages
+    void OnActivated() {}
+    void OnDeactivated() {}
+    void OnSuspending();
+    void OnResuming();
+
+#ifdef PC
+    void OnWindowMoved();
+#endif
+
+#if defined(PC) || defined(UWP)
+    void OnDisplayChange();
+#endif
+
+#ifndef XBOX
+    void OnWindowSizeChanged(int width, int height, DXGI_MODE_ROTATION rotation);
+#endif
+
+#ifdef UWP
+    void ValidateDevice();
+#endif
+
+    // Properties
+    void GetDefaultSize( int& width, int& height ) const;
+    const wchar_t* GetAppName() const { return L"NPRTest (DirectX 11)"; }
+    bool RequestHDRMode() const { return m_deviceResources ? (m_deviceResources->GetDeviceOptions() & DX::DeviceResources::c_EnableHDR) != 0 : false; }
+
+private:
+
+    void Update(DX::StepTimer const& timer);
+    void Render();
+
+    void Clear();
+
+    void CreateDeviceDependentResources();
+    void CreateWindowSizeDependentResources();
+
+    // Device resources.
+    std::unique_ptr<DX::DeviceResources>    m_deviceResources;
+
+    // Rendering loop timer.
+    DX::StepTimer                           m_timer;
+
+    // Input devices.
+    std::unique_ptr<DirectX::GamePad>       m_gamePad;
+    std::unique_ptr<DirectX::Keyboard>      m_keyboard;
+
+    // DirectXTK Test Objects
+#ifdef XBOX
+    std::unique_ptr<DirectX::GraphicsMemory>    m_graphicsMemory;
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+#endif
+
+    template<typename T>
+    class EffectWithDecl
+    {
+    public:
+        EffectWithDecl(ID3D11Device* device, std::function<void(T*)> setEffectParameters)
+            : effect(device)
+        {
+            setEffectParameters(&effect);
+
+            CreateTestInputLayout(device, &effect, &inputLayout);
+        }
+
+        void Apply(ID3D11DeviceContext* context, DirectX::CXMMATRIX world, DirectX::CXMMATRIX view, DirectX::CXMMATRIX projection)
+        {
+            effect.SetMatrices(world, view, projection);
+
+            effect.Apply(context);
+
+            context->IASetInputLayout(inputLayout.Get());
+        }
+
+        T effect;
+
+    private:
+        Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
+    };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+    std::unique_ptr<DirectX::CommonStates>                          m_states;
+
+    // Cel shading (Mode_Cel)
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffect;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectNoSpecular;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectNoRim;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectVc;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTx;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTxNoSpecular;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTxNoRim;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTxVc;
+
+    // Gooch shading (Mode_Gooch)
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffect;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectNoSpecular;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectNoRim;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectVc;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectCustom;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTx;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTxNoSpecular;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTxNoRim;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTxVc;
+
+    // MatCap shading (Mode_MatCap)
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_matcapEffect;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_matcapEffectVc;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_matcapEffectTx;
+    std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_matcapEffectTxVc;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>    m_indexBuffer;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_reftxt;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_mapCapTxt1;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_mapCapTxt2;
+
+    DirectX::SimpleMath::Matrix             m_view;
+    DirectX::SimpleMath::Matrix             m_projection;
+
+    UINT                                    m_indexCount;
+
+    static void CreateTestInputLayout(_In_ ID3D11Device* device, _In_ DirectX::IEffect* effect, _Out_ ID3D11InputLayout** pInputLayout);
+};

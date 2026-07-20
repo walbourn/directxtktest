@@ -35,8 +35,8 @@ namespace
     constexpr float SWAP_TIME = 1.f;
     constexpr float INTERACTIVE_TIME = 10.f;
 
-    constexpr float ortho_width = 6.f;
-    constexpr float ortho_height = 8.f;
+    constexpr float ortho_width = 8.f;
+    constexpr float ortho_height = 10.f;
 
     struct TestVertex
     {
@@ -444,6 +444,7 @@ void Game::CreateTestInputLayout(
     auto ipbr = dynamic_cast<PBREffect*>(effect);
     auto iskin = dynamic_cast<SkinnedEffect*>(effect);
     auto idbg = dynamic_cast<DebugEffect*>(effect);
+    auto inpr = dynamic_cast<NPREffect*>(effect);
 
     void const* shaderByteCode = nullptr;
     size_t byteCodeLength = 0;
@@ -478,6 +479,11 @@ void Game::CreateTestInputLayout(
         {
             idbg->SetBiasedVertexNormals(false);
             idbg->SetInstancingEnabled(false);
+        }
+        else if (inpr)
+        {
+            inpr->SetBiasedVertexNormals(false);
+            inpr->SetInstancingEnabled(false);
         }
 
         effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
@@ -520,6 +526,10 @@ void Game::CreateTestInputLayout(
         {
             idbg->SetBiasedVertexNormals(true);
         }
+        else if (inpr)
+        {
+            inpr->SetBiasedVertexNormals(true);
+        }
 
         effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
@@ -551,6 +561,11 @@ void Game::CreateTestInputLayout(
         {
             idbg->SetBiasedVertexNormals(false);
             idbg->SetInstancingEnabled(true);
+        }
+        else if (inpr)
+        {
+            inpr->SetBiasedVertexNormals(false);
+            inpr->SetInstancingEnabled(true);
         }
 
         effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
@@ -898,6 +913,28 @@ void Game::Render()
 
             y -= 1.f;
         }
+
+        // NPREffect (instanced)
+        {
+            auto it = m_nprInstanced.begin();
+            assert(it != m_nprInstanced.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                (*it)->Apply(context, XMMatrixTranslation(0, y, -1.f), m_view, m_projection, showCompressed);
+
+                context->DrawIndexedInstanced(m_indexCount, m_instanceCount, 0, 0, 0);
+
+                ++it;
+                if (it == m_nprInstanced.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_nprInstanced.cend());
+
+            y -= 1.f;
+        }
     }
     else
     {
@@ -1202,6 +1239,33 @@ void Game::Render()
             y -= 1.f;
         }
 
+        // NPREffect
+        {
+            auto it = m_npr.begin();
+            assert(it != m_npr.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_npr.cend())
+                        break;
+                }
+
+                if (it == m_npr.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_npr.cend());
+
+            y -= 1.f;
+        }
+
         // DGSLEffect
         if (!showCompressed)
         {
@@ -1229,7 +1293,7 @@ void Game::Render()
             // Make sure we drew all the effects
             assert(it == m_dgsl.cend());
 
-            // SkinnedDGSLEffect should be on same line...
+            y -= 1.f;
         }
 
         // SkinnedDGSLEffect
@@ -1240,7 +1304,7 @@ void Game::Render()
 
             for (; y > -ortho_height; y -= 1.f)
             {
-                for (float x = lastx + 1.f; x < ortho_width; x += 1.f)
+                for (float x = -ortho_width; x < ortho_width; x += 1.f)
                 {
                     (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection);
                     context->DrawIndexed(m_indexCount, 0, 0);
@@ -2566,6 +2630,171 @@ void Game::CreateDeviceDependentResources()
         effect->SetVertexColorEnabled(true);
     }));
 
+    //--- NPREffect ------------------------------------------------------------------------
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetVertexColorEnabled(true);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetVertexColorEnabled(true);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_cat.Get());
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_cat.Get());
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_cat.Get());
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_npr.emplace_back(std::make_unique<EffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_cat.Get());
+        effect->SetVertexColorEnabled(true);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Cel);
+        effect->SetVertexColorEnabled(true);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_Gooch);
+        effect->SetVertexColorEnabled(true);
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_cat.Get());
+        effect->SetVertexColorEnabled(true);
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_cat.Get());
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_nprInstanced.emplace_back(std::make_unique<InstancedEffectWithDecl<NPREffect>>(device, [=](NPREffect* effect)
+    {
+        effect->SetMode(NPREffect::Mode_MatCap);
+        effect->SetMatCap(m_cat.Get());
+        effect->SetTextureEnabled(true);
+        effect->SetTexture(m_cat.Get());
+        effect->SetVertexColorEnabled(true);
+    }));
+
     //--- DGSLEffect -----------------------------------------------------------------------
 
     // DGSLEffect
@@ -2743,12 +2972,14 @@ void Game::OnDeviceLost()
     m_pbr.clear();
     m_skinningPbr.clear();
     m_debug.clear();
+    m_npr.clear();
     m_dgsl.clear();
     m_dgslSkinned.clear();
 
     m_normalMapInstanced.clear();
     m_pbrInstanced.clear();
     m_debugInstanced.clear();
+    m_nprInstanced.clear();
 
     m_cat.Reset();
     m_cubemap.Reset();

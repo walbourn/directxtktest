@@ -164,6 +164,13 @@ private:
                 idbg->SetInstancingEnabled(false);
             }
 
+            auto inpr = dynamic_cast<NPREffect*>(&effect);
+            if (inpr)
+            {
+                inpr->SetBiasedVertexNormals(showCompressed);
+                inpr->SetInstancingEnabled(false);
+            }
+
             effect.Apply(context);
 
             context->IASetInputLayout((showCompressed) ? compressedInputLayout.Get() : inputLayout.Get());
@@ -213,6 +220,13 @@ private:
             {
                 idbg->SetBiasedVertexNormals(showCompressed);
                 idbg->SetInstancingEnabled(true);
+            }
+
+            auto inpr = dynamic_cast<NPREffect*>(&effect);
+            if (inpr)
+            {
+                inpr->SetBiasedVertexNormals(showCompressed);
+                inpr->SetInstancingEnabled(true);
             }
 
             effect.Apply(context);
@@ -270,12 +284,14 @@ private:
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::PBREffect>>> m_pbr;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::SkinnedPBREffect>>> m_skinningPbr;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::DebugEffect>>> m_debug;
+    std::vector<std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>> m_npr;
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::DGSLEffect>>> m_dgsl;
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::SkinnedDGSLEffect>>> m_dgslSkinned;
 
     std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::NormalMapEffect>>> m_normalMapInstanced;
     std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::PBREffect>>> m_pbrInstanced;
     std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::DebugEffect>>> m_debugInstanced;
+    std::vector<std::unique_ptr<InstancedEffectWithDecl<DirectX::NPREffect>>> m_nprInstanced;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_compressedVB;

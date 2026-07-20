@@ -102,6 +102,7 @@ extern _Success_(return) bool Test17(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test18(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test19(_In_ ID3D11Device *device);
 extern _Success_(return) bool Test20(_In_ ID3D11Device *device);
+extern _Success_(return) bool Test21(_In_ ID3D11Device *device);
 
 #ifdef TEST_AUDIO
 extern _Success_(return) bool TestA01(_In_ ID3D11Device *device);
@@ -124,6 +125,7 @@ const TestInfo g_Tests[] =
     { "DGSLEffect", Test14 },
     { "NormalMapEffect", Test11 },
     { "PBREffect", Test12 },
+    { "NPREffect", Test21 },
     { "Model", Test13 },
     { "DGSLModel", Test15 },
     { "GamePad", Test16 },
