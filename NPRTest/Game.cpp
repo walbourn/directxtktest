@@ -463,17 +463,17 @@ void Game::Render()
     };
 
     // Cel shading (4 bands) with skinning.
-    m_skinnedCelEffect->effect.SetBoneTransforms(bones, 4);
+    m_skinnedCelEffect->effect.SetBoneTransforms(bones, std::size(bones));
     m_skinnedCelEffect->Apply(context, world * XMMatrixTranslation(col6, row0, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Gooch effect with skinning.
-    m_skinnedGoochEffect->effect.SetBoneTransforms(bones, 4);
+    m_skinnedGoochEffect->effect.SetBoneTransforms(bones, std::size(bones));
     m_skinnedGoochEffect->Apply(context, world * XMMatrixTranslation(col6, row1, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
     // Matcap shading with skinning.
-    m_skinnedMatcapEffect->effect.SetBoneTransforms(bones, 4);
+    m_skinnedMatcapEffect->effect.SetBoneTransforms(bones, std::size(bones));
     m_skinnedMatcapEffect->Apply(context, world * XMMatrixTranslation(col6, row2, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
@@ -491,7 +491,7 @@ void Game::Render()
         bones[i] = XMMatrixScaling(scales[i], scales[i], scales[i]);
     }
 
-    m_skinnedCelEffect->effect.SetBoneTransforms(bones, 4);
+    m_skinnedCelEffect->effect.SetBoneTransforms(bones, std::size(bones));
     m_skinnedCelEffect->Apply(context, world * XMMatrixTranslation(col6, row3, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
@@ -509,7 +509,7 @@ void Game::Render()
         bones[i] = XMMatrixScaling(scales2[i], scales2[i], scales2[i]);
     }
 
-    m_skinnedCelEffect->effect.SetBoneTransforms(bones, 4);
+    m_skinnedCelEffect->effect.SetBoneTransforms(bones, std::size(bones));
     m_skinnedCelEffect->Apply(context, world * XMMatrixTranslation(col6, row4, 0), m_view, m_projection);
     context->DrawIndexed(m_indexCount, 0, 0);
 
