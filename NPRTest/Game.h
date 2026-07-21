@@ -148,6 +148,7 @@ private:
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTxNoSpecular;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTxNoRim;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_celEffectTxVc;
+    std::unique_ptr<EffectWithDecl<DirectX::SkinnedNPREffect>>      m_skinnedCelEffect;
 
     // Gooch shading (Mode_Gooch)
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffect;
@@ -159,19 +160,21 @@ private:
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTxNoSpecular;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTxNoRim;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_goochEffectTxVc;
+    std::unique_ptr<EffectWithDecl<DirectX::SkinnedNPREffect>>      m_skinnedGoochEffect;
 
     // MatCap shading (Mode_MatCap)
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_matcapEffect;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_matcapEffectVc;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_matcapEffectTx;
     std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>             m_matcapEffectTxVc;
+    std::unique_ptr<EffectWithDecl<DirectX::SkinnedNPREffect>>      m_skinnedMatcapEffect;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_vertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>    m_indexBuffer;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_reftxt;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_mapCapTxt1;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_mapCapTxt2;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_matCapTxt1;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_matCapTxt2;
 
     DirectX::SimpleMath::Matrix             m_view;
     DirectX::SimpleMath::Matrix             m_projection;
