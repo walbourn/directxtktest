@@ -353,6 +353,11 @@ void Game::Render()
             fog->SetFogEnabled(false);
     });
 
+        // NPR
+    local = XMMatrixTranslation(1.5f, row1, 0.f);
+    local = XMMatrixMultiply(world, local);
+    m_cupNPR->Draw(context, *m_states, local, m_view, m_projection);
+
         // Custom drawing
     local = XMMatrixRotationX(cos(time)) * XMMatrixTranslation(-5.f, row0, cos(time) * 2.f);
     for (const auto& mit : m_cup->meshes)
@@ -604,16 +609,28 @@ void Game::CreateDeviceDependentResources()
 
     m_fxFactory = std::make_unique<EffectFactory>(device);
 
+    m_fxFactoryNPR = std::make_unique<NPREffectFactory>(device);
+    m_fxFactoryNPR->SetMode(NPREffect::Mode_MatCap);
+
 #ifdef GAMMA_CORRECT_RENDERING
     m_fxFactory->EnableForceSRGB(true);
+    m_fxFactoryNPR->EnableForceSRGB(true);
     DDS_LOADER_FLAGS loadFlags = DDS_LOADER_FORCE_SRGB;
+    WIC_LOADER_FLAGS wicLoadFlags = WIC_LOADER_FORCE_SRGB;
 #else
     DDS_LOADER_FLAGS loadFlags = DDS_LOADER_DEFAULT;
+    WIC_LOADER_FLAGS wicLoadFlags = WIC_LOADER_DEFAULT;
 #endif
 
 #ifndef NORMALMAPS
     m_fxFactory->EnableNormalMapEffect(false);
 #endif
+
+    DX::ThrowIfFailed(CreateWICTextureFromFileEx(device, L"matcap.png",
+        0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, wicLoadFlags,
+        nullptr, m_matcap.ReleaseAndGetAddressOf()));
+
+    m_fxFactoryNPR->SetDefaultMatCap(m_matcap.Get());
 
     auto context = m_deviceResources->GetD3DDeviceContext();
 
@@ -624,13 +641,16 @@ void Game::CreateDeviceDependentResources()
 #endif
 
     // Wavefront OBJ
-#ifdef GAMMA_CORRECT_RENDERING
-    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, false, (ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise) | ModelLoader_MaterialColorsSRGB);
-    m_cupInst = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, true, (ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise) | ModelLoader_MaterialColorsSRGB);
-#else
-    m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, false, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
-    m_cupInst = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, true, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
-#endif
+    {
+        ModelLoaderFlags modelFlags = ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise;
+    #ifdef GAMMA_CORRECT_RENDERING
+        modelFlags |= ModelLoader_MaterialColorsSRGB;
+    #endif
+
+        m_cup = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, false, modelFlags);
+        m_cupInst = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactory, true, modelFlags);
+        m_cupNPR = CreateModelFromOBJ(device, context, L"cup._obj", *m_fxFactoryNPR, false, modelFlags);
+    }
 
     // VBO
     m_vbo = Model::CreateFromVBO(device, L"player_ship_a.vbo", nullptr, ccw ? ModelLoader_Clockwise : ModelLoader_CounterClockwise);
@@ -739,6 +759,7 @@ void Game::OnDeviceLost()
 
     m_cup.reset();
     m_cupInst.reset();
+    m_cupNPR.reset();
     m_cupMesh.reset();
     m_vbo.reset();
     m_vbo2.reset();
@@ -758,6 +779,7 @@ void Game::OnDeviceLost()
 
     m_defaultTex.Reset();
     m_cubemap.Reset();
+    m_matcap.Reset();
 }
 
 void Game::OnDeviceRestored()

@@ -109,6 +109,7 @@ private:
     std::shared_ptr<DirectX::EnvironmentMapEffect> m_effect;
 
     std::unique_ptr<DirectX::Model>         m_cup;
+    std::unique_ptr<DirectX::Model>         m_cupNPR;
     std::unique_ptr<DirectX::Model>         m_cupInst;
     std::unique_ptr<DirectX::Model>         m_cupMesh;
     std::unique_ptr<DirectX::Model>         m_vbo;
@@ -122,11 +123,13 @@ private:
     std::unique_ptr<DirectX::Model>         m_lmap;
     std::unique_ptr<DirectX::Model>         m_nmap;
 
-    std::unique_ptr<DirectX::EffectFactory> m_abstractFXFactory;
-    std::unique_ptr<DirectX::EffectFactory> m_fxFactory;
+    std::unique_ptr<DirectX::EffectFactory>     m_abstractFXFactory;
+    std::unique_ptr<DirectX::EffectFactory>     m_fxFactory;
+    std::unique_ptr<DirectX::NPREffectFactory>  m_fxFactoryNPR;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_defaultTex;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubemap;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_matcap;
 
     DirectX::SimpleMath::Matrix             m_view;
     DirectX::SimpleMath::Matrix             m_projection;
