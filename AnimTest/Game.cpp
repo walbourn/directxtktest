@@ -255,6 +255,24 @@ void Game::Render()
         nbones, bones.get(),
         local, m_view, m_projection);
 
+    // Teapot (direct-mapped bones) with NPR effects.
+    m_teapotNPR->UpdateEffects([&](IEffect* effect)
+    {
+        auto skinnedEffect = dynamic_cast<IEffectSkinning*>(effect);
+        if (skinnedEffect)
+            skinnedEffect->ResetBoneTransforms();
+    });
+    local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-4.f, row0, 0.f));
+    m_teapotNPR->Draw(context, *m_states, local, m_view, m_projection);
+
+    nbones = static_cast<uint32_t>(m_teapotNPR->bones.size());
+    m_teapotAnim.Apply(*m_teapotNPR, m_teapotNPR->bones.size(), bones.get());
+
+    local = XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(-4.f, row1, 0.f));
+    m_teapotNPR->DrawSkinned(context, *m_states,
+        nbones, bones.get(),
+        local, m_view, m_projection);
+
     // Draw SDKMESH models (bone influences)
     m_soldier->UpdateEffects([&](IEffect* effect)
     {
@@ -394,9 +412,11 @@ void Game::CreateDeviceDependentResources()
     m_states = std::make_unique<CommonStates>(device);
 
     m_fxFactory = std::make_unique<EffectFactory>(device);
+    m_fxNPRFactory = std::make_unique<NPREffectFactory>(device);
 
 #ifdef GAMMA_CORRECT_RENDERING
     m_fxFactory->EnableForceSRGB(true);
+    m_fxNPRFactory->EnableForceSRGB(true);
 #endif
 
 #ifdef LH_COORDS
@@ -411,6 +431,7 @@ void Game::CreateDeviceDependentResources()
 
     size_t animsOffset;
     m_teapot = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxFactory, flags, &animsOffset);
+    m_teapotNPR = Model::CreateFromCMO(device, L"teapot.cmo", *m_fxNPRFactory, flags, &animsOffset);
 
     DumpBones(m_teapot->bones, "teapot.cmo");
 
@@ -481,11 +502,13 @@ void Game::OnDeviceLost()
     m_states.reset();
 
     m_teapot.reset();
+    m_teapotNPR.reset();
     m_soldier.reset();
     m_soldierDiff.reset();
     m_tank.reset();
 
     m_fxFactory.reset();
+    m_fxNPRFactory.reset();
 }
 
 void Game::OnDeviceRestored()

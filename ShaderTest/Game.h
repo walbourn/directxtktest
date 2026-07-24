@@ -285,6 +285,7 @@ private:
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::SkinnedPBREffect>>> m_skinningPbr;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::DebugEffect>>> m_debug;
     std::vector<std::unique_ptr<EffectWithDecl<DirectX::NPREffect>>> m_npr;
+    std::vector<std::unique_ptr<EffectWithDecl<DirectX::SkinnedNPREffect>>> m_skinningNpr;
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::DGSLEffect>>> m_dgsl;
     std::vector<std::unique_ptr<DGSLEffectWithDecl<DirectX::SkinnedDGSLEffect>>> m_dgslSkinned;
 
