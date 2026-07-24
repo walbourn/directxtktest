@@ -71,10 +71,11 @@ Game::Game() noexcept(false) :
 #else
     constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 #endif
+    constexpr DXGI_FORMAT c_DepthFormat = DXGI_FORMAT_D32_FLOAT;
 
 #ifdef XBOX
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2,
+        c_RenderFormat, c_DepthFormat, 2,
         DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
         | DX::DeviceResources::c_FastSemantics
@@ -82,11 +83,11 @@ Game::Game() noexcept(false) :
         );
 #elif defined(UWP)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3,
+        c_RenderFormat, c_DepthFormat, 2, D3D_FEATURE_LEVEL_10_0,
         DX::DeviceResources::c_Enable4K_Xbox | DX::DeviceResources::c_EnableQHD_Xbox
         );
 #else
-    m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat);
+    m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat, c_DepthFormat);
 #endif
 
 #ifdef LOSTDEVICE
