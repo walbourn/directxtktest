@@ -1,0 +1,80 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Audio/">
+    <Project Path="Audio3DTest/Audio3DTest_Windows10.vcxproj" Id="64c17049-09c8-4e1f-9ef7-310786433a7d">
+      <Deploy />
+    </Project>
+    <Project Path="SimpleAudioTest/SimpleAudioTest_Windows10.vcxproj" Id="721c6820-8cdd-464e-b5b6-a53de5c6d17c">
+      <Deploy />
+    </Project>
+  </Folder>
+  <Folder Name="/Graphics/">
+    <Project Path="AnimTest/AnimTest_Windows10.vcxproj" Id="ec92b77e-5a93-4fa4-8847-682953172b0c">
+      <Deploy />
+    </Project>
+    <Project Path="D3D11Test/D3D11Test_Windows10.vcxproj" Id="70aa9c7e-9ef9-40bd-9490-29d395fac820">
+      <Deploy />
+    </Project>
+    <Project Path="DGSLTest/DGSLTest_Windows10.vcxproj" Id="03aad255-ca20-4fff-aadf-95d33c9a7cff">
+      <Deploy />
+    </Project>
+    <Project Path="EffectsTest/EffectsTest_Windows10.vcxproj" Id="0117d5a4-db90-41b5-9693-25920377c39e">
+      <Deploy />
+    </Project>
+    <Project Path="HDRTest/HDRTest_Windows10.vcxproj" Id="e527e4bd-665a-4732-8fd8-65574df0c0b2">
+      <Deploy />
+    </Project>
+    <Project Path="LoadTest/LoadTest_Windows10.vcxproj" Id="933208df-4391-4802-a006-e608d5eddfd8">
+      <Deploy />
+    </Project>
+    <Project Path="ModelTest/ModelTest_Windows10.vcxproj" Id="d5ea0b06-aee8-494c-a52b-9156db5e2f3c">
+      <Deploy />
+    </Project>
+    <Project Path="MSAATest/MSAATest_Windows10.vcxproj" Id="ae54bed4-b9cd-4790-ba4c-7384058db270">
+      <Deploy />
+    </Project>
+    <Project Path="NPRTest/NPRTest_Windows10.vcxproj" Id="bf9037f5-c9dd-414d-901e-65c5d03842f1">
+      <Deploy />
+    </Project>
+    <Project Path="PBRModelTest/PBRModelTest_Windows10.vcxproj" Id="97219a66-9c70-4509-9b43-78584d19b34d">
+      <Deploy />
+    </Project>
+    <Project Path="PBRTest/PBRTest_Windows10.vcxproj" Id="b9cbeaba-7973-4e59-a57b-2827a1228c6d">
+      <Deploy />
+    </Project>
+    <Project Path="PostProcessTest/PostProcessTest_Windows10.vcxproj" Id="12a25c83-2ba6-49cc-9dcb-074b410eb6c4">
+      <Deploy />
+    </Project>
+    <Project Path="PrimitivesTest/PrimitivesTest_Windows10.vcxproj" Id="f2ed7772-f723-4546-80e4-a25166404d62">
+      <Deploy />
+    </Project>
+    <Project Path="ShaderTest/ShaderTest_Windows10.vcxproj" Id="4822319b-e153-4623-8aaa-95a36305a7ab">
+      <Deploy />
+    </Project>
+    <Project Path="SpriteBatchTest/SpriteBatchTest_Windows10.vcxproj" Id="58dae92b-4a58-4db1-a691-d0bf21ada2f5">
+      <Deploy />
+    </Project>
+    <Project Path="SpriteFontTest/SpriteFontTest_Windows10.vcxproj" Id="c553820a-2d56-45e8-86cc-47e920d1b595">
+      <Deploy />
+    </Project>
+  </Folder>
+  <Folder Name="/Input/">
+    <Project Path="GamePadTest/GamePadTest_Windows10.vcxproj" Id="513a7b5a-05ce-4811-981c-646708fb7bbb">
+      <Deploy />
+    </Project>
+    <Project Path="KeyboardTest/KeyboardTest_Windows10.vcxproj" Id="1bdc589f-054b-40b1-8d94-4d14b59dec95">
+      <Deploy />
+    </Project>
+    <Project Path="MouseTest/MouseTest_Windows10.vcxproj" Id="8a103f71-2471-490e-9495-cdd5726b18d2">
+      <Deploy />
+    </Project>
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../.editorconfig" />
+  </Folder>
+  <Project Path="../DirectXTK_Windows10_2022.vcxproj" Id="f4776924-619c-42c7-88b2-82c947ccc9e7" />
+</Solution>
