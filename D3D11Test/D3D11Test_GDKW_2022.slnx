@@ -7,5 +7,5 @@
     <Platform Name="x64" />
   </Configurations>
   <Project Path="../../DirectXTK_GDKW_2022.vcxproj" Id="26be66bd-6e77-43ba-b363-725f9fc827c1" />
-  <Project Path="D3D11Test_GDKW_2022.vcxproj" Id="a66c50ca-7194-4f0d-80d0-9bb70c886170" />
+  <Project DefaultStartup="true" Path="D3D11Test_GDKW_2022.vcxproj" Id="a66c50ca-7194-4f0d-80d0-9bb70c886170" />
 </Solution>

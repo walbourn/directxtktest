@@ -7,5 +7,5 @@
     <Platform Name="x64" />
   </Configurations>
   <Project Path="../../DirectXTK_GDKW_2022.vcxproj" Id="26be66bd-6e77-43ba-b363-725f9fc827c1" />
-  <Project Path="MouseTest_GDKW_2022.vcxproj" Id="0d34d251-89e7-4888-addf-895c9fec353c" />
+  <Project DefaultStartup="true" Path="MouseTest_GDKW_2022.vcxproj" Id="0d34d251-89e7-4888-addf-895c9fec353c" />
 </Solution>

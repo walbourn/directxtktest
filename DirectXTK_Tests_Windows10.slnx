@@ -16,7 +16,7 @@
     <Project Path="AnimTest/AnimTest_Windows10.vcxproj" Id="ec92b77e-5a93-4fa4-8847-682953172b0c">
       <Deploy />
     </Project>
-    <Project Path="D3D11Test/D3D11Test_Windows10.vcxproj" Id="70aa9c7e-9ef9-40bd-9490-29d395fac820">
+    <Project DefaultStartup="true" Path="D3D11Test/D3D11Test_Windows10.vcxproj" Id="70aa9c7e-9ef9-40bd-9490-29d395fac820">
       <Deploy />
     </Project>
     <Project Path="DGSLTest/DGSLTest_Windows10.vcxproj" Id="03aad255-ca20-4fff-aadf-95d33c9a7cff">
