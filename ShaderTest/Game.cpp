@@ -1240,13 +1240,15 @@ void Game::Render()
         }
 
         // NPREffect
+        lastx = 0.f;
         {
             auto it = m_npr.begin();
             assert(it != m_npr.end());
 
             for (; y > -ortho_height; y -= 1.f)
             {
-                for (float x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
+                float x;
+                for (x = -ortho_width + 0.5f; x < ortho_width; x += 1.f)
                 {
                     (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
                     context->DrawIndexed(m_indexCount, 0, 0);
@@ -1255,6 +1257,7 @@ void Game::Render()
                     if (it == m_npr.cend())
                         break;
                 }
+                lastx = x;
 
                 if (it == m_npr.cend())
                     break;
@@ -1262,6 +1265,33 @@ void Game::Render()
 
             // Make sure we drew all the effects
             assert(it == m_npr.cend());
+
+            // SkinnedNPREffect should be on same line...
+        }
+
+        // SkinnedNPREffect
+        {
+            auto it = m_skinningNpr.begin();
+            assert(it != m_skinningNpr.end());
+
+            for (; y > -ortho_height; y -= 1.f)
+            {
+                for (float x = lastx + 1.f; x < ortho_width; x += 1.f)
+                {
+                    (*it)->Apply(context, world * XMMatrixTranslation(x, y, -1.f), m_view, m_projection, showCompressed);
+                    context->DrawIndexed(m_indexCount, 0, 0);
+
+                    ++it;
+                    if (it == m_skinningNpr.cend())
+                        break;
+                }
+
+                if (it == m_skinningNpr.cend())
+                    break;
+            }
+
+            // Make sure we drew all the effects
+            assert(it == m_skinningNpr.cend());
 
             y -= 1.f;
         }
@@ -2435,39 +2465,39 @@ void Game::CreateDeviceDependentResources()
 
     // SkinnedNormalMapEffect (no specular)
     m_skinningNormalMap.emplace_back(std::make_unique<EffectWithDecl<SkinnedNormalMapEffect>>(device, [=](SkinnedNormalMapEffect* effect)
-        {
-            effect->EnableDefaultLighting();
-            effect->SetTexture(m_brickDiffuse.Get());
-            effect->SetNormalTexture(m_brickNormal.Get());
-        }));
+    {
+        effect->EnableDefaultLighting();
+        effect->SetTexture(m_brickDiffuse.Get());
+        effect->SetNormalTexture(m_brickNormal.Get());
+    }));
 
     m_skinningNormalMap.emplace_back(std::make_unique<EffectWithDecl<SkinnedNormalMapEffect>>(device, [=](SkinnedNormalMapEffect* effect)
-        {
-            effect->EnableDefaultLighting();
-            effect->SetTexture(m_brickDiffuse.Get());
-            effect->SetNormalTexture(m_brickNormal.Get());
-            effect->SetFogEnabled(true);
-            effect->SetFogColor(Colors::Black);
-        }));
+    {
+        effect->EnableDefaultLighting();
+        effect->SetTexture(m_brickDiffuse.Get());
+        effect->SetNormalTexture(m_brickNormal.Get());
+        effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
+    }));
 
     // SkinnedNormalMapEffect (specular)
     m_skinningNormalMap.emplace_back(std::make_unique<EffectWithDecl<SkinnedNormalMapEffect>>(device, [=](SkinnedNormalMapEffect* effect)
-        {
-            effect->EnableDefaultLighting();
-            effect->SetTexture(m_brickDiffuse.Get());
-            effect->SetNormalTexture(m_brickNormal.Get());
-            effect->SetSpecularTexture(m_brickSpecular.Get());
-        }));
+    {
+        effect->EnableDefaultLighting();
+        effect->SetTexture(m_brickDiffuse.Get());
+        effect->SetNormalTexture(m_brickNormal.Get());
+        effect->SetSpecularTexture(m_brickSpecular.Get());
+    }));
 
     m_skinningNormalMap.emplace_back(std::make_unique<EffectWithDecl<SkinnedNormalMapEffect>>(device, [=](SkinnedNormalMapEffect* effect)
-        {
-            effect->EnableDefaultLighting();
-            effect->SetTexture(m_brickDiffuse.Get());
-            effect->SetNormalTexture(m_brickNormal.Get());
-            effect->SetSpecularTexture(m_brickSpecular.Get());
-            effect->SetFogEnabled(true);
-            effect->SetFogColor(Colors::Black);
-        }));
+    {
+        effect->EnableDefaultLighting();
+        effect->SetTexture(m_brickDiffuse.Get());
+        effect->SetNormalTexture(m_brickNormal.Get());
+        effect->SetSpecularTexture(m_brickSpecular.Get());
+        effect->SetFogEnabled(true);
+        effect->SetFogColor(Colors::Black);
+    }));
 
     //--- PBREffect ------------------------------------------------------------------------
     if (m_deviceResources->GetDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
@@ -2552,30 +2582,30 @@ void Game::CreateDeviceDependentResources()
         m_radianceIBL->GetDesc(&desc);
 
         m_skinningPbr.emplace_back(std::make_unique<EffectWithDecl<SkinnedPBREffect>>(device, [=](SkinnedPBREffect* effect)
-            {
-                effect->EnableDefaultLighting();
-                effect->SetConstantAlbedo(Colors::Cyan);
-                effect->SetConstantMetallic(0.5f);
-                effect->SetConstantRoughness(0.75f);
-                effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
-            }));
+        {
+            effect->EnableDefaultLighting();
+            effect->SetConstantAlbedo(Colors::Cyan);
+            effect->SetConstantMetallic(0.5f);
+            effect->SetConstantRoughness(0.75f);
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
+        }));
 
         // SkinnedPBREffect (textured)
         m_skinningPbr.emplace_back(std::make_unique<EffectWithDecl<SkinnedPBREffect>>(device, [=](SkinnedPBREffect* effect)
-            {
-                effect->EnableDefaultLighting();
-                effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-                effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
-            }));
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
+        }));
 
         // SkinnedPBREffect (emissive)
         m_skinningPbr.emplace_back(std::make_unique<EffectWithDecl<SkinnedPBREffect>>(device, [=](SkinnedPBREffect* effect)
-            {
-                effect->EnableDefaultLighting();
-                effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
-                effect->SetEmissiveTexture(m_pbrEmissive.Get());
-                effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
-            }));
+        {
+            effect->EnableDefaultLighting();
+            effect->SetSurfaceTextures(m_pbrAlbedo.Get(), m_pbrNormal.Get(), m_pbrRMA.Get());
+            effect->SetEmissiveTexture(m_pbrEmissive.Get());
+            effect->SetIBLTextures(m_radianceIBL.Get(), static_cast<int>(desc.TextureCube.MipLevels), m_irradianceIBL.Get());
+        }));
     }
 
     //--- DebugEffect ----------------------------------------------------------------------
@@ -2795,6 +2825,26 @@ void Game::CreateDeviceDependentResources()
         effect->SetVertexColorEnabled(true);
     }));
 
+    //--- SkinnedNPREffect ------------------------------------------------------------------
+    m_skinningNpr.emplace_back(std::make_unique<EffectWithDecl<SkinnedNPREffect>>(device, [=](SkinnedNPREffect* effect)
+    {
+        effect->SetMode(SkinnedNPREffect::Mode_Cel);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_skinningNpr.emplace_back(std::make_unique<EffectWithDecl<SkinnedNPREffect>>(device, [=](SkinnedNPREffect* effect)
+    {
+        effect->SetMode(SkinnedNPREffect::Mode_Gooch);
+        effect->SetTexture(m_cat.Get());
+    }));
+
+    m_skinningNpr.emplace_back(std::make_unique<EffectWithDecl<SkinnedNPREffect>>(device, [=](SkinnedNPREffect* effect)
+    {
+        effect->SetMode(SkinnedNPREffect::Mode_MatCap);
+        effect->SetMatCap(m_cat.Get());
+        effect->SetTexture(m_cat.Get());
+    }));
+
     //--- DGSLEffect -----------------------------------------------------------------------
 
     // DGSLEffect
@@ -2973,6 +3023,7 @@ void Game::OnDeviceLost()
     m_skinningPbr.clear();
     m_debug.clear();
     m_npr.clear();
+    m_skinningNpr.clear();
     m_dgsl.clear();
     m_dgslSkinned.clear();
 

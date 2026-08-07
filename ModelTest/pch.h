@@ -104,6 +104,7 @@
 #include "Mouse.h"
 #include "SimpleMath.h"
 #include "VertexTypes.h"
+#include "WICTextureLoader.h"
 
 namespace DX
 {

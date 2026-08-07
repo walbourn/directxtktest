@@ -108,8 +108,10 @@ private:
     std::unique_ptr<DirectX::Model>         m_soldier;
     std::unique_ptr<DirectX::Model>         m_soldierDiff;
     std::unique_ptr<DirectX::Model>         m_tank;
+    std::unique_ptr<DirectX::Model>         m_teapotNPR;
 
-    std::unique_ptr<DirectX::EffectFactory> m_fxFactory;
+    std::unique_ptr<DirectX::EffectFactory>     m_fxFactory;
+    std::unique_ptr<DirectX::NPREffectFactory>  m_fxNPRFactory;
 
     DirectX::SimpleMath::Matrix             m_view;
     DirectX::SimpleMath::Matrix             m_projection;
