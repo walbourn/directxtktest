@@ -46,10 +46,11 @@ Game::Game() noexcept(false)
 #else
     constexpr DXGI_FORMAT c_RenderFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 #endif
+    constexpr DXGI_FORMAT c_DepthFormat = DXGI_FORMAT_D32_FLOAT;
 
 #ifdef XBOX
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        c_RenderFormat, DXGI_FORMAT_D32_FLOAT, 2,
+        c_RenderFormat, c_DepthFormat, 2,
         DX::DeviceResources::c_Enable4K_UHD
 #ifdef USE_FAST_SEMANTICS
         | DX::DeviceResources::c_FastSemantics
@@ -57,11 +58,11 @@ Game::Game() noexcept(false)
         );
 #elif defined(UWP)
     m_deviceResources = std::make_unique<DX::DeviceResources>(
-        c_RenderFormat, DXGI_FORMAT_D24_UNORM_S8_UINT, 2, D3D_FEATURE_LEVEL_9_3,
+        c_RenderFormat, c_DepthFormat, 2, D3D_FEATURE_LEVEL_10_0,
         DX::DeviceResources::c_Enable4K_Xbox | DX::DeviceResources::c_EnableQHD_Xbox
         );
 #else
-    m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat);
+    m_deviceResources = std::make_unique<DX::DeviceResources>(c_RenderFormat, c_DepthFormat);
 #endif
 
 #ifdef LOSTDEVICE
@@ -103,9 +104,9 @@ void Game::Initialize(
 #ifdef _DEBUG
     switch (m_deviceResources->GetDeviceFeatureLevel())
     {
-    case D3D_FEATURE_LEVEL_9_1: OutputDebugStringA("INFO: Direct3D Hardware Feature level 9.1\n"); break;
-    case D3D_FEATURE_LEVEL_9_2: OutputDebugStringA("INFO: Direct3D Hardware Feature level 9.2\n"); break;
-    case D3D_FEATURE_LEVEL_9_3: OutputDebugStringA("INFO: Direct3D Hardware Feature level 9.3\n"); break;
+    case D3D_FEATURE_LEVEL_9_1: OutputDebugStringA("INFO: Direct3D Hardware Feature level 9.1 [NOT SUPPORTED]\n"); break;
+    case D3D_FEATURE_LEVEL_9_2: OutputDebugStringA("INFO: Direct3D Hardware Feature level 9.2 [NOT SUPPORTED]\n"); break;
+    case D3D_FEATURE_LEVEL_9_3: OutputDebugStringA("INFO: Direct3D Hardware Feature level 9.3 [NOT SUPPORTED]\n"); break;
     case D3D_FEATURE_LEVEL_10_0: OutputDebugStringA("INFO: Direct3D Hardware Feature level 10.0\n"); break;
     case D3D_FEATURE_LEVEL_10_1: OutputDebugStringA("INFO: Direct3D Hardware Feature level 10.1\n"); break;
     case D3D_FEATURE_LEVEL_11_0: OutputDebugStringA("INFO: Direct3D Hardware Feature level 11.0\n"); break;
