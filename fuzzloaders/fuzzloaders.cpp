@@ -43,7 +43,7 @@
 #include "Effects.h"
 #include "Model.h"
 
-#include <wrl\client.h>
+#include <wrl/client.h>
 
 #define TOOL_VERSION 0
 #include "CmdLineHelpers.h"
